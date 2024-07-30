@@ -18,7 +18,7 @@ namespace sm {
     class PostProcessingStep {
     public:
         PostProcessingStep(std::shared_ptr<GlFramebuffer> framebuffer, std::shared_ptr<GlShader> shader) noexcept
-            : framebuffer(framebuffer), shader(shader) {}
+            : m_framebuffer(framebuffer), m_shader(shader) {}
         virtual ~PostProcessingStep() = default;
 
         PostProcessingStep(const PostProcessingStep&) noexcept = default;
@@ -30,8 +30,8 @@ namespace sm {
 
         static void bind_texture(unsigned int texture, int unit) noexcept;
     protected:
-        std::shared_ptr<GlFramebuffer> framebuffer;
-        std::shared_ptr<GlShader> shader;
+        std::shared_ptr<GlFramebuffer> m_framebuffer;
+        std::shared_ptr<GlShader> m_shader;
 
         friend class internal::Renderer;
     };

@@ -5,7 +5,7 @@
 
 namespace sm {
     MusicTrack::MusicTrack(std::shared_ptr<SoundData> data)
-        : buffer(std::make_unique<AlBuffer>(data)) {
+        : m_buffer(std::make_unique<AlBuffer>(data)) {
         if (data->get_channels() != 2) {
             LOG_WARNING("Music track is not stereo");
         }

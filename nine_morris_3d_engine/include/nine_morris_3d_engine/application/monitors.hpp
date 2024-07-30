@@ -17,8 +17,8 @@ namespace sm {
         const char* get_name(std::size_t index) const;
         std::size_t get_count() const noexcept;
     private:
-        GLFWmonitor** monitors {};
-        std::size_t count {};
+        GLFWmonitor** m_monitors {};
+        std::size_t m_count {};
 
         friend class internal::Window;
     };

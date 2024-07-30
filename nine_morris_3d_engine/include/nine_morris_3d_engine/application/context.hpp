@@ -77,22 +77,22 @@ namespace sm {
 
         // Events
         template<typename E, auto F, typename... T>
-        void connect_event(T&&... value_or_instance) { evt.connect<E, F>(value_or_instance...); }
+        void connect_event(T&&... value_or_instance) { m_evt.connect<E, F>(value_or_instance...); }
 
         template<typename E, auto F, typename... T>
-        void disconnect_event(T&&... value_or_instance) { evt.disconnect<E, F>(value_or_instance...); }
+        void disconnect_event(T&&... value_or_instance) { m_evt.disconnect<E, F>(value_or_instance...); }
 
         template<typename T>
-        void disconnect_events(T& value_or_instance) { evt.disconnect(value_or_instance); }
+        void disconnect_events(T& value_or_instance) { m_evt.disconnect(value_or_instance); }
 
         template<typename T>
-        void disconnect_events(T* value_or_instance) { evt.disconnect(value_or_instance); }
+        void disconnect_events(T* value_or_instance) { m_evt.disconnect(value_or_instance); }
 
         template<typename E, typename... Args>
-        void enqueue_event(Args&&... args) { evt.enqueue<E>(std::forward<Args>(args)...); }
+        void enqueue_event(Args&&... args) { m_evt.enqueue<E>(std::forward<Args>(args)...); }
 
         template<typename E>
-        void clear_events() { evt.clear<E>(); }
+        void clear_events() { m_evt.clear<E>(); }
 
         // Window
         int get_window_width() const noexcept;
@@ -172,12 +172,12 @@ namespace sm {
 
         template<typename T>
         T& global() {
-            return std::any_cast<T&>(global_data);
+            return std::any_cast<T&>(m_global_data);
         }
 
         template<typename T>
         T& user() noexcept {
-            return *static_cast<T*>(user_data);
+            return *static_cast<T*>(m_user_data);
         }
 
         bool running {true};
@@ -185,28 +185,28 @@ namespace sm {
     private:
         // The order of these members matters
 
-        internal::FileSystem fs;
-        internal::Logging log;
-        internal::ShaderLibrary shd;
-        internal::EventDispatcher evt;
-        internal::Window win;
-        internal::Renderer rnd;
-        internal::OpenAlContext snd;
-        internal::MusicPlayer mus;
-        internal::TaskManager tsk;
-        internal::Input inp;
-        internal::Scene scn;
-        internal::ResourcesCache res;
+        internal::FileSystem m_fs;
+        internal::Logging m_log;
+        internal::ShaderLibrary m_shd;
+        internal::EventDispatcher m_evt;
+        internal::Window m_win;
+        internal::Renderer m_rnd;
+        internal::OpenAlContext m_snd;
+        internal::MusicPlayer m_mus;
+        internal::TaskManager m_tsk;
+        internal::Input m_inp;
+        internal::Scene m_scn;
+        internal::ResourcesCache m_res;
 #ifndef SM_BUILD_DISTRIBUTION
-        internal::DebugUi dbg;
+        internal::DebugUi m_dbg;
 #endif
 
-        float delta {};
-        float fps {};
+        float m_delta {};
+        float m_fps {};
 
-        std::any global_data;
-        void* user_data {};  // Arbitrary data defined by the user
-        Application* application {};
+        std::any m_global_data;
+        void* m_user_data {};  // Arbitrary data defined by the user
+        Application* m_application {};
 
         friend class Application;
         friend class internal::DebugUi;

@@ -57,15 +57,15 @@ namespace sm {
         static bool check_compilation(unsigned int shader, unsigned int type);
         bool check_linking(unsigned int program) const;
 
-        unsigned int program {};
+        unsigned int m_program {};
 
         // Uniforms cache
-        std::unordered_map<Id, int, Hash> cache;
+        std::unordered_map<Id, int, Hash> m_cache;
 
         // Data from introspection; needed by renderer
-        std::vector<UniformBlockSpecification> uniform_blocks;
+        std::vector<UniformBlockSpecification> m_uniform_blocks;
 
-        std::vector<std::shared_ptr<GlUniformBuffer>> uniform_buffers;
+        std::vector<std::shared_ptr<GlUniformBuffer>> m_uniform_buffers;
 
         friend class internal::Renderer;
     };

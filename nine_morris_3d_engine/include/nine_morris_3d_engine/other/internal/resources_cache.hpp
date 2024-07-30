@@ -23,19 +23,19 @@ namespace sm::internal {
     class LockedCache {
     public:
         resmanager::Cache<T>& operator*() {
-            std::lock_guard<std::mutex> lock {mutex};
+            std::lock_guard<std::mutex> lock {m_mutex};
 
-            return cache;
+            return m_cache;
         }
 
         resmanager::Cache<T>* operator->() {
-            std::lock_guard<std::mutex> lock {mutex};
+            std::lock_guard<std::mutex> lock {m_mutex};
 
-            return &cache;
+            return &m_cache;
         }
     private:
-        resmanager::Cache<T> cache;
-        std::mutex mutex;
+        resmanager::Cache<T> m_cache;
+        std::mutex m_mutex;
     };
 
     // Global cache of resources

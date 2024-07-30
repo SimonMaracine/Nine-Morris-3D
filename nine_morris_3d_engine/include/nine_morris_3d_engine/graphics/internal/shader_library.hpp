@@ -25,6 +25,6 @@ namespace sm::internal {
         static std::string get_include_argument(const std::string& string);
         static std::size_t get_line(std::string::const_iterator begin, std::string::const_iterator end);
 
-        std::unordered_map<std::string, std::string> include_shader_sources;
+        std::unordered_map<std::string, std::string> m_include_shader_sources;
     };
 }

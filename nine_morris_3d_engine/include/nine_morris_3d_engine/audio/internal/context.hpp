@@ -16,9 +16,9 @@ namespace sm::internal {
         OpenAlContext(OpenAlContext&&) = delete;
         OpenAlContext& operator=(OpenAlContext&&) = delete;
     private:
-        bool create {};
+        bool m_create {};
 
-        ALCdevice* device {};
-        ALCcontext* context {};
+        ALCdevice* m_device {};
+        ALCcontext* m_context {};
     };
 }

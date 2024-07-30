@@ -35,10 +35,10 @@ namespace sm {
         // Add scenes to the application before calling run()
         template<typename S>
         void add_scene() {
-            scene_meta_scenes.push_back({
+            m_scene_meta_scenes.push_back({
                 Id(S::static_name()),
                 [this]() {
-                    return std::make_unique<S>(ctx);
+                    return std::make_unique<S>(m_ctx);
                 },
                 nullptr
             });
@@ -47,11 +47,8 @@ namespace sm {
         // Setup a struct that is shared across all scenes
         template<typename T>
         void set_global_data() {
-            ctx.global_data.emplace<T>();
+            m_ctx.m_global_data.emplace<T>();
         }
-
-        // API accessible to the user
-        Ctx ctx;
     private:
         struct MetaScene {
             Id id;
@@ -72,25 +69,28 @@ namespace sm {
         void on_window_resized(const WindowResizedEvent& event);
         void on_window_iconified(const WindowIconifiedEvent& event) noexcept;
 
-        std::vector<MetaScene> scene_meta_scenes;
-        MetaScene* scene_current {};
-        MetaScene* scene_next {};
-        bool scene_clear_resources {};
+        // API accessible to the user
+        Ctx m_ctx;
+
+        std::vector<MetaScene> m_scene_meta_scenes;
+        MetaScene* m_scene_current {};
+        MetaScene* m_scene_next {};
+        bool m_scene_clear_resources {};
 
         // Keep track of window state to skip rendering
-        bool minimized {false};
+        bool m_minimized {false};
 
         // Clock variables
         struct {
             double previous_seconds {};
             double total_time {};
             int frame_count {};
-        } frame_counter;
+        } m_frame_counter;
 
         struct {
             double previous_seconds {};
             double total_time {};
-        } fixed_update;
+        } m_fixed_update;
 
         friend class ApplicationScene;
         friend class Window;

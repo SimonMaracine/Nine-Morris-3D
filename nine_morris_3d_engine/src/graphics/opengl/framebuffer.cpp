@@ -19,10 +19,10 @@ namespace sm {
         return multisampled ? GL_TEXTURE_2D_MULTISAMPLE : GL_TEXTURE_2D;
     }
 
-    static bool depth_attachment_present(const FramebufferSpecification& specification) noexcept {
+    static bool depth_attachment_present(const FramebufferSpecification& m_specification) noexcept {
         return (
-            specification.depth_attachment.format != AttachmentFormat::None &&
-            specification.depth_attachment.type != AttachmentType::None
+            m_specification.depth_attachment.format != AttachmentFormat::None &&
+            m_specification.depth_attachment.type != AttachmentType::None
         );
     }
 
@@ -173,65 +173,65 @@ namespace sm {
         return message;
     }
 
-    GlFramebuffer::GlFramebuffer(const FramebufferSpecification& specification)
-        : specification(specification) {
-        assert(specification.samples == 1 || specification.samples == 2 || specification.samples == 4);
+    GlFramebuffer::GlFramebuffer(const FramebufferSpecification& m_specification)
+        : m_specification(m_specification) {
+        assert(m_specification.samples == 1 || m_specification.samples == 2 || m_specification.samples == 4);
 
-        if (specification.white_border_depth_texture) {
-            assert(specification.depth_attachment.format != AttachmentFormat::None);
-            assert(specification.depth_attachment.type == AttachmentType::Texture);
-            assert(specification.samples == 1);
+        if (m_specification.white_border_depth_texture) {
+            assert(m_specification.m_depth_attachment.format != AttachmentFormat::None);
+            assert(m_specification.m_depth_attachment.type == AttachmentType::Texture);
+            assert(m_specification.samples == 1);
         }
 
-        if (specification.comparison_mode_depth_texture) {
-            assert(specification.depth_attachment.format != AttachmentFormat::None);
-            assert(specification.depth_attachment.type == AttachmentType::Texture);
-            assert(specification.samples == 1);
+        if (m_specification.comparison_mode_depth_texture) {
+            assert(m_specification.m_depth_attachment.format != AttachmentFormat::None);
+            assert(m_specification.m_depth_attachment.type == AttachmentType::Texture);
+            assert(m_specification.samples == 1);
         }
 
-        assert(specification.width > 0 && specification.height > 0);
+        assert(m_specification.width > 0 && m_specification.height > 0);
 
         build();
 
-        LOG_DEBUG("Created GL framebuffer {}", framebuffer);
+        LOG_DEBUG("Created GL framebuffer {}", m_framebuffer);
     }
 
     GlFramebuffer::~GlFramebuffer() {
-        for (std::size_t i {0}; i < specification.color_attachments.size(); i++) {
-            switch (specification.color_attachments[i].type) {
+        for (std::size_t i {0}; i < m_specification.color_attachments.size(); i++) {
+            switch (m_specification.color_attachments[i].type) {
                 case AttachmentType::None:
                     assert(false);
                     break;
                 case AttachmentType::Texture:
-                    glDeleteTextures(1, &color_attachments[i]);
+                    glDeleteTextures(1, &m_color_attachments[i]);
                     break;
                 case AttachmentType::Renderbuffer:
-                    glDeleteRenderbuffers(1, &color_attachments[i]);
+                    glDeleteRenderbuffers(1, &m_color_attachments[i]);
                     break;
             }
         }
 
-        if (depth_attachment_present(specification)) {
-            switch (specification.depth_attachment.type) {
+        if (depth_attachment_present(m_specification)) {
+            switch (m_specification.depth_attachment.type) {
                 case AttachmentType::None:
                     assert(false);
                     break;
                 case AttachmentType::Texture:
-                    glDeleteTextures(1, &depth_attachment);
+                    glDeleteTextures(1, &m_depth_attachment);
                     break;
                 case AttachmentType::Renderbuffer:
-                    glDeleteRenderbuffers(1, &depth_attachment);
+                    glDeleteRenderbuffers(1, &m_depth_attachment);
                     break;
             }
         }
 
-        glDeleteFramebuffers(1, &framebuffer);
+        glDeleteFramebuffers(1, &m_framebuffer);
 
-        LOG_DEBUG("Deleted GL framebuffer {}", framebuffer);
+        LOG_DEBUG("Deleted GL framebuffer {}", m_framebuffer);
     }
 
     void GlFramebuffer::bind() const noexcept {
-        glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
+        glBindFramebuffer(GL_FRAMEBUFFER, m_framebuffer);
     }
 
     void GlFramebuffer::bind_default() noexcept {
@@ -239,17 +239,17 @@ namespace sm {
     }
 
     unsigned int GlFramebuffer::get_color_attachment(int attachment_index) const noexcept {
-        assert(static_cast<std::size_t>(attachment_index) < color_attachments.size());
+        assert(static_cast<std::size_t>(attachment_index) < m_color_attachments.size());
 
-        return color_attachments[attachment_index];
+        return m_color_attachments[attachment_index];
     }
 
     unsigned int GlFramebuffer::get_depth_attachment() const noexcept {
-        return depth_attachment;
+        return m_depth_attachment;
     }
 
     const FramebufferSpecification& GlFramebuffer::get_specification() const noexcept {
-        return specification;
+        return m_specification;
     }
 
     void GlFramebuffer::resize(int width, int height) {
@@ -258,14 +258,14 @@ namespace sm {
             return;
         }
 
-        specification.width = width / specification.resize_divisor;
-        specification.height = height / specification.resize_divisor;
+        m_specification.width = width / m_specification.resize_divisor;
+        m_specification.height = height / m_specification.resize_divisor;
 
         build();
     }
 
     float GlFramebuffer::read_pixel_float(int attachment_index, int x, int y) const noexcept {
-        assert(static_cast<std::size_t>(attachment_index) < color_attachments.size());
+        assert(static_cast<std::size_t>(attachment_index) < m_color_attachments.size());
 
         glReadBuffer(GL_COLOR_ATTACHMENT0 + attachment_index);
         float pixel;
@@ -275,74 +275,74 @@ namespace sm {
     }
 
     void GlFramebuffer::read_pixel_float_pbo(int attachment_index, int x, int y) const noexcept {
-        assert(static_cast<std::size_t>(attachment_index) < color_attachments.size());
+        assert(static_cast<std::size_t>(attachment_index) < m_color_attachments.size());
 
         glReadBuffer(GL_COLOR_ATTACHMENT0 + attachment_index);
         glReadPixels(x, y, 1, 1, GL_RED, GL_FLOAT, nullptr);
     }
 
     void GlFramebuffer::blit(const GlFramebuffer* draw_framebuffer, int width, int height) const noexcept {
-        assert(color_attachments.size() == draw_framebuffer->color_attachments.size());
+        assert(m_color_attachments.size() == draw_framebuffer->m_color_attachments.size());
 
-        glBindFramebuffer(GL_READ_FRAMEBUFFER, framebuffer);
-        glBindFramebuffer(GL_DRAW_FRAMEBUFFER, draw_framebuffer->framebuffer);
+        glBindFramebuffer(GL_READ_FRAMEBUFFER, m_framebuffer);
+        glBindFramebuffer(GL_DRAW_FRAMEBUFFER, draw_framebuffer->m_framebuffer);
 
-        for (std::size_t i {0}; i < color_attachments.size(); i++) {
+        for (std::size_t i {0}; i < m_color_attachments.size(); i++) {
             glReadBuffer(GL_COLOR_ATTACHMENT0 + static_cast<unsigned int>(i));
             glDrawBuffer(GL_COLOR_ATTACHMENT0 + static_cast<unsigned int>(i));
             glBlitFramebuffer(0, 0, width, height, 0, 0, width, height, GL_COLOR_BUFFER_BIT, GL_NEAREST);
         }
 
-        glDrawBuffers(static_cast<int>(draw_framebuffer->color_attachments.size()), COLOR_ATTACHMENTS);
+        glDrawBuffers(static_cast<int>(draw_framebuffer->m_color_attachments.size()), COLOR_ATTACHMENTS);
     }
 
     void GlFramebuffer::build() {
         // Delete old framebuffer first
-        if (framebuffer != 0) {
-            for (std::size_t i {0}; i < specification.color_attachments.size(); i++) {
-                switch (specification.color_attachments[i].type) {
+        if (m_framebuffer != 0) {
+            for (std::size_t i {0}; i < m_specification.color_attachments.size(); i++) {
+                switch (m_specification.color_attachments[i].type) {
                     case AttachmentType::None:
                         assert(false);
                         break;
                     case AttachmentType::Texture:
-                        glDeleteTextures(1, &color_attachments[i]);
+                        glDeleteTextures(1, &m_color_attachments[i]);
                         break;
                     case AttachmentType::Renderbuffer:
-                        glDeleteRenderbuffers(1, &color_attachments[i]);
+                        glDeleteRenderbuffers(1, &m_color_attachments[i]);
                         break;
                 }
             }
 
-            if (depth_attachment_present(specification)) {
-                switch (specification.depth_attachment.type) {
+            if (depth_attachment_present(m_specification)) {
+                switch (m_specification.depth_attachment.type) {
                     case AttachmentType::None:
                         assert(false);
                         break;
                     case AttachmentType::Texture:
-                        glDeleteTextures(1, &depth_attachment);
+                        glDeleteTextures(1, &m_depth_attachment);
                         break;
                     case AttachmentType::Renderbuffer:
-                        glDeleteRenderbuffers(1, &depth_attachment);
+                        glDeleteRenderbuffers(1, &m_depth_attachment);
                         break;
                 }
             }
 
-            glDeleteFramebuffers(1, &framebuffer);
+            glDeleteFramebuffers(1, &m_framebuffer);
 
-            color_attachments.clear();
-            depth_attachment = 0;
+            m_color_attachments.clear();
+            m_depth_attachment = 0;
         }
 
         // Then create a new framebuffer
-        glGenFramebuffers(1, &framebuffer);
-        glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
+        glGenFramebuffers(1, &m_framebuffer);
+        glBindFramebuffer(GL_FRAMEBUFFER, m_framebuffer);
 
-        const bool multisampled {specification.samples > 1};
+        const bool multisampled {m_specification.samples > 1};
 
-        color_attachments.resize(specification.color_attachments.size());
+        m_color_attachments.resize(m_specification.color_attachments.size());
 
-        for (std::size_t i {0}; i < specification.color_attachments.size(); i++) {
-            switch (specification.color_attachments[i].type) {
+        for (std::size_t i {0}; i < m_specification.color_attachments.size(); i++) {
+            switch (m_specification.color_attachments[i].type) {
                 case AttachmentType::None:
                     assert(false);
 
@@ -352,47 +352,47 @@ namespace sm {
                     glGenTextures(1, &texture);
                     glBindTexture(target(multisampled), texture);
 
-                    switch (specification.color_attachments[i].format) {
+                    switch (m_specification.color_attachments[i].format) {
                         case AttachmentFormat::None:
                             assert(false);
                             break;
                         case AttachmentFormat::Rgba8:
                             attach_color_texture(
                                 texture,
-                                specification.samples,
+                                m_specification.samples,
                                 GL_RGBA8,
-                                specification.width,
-                                specification.height,
+                                m_specification.width,
+                                m_specification.height,
                                 static_cast<unsigned int>(i)
                             );
                             break;
                         case AttachmentFormat::Rgba8Float:
                             attach_color_texture(
                                 texture,
-                                specification.samples,
+                                m_specification.samples,
                                 GL_RGBA16F,
-                                specification.width,
-                                specification.height,
+                                m_specification.width,
+                                m_specification.height,
                                 static_cast<unsigned int>(i)
                             );
                             break;
                         case AttachmentFormat::RedInt:
                             attach_color_texture(
                                 texture,
-                                specification.samples,
+                                m_specification.samples,
                                 GL_R32I,
-                                specification.width,
-                                specification.height,
+                                m_specification.width,
+                                m_specification.height,
                                 static_cast<unsigned int>(i)
                             );
                             break;
                         case AttachmentFormat::RedFloat:
                             attach_color_texture(
                                 texture,
-                                specification.samples,
+                                m_specification.samples,
                                 GL_R32F,
-                                specification.width,
-                                specification.height,
+                                m_specification.width,
+                                m_specification.height,
                                 static_cast<unsigned int>(i)
                             );
                             break;
@@ -401,7 +401,7 @@ namespace sm {
                             break;
                     }
 
-                    color_attachments[i] = texture;
+                    m_color_attachments[i] = texture;
                     glBindTexture(target(multisampled), 0);
 
                     break;
@@ -411,47 +411,47 @@ namespace sm {
                     glGenRenderbuffers(1, &renderbuffer);
                     glBindRenderbuffer(GL_RENDERBUFFER, renderbuffer);
 
-                    switch (specification.color_attachments[i].format) {
+                    switch (m_specification.color_attachments[i].format) {
                         case AttachmentFormat::None:
                             assert(false);
                             break;
                         case AttachmentFormat::Rgba8:
                             attach_color_renderbuffer(
                                 renderbuffer,
-                                specification.samples,
+                                m_specification.samples,
                                 GL_RGBA8,
-                                specification.width,
-                                specification.height,
+                                m_specification.width,
+                                m_specification.height,
                                 static_cast<unsigned int>(i)
                             );
                             break;
                         case AttachmentFormat::Rgba8Float:
                             attach_color_renderbuffer(
                                 renderbuffer,
-                                specification.samples,
+                                m_specification.samples,
                                 GL_RGBA16F,
-                                specification.width,
-                                specification.height,
+                                m_specification.width,
+                                m_specification.height,
                                 static_cast<unsigned int>(i)
                             );
                             break;
                         case AttachmentFormat::RedInt:
                             attach_color_renderbuffer(
                                 renderbuffer,
-                                specification.samples,
+                                m_specification.samples,
                                 GL_R32I,
-                                specification.width,
-                                specification.height,
+                                m_specification.width,
+                                m_specification.height,
                                 static_cast<unsigned int>(i)
                             );
                             break;
                         case AttachmentFormat::RedFloat:
                             attach_color_renderbuffer(
                                 renderbuffer,
-                                specification.samples,
+                                m_specification.samples,
                                 GL_R32F,
-                                specification.width,
-                                specification.height,
+                                m_specification.width,
+                                m_specification.height,
                                 static_cast<unsigned int>(i)
                             );
                             break;
@@ -460,7 +460,7 @@ namespace sm {
                             break;
                     }
 
-                    color_attachments[i] = renderbuffer;
+                    m_color_attachments[i] = renderbuffer;
                     glBindRenderbuffer(GL_RENDERBUFFER, 0);
 
                     break;
@@ -468,8 +468,8 @@ namespace sm {
             }
         }
 
-        if (depth_attachment_present(specification)) {
-            switch (specification.depth_attachment.type) {
+        if (depth_attachment_present(m_specification)) {
+            switch (m_specification.depth_attachment.type) {
                 case AttachmentType::None:
                     assert(false);
 
@@ -479,24 +479,24 @@ namespace sm {
                     glGenTextures(1, &texture);
                     glBindTexture(target(multisampled), texture);
 
-                    switch (specification.depth_attachment.format) {
+                    switch (m_specification.depth_attachment.format) {
                         case AttachmentFormat::None:
                             assert(false);
                             break;
                         case AttachmentFormat::Depth24Stencil8:
                             attach_depth_texture(
-                                texture, specification.samples,
-                                GL_DEPTH24_STENCIL8, GL_DEPTH_STENCIL_ATTACHMENT, specification.width,
-                                specification.height, specification.white_border_depth_texture,
-                                specification.comparison_mode_depth_texture
+                                texture, m_specification.samples,
+                                GL_DEPTH24_STENCIL8, GL_DEPTH_STENCIL_ATTACHMENT, m_specification.width,
+                                m_specification.height, m_specification.white_border_depth_texture,
+                                m_specification.comparison_mode_depth_texture
                             );
                             break;
                         case AttachmentFormat::Depth32:
                             attach_depth_texture(
-                                texture, specification.samples,
-                                GL_DEPTH_COMPONENT32, GL_DEPTH_ATTACHMENT, specification.width,
-                                specification.height, specification.white_border_depth_texture,
-                                specification.comparison_mode_depth_texture
+                                texture, m_specification.samples,
+                                GL_DEPTH_COMPONENT32, GL_DEPTH_ATTACHMENT, m_specification.width,
+                                m_specification.height, m_specification.white_border_depth_texture,
+                                m_specification.comparison_mode_depth_texture
                             );
                             break;
                         default:
@@ -504,7 +504,7 @@ namespace sm {
                             break;
                     }
 
-                    depth_attachment = texture;
+                    m_depth_attachment = texture;
                     glBindTexture(target(multisampled), 0);
 
                     break;
@@ -514,22 +514,22 @@ namespace sm {
                     glGenRenderbuffers(1, &renderbuffer);
                     glBindRenderbuffer(GL_RENDERBUFFER, renderbuffer);
 
-                    switch (specification.depth_attachment.format) {
+                    switch (m_specification.depth_attachment.format) {
                         case AttachmentFormat::None:
                             assert(false);
                             break;
                         case AttachmentFormat::Depth24Stencil8:
                             attach_depth_renderbuffer(
-                                renderbuffer, specification.samples,
+                                renderbuffer, m_specification.samples,
                                 GL_DEPTH24_STENCIL8, GL_DEPTH_STENCIL_ATTACHMENT,
-                                specification.width, specification.height
+                                m_specification.width, m_specification.height
                             );
                             break;
                         case AttachmentFormat::Depth32:
                             attach_depth_renderbuffer(
-                                renderbuffer, specification.samples,
+                                renderbuffer, m_specification.samples,
                                 GL_DEPTH_COMPONENT32, GL_DEPTH_ATTACHMENT,
-                                specification.width, specification.height
+                                m_specification.width, m_specification.height
                             );
                             break;
                         default:
@@ -537,7 +537,7 @@ namespace sm {
                             break;
                     }
 
-                    depth_attachment = renderbuffer;
+                    m_depth_attachment = renderbuffer;
                     glBindRenderbuffer(GL_RENDERBUFFER, 0);
 
                     break;
@@ -545,11 +545,11 @@ namespace sm {
             }
         }
 
-        if (color_attachments.size() > 1) {
-            assert(color_attachments.size() <= std::size(COLOR_ATTACHMENTS));
+        if (m_color_attachments.size() > 1) {
+            assert(m_color_attachments.size() <= std::size(COLOR_ATTACHMENTS));
 
-            glDrawBuffers(static_cast<int>(color_attachments.size()), COLOR_ATTACHMENTS);
-        } else if (color_attachments.empty()) {
+            glDrawBuffers(static_cast<int>(m_color_attachments.size()), COLOR_ATTACHMENTS);
+        } else if (m_color_attachments.empty()) {
             glDrawBuffer(GL_NONE);  // TODO what is this?
         }
 
@@ -559,7 +559,7 @@ namespace sm {
             SM_THROW_ERROR(
                 OtherError,
                 "GL framebuffer {} is incomplete: {}",
-                framebuffer,
+                m_framebuffer,
                 framebuffer_status_message(status)
             );
         }

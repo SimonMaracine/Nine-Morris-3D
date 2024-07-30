@@ -72,20 +72,20 @@ namespace sm {
             int count {};
         };
 
-        std::unique_ptr<unsigned char[]> bitmap;
-        std::vector<PackRange> pack_ranges;
-        stbtt_pack_context* pack_context {};
+        std::unique_ptr<unsigned char[]> m_bitmap;
+        std::vector<PackRange> m_pack_ranges;
+        stbtt_pack_context* m_pack_context {};
 
-        std::unique_ptr<GlTexture> bitmap_texture;
+        std::unique_ptr<GlTexture> m_bitmap_texture;
 
-        std::string font_buffer;
-        stbtt_fontinfo* font_info {};
+        std::string m_font_buffer;
+        stbtt_fontinfo* m_font_info {};
 
-        float size_height {};
-        int bitmap_size {};
+        float m_size_height {};
+        int m_bitmap_size {};
 
-        float sf {};  // Scale factor
-        float baseline {};
-        float vertical_advance {};
+        float m_sf {};  // Scale factor
+        float m_baseline {};
+        float m_vertical_advance {};
     };
 }

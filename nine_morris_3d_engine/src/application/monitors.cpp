@@ -11,7 +11,7 @@ namespace sm {
     std::pair<int, int> Monitors::get_resolution(std::size_t index) const {
         assert(index < count);
 
-        const GLFWvidmode* video_mode {glfwGetVideoMode(monitors[index])};
+        const GLFWvidmode* video_mode {glfwGetVideoMode(m_monitors[index])};
 
         if (video_mode == nullptr) {
             SM_THROW_ERROR(OtherError, "Could not get monitor video mode");
@@ -24,7 +24,7 @@ namespace sm {
         assert(index < count);
 
         float xscale, yscale;
-        glfwGetMonitorContentScale(monitors[index], &xscale, &yscale);
+        glfwGetMonitorContentScale(m_monitors[index], &xscale, &yscale);
 
         return std::make_pair(xscale, yscale);
     }
@@ -32,7 +32,7 @@ namespace sm {
     const char* Monitors::get_name(std::size_t index) const {
         assert(index < count);
 
-        const char* name {glfwGetMonitorName(monitors[index])};
+        const char* name {glfwGetMonitorName(m_monitors[index])};
 
         if (name == nullptr) {
             SM_THROW_ERROR(OtherError, "Could not get monitor name");
@@ -42,6 +42,6 @@ namespace sm {
     }
 
     std::size_t Monitors::get_count() const noexcept {
-        return count;
+        return m_count;
     }
 }

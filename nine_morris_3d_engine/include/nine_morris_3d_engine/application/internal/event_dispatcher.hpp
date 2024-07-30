@@ -17,38 +17,38 @@ namespace sm::internal {
     public:
         template<typename E, auto F, typename... T>
         void connect(T&&... value_or_instance) {
-            dispatcher.template sink<E>().template connect<F>(value_or_instance...);
+            m_dispatcher.template sink<E>().template connect<F>(value_or_instance...);
         }
 
         template<typename E, auto F, typename... T>
         void disconnect(T&&... value_or_instance) {
-            dispatcher.template sink<E>().template disconnect<F>(value_or_instance...);
+            m_dispatcher.template sink<E>().template disconnect<F>(value_or_instance...);
         }
 
         template<typename T>
         void disconnect(T& value_or_instance) {
-            dispatcher.disconnect(value_or_instance);
+            m_dispatcher.disconnect(value_or_instance);
         }
 
         template<typename T>
         void disconnect(T* value_or_instance) {
-            dispatcher.disconnect(value_or_instance);
+            m_dispatcher.disconnect(value_or_instance);
         }
 
         template<typename E, typename... Args>
         void enqueue(Args&&... args) {
-            dispatcher.template enqueue<E>(std::forward<Args>(args)...);
+            m_dispatcher.template enqueue<E>(std::forward<Args>(args)...);
         }
 
         template<typename E>
         void clear() {
-            dispatcher.clear<E>();
+            m_dispatcher.clear<E>();
         }
 
         void update() {
-            dispatcher.update();
+            m_dispatcher.update();
         }
     private:
-        entt::dispatcher dispatcher;
+        entt::dispatcher m_dispatcher;
     };
 }

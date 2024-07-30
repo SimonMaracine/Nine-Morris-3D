@@ -30,9 +30,9 @@ namespace sm {
 
         const GlIndexBuffer* get_index_buffer() const noexcept;
     private:
-        unsigned int array {};
+        unsigned int m_array {};
 
-        std::vector<std::shared_ptr<GlVertexBuffer>> vertex_buffers;
-        std::shared_ptr<GlIndexBuffer> index_buffer;
+        std::vector<std::shared_ptr<GlVertexBuffer>> m_vertex_buffers;
+        std::shared_ptr<GlIndexBuffer> m_index_buffer;
     };
 }

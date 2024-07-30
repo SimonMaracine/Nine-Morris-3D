@@ -136,7 +136,7 @@ void PointCameraController::update_camera(float dt) {
     matrix = glm::rotate(matrix, glm::radians(yaw), glm::vec3(0.0f, 1.0f, 0.0f));
     matrix = glm::translate(matrix, -position);
 
-    camera->set_view(matrix);
+    m_camera->set_view(matrix);
 }
 
 void PointCameraController::update_friction() {
@@ -153,10 +153,10 @@ void PointCameraController::set_position(glm::vec3 position) {
     distance_to_point = glm::length(position - point);
 
     // Update camera data
-    camera->set_position_orientation(position, point - position, glm::vec3(0.0f, 1.0f, 0.0f));
+    m_camera->set_position_orientation(position, point - position, glm::vec3(0.0f, 1.0f, 0.0f));
 
     // Calculate yaw, pitch and angle_around_point
-    const glm::vec3 direction {glm::vec3(glm::transpose(camera->view_matrix)[2])};
+    const glm::vec3 direction {glm::vec3(glm::transpose(m_camera->view_matrix)[2])};
     yaw = glm::degrees(glm::atan(-direction.x, direction.z));
     pitch = glm::degrees(glm::asin(direction.y));
     angle_around_point = 180.0f - yaw;

@@ -9,22 +9,22 @@
 
 namespace sm {
     GlVertexArray::GlVertexArray() noexcept {
-        glGenVertexArrays(1, &array);
-        glBindVertexArray(array);
+        glGenVertexArrays(1, &m_array);
+        glBindVertexArray(m_array);
 
         glBindVertexArray(0);
 
-        LOG_DEBUG("Created GL vertex array {}", array);
+        LOG_DEBUG("Created GL vertex array {}", m_array);
     }
 
     GlVertexArray::~GlVertexArray() {
-        glDeleteVertexArrays(1, &array);
+        glDeleteVertexArrays(1, &m_array);
 
-        LOG_DEBUG("Deleted GL vertex array {}", array);
+        LOG_DEBUG("Deleted GL vertex array {}", m_array);
     }
 
     void GlVertexArray::bind() const noexcept {
-        glBindVertexArray(array);
+        glBindVertexArray(m_array);
     }
 
     void GlVertexArray::unbind() noexcept {
@@ -81,7 +81,7 @@ namespace sm {
             offset += element.size * VertexBufferLayout::VertexElement::get_size(element.type);
         }
 
-        vertex_buffers.push_back(buffer);
+        m_vertex_buffers.push_back(buffer);
 
         GlVertexBuffer::unbind();
     }
@@ -89,10 +89,10 @@ namespace sm {
     void GlVertexArray::add_index_buffer(std::shared_ptr<GlIndexBuffer> buffer) noexcept {
         buffer->bind();
 
-        index_buffer = buffer;
+        m_index_buffer = buffer;
     }
 
     const GlIndexBuffer* GlVertexArray::get_index_buffer() const noexcept {
-        return index_buffer.get();
+        return m_index_buffer.get();
     }
 }

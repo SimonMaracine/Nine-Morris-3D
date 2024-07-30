@@ -34,8 +34,8 @@ namespace sm {
         void upload_data(const void* data, std::size_t size) const noexcept;
         void upload_sub_data(const void* data, std::size_t offset, std::size_t size) const noexcept;
     private:
-        unsigned int buffer {};
-        DrawHint hint {DrawHint::Static};
+        unsigned int m_buffer {};
+        DrawHint m_hint {DrawHint::Static};
     };
 
     // Only supports unsigned int
@@ -54,8 +54,8 @@ namespace sm {
 
         int get_index_count() const noexcept;
     private:
-        unsigned int buffer {};
-        int index_count {};
+        unsigned int m_buffer {};
+        int m_index_count {};
     };
 
     struct UniformBlockSpecification {
@@ -87,21 +87,21 @@ namespace sm {
         void allocate_memory(std::size_t size);
         static std::size_t type_size(unsigned int type) noexcept;
 
-        unsigned int buffer {};
+        unsigned int m_buffer {};
 
         struct UniformBlockField {
             std::size_t offset {};
             std::size_t size {};
         };
 
-        UniformBlockSpecification specification;
+        UniformBlockSpecification m_specification;
 
-        std::unordered_map<Id, UniformBlockField, Hash> fields;
+        std::unordered_map<Id, UniformBlockField, Hash> m_fields;
 
-        unsigned char* data {};
-        std::size_t size {};
+        unsigned char* m_data {};
+        std::size_t m_size {};
 
-        bool configured {false};
+        bool m_configured {false};
 
         friend class GlShader;
     };
@@ -124,11 +124,11 @@ namespace sm {
 
         template<typename T>
         void get_data(T** data_out) const noexcept {
-            *data_out = static_cast<T*>(data);
+            *data_out = static_cast<T*>(m_data);
         }
     private:
-        unsigned int buffer {};
-        void* data {};  // TODO clear value is float; should be generic
-        unsigned char* dummy_data {};
+        unsigned int m_buffer {};
+        void* m_data {};  // TODO clear value is float; should be generic
+        unsigned char* m_dummy_data {};
     };
 }

@@ -43,7 +43,7 @@ namespace sm::internal {
             std::unique_ptr<GlVertexArray> vertex_array;
 
             std::vector<BufferVertex> lines_buffer;
-        } storage;
+        } m_storage;
     };
 #else
     class DebugRenderer {};
@@ -151,15 +151,15 @@ namespace sm::internal {
             std::vector<std::weak_ptr<GlShader>> shaders;
             std::vector<std::weak_ptr<GlFramebuffer>> framebuffers;
             std::unordered_map<unsigned int, std::weak_ptr<GlUniformBuffer>> uniform_buffers;
-        } storage;
+        } m_storage;
 
-        PostProcessingContext post_processing_context;
+        PostProcessingContext m_post_processing_context;
 
-        glm::vec3 clear_color {};
-        bool color_correction {true};
+        glm::vec3 m_clear_color {};
+        bool m_color_correction {true};
 
 #ifndef SM_BUILD_DISTRIBUTION
-        DebugRenderer debug;
+        DebugRenderer m_debug;
 #endif
 
         static constexpr unsigned int PROJECTON_VIEW_UNIFORM_BLOCK_BINDING {0};

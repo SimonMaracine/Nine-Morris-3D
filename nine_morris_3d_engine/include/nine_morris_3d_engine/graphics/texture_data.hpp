@@ -29,8 +29,8 @@ namespace sm {
     private:
         void resize(int new_width, int new_height);
 
-        int width {};
-        int height {};
-        unsigned char* data {};
+        int m_width {};
+        int m_height {};
+        unsigned char* m_data {};
     };
 }

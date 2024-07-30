@@ -8,29 +8,29 @@
 
 namespace sm::internal {
     OpenAlContext::OpenAlContext(bool create)
-        : create(create) {
-        if (!create) {
+        : m_create(create) {
+        if (!m_create) {
             return;
         }
 
         // Choose the default device
-        device = alcOpenDevice(nullptr);
+        m_device = alcOpenDevice(nullptr);
 
-        if (device == nullptr) {
+        if (m_device == nullptr) {
             SM_THROW_ERROR(InitializationError, "Could not open a playback device");
         }
 
-        context = alcCreateContext(device, nullptr);
+        m_context = alcCreateContext(m_device, nullptr);
 
-        if (context == nullptr) {
-            alcCloseDevice(device);
+        if (m_context == nullptr) {
+            alcCloseDevice(m_device);
 
             SM_THROW_ERROR(InitializationError, "Could not create OpenAL context");
         }
 
-        if (alcMakeContextCurrent(context) == ALC_FALSE) {
-            alcDestroyContext(context);
-            alcCloseDevice(device);
+        if (alcMakeContextCurrent(m_context) == ALC_FALSE) {
+            alcDestroyContext(m_context);
+            alcCloseDevice(m_device);
 
             SM_THROW_ERROR(InitializationError, "Could not make OpenAL context current");
         }
@@ -44,13 +44,13 @@ namespace sm::internal {
     }
 
     OpenAlContext::~OpenAlContext() noexcept {
-        if (!create) {
+        if (!m_create) {
             return;
         }
 
         alcMakeContextCurrent(nullptr);
-        alcDestroyContext(context);
-        alcCloseDevice(device);
+        alcDestroyContext(m_context);
+        alcCloseDevice(m_device);
 
         LOG_INFO("Destroyed OpenAL context and closed playback device");
     }

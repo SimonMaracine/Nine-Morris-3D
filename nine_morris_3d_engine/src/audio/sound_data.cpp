@@ -10,22 +10,22 @@
 
 namespace sm {
     SoundData::SoundData(const std::string& buffer) {
-        samples = stb_vorbis_decode_memory(
+        m_samples = stb_vorbis_decode_memory(
             reinterpret_cast<const unsigned char*>(buffer.data()),
             static_cast<int>(buffer.size()),
-            &channels,
-            &sample_rate,
-            &data
+            &m_channels,
+            &m_sample_rate,
+            &m_data
         );
 
-        if (data == nullptr) {
+        if (m_data == nullptr) {
             SM_THROW_ERROR(ResourceError, "Could not load sound data");
         }
 
-        size = compute_size();
-        bits_per_sample = compute_bits_per_sample();
+        m_size = compute_size();
+        m_bits_per_sample = compute_bits_per_sample();
 
-        if (bits_per_sample == 8) {
+        if (m_bits_per_sample == 8) {
             LOG_WARNING("bits_per_sample = 8");
         }
 
@@ -35,40 +35,40 @@ namespace sm {
     SoundData::~SoundData() noexcept {
         assert(data != nullptr);
 
-        std::free(data);
+        std::free(m_data);
 
         LOG_DEBUG("Freed sound data");
     }
 
     int SoundData::get_samples() const noexcept {
-        return samples;
+        return m_samples;
     }
 
     int SoundData::get_channels() const noexcept {
-        return channels;
+        return m_channels;
     }
 
     int SoundData::get_frequency() const noexcept {
-        return sample_rate;
+        return m_sample_rate;
     }
 
     const short* SoundData::get_data() const noexcept {
-        return data;
+        return m_data;
     }
 
     std::size_t SoundData::get_size() const noexcept {
-        return size;
+        return m_size;
     }
 
     std::size_t SoundData::get_bps() const noexcept {
-        return bits_per_sample;
+        return m_bits_per_sample;
     }
 
     std::size_t SoundData::compute_size() const noexcept {
-        return samples * channels * sizeof(short);
+        return m_samples * m_channels * sizeof(short);
     }
 
     std::size_t SoundData::compute_bits_per_sample() const noexcept {
-        return (8 * size) / (samples * channels);
+        return (8 * m_size) / (m_samples * m_channels);
     }
 }

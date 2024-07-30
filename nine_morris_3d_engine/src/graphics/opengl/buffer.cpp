@@ -27,45 +27,45 @@ namespace sm {
     }
 
     GlVertexBuffer::GlVertexBuffer(DrawHint hint) noexcept
-        : hint(hint) {
-        glGenBuffers(1, &buffer);
-        glBindBuffer(GL_ARRAY_BUFFER, buffer);
+        : m_hint(hint) {
+        glGenBuffers(1, &m_buffer);
+        glBindBuffer(GL_ARRAY_BUFFER, m_buffer);
 
         glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-        LOG_DEBUG("Created GL vertex buffer {}", buffer);
+        LOG_DEBUG("Created GL vertex buffer {}", m_buffer);
     }
 
     GlVertexBuffer::GlVertexBuffer(std::size_t size, DrawHint hint) noexcept
-        : hint(hint) {
-        glGenBuffers(1, &buffer);
-        glBindBuffer(GL_ARRAY_BUFFER, buffer);
+        : m_hint(hint) {
+        glGenBuffers(1, &m_buffer);
+        glBindBuffer(GL_ARRAY_BUFFER, m_buffer);
         glBufferData(GL_ARRAY_BUFFER, size, nullptr, draw_hint_to_int(hint));
 
         glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-        LOG_DEBUG("Created GL vertex buffer {}", buffer);
+        LOG_DEBUG("Created GL vertex buffer {}", m_buffer);
     }
 
     GlVertexBuffer::GlVertexBuffer(const void* data, std::size_t size, DrawHint hint) noexcept
-        : hint(hint) {
-        glGenBuffers(1, &buffer);
-        glBindBuffer(GL_ARRAY_BUFFER, buffer);
+        : m_hint(hint) {
+        glGenBuffers(1, &m_buffer);
+        glBindBuffer(GL_ARRAY_BUFFER, m_buffer);
         glBufferData(GL_ARRAY_BUFFER, size, data, draw_hint_to_int(hint));
 
         glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-        LOG_DEBUG("Created GL vertex buffer {}", buffer);
+        LOG_DEBUG("Created GL vertex buffer {}", m_buffer);
     }
 
     GlVertexBuffer::~GlVertexBuffer() noexcept {
-        glDeleteBuffers(1, &buffer);
+        glDeleteBuffers(1, &m_buffer);
 
-        LOG_DEBUG("Deleted GL vertex buffer {}", buffer);
+        LOG_DEBUG("Deleted GL vertex buffer {}", m_buffer);
     }
 
     void GlVertexBuffer::bind() const noexcept {
-        glBindBuffer(GL_ARRAY_BUFFER, buffer);
+        glBindBuffer(GL_ARRAY_BUFFER, m_buffer);
     }
 
     void GlVertexBuffer::unbind() noexcept {
@@ -73,7 +73,7 @@ namespace sm {
     }
 
     void GlVertexBuffer::upload_data(const void* data, std::size_t size) const noexcept {
-        glBufferData(GL_ARRAY_BUFFER, size, data, draw_hint_to_int(hint));
+        glBufferData(GL_ARRAY_BUFFER, size, data, draw_hint_to_int(m_hint));
     }
 
     void GlVertexBuffer::upload_sub_data(const void* data, std::size_t offset, std::size_t size) const noexcept {
@@ -81,27 +81,27 @@ namespace sm {
     }
 
     GlIndexBuffer::GlIndexBuffer(const void* data, std::size_t size) noexcept {
-        glGenBuffers(1, &buffer);
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffer);
+        glGenBuffers(1, &m_buffer);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_buffer);
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, size, data, GL_STATIC_DRAW);
 
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
         assert(size % sizeof(unsigned int) == 0);
 
-        index_count = static_cast<int>(size / sizeof(unsigned int));
+        m_index_count = static_cast<int>(size / sizeof(unsigned int));
 
-        LOG_DEBUG("Created GL index buffer {}", buffer);
+        LOG_DEBUG("Created GL index buffer {}", m_buffer);
     }
 
     GlIndexBuffer::~GlIndexBuffer() noexcept {
-        glDeleteBuffers(1, &buffer);
+        glDeleteBuffers(1, &m_buffer);
 
-        LOG_DEBUG("Deleted GL index buffer {}", buffer);
+        LOG_DEBUG("Deleted GL index buffer {}", m_buffer);
     }
 
     void GlIndexBuffer::bind() const noexcept {
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffer);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_buffer);
     }
 
     void GlIndexBuffer::unbind() noexcept {
@@ -109,29 +109,29 @@ namespace sm {
     }
 
     int GlIndexBuffer::get_index_count() const noexcept {
-        return index_count;
+        return m_index_count;
     }
 
     GlUniformBuffer::GlUniformBuffer(const UniformBlockSpecification& specification)
-        : specification(specification) {
-        glGenBuffers(1, &buffer);
-        glBindBuffer(GL_UNIFORM_BUFFER, buffer);
+        : m_specification(specification) {
+        glGenBuffers(1, &m_buffer);
+        glBindBuffer(GL_UNIFORM_BUFFER, m_buffer);
 
         glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
-        LOG_DEBUG("Created GL uniform buffer {}", buffer);
+        LOG_DEBUG("Created GL uniform buffer {}", m_buffer);
     }
 
     GlUniformBuffer::~GlUniformBuffer() {
-        glDeleteBuffers(1, &buffer);
+        glDeleteBuffers(1, &m_buffer);
 
-        delete[] data;
+        delete[] m_data;
 
-        LOG_DEBUG("Deleted GL uniform buffer {}", buffer);
+        LOG_DEBUG("Deleted GL uniform buffer {}", m_buffer);
     }
 
     void GlUniformBuffer::bind() const noexcept {
-        glBindBuffer(GL_UNIFORM_BUFFER, buffer);
+        glBindBuffer(GL_UNIFORM_BUFFER, m_buffer);
     }
 
     void GlUniformBuffer::unbind() noexcept {
@@ -139,18 +139,18 @@ namespace sm {
     }
 
     bool GlUniformBuffer::is_configured() const noexcept {
-        return configured;
+        return m_configured;
     }
 
     void GlUniformBuffer::configure(unsigned int shader_program) {
         const unsigned int block_index {
-            glGetUniformBlockIndex(shader_program, specification.block_name.c_str())
+            glGetUniformBlockIndex(shader_program, m_specification.block_name.c_str())
         };
 
         assert(block_index != GL_INVALID_INDEX);
 
         // If it's already configured, return
-        if (configured) {
+        if (m_configured) {
             return;
         }
 
@@ -162,9 +162,9 @@ namespace sm {
         allocate_memory(block_size);
 
         // Link uniform buffer to binding index
-        glBindBufferBase(GL_UNIFORM_BUFFER, specification.binding_index, buffer);
+        glBindBufferBase(GL_UNIFORM_BUFFER, m_specification.binding_index, m_buffer);
 
-        const std::size_t field_count {specification.uniforms.size()};
+        const std::size_t field_count {m_specification.uniforms.size()};
         static constexpr std::size_t MAX_FIELD_COUNT {24};
 
         assert(field_count <= MAX_FIELD_COUNT);
@@ -178,7 +178,7 @@ namespace sm {
         const char* field_names[MAX_FIELD_COUNT];
 
         for (std::size_t i {0}; i < field_count; i++) {
-            field_names[i] = specification.uniforms[i].c_str();
+            field_names[i] = m_specification.uniforms[i].c_str();
         }
 
         // Get uniform indices just to later get offsets, sizes and types
@@ -203,39 +203,39 @@ namespace sm {
             field.offset = static_cast<std::size_t>(offsets[i]);
             field.size = static_cast<std::size_t>(sizes[i]) * type_size(types[i]);
 
-            fields[Id(field_names[i])] = field;
+            m_fields[Id(field_names[i])] = field;
         }
 
-        configured = true;
+        m_configured = true;
     }
 
     void GlUniformBuffer::set(const void* field_data, Id field) {
         assert(configured);
         assert(data != nullptr && size > 0);
 
-        std::memcpy(data + fields.at(field).offset, field_data, fields.at(field).size);
+        std::memcpy(m_data + m_fields.at(field).offset, field_data, m_fields.at(field).size);
     }
 
     void GlUniformBuffer::upload() const noexcept {
         assert(data != nullptr && size > 0);
 
-        glBufferSubData(GL_UNIFORM_BUFFER, 0, size, data);
+        glBufferSubData(GL_UNIFORM_BUFFER, 0, m_size, m_data);
     }
 
     void GlUniformBuffer::set_and_upload(const void* field_data, Id field) {
         assert(configured);
         assert(data != nullptr && size > 0);
 
-        const std::size_t offset {fields.at(field).offset};
-        const std::size_t size {fields.at(field).size};
+        const std::size_t offset {m_fields.at(field).offset};
+        const std::size_t size {m_fields.at(field).size};
 
-        std::memcpy(data + offset, field_data, size);
-        glBufferSubData(GL_UNIFORM_BUFFER, offset, size, data);
+        std::memcpy(m_data + offset, field_data, size);
+        glBufferSubData(GL_UNIFORM_BUFFER, offset, size, m_data);
     }
 
     void GlUniformBuffer::allocate_memory(std::size_t size) {
-        data = new unsigned char[size];
-        this->size = size;
+        m_data = new unsigned char[size];
+        m_size = size;
 
         glBufferData(GL_UNIFORM_BUFFER, size, nullptr, GL_STREAM_DRAW);
     }
@@ -262,30 +262,30 @@ namespace sm {
     }
 
     GlPixelBuffer::GlPixelBuffer(std::size_t size) {
-        glGenBuffers(1, &buffer);
-        glBindBuffer(GL_PIXEL_PACK_BUFFER, buffer);
+        glGenBuffers(1, &m_buffer);
+        glBindBuffer(GL_PIXEL_PACK_BUFFER, m_buffer);
         glBufferData(GL_PIXEL_PACK_BUFFER, size, nullptr, GL_STREAM_READ);
         const float value {0.0f};
         glClearBufferData(GL_PIXEL_PACK_BUFFER, GL_R32F, GL_RED, GL_FLOAT, &value);
 
         glBindBuffer(GL_PIXEL_PACK_BUFFER, 0);
 
-        dummy_data = new unsigned char[size];
-        std::memset(dummy_data, 0, size);
+        m_dummy_data = new unsigned char[size];
+        std::memset(m_dummy_data, 0, size);
 
-        LOG_DEBUG("Created GL pixel buffer {}", buffer);
+        LOG_DEBUG("Created GL pixel buffer {}", m_buffer);
     }
 
     GlPixelBuffer::~GlPixelBuffer() noexcept {
-        glDeleteBuffers(1, &buffer);
+        glDeleteBuffers(1, &m_buffer);
 
-        delete[] dummy_data;
+        delete[] m_dummy_data;
 
-        LOG_DEBUG("Deleted GL pixel buffer {}", buffer);
+        LOG_DEBUG("Deleted GL pixel buffer {}", m_buffer);
     }
 
     void GlPixelBuffer::bind() const noexcept {
-        glBindBuffer(GL_PIXEL_PACK_BUFFER, buffer);
+        glBindBuffer(GL_PIXEL_PACK_BUFFER, m_buffer);
     }
 
     void GlPixelBuffer::unbind() noexcept {
@@ -293,12 +293,12 @@ namespace sm {
     }
 
     void GlPixelBuffer::map_data() noexcept {
-        data = glMapBuffer(GL_PIXEL_PACK_BUFFER, GL_READ_ONLY);
+        m_data = glMapBuffer(GL_PIXEL_PACK_BUFFER, GL_READ_ONLY);
 
-        if (data == nullptr) {
-            LOG_ERROR("Could not map GL pixel buffer {}", buffer);
+        if (m_data == nullptr) {
+            LOG_ERROR("Could not map GL pixel buffer {}", m_buffer);
 
-            data = dummy_data;
+            m_data = m_dummy_data;
         }
     }
 
@@ -306,7 +306,7 @@ namespace sm {
         const auto success {glUnmapBuffer(GL_PIXEL_PACK_BUFFER)};
 
         if (success == GL_FALSE) {
-            LOG_ERROR("Memory mapped by GL buffer {} became corrupted while it was used", buffer);
+            LOG_ERROR("Memory mapped by GL buffer {} became corrupted while it was used", m_buffer);
         }
     }
 }

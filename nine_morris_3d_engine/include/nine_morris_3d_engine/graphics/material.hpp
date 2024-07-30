@@ -36,17 +36,17 @@ namespace sm {
         void add_uniform(Uniform type, Id name);
         void add_texture(Id name);
     private:
-        std::shared_ptr<GlShader> shader;
+        std::shared_ptr<GlShader> m_shader;
 
-        std::vector<Id> uniforms_mat4;
-        std::vector<Id> uniforms_int;
-        std::vector<Id> uniforms_float;
-        std::vector<Id> uniforms_vec2;
-        std::vector<Id> uniforms_vec3;
-        std::vector<Id> uniforms_vec4;
-        std::vector<Id> textures;
+        std::vector<Id> m_uniforms_mat4;
+        std::vector<Id> m_uniforms_int;
+        std::vector<Id> m_uniforms_float;
+        std::vector<Id> m_uniforms_vec2;
+        std::vector<Id> m_uniforms_vec3;
+        std::vector<Id> m_uniforms_vec4;
+        std::vector<Id> m_textures;
 
-        unsigned int flags {};
+        unsigned int m_flags {};
 
         friend class MaterialInstance;
     };
@@ -68,7 +68,6 @@ namespace sm {
 
         const GlShader* get_shader() const noexcept;
 
-        // Intentionally public
         unsigned int flags {};
     private:
         struct Element {
@@ -90,11 +89,11 @@ namespace sm {
             unsigned int texture;
         };
 
-        std::shared_ptr<GlShader> shader;
+        std::shared_ptr<GlShader> m_shader;
 
-        std::unique_ptr<unsigned char[]> data;
-        std::size_t size {};
+        std::unique_ptr<unsigned char[]> m_data;
+        std::size_t m_size {};
 
-        std::unordered_map<Id, Element, Hash> offsets;
+        std::unordered_map<Id, Element, Hash> m_offsets;
     };
 }

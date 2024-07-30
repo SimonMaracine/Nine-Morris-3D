@@ -29,22 +29,22 @@ namespace sm {
 
             int channels {};
 
-            data = stbi_load_from_memory(
+            m_data = stbi_load_from_memory(
                 reinterpret_cast<const unsigned char*>(buffer.data()),
                 static_cast<int>(buffer.size()),
-                &width,
-                &height,
+                &m_width,
+                &m_height,
                 &channels,
                 CHANNELS
             );
         }
 
-        if (data == nullptr) {
+        if (m_data == nullptr) {
             SM_THROW_ERROR(ResourceError, "Could not load texture data");
         }
 
         if (post_processing.size == Size::Half) {
-            resize(width / 2, height / 2);
+            resize(m_width / 2, m_height / 2);
 
             LOG_DEBUG("Resized texture");
         }
@@ -55,31 +55,31 @@ namespace sm {
     TextureData::~TextureData() noexcept {
         assert(data != nullptr);
 
-        stbi_image_free(data);
+        stbi_image_free(m_data);
 
         LOG_DEBUG("Freed texture data");
     }
 
     int TextureData::get_width() const noexcept {
-        return width;
+        return m_width;
     }
 
     int TextureData::get_height() const noexcept {
-        return height;
+        return m_height;
     }
 
     const unsigned char* TextureData::get_data() const noexcept {
-        return data;
+        return m_data;
     }
 
     void TextureData::resize(int new_width, int new_height) {
         unsigned char* new_data {
-            stbir_resize_uint8_linear(data, width, height, 0, nullptr, new_width, new_height, 0, STBIR_RGBA)
+            stbir_resize_uint8_linear(m_data, m_width, m_height, 0, nullptr, new_width, new_height, 0, STBIR_RGBA)
         };
-        stbi_image_free(data);
+        stbi_image_free(m_data);
 
-        data = new_data;
-        width = new_width;
-        height = new_height;
+        m_data = new_data;
+        m_width = new_width;
+        m_height = new_height;
     }
 }

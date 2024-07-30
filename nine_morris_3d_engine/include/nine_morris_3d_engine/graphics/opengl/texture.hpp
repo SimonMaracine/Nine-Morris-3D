@@ -66,11 +66,11 @@ namespace sm {
     private:
         void allocate_texture(int width, int height, const unsigned char* data) const;
 
-        TextureSpecification specification;
+        TextureSpecification m_specification;
 
-        unsigned int texture {};
-        int width {};
-        int height {};
+        unsigned int m_texture {};
+        int m_width {};
+        int m_height {};
     };
 
     class GlTextureCubemap {
@@ -86,7 +86,7 @@ namespace sm {
         void bind(unsigned int unit) const noexcept;
         static void unbind() noexcept;
     private:
-        unsigned int texture {};
+        unsigned int m_texture {};
     };
 
     inline constexpr float CUBEMAP_VERTICES[] {

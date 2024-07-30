@@ -10,7 +10,7 @@ namespace sm {
     public:
         CameraController() noexcept = default;
         explicit CameraController(Camera& camera) noexcept
-            : camera(&camera) {}
+            : m_camera(&camera) {}
         virtual ~CameraController() noexcept = default;
 
         CameraController(const CameraController&) noexcept = default;
@@ -24,13 +24,13 @@ namespace sm {
         virtual glm::vec3 get_rotation() const noexcept = 0;
 
         const Camera& get_camera() const noexcept {
-            return *camera;
+            return *m_camera;
         }
 
         void set_camera(Camera& camera) noexcept {
-            this->camera = &camera;
+            m_camera = &camera;
         }
     protected:
-        Camera* camera {};
+        Camera* m_camera {};
     };
 }

@@ -36,13 +36,13 @@ namespace sm {
         void allocate(const void* vertices, std::size_t vertices_size, const void* indices, std::size_t indices_size);
 
         // Raw data
-        unsigned char* vertices {};
-        unsigned char* indices {};
-        std::size_t vertices_size {};
-        std::size_t indices_size {};
+        unsigned char* m_vertices {};
+        unsigned char* m_indices {};
+        std::size_t m_vertices_size {};
+        std::size_t m_indices_size {};
 
-        utils::AABB aabb;
+        utils::AABB m_aabb;
 
-        Type type;
+        Type m_type;
     };
 }

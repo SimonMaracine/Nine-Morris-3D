@@ -19,7 +19,7 @@
 
 namespace sm::internal {
     Window::Window(const ApplicationProperties& properties, EventDispatcher* evt)
-        : evt(evt) {
+        : m_evt(evt) {
         if (!glfwInit()) {
             SM_THROW_ERROR(InitializationError, "Could not initialize GLFW");
         }
@@ -49,7 +49,7 @@ namespace sm::internal {
 
         LOG_INFO("Created window and OpenGL context");
 
-        glfwMakeContextCurrent(window);
+        glfwMakeContextCurrent(m_window);
 
         if (!gladLoadGL()) {
             SM_THROW_ERROR(InitializationError, "Could not initialize GLAD");
@@ -60,8 +60,8 @@ namespace sm::internal {
 #endif
 
         glfwSwapInterval(1);
-        glfwSetWindowUserPointer(window, this);
-        glfwSetWindowSizeLimits(window, properties.min_width, properties.min_height, GLFW_DONT_CARE, GLFW_DONT_CARE);
+        glfwSetWindowUserPointer(m_window, this);
+        glfwSetWindowSizeLimits(m_window, properties.min_width, properties.min_height, GLFW_DONT_CARE, GLFW_DONT_CARE);
 
         install_callbacks();
 
@@ -69,26 +69,26 @@ namespace sm::internal {
     }
 
     Window::~Window() {
-        for (const auto& cursor : cursors) {
+        for (const auto& cursor : m_cursors) {
             glfwDestroyCursor(cursor.second);
         }
 
-        glfwDestroyWindow(window);
+        glfwDestroyWindow(m_window);
         glfwTerminate();
 
         LOG_INFO("Destroyed window and OpenGL context and terminated GLFW");
     }
 
     int Window::get_width() const noexcept {
-        return width;
+        return m_width;
     }
 
     int Window::get_height() const noexcept {
-        return height;
+        return m_height;
     }
 
     void Window::show() const noexcept {
-        glfwShowWindow(window);
+        glfwShowWindow(m_window);
     }
 
     void Window::set_vsync(int interval) const noexcept {
@@ -109,19 +109,19 @@ namespace sm::internal {
             LOG_DIST_ERROR("Could not create custom cursor");
         }
 
-        cursors[id] = cursor;
+        m_cursors[id] = cursor;
     }
 
     void Window::set_cursor(Id id) const {
         static constexpr auto null {Id("null")};
 
         if (id == null) {
-            glfwSetCursor(window, nullptr);
+            glfwSetCursor(m_window, nullptr);
             return;
         }
 
-        GLFWcursor* cursor {cursors.at(id)};
-        glfwSetCursor(window, cursor);
+        GLFWcursor* cursor {m_cursors.at(id)};
+        glfwSetCursor(m_window, cursor);
     }
 
     void Window::set_icons(std::initializer_list<std::unique_ptr<TextureData>> datas) const {
@@ -137,7 +137,7 @@ namespace sm::internal {
             icons.push_back(icon);
         }
 
-        glfwSetWindowIcon(window, static_cast<int>(icons.size()), icons.data());
+        glfwSetWindowIcon(m_window, static_cast<int>(icons.size()), icons.data());
     }
 
     Monitors Window::get_monitors() const {
@@ -149,8 +149,8 @@ namespace sm::internal {
         }
 
         Monitors monitors;
-        monitors.count = static_cast<std::size_t>(count);
-        monitors.monitors = connected_monitors;
+        monitors.m_count = static_cast<std::size_t>(count);
+        monitors.m_monitors = connected_monitors;
 
         return monitors;
     }
@@ -170,12 +170,12 @@ namespace sm::internal {
     }
 
     GLFWwindow* Window::get_handle() const noexcept {
-        return window;
+        return m_window;
     }
 
     void Window::update() const noexcept {
         glfwPollEvents();
-        glfwSwapBuffers(window);
+        glfwSwapBuffers(m_window);
     }
 
     void Window::create_window(const ApplicationProperties& properties) {
@@ -195,66 +195,66 @@ namespace sm::internal {
             }
 
             if (properties.native_resolution) {
-                width = video_mode->width;
-                height = video_mode->height;
+                m_width = video_mode->width;
+                m_height = video_mode->height;
             } else {
                 if (properties.width > video_mode->width || properties.height > video_mode->height) {
                     SM_THROW_ERROR(InitializationError, "Invalid window width or height");
                 }
 
-                width = properties.width;
-                height = properties.height;
+                m_width = properties.width;
+                m_height = properties.height;
             }
         } else {
-            width = properties.width;
-            height = properties.height;
+            m_width = properties.width;
+            m_height = properties.height;
         }
 
         assert(width > 0 && height > 0);
 
-        window = glfwCreateWindow(width, height, properties.title, primary_monitor, nullptr);
+        m_window = glfwCreateWindow(m_width, m_height, properties.title, primary_monitor, nullptr);
 
-        if (window == nullptr) {
+        if (m_window == nullptr) {
             SM_THROW_ERROR(InitializationError, "Could not create window");
         }
     }
 
     void Window::install_callbacks() const noexcept {
-        glfwSetWindowCloseCallback(window, [](GLFWwindow* window) {
+        glfwSetWindowCloseCallback(m_window, [](GLFWwindow* window) {
             auto* win {static_cast<Window*>(glfwGetWindowUserPointer(window))};
 
-            win->evt->enqueue<WindowClosedEvent>();
+            win->m_evt->enqueue<WindowClosedEvent>();
         });
 
-        glfwSetFramebufferSizeCallback(window, [](GLFWwindow* window, int width, int height) {
+        glfwSetFramebufferSizeCallback(m_window, [](GLFWwindow* window, int width, int height) {
             auto* win {static_cast<Window*>(glfwGetWindowUserPointer(window))};
 
-            win->evt->enqueue<WindowResizedEvent>(width, height);
+            win->m_evt->enqueue<WindowResizedEvent>(width, height);
 
-            // Set these after firing the event
-            win->width = width;
-            win->height = height;
+            // Sem_t these after firing the event
+            win->m_width = width;
+            win->m_height = height;
         });
 
-        glfwSetWindowFocusCallback(window, [](GLFWwindow* window, int focused) {
+        glfwSetWindowFocusCallback(m_window, [](GLFWwindow* window, int focused) {
             auto* win {static_cast<Window*>(glfwGetWindowUserPointer(window))};
 
-            win->evt->enqueue<WindowFocusedEvent>(static_cast<bool>(focused));
+            win->m_evt->enqueue<WindowFocusedEvent>(static_cast<bool>(focused));
         });
 
-        glfwSetWindowIconifyCallback(window, [](GLFWwindow* window, int iconified) {
+        glfwSetWindowIconifyCallback(m_window, [](GLFWwindow* window, int iconified) {
             auto* win {static_cast<Window*>(glfwGetWindowUserPointer(window))};
 
-            win->evt->enqueue<WindowIconifiedEvent>(static_cast<bool>(iconified));
+            win->m_evt->enqueue<WindowIconifiedEvent>(static_cast<bool>(iconified));
         });
 
-        glfwSetWindowPosCallback(window, [](GLFWwindow* window, int xpos, int ypos) {
+        glfwSetWindowPosCallback(m_window, [](GLFWwindow* window, int xpos, int ypos) {
             auto* win {static_cast<Window*>(glfwGetWindowUserPointer(window))};
 
-            win->evt->enqueue<WindowMovedEvent>(xpos, ypos);
+            win->m_evt->enqueue<WindowMovedEvent>(xpos, ypos);
         });
 
-        glfwSetKeyCallback(window, [](GLFWwindow* window, int key, int scancode, int action, int mods) {
+        glfwSetKeyCallback(m_window, [](GLFWwindow* window, int key, int scancode, int action, int mods) {
             auto* win {static_cast<Window*>(glfwGetWindowUserPointer(window))};
 
             switch (action) {
@@ -263,7 +263,7 @@ namespace sm::internal {
                         return;
                     }
 
-                    win->evt->enqueue<KeyPressedEvent>(
+                    win->m_evt->enqueue<KeyPressedEvent>(
                         Input::key_from_code(key),
                         false,
                         static_cast<bool>(mods & GLFW_MOD_CONTROL)
@@ -275,7 +275,7 @@ namespace sm::internal {
                         return;
                     }
 
-                    win->evt->enqueue<KeyReleasedEvent>(Input::key_from_code(key));
+                    win->m_evt->enqueue<KeyReleasedEvent>(Input::key_from_code(key));
 
                     break;
                 case GLFW_REPEAT:
@@ -283,7 +283,7 @@ namespace sm::internal {
                         return;
                     }
 
-                    win->evt->enqueue<KeyPressedEvent>(
+                    win->m_evt->enqueue<KeyPressedEvent>(
                         Input::key_from_code(key),
                         true,
                         static_cast<bool>(mods & GLFW_MOD_CONTROL)
@@ -293,7 +293,7 @@ namespace sm::internal {
             }
         });
 
-        glfwSetCharCallback(window, [](GLFWwindow*, unsigned int codepoint) {
+        glfwSetCharCallback(m_window, [](GLFWwindow*, unsigned int codepoint) {
             if (imgui_context::on_char_typed(codepoint)) {
                 return;
             }
@@ -301,7 +301,7 @@ namespace sm::internal {
             // A char typed event is not defined
         });
 
-        glfwSetMouseButtonCallback(window, [](GLFWwindow* window, int button, int action, int) {
+        glfwSetMouseButtonCallback(m_window, [](GLFWwindow* window, int button, int action, int) {
             auto* win {static_cast<Window*>(glfwGetWindowUserPointer(window))};
 
             switch (action) {
@@ -310,7 +310,7 @@ namespace sm::internal {
                         return;
                     }
 
-                    win->evt->enqueue<MouseButtonPressedEvent>(Input::mouse_button_from_code(button));
+                    win->m_evt->enqueue<MouseButtonPressedEvent>(Input::mouse_button_from_code(button));
 
                     break;
                 case GLFW_RELEASE:
@@ -318,30 +318,30 @@ namespace sm::internal {
                         return;
                     }
 
-                    win->evt->enqueue<MouseButtonReleasedEvent>(Input::mouse_button_from_code(button));
+                    win->m_evt->enqueue<MouseButtonReleasedEvent>(Input::mouse_button_from_code(button));
 
                     break;
             }
         });
 
-        glfwSetScrollCallback(window, [](GLFWwindow* window, double, double yoffset) {
+        glfwSetScrollCallback(m_window, [](GLFWwindow* window, double, double yoffset) {
             auto* win {static_cast<Window*>(glfwGetWindowUserPointer(window))};
 
             if (imgui_context::on_mouse_wheel_scrolled(static_cast<float>(yoffset))) {
                 return;
             }
 
-            win->evt->enqueue<MouseWheelScrolledEvent>(static_cast<float>(yoffset));
+            win->m_evt->enqueue<MouseWheelScrolledEvent>(static_cast<float>(yoffset));
         });
 
-        glfwSetCursorPosCallback(window, [](GLFWwindow* window, double xpos, double ypos) {
+        glfwSetCursorPosCallback(m_window, [](GLFWwindow* window, double xpos, double ypos) {
             auto* win {static_cast<Window*>(glfwGetWindowUserPointer(window))};
 
             if (imgui_context::on_mouse_moved(static_cast<float>(xpos), static_cast<float>(ypos))) {
                 return;
             }
 
-            win->evt->enqueue<MouseMovedEvent>(static_cast<float>(xpos), static_cast<float>(ypos));
+            win->m_evt->enqueue<MouseMovedEvent>(static_cast<float>(xpos), static_cast<float>(ypos));
         });
     }
 }

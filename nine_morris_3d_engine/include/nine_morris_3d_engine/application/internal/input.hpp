@@ -10,7 +10,7 @@ namespace sm::internal {
     class Input {
     public:
         explicit Input(GLFWwindow* window_handle) noexcept
-            : window_handle(window_handle) {}
+            : m_window_handle(window_handle) {}
 
         bool is_key_pressed(Key key) const noexcept;
         bool is_mouse_button_pressed(MouseButton button) const noexcept;
@@ -19,6 +19,6 @@ namespace sm::internal {
         static Key key_from_code(int code) noexcept;
         static MouseButton mouse_button_from_code(int code) noexcept;
     private:
-        GLFWwindow* window_handle {};
+        GLFWwindow* m_window_handle {};
     };
 }

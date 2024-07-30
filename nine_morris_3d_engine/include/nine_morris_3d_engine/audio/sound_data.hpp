@@ -24,11 +24,11 @@ namespace sm {
         std::size_t compute_size() const noexcept;
         std::size_t compute_bits_per_sample() const noexcept;
 
-        int samples {};  // Total number of samples
-        int channels {};  // Usually mono or stereo
-        int sample_rate {};  // Frequency
-        short* data {};
-        std::size_t size {};
-        std::size_t bits_per_sample {};
+        int m_samples {};  // Total number of samples
+        int m_channels {};  // Usually mono or stereo
+        int m_sample_rate {};  // Frequency
+        short* m_data {};
+        std::size_t m_size {};
+        std::size_t m_bits_per_sample {};
     };
 }

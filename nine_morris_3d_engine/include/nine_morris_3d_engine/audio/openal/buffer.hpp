@@ -20,8 +20,8 @@ namespace sm {
         AlBuffer(AlBuffer&&) = delete;
         AlBuffer& operator=(AlBuffer&&) = delete;
     private:
-        unsigned int buffer {};
-        std::unordered_set<unsigned int> sources_attached;  // The sources that this buffer is attached to
+        unsigned int m_buffer {};
+        std::unordered_set<unsigned int> m_sources_attached;  // The sources that this buffer is attached to
 
         friend class AlSource;
     };

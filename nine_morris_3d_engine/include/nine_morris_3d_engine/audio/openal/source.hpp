@@ -46,7 +46,7 @@ namespace sm {
     private:
         void play(AlBuffer* buffer);
 
-        unsigned int source {};
-        unsigned int attached_buffer {};  // The buffer that is currently attached to this source
+        unsigned int m_source {};
+        unsigned int m_attached_buffer {};  // The buffer that is currently attached to this source
     };
 }

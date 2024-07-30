@@ -35,13 +35,13 @@ namespace sm::internal {
             glm::vec3 orientation
         );
     private:
-        bool vsync {true};
-        bool renderables {false};
-        bool lights {false};
-        bool shadows {false};
-        bool texts {false};
-        bool quads {false};
-        bool tasks {false};
+        bool m_vsync {true};
+        bool m_renderables {false};
+        bool m_lights {false};
+        bool m_shadows {false};
+        bool m_texts {false};
+        bool m_quads {false};
+        bool m_tasks {false};
     };
 #else
     class DebugUi {};

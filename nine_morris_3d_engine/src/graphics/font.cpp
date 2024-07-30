@@ -16,92 +16,92 @@
 
 namespace sm {
     Font::Font(const std::string& buffer, const FontSpecification& specification)
-        : font_buffer(buffer), size_height(specification.size_height), bitmap_size(specification.bitmap_size) {
+        : m_font_buffer(buffer), m_size_height(specification.size_height), m_bitmap_size(specification.bitmap_size) {
         assert(bitmap_size % 4 == 0);  // Needs 4 byte alignment
 
-        font_info = new stbtt_fontinfo;
+        m_font_info = new stbtt_fontinfo;
 
-        if (!stbtt_InitFont(font_info, reinterpret_cast<unsigned char*>(font_buffer.data()), 0)) {
+        if (!stbtt_InitFont(m_font_info, reinterpret_cast<unsigned char*>(m_font_buffer.data()), 0)) {
             SM_THROW_ERROR(ResourceError, "Could not load font");
         }
 
-        sf = stbtt_ScaleForPixelHeight(font_info, specification.size_height);
+        m_sf = stbtt_ScaleForPixelHeight(m_font_info, specification.size_height);
 
         int y0 {};
         int x0, x1, y1;
-        stbtt_GetFontBoundingBox(font_info, &x0, &y0, &x1, &y1);
+        stbtt_GetFontBoundingBox(m_font_info, &x0, &y0, &x1, &y1);
 
-        baseline = static_cast<float>(-y0) * sf;
+        m_baseline = static_cast<float>(-y0) * m_sf;
 
         int ascent {};
         int descent {};
         int line_gap {};
-        stbtt_GetFontVMetrics(font_info, &ascent, &descent, &line_gap);
+        stbtt_GetFontVMetrics(m_font_info, &ascent, &descent, &line_gap);
 
-        vertical_advance = static_cast<float>(ascent - descent + line_gap) * sf;
+        m_vertical_advance = static_cast<float>(ascent - descent + line_gap) * m_sf;
 
         LOG_DEBUG("Loaded font");
     }
 
     Font::~Font() {
-        for (const PackRange& pack_range : pack_ranges) {
+        for (const PackRange& pack_range : m_pack_ranges) {
             delete[] static_cast<stbtt_packedchar*>(pack_range.packed_characters);
         }
 
-        delete font_info;
+        delete m_font_info;
 
         LOG_DEBUG("Freed font");
     }
 
     int Font::get_bitmap_size() const noexcept {
-        return bitmap_size;
+        return m_bitmap_size;
     }
 
     const GlTexture* Font::get_bitmap() const noexcept {
-        return bitmap_texture.get();
+        return m_bitmap_texture.get();
     }
 
     void Font::begin_baking() {
         LOG_DEBUG("Begin baking font");
 
-        bitmap = std::make_unique<unsigned char[]>(bitmap_size * bitmap_size);
-        pack_context = new stbtt_pack_context;
+        m_bitmap = std::make_unique<unsigned char[]>(m_bitmap_size * m_bitmap_size);
+        m_pack_context = new stbtt_pack_context;
 
-        if (!stbtt_PackBegin(pack_context, bitmap.get(), bitmap_size, bitmap_size, 0, 1, nullptr)) {
+        if (!stbtt_PackBegin(m_pack_context, m_bitmap.get(), m_bitmap_size, m_bitmap_size, 0, 1, nullptr)) {
             SM_THROW_ERROR(ResourceError, "Could not begin packing");
         }
 
-        bitmap_texture.reset();
+        m_bitmap_texture.reset();
     }
 
     void Font::end_baking([[maybe_unused]] const char* name) {
-        stbtt_PackEnd(pack_context);
-        delete pack_context;
+        stbtt_PackEnd(m_pack_context);
+        delete m_pack_context;
 
         TextureSpecification specification;
         specification.format = TextureFormat::R8;
         specification.border_color = std::make_optional<glm::vec4>(0.0f, 0.0f, 0.0f, 1.0f);
 
-        bitmap_texture = std::make_unique<GlTexture>(bitmap_size, bitmap_size, bitmap.get(), specification);
+        m_bitmap_texture = std::make_unique<GlTexture>(m_bitmap_size, m_bitmap_size, m_bitmap.get(), specification);
 
 #ifndef SM_BUILD_DISTRIBUTION
-        write_bitmap_to_file(name, bitmap.get(), bitmap_size);
+        write_bitmap_to_file(name, m_bitmap.get(), m_bitmap_size);
 #endif
 
-        bitmap.reset();
+        m_bitmap.reset();
 
         LOG_DEBUG("End baking font");
     }
 
     void Font::bake_characters(int begin_codepoint, int count) {
-        PackRange& pack_range {pack_ranges.emplace_back()};
+        PackRange& pack_range {m_pack_ranges.emplace_back()};
 
         pack_range.packed_characters = new stbtt_packedchar[count];
 
-        const auto* data {reinterpret_cast<unsigned char*>(font_buffer.data())};
+        const auto* data {reinterpret_cast<unsigned char*>(m_font_buffer.data())};
         auto* characters {static_cast<stbtt_packedchar*>(pack_range.packed_characters)};
 
-        if (!stbtt_PackFontRange(pack_context, data, 0, size_height, begin_codepoint, count, characters)) {
+        if (!stbtt_PackFontRange(m_pack_context, data, 0, m_size_height, begin_codepoint, count, characters)) {
             SM_THROW_ERROR(ResourceError, "Could not pack range [{}, {}]", begin_codepoint, begin_codepoint + count);
         }
 
@@ -117,7 +117,7 @@ namespace sm {
         const std::u32string utf32_string {utf8::utf8to32(string)};
 
         float x {0.0f};  // TODO C++20
-        float y {-baseline};
+        float y {-m_baseline};
 
         // This makes multi-line text have its origin at bottom-left
         float vertical_positioning {0.0f};
@@ -126,8 +126,8 @@ namespace sm {
 
         for (const char32_t character : utf32_string) {
             if (character == '\n') {
-                y -= (-vertical_advance);
-                vertical_positioning += vertical_advance;
+                y -= (-m_vertical_advance);
+                vertical_positioning += m_vertical_advance;
                 x = 0.0f;
                 continue;
             }
@@ -188,13 +188,13 @@ namespace sm {
         const std::u32string utf32_string {utf8::utf8to32(string)};
 
         float width {-1.0f};
-        float height {size_height};
+        float height {m_size_height};
 
         float line_width {0.0f};
 
         for (const char32_t character : utf32_string) {
             if (character == '\n') {
-                height += vertical_advance;
+                height += m_vertical_advance;
 
                 width = std::max(width, line_width);
                 line_width = 0.0f;
@@ -203,9 +203,9 @@ namespace sm {
             }
 
             int advance_width {};
-            stbtt_GetCodepointHMetrics(font_info, static_cast<int>(character), &advance_width, nullptr);
+            stbtt_GetCodepointHMetrics(m_font_info, static_cast<int>(character), &advance_width, nullptr);
 
-            line_width += static_cast<float>(advance_width) * sf;
+            line_width += static_cast<float>(advance_width) * m_sf;
         }
 
         width = std::max(width, line_width);
@@ -217,12 +217,12 @@ namespace sm {
         stbtt_aligned_quad aligned_quad {};
         [[maybe_unused]] bool found_character {false};
 
-        for (const PackRange& pack_range : pack_ranges) {
+        for (const PackRange& pack_range : m_pack_ranges) {
             if (codepoint >= pack_range.begin_codepoint && codepoint <= pack_range.begin_codepoint + pack_range.count) {
                 stbtt_GetPackedQuad(
                     static_cast<stbtt_packedchar*>(pack_range.packed_characters),
-                    bitmap_size,
-                    bitmap_size,
+                    m_bitmap_size,
+                    m_bitmap_size,
                     codepoint - pack_range.begin_codepoint,
                     x,
                     y,

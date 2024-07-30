@@ -29,18 +29,18 @@ using namespace resmanager::literals;
 namespace sm::internal {
 #ifndef SM_BUILD_DISTRIBUTION
     DebugRenderer::DebugRenderer(const FileSystem& fs, Renderer& renderer) {
-        storage.shader = std::make_shared<GlShader>(
+        m_storage.shader = std::make_shared<GlShader>(
             utils::read_file(fs.path_engine_assets("shaders/internal/debug.vert")),
             utils::read_file(fs.path_engine_assets("shaders/internal/debug.frag"))
         );
 
-        renderer.register_shader(storage.shader);
+        renderer.register_shader(m_storage.shader);
 
         const auto vertex_buffer {std::make_shared<GlVertexBuffer>(DrawHint::Stream)};
-        storage.wvertex_buffer = vertex_buffer;
+        m_storage.wvertex_buffer = vertex_buffer;
 
-        storage.vertex_array = std::make_unique<GlVertexArray>();
-        storage.vertex_array->configure([&](GlVertexArray* va) {
+        m_storage.vertex_array = std::make_unique<GlVertexArray>();
+        m_storage.vertex_array->configure([&](GlVertexArray* va) {
             VertexBufferLayout layout;
             layout.add(0, VertexBufferLayout::Float, 3);
             layout.add(1, VertexBufferLayout::Float, 3);
@@ -55,29 +55,29 @@ namespace sm::internal {
             v1.position = line.position1;
             v1.color = line.color;
 
-            storage.lines_buffer.push_back(v1);
+            m_storage.lines_buffer.push_back(v1);
 
             BufferVertex v2;
             v2.position = line.position2;
             v2.color = line.color;
 
-            storage.lines_buffer.push_back(v2);
+            m_storage.lines_buffer.push_back(v2);
         }
 
-        if (storage.lines_buffer.empty()) {
+        if (m_storage.lines_buffer.empty()) {
             return;
         }
 
-        const auto vertex_buffer {storage.wvertex_buffer.lock()};
+        const auto vertex_buffer {m_storage.wvertex_buffer.lock()};
 
         vertex_buffer->bind();
-        vertex_buffer->upload_data(storage.lines_buffer.data(), storage.lines_buffer.size() * sizeof(BufferVertex));
+        vertex_buffer->upload_data(m_storage.lines_buffer.data(), m_storage.lines_buffer.size() * sizeof(BufferVertex));
         GlVertexBuffer::unbind();
 
-        storage.lines_buffer.clear();
+        m_storage.lines_buffer.clear();
 
-        storage.shader->bind();
-        storage.vertex_array->bind();
+        m_storage.shader->bind();
+        m_storage.vertex_array->bind();
 
         opengl::draw_arrays_lines(static_cast<int>(scene.m_debug.debug_lines.size()) * 2);
 
@@ -103,9 +103,9 @@ namespace sm::internal {
             );
             specification.samples = samples;
 
-            storage.scene_framebuffer = std::make_shared<GlFramebuffer>(specification);
+            m_storage.scene_framebuffer = std::make_shared<GlFramebuffer>(specification);
 
-            register_framebuffer(storage.scene_framebuffer);
+            register_framebuffer(m_storage.scene_framebuffer);
         }
 
         // Final
@@ -120,9 +120,9 @@ namespace sm::internal {
                 AttachmentFormat::Depth32, AttachmentType::Renderbuffer
             );
 
-            storage.final_framebuffer = std::make_shared<GlFramebuffer>(specification);
+            m_storage.final_framebuffer = std::make_shared<GlFramebuffer>(specification);
 
-            register_framebuffer(storage.final_framebuffer);
+            register_framebuffer(m_storage.final_framebuffer);
         }
 
         // Shadow
@@ -134,31 +134,31 @@ namespace sm::internal {
             specification.white_border_depth_texture = true;
             specification.resizable = false;
 
-            storage.shadow_map_framebuffer = std::make_shared<GlFramebuffer>(specification);
+            m_storage.shadow_map_framebuffer = std::make_shared<GlFramebuffer>(specification);
 
-            register_framebuffer(storage.shadow_map_framebuffer);
+            register_framebuffer(m_storage.shadow_map_framebuffer);
         }
 
         {
             // Doesn't have uniform buffers for sure
-            storage.screen_quad_shader = std::make_unique<GlShader>(
+            m_storage.screen_quad_shader = std::make_unique<GlShader>(
                 utils::read_file(fs.path_engine_assets("shaders/internal/screen_quad.vert")),
                 utils::read_file(fs.path_engine_assets("shaders/internal/screen_quad.frag"))
             );
         }
 
         {
-            storage.shadow_shader = std::make_shared<GlShader>(
+            m_storage.shadow_shader = std::make_shared<GlShader>(
                 utils::read_file(fs.path_engine_assets("shaders/internal/shadow.vert")),
                 utils::read_file(fs.path_engine_assets("shaders/internal/shadow.frag"))
             );
 
-            register_shader(storage.shadow_shader);
+            register_shader(m_storage.shadow_shader);
         }
 
         {
             // Doesn't have uniform buffers for sure
-            storage.text_shader = std::make_unique<GlShader>(
+            m_storage.text_shader = std::make_unique<GlShader>(
                 shd.load_shader(
                     utils::read_file(fs.path_engine_assets("shaders/internal/text.vert")),
                     {{"D_MAX_TEXTS", std::to_string(SHADER_MAX_BATCH_TEXTS)}}
@@ -172,31 +172,31 @@ namespace sm::internal {
 
         {
             // Doesn't have uniform buffers for sure
-            storage.quad_shader = std::make_unique<GlShader>(
+            m_storage.quad_shader = std::make_unique<GlShader>(
                 utils::read_file(fs.path_engine_assets("shaders/internal/quad.vert")),
                 utils::read_file(fs.path_engine_assets("shaders/internal/quad.frag"))
             );
 
-            storage.quad_shader->bind();
-            storage.quad_shader->upload_uniform_int_array("u_texture[0]"_H, {0, 1, 2, 3, 4, 5, 6, 7});  // This is the only way
+            m_storage.quad_shader->bind();
+            m_storage.quad_shader->upload_uniform_int_array("u_texture[0]"_H, {0, 1, 2, 3, 4, 5, 6, 7});  // This is the only way
             GlShader::unbind();
         }
 
         {
             // Doesn't have uniform buffers for sure
-            storage.skybox_shader = std::make_unique<GlShader>(
+            m_storage.skybox_shader = std::make_unique<GlShader>(
                 utils::read_file(fs.path_engine_assets("shaders/internal/skybox.vert")),
                 utils::read_file(fs.path_engine_assets("shaders/internal/skybox.frag"))
             );
         }
 
         {
-            storage.outline_shader = std::make_shared<GlShader>(
+            m_storage.outline_shader = std::make_shared<GlShader>(
                 utils::read_file(fs.path_engine_assets("shaders/internal/outline.vert")),
                 utils::read_file(fs.path_engine_assets("shaders/internal/outline.frag"))
             );
 
-            register_shader(storage.outline_shader);
+            register_shader(m_storage.outline_shader);
         }
 
         {
@@ -211,8 +211,8 @@ namespace sm::internal {
 
             const auto vertex_buffer {std::make_shared<GlVertexBuffer>(vertices, sizeof(vertices))};
 
-            storage.screen_quad_vertex_array = std::make_unique<GlVertexArray>();
-            storage.screen_quad_vertex_array->configure([&](GlVertexArray* va) {
+            m_storage.screen_quad_vertex_array = std::make_unique<GlVertexArray>();
+            m_storage.screen_quad_vertex_array->configure([&](GlVertexArray* va) {
                 VertexBufferLayout layout;
                 layout.add(0, VertexBufferLayout::Float, 2);
 
@@ -223,8 +223,8 @@ namespace sm::internal {
         {
             const auto vertex_buffer {std::make_shared<GlVertexBuffer>(CUBEMAP_VERTICES, sizeof(CUBEMAP_VERTICES))};
 
-            storage.skybox_vertex_array = std::make_unique<GlVertexArray>();
-            storage.skybox_vertex_array->configure([&](GlVertexArray* va) {
+            m_storage.skybox_vertex_array = std::make_unique<GlVertexArray>();
+            m_storage.skybox_vertex_array->configure([&](GlVertexArray* va) {
                 VertexBufferLayout layout;
                 layout.add(0, VertexBufferLayout::Float, 3);
 
@@ -235,8 +235,8 @@ namespace sm::internal {
         {
             const auto vertex_buffer {std::make_shared<GlVertexBuffer>(DrawHint::Stream)};
 
-            storage.text_vertex_array = std::make_unique<GlVertexArray>();
-            storage.text_vertex_array->configure([&](GlVertexArray* va) {
+            m_storage.text_vertex_array = std::make_unique<GlVertexArray>();
+            m_storage.text_vertex_array->configure([&](GlVertexArray* va) {
                 VertexBufferLayout layout;
                 layout.add(0, VertexBufferLayout::Float, 2);
                 layout.add(1, VertexBufferLayout::Float, 2);
@@ -245,15 +245,15 @@ namespace sm::internal {
                 va->add_vertex_buffer(vertex_buffer, layout);
             });
 
-            storage.wtext_vertex_buffer = vertex_buffer;
+            m_storage.wtext_vertex_buffer = vertex_buffer;
         }
 
         {
             const auto vertex_buffer {std::make_shared<GlVertexBuffer>(MAX_QUADS_BUFFER_SIZE, DrawHint::Stream)};
             const auto index_buffer {initialize_quads_index_buffer()};
 
-            storage.quad_vertex_array = std::make_unique<GlVertexArray>();
-            storage.quad_vertex_array->configure([&](GlVertexArray* va) {
+            m_storage.quad_vertex_array = std::make_unique<GlVertexArray>();
+            m_storage.quad_vertex_array->configure([&](GlVertexArray* va) {
                 VertexBufferLayout layout;
                 layout.add(0, VertexBufferLayout::Float, 2);
                 layout.add(1, VertexBufferLayout::Float, 2);
@@ -263,79 +263,79 @@ namespace sm::internal {
                 va->add_index_buffer(index_buffer);
             });
 
-            storage.wquad_vertex_buffer = vertex_buffer;
+            m_storage.wquad_vertex_buffer = vertex_buffer;
 
-            storage.quad.buffer = std::make_unique<QuadVertex[]>(MAX_QUAD_COUNT * 4);
+            m_storage.quad.buffer = std::make_unique<QuadVertex[]>(MAX_QUAD_COUNT * 4);
         }
 
         {
-            storage.default_font = std::make_unique<Font>(
+            m_storage.default_font = std::make_unique<Font>(
                 utils::read_file(fs.path_engine_assets("fonts/CodeNewRoman/code-new-roman.regular.ttf"))
             );
 
-            storage.default_font->begin_baking();
-            storage.default_font->bake_ascii();
-            storage.default_font->end_baking("default");
+            m_storage.default_font->begin_baking();
+            m_storage.default_font->bake_ascii();
+            m_storage.default_font->end_baking("default");
         }
 
 #ifndef SM_BUILD_DISTRIBUTION
-        debug = DebugRenderer(fs, *this);
+        m_debug = DebugRenderer(fs, *this);
 #endif
     }
 
     std::shared_ptr<Font> Renderer::get_default_font() const noexcept {
-        return storage.default_font;
+        return m_storage.default_font;
     }
 
     void Renderer::set_color_correction(bool enable) noexcept {
-        color_correction = enable;
+        m_color_correction = enable;
     }
 
     bool Renderer::get_color_correction() const noexcept {
-        return color_correction;
+        return m_color_correction;
     }
 
     void Renderer::set_clear_color(glm::vec3 color) noexcept {
-        if (color_correction) {
-            clear_color = glm::convertSRGBToLinear(color);
+        if (m_color_correction) {
+            m_clear_color = glm::convertSRGBToLinear(color);
         } else {
-            clear_color = color;
+            m_clear_color = color;
         }
 
-        opengl::clear_color(clear_color.r, clear_color.g, clear_color.b);
+        opengl::clear_color(m_clear_color.r, m_clear_color.g, m_clear_color.b);
     }
 
     void Renderer::register_shader(std::shared_ptr<GlShader> shader) {
-        storage.shaders.push_back(shader);
+        m_storage.shaders.push_back(shader);
         setup_shader_uniform_buffers(shader);
     }
 
     void Renderer::register_framebuffer(std::shared_ptr<GlFramebuffer> framebuffer) {
-        storage.framebuffers.push_back(framebuffer);
+        m_storage.framebuffers.push_back(framebuffer);
     }
 
     void Renderer::render(const Scene& scene, int width, int height) {
         set_and_upload_uniform_buffer_data(scene);
 
         // Draw to depth buffer for shadows
-        storage.shadow_map_framebuffer->bind();
+        m_storage.shadow_map_framebuffer->bind();
         opengl::clear(opengl::Buffers::D);
         opengl::viewport(
-            storage.shadow_map_framebuffer->get_specification().width,
-            storage.shadow_map_framebuffer->get_specification().height
+            m_storage.shadow_map_framebuffer->get_specification().width,
+            m_storage.shadow_map_framebuffer->get_specification().height
         );
 
         draw_renderables_to_shadow_map(scene);
 
         // Draw normal things
-        storage.scene_framebuffer->bind();
+        m_storage.scene_framebuffer->bind();
         opengl::clear(opengl::Buffers::CDS);
         opengl::viewport(
-            storage.scene_framebuffer->get_specification().width,
-            storage.scene_framebuffer->get_specification().height
+            m_storage.scene_framebuffer->get_specification().width,
+            m_storage.scene_framebuffer->get_specification().height
         );
 
-        opengl::bind_texture_2d(storage.shadow_map_framebuffer->get_depth_attachment(), SHADOW_MAP_UNIT);
+        opengl::bind_texture_2d(m_storage.shadow_map_framebuffer->get_depth_attachment(), SHADOW_MAP_UNIT);
 
         // I sincerely have no idea why outlined objects need to be rendered first; it seems the opposite
         draw_renderables_outlined(scene);
@@ -347,10 +347,10 @@ namespace sm::internal {
         }
 
         // Blit the resulted scene texture to an intermediate texture, resolving anti-aliasing
-        storage.scene_framebuffer->blit(
-            storage.final_framebuffer.get(),
-            storage.scene_framebuffer->get_specification().width,
-            storage.scene_framebuffer->get_specification().height
+        m_storage.scene_framebuffer->blit(
+            m_storage.final_framebuffer.get(),
+            m_storage.scene_framebuffer->get_specification().width,
+            m_storage.scene_framebuffer->get_specification().height
         );
 
         // Do post processing and render the final 3D image to the screen
@@ -361,7 +361,7 @@ namespace sm::internal {
         draw_quads(scene);
 
 #ifndef SM_BUILD_DISTRIBUTION
-        debug.render(scene);
+        m_debug.render(scene);
 #endif
     }
 
@@ -380,7 +380,7 @@ namespace sm::internal {
 
         opengl::viewport(width, height);
 
-        for (std::weak_ptr<GlFramebuffer> wframebuffer : storage.framebuffers) {
+        for (std::weak_ptr<GlFramebuffer> wframebuffer : m_storage.framebuffers) {
             std::shared_ptr<GlFramebuffer> framebuffer {wframebuffer.lock()};
 
             if (framebuffer == nullptr) {
@@ -400,7 +400,7 @@ namespace sm::internal {
     }
 
     void Renderer::set_and_upload_uniform_buffer_data(const Scene& scene) {
-        for (const auto& [binding_index, wuniform_buffer] : storage.uniform_buffers) {
+        for (const auto& [binding_index, wuniform_buffer] : m_storage.uniform_buffers) {
             const auto uniform_buffer {wuniform_buffer.lock()};
 
             if (uniform_buffer == nullptr) {
@@ -439,22 +439,22 @@ namespace sm::internal {
     }
 
     void Renderer::post_processing(const Scene& scene) {
-        post_processing_context.original_texture = storage.final_framebuffer->get_color_attachment(0);
-        post_processing_context.last_texture = post_processing_context.original_texture;
-        post_processing_context.textures.clear();
+        m_post_processing_context.original_texture = m_storage.final_framebuffer->get_color_attachment(0);
+        m_post_processing_context.last_texture = m_post_processing_context.original_texture;
+        m_post_processing_context.textures.clear();
 
         for (const auto& step : scene.m_post_processing_steps) {
-            step->framebuffer->bind();
+            step->m_framebuffer->bind();
             opengl::clear(opengl::Buffers::C);
-            opengl::viewport(step->framebuffer->get_specification().width, step->framebuffer->get_specification().height);
+            opengl::viewport(step->m_framebuffer->get_specification().width, step->m_framebuffer->get_specification().height);
 
-            step->shader->bind();
-            step->setup(post_processing_context);
+            step->m_shader->bind();
+            step->setup(m_post_processing_context);
 
             opengl::draw_arrays(6);
 
-            post_processing_context.last_texture = step->framebuffer->get_color_attachment(0);
-            post_processing_context.textures.push_back(post_processing_context.last_texture);
+            m_post_processing_context.last_texture = step->m_framebuffer->get_color_attachment(0);
+            m_post_processing_context.textures.push_back(m_post_processing_context.last_texture);
         }
     }
 
@@ -462,7 +462,7 @@ namespace sm::internal {
         opengl::disable_depth_test();
         opengl::clear_color(0.0f, 0.0f, 0.0f);
 
-        storage.screen_quad_vertex_array->bind();
+        m_storage.screen_quad_vertex_array->bind();
 
         post_processing(scene);
 
@@ -470,17 +470,17 @@ namespace sm::internal {
         opengl::clear(opengl::Buffers::CD);  // Clear for debug renderer
         opengl::viewport(width, height);
 
-        if (color_correction) {
+        if (m_color_correction) {
             opengl::enable_framebuffer_srgb();
-            screen_quad(storage.screen_quad_shader.get(), post_processing_context.last_texture);
+            screen_quad(m_storage.screen_quad_shader.get(), m_post_processing_context.last_texture);
             opengl::disable_framebuffer_srgb();
         } else {
-            screen_quad(storage.screen_quad_shader.get(), post_processing_context.last_texture);
+            screen_quad(m_storage.screen_quad_shader.get(), m_post_processing_context.last_texture);
         }
 
         GlVertexArray::unbind();
 
-        opengl::clear_color(clear_color.r, clear_color.g, clear_color.b);
+        opengl::clear_color(m_clear_color.r, m_clear_color.g, m_clear_color.b);
         opengl::enable_depth_test();
     }
 
@@ -492,9 +492,9 @@ namespace sm::internal {
 
     void Renderer::setup_shader_uniform_buffers(std::shared_ptr<GlShader> shader) {
         // Create and store references to particular uniform buffers
-        for (const UniformBlockSpecification& block : shader->uniform_blocks) {
+        for (const UniformBlockSpecification& block : shader->m_uniform_blocks) {
             // Don't create duplicate buffers
-            if (const auto iter {storage.uniform_buffers.find(block.binding_index)}; iter != storage.uniform_buffers.cend()) {
+            if (const auto iter {m_storage.uniform_buffers.find(block.binding_index)}; iter != m_storage.uniform_buffers.cend()) {
                 if (!iter->second.expired()) {
                     continue;
                 }
@@ -503,28 +503,28 @@ namespace sm::internal {
             const auto uniform_buffer {std::make_shared<GlUniformBuffer>(block)};
             shader->add_uniform_buffer(uniform_buffer);
 
-            storage.uniform_buffers[block.binding_index] = uniform_buffer;
+            m_storage.uniform_buffers[block.binding_index] = uniform_buffer;
         }
     }
 
     void Renderer::clear_expired_resources() {
-        storage.shaders.erase(
-            std::remove_if(storage.shaders.begin(), storage.shaders.end(), [](const std::weak_ptr<GlShader>& wshader) {
+        m_storage.shaders.erase(
+            std::remove_if(m_storage.shaders.begin(), m_storage.shaders.end(), [](const std::weak_ptr<GlShader>& wshader) {
                 return wshader.lock() == nullptr;
             }),
-            storage.shaders.cend()
+            m_storage.shaders.cend()
         );
 
-        storage.framebuffers.erase(
-            std::remove_if(storage.framebuffers.begin(), storage.framebuffers.end(), [](const std::weak_ptr<GlFramebuffer>& wframebuffer) {
+        m_storage.framebuffers.erase(
+            std::remove_if(m_storage.framebuffers.begin(), m_storage.framebuffers.end(), [](const std::weak_ptr<GlFramebuffer>& wframebuffer) {
                 return wframebuffer.lock() == nullptr;
             }),
-            storage.framebuffers.cend()
+            m_storage.framebuffers.cend()
         );
 
-        for (auto iter {storage.uniform_buffers.begin()}; iter != storage.uniform_buffers.end();) {
+        for (auto iter {m_storage.uniform_buffers.begin()}; iter != m_storage.uniform_buffers.end();) {
             if (iter->second.lock() == nullptr) {
-                iter = storage.uniform_buffers.erase(iter);
+                iter = m_storage.uniform_buffers.erase(iter);
             } else {
                 iter++;
             }
@@ -533,7 +533,7 @@ namespace sm::internal {
 
     void Renderer::draw_renderables(const Scene& scene) {
         for (const Renderable& renderable : scene.m_renderables) {
-            const auto material {renderable.material};
+            const auto material {renderable.m_material};
 
             if (material->flags & Material::Outline) {
                 continue;  // This one is rendered differently
@@ -552,11 +552,11 @@ namespace sm::internal {
     }
 
     void Renderer::draw_renderable(const Renderable& renderable) {
-        renderable.vertex_array->bind();
-        renderable.material->bind_and_upload();
-        renderable.material->get_shader()->upload_uniform_mat4("u_model_matrix"_H, get_renderable_transform(renderable.transform));
+        renderable.m_vertex_array->bind();
+        renderable.m_material->bind_and_upload();
+        renderable.m_material->get_shader()->upload_uniform_mat4("u_model_matrix"_H, get_renderable_transform(renderable.transform));
 
-        opengl::draw_elements(renderable.vertex_array->get_index_buffer()->get_index_count());
+        opengl::draw_elements(renderable.m_vertex_array->get_index_buffer()->get_index_count());
 
         // Don't unbind the vertex array
     }
@@ -565,7 +565,7 @@ namespace sm::internal {
         std::vector<Renderable> outline_renderables;
 
         std::for_each(scene.m_renderables.cbegin(), scene.m_renderables.cend(), [&](const Renderable& renderable) {
-            if (renderable.material->flags & Material::Outline) {
+            if (renderable.m_material->flags & Material::Outline) {
                 outline_renderables.push_back(renderable);
             }
         });
@@ -590,11 +590,11 @@ namespace sm::internal {
         const glm::mat4 transform {get_renderable_transform(renderable.transform)};
 
         {
-            renderable.vertex_array->bind();
-            renderable.material->bind_and_upload();
-            renderable.material->get_shader()->upload_uniform_mat4("u_model_matrix"_H, transform);
+            renderable.m_vertex_array->bind();
+            renderable.m_material->bind_and_upload();
+            renderable.m_material->get_shader()->upload_uniform_mat4("u_model_matrix"_H, transform);
 
-            opengl::draw_elements(renderable.vertex_array->get_index_buffer()->get_index_count());
+            opengl::draw_elements(renderable.m_vertex_array->get_index_buffer()->get_index_count());
         }
 
         opengl::stencil_mask(0x00);
@@ -604,15 +604,15 @@ namespace sm::internal {
             // Vertex array is already bound
 
             const glm::vec3 color {
-                color_correction ? glm::convertSRGBToLinear(renderable.outline.color) : renderable.outline.color
+                m_color_correction ? glm::convertSRGBToLinear(renderable.outline.color) : renderable.outline.color
             };
 
-            storage.outline_shader->bind();
-            storage.outline_shader->upload_uniform_mat4("u_model_matrix"_H, transform);
-            storage.outline_shader->upload_uniform_vec3("u_color"_H, color);
-            storage.outline_shader->upload_uniform_float("u_outline_thickness"_H, renderable.outline.thickness);
+            m_storage.outline_shader->bind();
+            m_storage.outline_shader->upload_uniform_mat4("u_model_matrix"_H, transform);
+            m_storage.outline_shader->upload_uniform_vec3("u_color"_H, color);
+            m_storage.outline_shader->upload_uniform_float("u_outline_thickness"_H, renderable.outline.thickness);
 
-            opengl::draw_elements(renderable.vertex_array->get_index_buffer()->get_index_count());
+            opengl::draw_elements(renderable.m_vertex_array->get_index_buffer()->get_index_count());
 
             GlVertexArray::unbind();
         }
@@ -624,18 +624,18 @@ namespace sm::internal {
     void Renderer::draw_renderables_to_shadow_map(const Scene& scene) {
         opengl::disable_back_face_culling();
 
-        storage.shadow_shader->bind();
+        m_storage.shadow_shader->bind();
 
         for (const Renderable& renderable : scene.m_renderables) {
-            if (!(renderable.material->flags & Material::CastShadow)) {
+            if (!(renderable.m_material->flags & Material::CastShadow)) {
                 continue;
             }
 
-            renderable.vertex_array->bind();
+            renderable.m_vertex_array->bind();
 
-            storage.shadow_shader->upload_uniform_mat4("u_model_matrix"_H, get_renderable_transform(renderable.transform));
+            m_storage.shadow_shader->upload_uniform_mat4("u_model_matrix"_H, get_renderable_transform(renderable.transform));
 
-            opengl::draw_elements(renderable.vertex_array->get_index_buffer()->get_index_count());
+            opengl::draw_elements(renderable.m_vertex_array->get_index_buffer()->get_index_count());
         }
 
         GlVertexArray::unbind();
@@ -647,10 +647,10 @@ namespace sm::internal {
         const glm::mat4& projection {scene.m_camera.projection_matrix};
         const glm::mat4 view {glm::mat4(glm::mat3(scene.m_camera.view_matrix))};
 
-        storage.skybox_shader->bind();
-        storage.skybox_shader->upload_uniform_mat4("u_projection_view_matrix"_H, projection * view);
+        m_storage.skybox_shader->bind();
+        m_storage.skybox_shader->upload_uniform_mat4("u_projection_view_matrix"_H, projection * view);
 
-        storage.skybox_vertex_array->bind();
+        m_storage.skybox_vertex_array->bind();
         scene.m_skybox_texture->bind(0);
 
         opengl::draw_arrays(36);
@@ -661,7 +661,7 @@ namespace sm::internal {
     void Renderer::draw_texts(const Scene& scene) {
         opengl::disable_depth_test();
 
-        storage.text_shader->bind();
+        m_storage.text_shader->bind();
 
         auto texts {scene.m_texts};
 
@@ -679,24 +679,24 @@ namespace sm::internal {
             if (current != last) {
                 last = current;
 
-                storage.text.batches.emplace_back().font = text.font;
+                m_storage.text.batches.emplace_back().font = text.font;
             }
 
-            if (storage.text.batches.back().texts.size() >= SHADER_MAX_BATCH_TEXTS) {
-                storage.text.batches.emplace_back().font = text.font;
+            if (m_storage.text.batches.back().texts.size() >= SHADER_MAX_BATCH_TEXTS) {
+                m_storage.text.batches.emplace_back().font = text.font;
             }
 
-            storage.text.batches.back().texts.push_back(text);
+            m_storage.text.batches.back().texts.push_back(text);
         }
 
-        for (const auto& batch : storage.text.batches) {
+        for (const auto& batch : m_storage.text.batches) {
             draw_text_batch(scene, batch);
-            storage.text.batch_buffer.clear();
-            storage.text.batch_matrices.clear();
-            storage.text.batch_colors.clear();
+            m_storage.text.batch_buffer.clear();
+            m_storage.text.batch_matrices.clear();
+            m_storage.text.batch_colors.clear();
         }
 
-        storage.text.batches.clear();
+        m_storage.text.batches.clear();
 
         opengl::enable_depth_test();
     }
@@ -708,31 +708,31 @@ namespace sm::internal {
             assert(i < SHADER_MAX_BATCH_TEXTS);
 
             // Pushes the rendered text onto the buffer
-            batch.font->render(text.text, static_cast<int>(i++), storage.text.batch_buffer);
+            batch.font->render(text.text, static_cast<int>(i++), m_storage.text.batch_buffer);
 
             glm::mat4 matrix {1.0f};  // TODO upload mat3 instead
             matrix = glm::translate(matrix, glm::vec3(text.position, 0.0f));
             matrix = glm::scale(matrix, glm::vec3(std::min(text.scale, 1.0f), std::min(text.scale, 1.0f), 1.0f));
 
-            storage.text.batch_matrices.push_back(matrix);
-            storage.text.batch_colors.push_back(text.color);
+            m_storage.text.batch_matrices.push_back(matrix);
+            m_storage.text.batch_colors.push_back(text.color);
         }
 
         // Uniforms must be set as arrays
-        storage.text_shader->upload_uniform_mat4_array("u_model_matrix[0]"_H, storage.text.batch_matrices);
-        storage.text_shader->upload_uniform_vec3_array("u_color[0]"_H, storage.text.batch_colors);
-        storage.text_shader->upload_uniform_mat4("u_projection_matrix"_H, scene.m_camera_2d.projection_matrix);
+        m_storage.text_shader->upload_uniform_mat4_array("u_model_matrix[0]"_H, m_storage.text.batch_matrices);
+        m_storage.text_shader->upload_uniform_vec3_array("u_color[0]"_H, m_storage.text.batch_colors);
+        m_storage.text_shader->upload_uniform_mat4("u_projection_matrix"_H, scene.m_camera_2d.projection_matrix);
 
-        const auto vertex_buffer {storage.wtext_vertex_buffer.lock()};
+        const auto vertex_buffer {m_storage.wtext_vertex_buffer.lock()};
         vertex_buffer->bind();
-        vertex_buffer->upload_data(storage.text.batch_buffer.data(), storage.text.batch_buffer.size() * sizeof(Font::CharacterBuffer));
+        vertex_buffer->upload_data(m_storage.text.batch_buffer.data(), m_storage.text.batch_buffer.size() * sizeof(Font::CharacterBuffer));
         GlVertexBuffer::unbind();
 
-        storage.text_vertex_array->bind();
+        m_storage.text_vertex_array->bind();
 
         opengl::bind_texture_2d(batch.font->get_bitmap()->get_id(), 0);
 
-        opengl::draw_arrays(static_cast<int>(storage.text.batch_buffer.size()) * 6);
+        opengl::draw_arrays(static_cast<int>(m_storage.text.batch_buffer.size()) * 6);
 
         GlVertexArray::unbind();
     }
@@ -740,10 +740,10 @@ namespace sm::internal {
     void Renderer::draw_quads(const Scene& scene) {
         opengl::disable_depth_test();
 
-        storage.quad_shader->bind();
-        storage.quad_vertex_array->bind();
+        m_storage.quad_shader->bind();
+        m_storage.quad_vertex_array->bind();
 
-        storage.quad_shader->upload_uniform_mat4("u_projection_matrix"_H, scene.m_camera_2d.projection_matrix);
+        m_storage.quad_shader->upload_uniform_mat4("u_projection_matrix"_H, scene.m_camera_2d.projection_matrix);
 
         begin_quads_batch();
 
@@ -765,7 +765,7 @@ namespace sm::internal {
     }
 
     void Renderer::draw_quad(glm::vec2 position, glm::vec2 size, glm::vec2 scale, unsigned int texture) {
-        if (storage.quad.quad_count == MAX_QUAD_COUNT || storage.quad.texture_index == storage.quad.textures.size()) {
+        if (m_storage.quad.quad_count == MAX_QUAD_COUNT || m_storage.quad.texture_index == m_storage.quad.textures.size()) {
             end_quads_batch();
             flush_quads_batch();
             begin_quads_batch();
@@ -774,8 +774,8 @@ namespace sm::internal {
         int texture_index {-1};
 
         // Search for this texture in textures array
-        for (std::size_t i {0}; i < storage.quad.texture_index; i++) {
-            if (storage.quad.textures[i] == texture) {
+        for (std::size_t i {0}; i < m_storage.quad.texture_index; i++) {
+            if (m_storage.quad.textures[i] == texture) {
                 texture_index = static_cast<int>(i);
                 break;
             }
@@ -783,57 +783,57 @@ namespace sm::internal {
 
         if (texture_index < 0) {
             // Not found in textures
-            texture_index = static_cast<int>(storage.quad.texture_index);
-            storage.quad.textures[storage.quad.texture_index] = texture;
-            storage.quad.texture_index++;
+            texture_index = static_cast<int>(m_storage.quad.texture_index);
+            m_storage.quad.textures[m_storage.quad.texture_index] = texture;
+            m_storage.quad.texture_index++;
         }
 
         size *= glm::min(scale, glm::vec2(1.0f));
 
-        storage.quad.buffer_pointer->position = glm::vec2(position.x + size.x, position.y + size.y);
-        storage.quad.buffer_pointer->texture_coordinate = glm::vec2(1.0f, 1.0f);
-        storage.quad.buffer_pointer->texture_index = texture_index;
-        storage.quad.buffer_pointer++;
+        m_storage.quad.buffer_pointer->position = glm::vec2(position.x + size.x, position.y + size.y);
+        m_storage.quad.buffer_pointer->texture_coordinate = glm::vec2(1.0f, 1.0f);
+        m_storage.quad.buffer_pointer->texture_index = texture_index;
+        m_storage.quad.buffer_pointer++;
 
-        storage.quad.buffer_pointer->position = glm::vec2(position.x, position.y + size.y);
-        storage.quad.buffer_pointer->texture_coordinate = glm::vec2(0.0f, 1.0f);
-        storage.quad.buffer_pointer->texture_index = texture_index;
-        storage.quad.buffer_pointer++;
+        m_storage.quad.buffer_pointer->position = glm::vec2(position.x, position.y + size.y);
+        m_storage.quad.buffer_pointer->texture_coordinate = glm::vec2(0.0f, 1.0f);
+        m_storage.quad.buffer_pointer->texture_index = texture_index;
+        m_storage.quad.buffer_pointer++;
 
-        storage.quad.buffer_pointer->position = glm::vec2(position.x, position.y);
-        storage.quad.buffer_pointer->texture_coordinate = glm::vec2(0.0f, 0.0f);
-        storage.quad.buffer_pointer->texture_index = texture_index;
-        storage.quad.buffer_pointer++;
+        m_storage.quad.buffer_pointer->position = glm::vec2(position.x, position.y);
+        m_storage.quad.buffer_pointer->texture_coordinate = glm::vec2(0.0f, 0.0f);
+        m_storage.quad.buffer_pointer->texture_index = texture_index;
+        m_storage.quad.buffer_pointer++;
 
-        storage.quad.buffer_pointer->position = glm::vec2(position.x + size.x, position.y);
-        storage.quad.buffer_pointer->texture_coordinate = glm::vec2(1.0f, 0.0f);
-        storage.quad.buffer_pointer->texture_index = texture_index;
-        storage.quad.buffer_pointer++;
+        m_storage.quad.buffer_pointer->position = glm::vec2(position.x + size.x, position.y);
+        m_storage.quad.buffer_pointer->texture_coordinate = glm::vec2(1.0f, 0.0f);
+        m_storage.quad.buffer_pointer->texture_index = texture_index;
+        m_storage.quad.buffer_pointer++;
 
-        storage.quad.quad_count++;
+        m_storage.quad.quad_count++;
     }
 
     void Renderer::begin_quads_batch() {
-        storage.quad.quad_count = 0;
-        storage.quad.buffer_pointer = storage.quad.buffer.get();
-        storage.quad.texture_index = 0;
+        m_storage.quad.quad_count = 0;
+        m_storage.quad.buffer_pointer = m_storage.quad.buffer.get();
+        m_storage.quad.texture_index = 0;
     }
 
     void Renderer::end_quads_batch() {
-        const std::size_t size {(storage.quad.buffer_pointer - storage.quad.buffer.get()) * sizeof(QuadVertex)};
+        const std::size_t size {(m_storage.quad.buffer_pointer - m_storage.quad.buffer.get()) * sizeof(QuadVertex)};
 
-        const auto vertex_buffer {storage.wquad_vertex_buffer.lock()};
+        const auto vertex_buffer {m_storage.wquad_vertex_buffer.lock()};
 
         vertex_buffer->bind();
-        vertex_buffer->upload_sub_data(storage.quad.buffer.get(), 0, size);
+        vertex_buffer->upload_sub_data(m_storage.quad.buffer.get(), 0, size);
     }
 
     void Renderer::flush_quads_batch() {
-        for (std::size_t i {0}; i < storage.quad.texture_index; i++) {
-            opengl::bind_texture_2d(storage.quad.textures[i], static_cast<int>(i));
+        for (std::size_t i {0}; i < m_storage.quad.texture_index; i++) {
+            opengl::bind_texture_2d(m_storage.quad.textures[i], static_cast<int>(i));
         }
 
-        opengl::draw_elements(static_cast<int>(storage.quad.quad_count * 6));
+        opengl::draw_elements(static_cast<int>(m_storage.quad.quad_count * 6));
     }
 
     void Renderer::setup_point_light_uniform_buffer(const Scene& scene, const std::shared_ptr<GlUniformBuffer> uniform_buffer) {

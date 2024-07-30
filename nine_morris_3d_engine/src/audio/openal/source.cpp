@@ -9,24 +9,24 @@
 
 namespace sm {
     AlSource::AlSource() noexcept {
-        alGenSources(1, &source);
-        alSourcef(source, AL_ROLLOFF_FACTOR, 1.0f);
-        alSourcef(source, AL_REFERENCE_DISTANCE, 8.0f);
-        alSourcef(source, AL_MAX_DISTANCE, 22.0f);
+        alGenSources(1, &m_source);
+        alSourcef(m_source, AL_ROLLOFF_FACTOR, 1.0f);
+        alSourcef(m_source, AL_REFERENCE_DISTANCE, 8.0f);
+        alSourcef(m_source, AL_MAX_DISTANCE, 22.0f);
 
         openal_debug::check_errors();
 
-        LOG_DEBUG("Created AL source {}", source);
+        LOG_DEBUG("Created AL source {}", m_source);
     }
 
     AlSource::~AlSource() noexcept {
         stop();
 
-        alDeleteSources(1, &source);
+        alDeleteSources(1, &m_source);
 
         openal_debug::check_errors();
 
-        LOG_DEBUG("Deleted AL source {}", source);
+        LOG_DEBUG("Deleted AL source {}", m_source);
     }
 
     void AlSource::play(std::shared_ptr<AlBuffer> buffer) {
@@ -38,26 +38,26 @@ namespace sm {
     }
 
     void AlSource::stop() const noexcept {
-        alSourceStop(source);
+        alSourceStop(m_source);
 
         openal_debug::check_errors();
     }
 
     void AlSource::pause() const noexcept {
-        alSourcePause(source);
+        alSourcePause(m_source);
 
         openal_debug::check_errors();
     }
 
     void AlSource::resume() const noexcept {
-        alSourcePlay(source);
+        alSourcePlay(m_source);
 
         openal_debug::check_errors();
     }
 
     bool AlSource::is_playing() const noexcept {
         int state {};
-        alGetSourcei(source, AL_SOURCE_STATE, &state);
+        alGetSourcei(m_source, AL_SOURCE_STATE, &state);
 
         openal_debug::check_errors();
 
@@ -67,7 +67,7 @@ namespace sm {
     void AlSource::set_gain(float gain) const noexcept {
         assert(gain >= 0.0f);
 
-        alSourcef(source, AL_GAIN, gain);
+        alSourcef(m_source, AL_GAIN, gain);
 
         openal_debug::check_errors();
     }
@@ -75,56 +75,56 @@ namespace sm {
     void AlSource::set_pitch(float pitch) const noexcept {
         assert(pitch >= 0.0f);
 
-        alSourcef(source, AL_PITCH, pitch);
+        alSourcef(m_source, AL_PITCH, pitch);
 
         openal_debug::check_errors();
     }
 
     void AlSource::set_position(glm::vec3 position) const noexcept {
-        alSource3f(source, AL_POSITION, position.x, position.y, position.z);
+        alSource3f(m_source, AL_POSITION, position.x, position.y, position.z);
 
         openal_debug::check_errors();
     }
 
     void AlSource::set_velocity(glm::vec3 velocity) const noexcept {
-        alSource3f(source, AL_VELOCITY, velocity.x, velocity.y, velocity.z);
+        alSource3f(m_source, AL_VELOCITY, velocity.x, velocity.y, velocity.z);
 
         openal_debug::check_errors();
     }
 
     void AlSource::set_direction(glm::vec3 direction) const noexcept {
-        alSource3f(source, AL_DIRECTION, direction.x, direction.y, direction.z);
+        alSource3f(m_source, AL_DIRECTION, direction.x, direction.y, direction.z);
 
         openal_debug::check_errors();
     }
 
     void AlSource::set_looping(bool looping) const noexcept {
-        alSourcei(source, AL_LOOPING, static_cast<ALint>(looping));
+        alSourcei(m_source, AL_LOOPING, static_cast<ALint>(looping));
 
         openal_debug::check_errors();
     }
 
     void AlSource::set_rolloff_factor(float rolloff_factor) const noexcept {
-        alSourcef(source, AL_ROLLOFF_FACTOR, rolloff_factor);
+        alSourcef(m_source, AL_ROLLOFF_FACTOR, rolloff_factor);
 
         openal_debug::check_errors();
     }
 
     void AlSource::set_reference_distance(float reference_distance) const noexcept {
-        alSourcef(source, AL_REFERENCE_DISTANCE, reference_distance);
+        alSourcef(m_source, AL_REFERENCE_DISTANCE, reference_distance);
 
         openal_debug::check_errors();
     }
 
     void AlSource::set_max_distance(float max_distance) const noexcept {
-        alSourcef(source, AL_MAX_DISTANCE, max_distance);
+        alSourcef(m_source, AL_MAX_DISTANCE, max_distance);
 
         openal_debug::check_errors();
     }
 
     float AlSource::get_gain() const noexcept {
         float gain {};
-        alGetSourcef(source, AL_GAIN, &gain);
+        alGetSourcef(m_source, AL_GAIN, &gain);
 
         openal_debug::check_errors();
 
@@ -133,7 +133,7 @@ namespace sm {
 
     float AlSource::get_pitch() const noexcept {
         float pitch {};
-        alGetSourcef(source, AL_PITCH, &pitch);
+        alGetSourcef(m_source, AL_PITCH, &pitch);
 
         openal_debug::check_errors();
 
@@ -142,7 +142,7 @@ namespace sm {
 
     glm::vec3 AlSource::get_position() const noexcept {
         glm::vec3 position {};
-        alGetSource3f(source, AL_POSITION, &position.x, &position.y, &position.z);
+        alGetSource3f(m_source, AL_POSITION, &position.x, &position.y, &position.z);
 
         openal_debug::check_errors();
 
@@ -151,7 +151,7 @@ namespace sm {
 
     glm::vec3 AlSource::get_velocity() const noexcept {
         glm::vec3 velocity {};
-        alGetSource3f(source, AL_VELOCITY, &velocity.x, &velocity.y, &velocity.z);
+        alGetSource3f(m_source, AL_VELOCITY, &velocity.x, &velocity.y, &velocity.z);
 
         openal_debug::check_errors();
 
@@ -160,7 +160,7 @@ namespace sm {
 
     glm::vec3 AlSource::get_direction() const noexcept {
         glm::vec3 direction {};
-        alGetSource3f(source, AL_DIRECTION, &direction.x, &direction.y, &direction.z);
+        alGetSource3f(m_source, AL_DIRECTION, &direction.x, &direction.y, &direction.z);
 
         openal_debug::check_errors();
 
@@ -169,7 +169,7 @@ namespace sm {
 
     bool AlSource::get_looping() const noexcept {
         int looping {};
-        alGetSourcei(source, AL_LOOPING, &looping);
+        alGetSourcei(m_source, AL_LOOPING, &looping);
 
         openal_debug::check_errors();
 
@@ -178,7 +178,7 @@ namespace sm {
 
     float AlSource::get_rolloff_factor() const noexcept {
         float rolloff_factor {};
-        alGetSourcef(source, AL_ROLLOFF_FACTOR, &rolloff_factor);
+        alGetSourcef(m_source, AL_ROLLOFF_FACTOR, &rolloff_factor);
 
         openal_debug::check_errors();
 
@@ -187,7 +187,7 @@ namespace sm {
 
     float AlSource::get_reference_distance() const noexcept {
         float reference_distance {};
-        alGetSourcef(source, AL_REFERENCE_DISTANCE, &reference_distance);
+        alGetSourcef(m_source, AL_REFERENCE_DISTANCE, &reference_distance);
 
         openal_debug::check_errors();
 
@@ -196,7 +196,7 @@ namespace sm {
 
     float AlSource::get_max_distance() const noexcept {
         float max_distance {};
-        alGetSourcef(source, AL_MAX_DISTANCE, &max_distance);
+        alGetSourcef(m_source, AL_MAX_DISTANCE, &max_distance);
 
         openal_debug::check_errors();
 
@@ -206,16 +206,16 @@ namespace sm {
     void AlSource::play(AlBuffer* buffer) {
         stop();
 
-        if (buffer->buffer != attached_buffer) {
-            attached_buffer = buffer->buffer;
-            buffer->sources_attached.insert(source);
+        if (buffer->m_buffer != m_attached_buffer) {
+            m_attached_buffer = buffer->m_buffer;
+            buffer->m_sources_attached.insert(m_source);
 
-            alSourcei(source, AL_BUFFER, attached_buffer);
+            alSourcei(m_source, AL_BUFFER, m_attached_buffer);
 
             openal_debug::check_errors();
         }
 
-        alSourcePlay(source);
+        alSourcePlay(m_source);
 
         openal_debug::check_errors();
     }

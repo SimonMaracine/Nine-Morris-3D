@@ -24,9 +24,9 @@ namespace sm::internal {
         void resume() noexcept;
         void set_gain(float gain) noexcept;
     private:
-        std::unique_ptr<AlSource> source;
+        std::unique_ptr<AlSource> m_source;
 
         // Pointer is reset when music is stopped
-        std::shared_ptr<MusicTrack> current_music_track;
+        std::shared_ptr<MusicTrack> m_current_music_track;
     };
 }

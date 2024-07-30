@@ -9,41 +9,41 @@
 
 namespace sm::internal {
     void TaskManager::add(const Task::TaskFunction& function, void* user_data) {
-        std::lock_guard<std::mutex> lock {mutex};
+        std::lock_guard<std::mutex> lock {m_mutex};
 
-        tasks_active.emplace_back(function, user_data);
+        m_tasks_active.emplace_back(function, user_data);
     }
 
     void TaskManager::add_async(const AsyncTask::TaskFunction& function, void* user_data) {
-        std::lock_guard<std::mutex> lock {async_mutex};
+        std::lock_guard<std::mutex> lock {m_async_mutex};
 
-        async_tasks.push_back(std::make_unique<AsyncTask>(function, user_data));
+        m_async_tasks.push_back(std::make_unique<AsyncTask>(function, user_data));
     }
 
     void TaskManager::update() {
         {
-            std::lock_guard<std::mutex> lock {mutex};
+            std::lock_guard<std::mutex> lock {m_mutex};
 
             update_tasks();
         }
 
         {
-            std::lock_guard<std::mutex> lock {async_mutex};
+            std::lock_guard<std::mutex> lock {m_async_mutex};
 
             update_async_tasks();
         }
     }
 
     void TaskManager::wait_async() {
-        std::lock_guard<std::mutex> lock {async_mutex};
+        std::lock_guard<std::mutex> lock {m_async_mutex};
 
-        for (const auto& async_task : async_tasks) {
+        for (const auto& async_task : m_async_tasks) {
             async_task->m_stop.store(true);
         }
 
         std::exception_ptr last_exception;
 
-        while (!async_tasks.empty()) {
+        while (!m_async_tasks.empty()) {
             try {
                 update_async_tasks();
             } catch (const OtherError&) {
@@ -57,7 +57,7 @@ namespace sm::internal {
     }
 
     void TaskManager::update_tasks() {
-        for (Task& task : tasks_active) {
+        for (Task& task : m_tasks_active) {
             if (task.m_start_time == 0.0) {
                 task.m_start_time = Window::get_time();
             } else {
@@ -70,20 +70,20 @@ namespace sm::internal {
                 case Task::Result::Done:
                     break;
                 case Task::Result::Repeat:
-                    tasks_next.push_back(task);
+                    m_tasks_next.push_back(task);
                     break;
             }
         }
 
-        std::swap(tasks_active, tasks_next);
-        tasks_next.clear();
+        std::swap(m_tasks_active, m_tasks_next);
+        m_tasks_next.clear();
     }
 
     void TaskManager::update_async_tasks() {
         bool tasks_done {false};
         std::exception_ptr exception;
 
-        for (const auto& async_task : async_tasks) {
+        for (const auto& async_task : m_async_tasks) {
             if (async_task->m_done.load()) {
                 if (async_task->m_exception) {
                     exception = async_task->m_exception;
@@ -94,11 +94,11 @@ namespace sm::internal {
         }
 
         if (tasks_done) {
-            async_tasks.erase(
-                std::remove_if(async_tasks.begin(), async_tasks.end(), [](const std::unique_ptr<AsyncTask>& async_task) {
+            m_async_tasks.erase(
+                std::remove_if(m_async_tasks.begin(), m_async_tasks.end(), [](const std::unique_ptr<AsyncTask>& async_task) {
                     return async_task->m_done.load();
                 }),
-                async_tasks.cend()
+                m_async_tasks.cend()
             );
         }
 

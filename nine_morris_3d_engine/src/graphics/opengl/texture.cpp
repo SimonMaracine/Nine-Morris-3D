@@ -93,11 +93,11 @@ namespace sm {
     }
 
     GlTexture::GlTexture(std::shared_ptr<TextureData> data, const TextureSpecification& specification)
-        : specification(specification) {
+        : m_specification(specification) {
         assert(data->get_data() != nullptr);
 
-        glGenTextures(1, &texture);
-        glBindTexture(GL_TEXTURE_2D, texture);
+        glGenTextures(1, &m_texture);
+        glBindTexture(GL_TEXTURE_2D, m_texture);
 
         configure_options(specification);
         allocate_texture(data->get_width(), data->get_height(), data->get_data());
@@ -105,18 +105,18 @@ namespace sm {
 
         glBindTexture(GL_TEXTURE_2D, 0);
 
-        width = data->get_width();
-        height = data->get_height();
+        m_width = data->get_width();
+        m_height = data->get_height();
 
-        LOG_DEBUG("Created GL texture {}", texture);
+        LOG_DEBUG("Created GL texture {}", m_texture);
     }
 
     GlTexture::GlTexture(int width, int height, unsigned char* data, const TextureSpecification& specification)
-        : specification(specification) {
+        : m_specification(specification) {
         assert(data != nullptr);
 
-        glGenTextures(1, &texture);
-        glBindTexture(GL_TEXTURE_2D, texture);
+        glGenTextures(1, &m_texture);
+        glBindTexture(GL_TEXTURE_2D, m_texture);
 
         configure_options(specification);
         allocate_texture(width, height, data);
@@ -124,33 +124,33 @@ namespace sm {
 
         glBindTexture(GL_TEXTURE_2D, 0);
 
-        this->width = width;
-        this->height = height;
+        m_width = width;
+        m_height = height;
 
-        LOG_DEBUG("Created GL texture {}", texture);
+        LOG_DEBUG("Created GL texture {}", m_texture);
     }
 
     GlTexture::~GlTexture() noexcept {
-        glDeleteTextures(1, &texture);
+        glDeleteTextures(1, &m_texture);
 
-        LOG_DEBUG("Deleted GL texture {}", texture);
+        LOG_DEBUG("Deleted GL texture {}", m_texture);
     }
 
     int GlTexture::get_width() const noexcept {
-        return width;
+        return m_width;
     }
 
     int GlTexture::get_height() const noexcept {
-        return height;
+        return m_height;
     }
 
     unsigned int GlTexture::get_id() const noexcept {
-        return texture;
+        return m_texture;
     }
 
     void GlTexture::bind(unsigned int unit) const noexcept {
         glActiveTexture(GL_TEXTURE0 + unit);
-        glBindTexture(GL_TEXTURE_2D, texture);
+        glBindTexture(GL_TEXTURE_2D, m_texture);
     }
 
     void GlTexture::unbind() noexcept {
@@ -158,9 +158,9 @@ namespace sm {
     }
 
     void GlTexture::allocate_texture(int width, int height, const unsigned char* data) const {
-        const int levels {use_mipmapping(specification) ? specification.mipmapping->levels : 1};
+        const int levels {use_mipmapping(m_specification) ? m_specification.mipmapping->levels : 1};
 
-        switch (specification.format) {
+        switch (m_specification.format) {
             case TextureFormat::Rgba8:
                 glTexStorage2D(GL_TEXTURE_2D, levels, GL_RGBA8, width, height);
                 glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, data);
@@ -181,8 +181,8 @@ namespace sm {
     }
 
     GlTextureCubemap::GlTextureCubemap(std::initializer_list<std::shared_ptr<TextureData>> data, TextureFormat format) noexcept {
-        glGenTextures(1, &texture);
-        glBindTexture(GL_TEXTURE_CUBE_MAP, texture);
+        glGenTextures(1, &m_texture);
+        glBindTexture(GL_TEXTURE_CUBE_MAP, m_texture);
 
         glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -229,18 +229,18 @@ namespace sm {
 
         glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
 
-        LOG_DEBUG("Created GL texture cubemap {}", texture);
+        LOG_DEBUG("Created GL texture cubemap {}", m_texture);
     }
 
     GlTextureCubemap::~GlTextureCubemap() noexcept {
-        glDeleteTextures(1, &texture);
+        glDeleteTextures(1, &m_texture);
 
-        LOG_DEBUG("Deleted GL texture cubemap {}", texture);
+        LOG_DEBUG("Deleted GL texture cubemap {}", m_texture);
     }
 
     void GlTextureCubemap::bind(unsigned int unit) const noexcept {
         glActiveTexture(GL_TEXTURE0 + unit);
-        glBindTexture(GL_TEXTURE_CUBE_MAP, texture);
+        glBindTexture(GL_TEXTURE_CUBE_MAP, m_texture);
     }
 
     void GlTextureCubemap::unbind() noexcept {

@@ -20,12 +20,12 @@ namespace sm::internal {
         void update_tasks();
         void update_async_tasks();
 
-        std::vector<Task> tasks_active;
-        std::vector<Task> tasks_next;
-        std::mutex mutex;
+        std::vector<Task> m_tasks_active;
+        std::vector<Task> m_tasks_next;
+        std::mutex m_mutex;
 
-        std::vector<std::unique_ptr<AsyncTask>> async_tasks;
-        std::mutex async_mutex;
+        std::vector<std::unique_ptr<AsyncTask>> m_async_tasks;
+        std::mutex m_async_mutex;
 
         friend class DebugUi;
     };

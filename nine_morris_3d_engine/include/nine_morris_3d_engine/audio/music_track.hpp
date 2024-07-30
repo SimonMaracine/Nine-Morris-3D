@@ -15,7 +15,7 @@ namespace sm {
     public:
         explicit MusicTrack(std::shared_ptr<SoundData> data);
     private:
-        std::unique_ptr<AlBuffer> buffer;
+        std::unique_ptr<AlBuffer> m_buffer;
 
         friend class internal::MusicPlayer;
     };

@@ -7,50 +7,50 @@
 
 namespace sm::internal {
     MusicPlayer::MusicPlayer()
-        : source(std::make_unique<AlSource>()) {
-        source->set_rolloff_factor(0.0f);
-        source->set_looping(true);
+        : m_source(std::make_unique<AlSource>()) {
+        m_source->set_rolloff_factor(0.0f);
+        m_source->set_looping(true);
     }
 
     void MusicPlayer::play(std::shared_ptr<MusicTrack> music_track) {
-        current_music_track = music_track;
+        m_current_music_track = music_track;
 
-        source->play(current_music_track->buffer);
+        m_source->play(m_current_music_track->m_buffer);
 
         LOG_DEBUG("Started playing music track");
     }
 
     void MusicPlayer::stop() noexcept {
-        if (current_music_track == nullptr) {
+        if (m_current_music_track == nullptr) {
             LOG_WARNING("No music track");
             return;
         }
 
-        source->stop();
+        m_source->stop();
 
         LOG_DEBUG("Stopped playing music track");
 
-        current_music_track = nullptr;
+        m_current_music_track = nullptr;
     }
 
     void MusicPlayer::pause() noexcept {
-        if (current_music_track == nullptr) {
+        if (m_current_music_track == nullptr) {
             LOG_WARNING("No music track");
             return;
         }
 
-        source->pause();
+        m_source->pause();
 
         LOG_DEBUG("Paused playing music track");
     }
 
     void MusicPlayer::resume() noexcept {
-        if (current_music_track == nullptr) {
+        if (m_current_music_track == nullptr) {
             LOG_WARNING("No music track");
             return;
         }
 
-        source->resume();
+        m_source->resume();
 
         LOG_DEBUG("Resumed playing music track");
     }
@@ -62,6 +62,6 @@ namespace sm::internal {
             LOG_WARNING("Gain is larger than 1.0");
         }
 
-        source->set_gain(gain);
+        m_source->set_gain(gain);
     }
 }

@@ -46,11 +46,11 @@ namespace sm::internal {
         void create_window(const ApplicationProperties& properties);
         void install_callbacks() const noexcept;
 
-        int width {};
-        int height {};
+        int m_width {};
+        int m_height {};
 
-        GLFWwindow* window {};
-        std::unordered_map<Id, GLFWcursor*, Hash> cursors;
-        EventDispatcher* evt {};
+        GLFWwindow* m_window {};
+        std::unordered_map<Id, GLFWcursor*, Hash> m_cursors;
+        EventDispatcher* m_evt {};
     };
 }

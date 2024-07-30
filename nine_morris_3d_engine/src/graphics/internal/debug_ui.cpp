@@ -12,47 +12,47 @@ namespace sm::internal {
 #ifndef SM_BUILD_DISTRIBUTION
     void DebugUi::render_dear_imgui(Scene& scene, Ctx& ctx) noexcept {
         if (ImGui::Begin("Debug")) {
-            ImGui::Checkbox("Renderables", &renderables);
-            ImGui::Checkbox("Lights", &lights);
-            ImGui::Checkbox("Shadows", &shadows);
-            ImGui::Checkbox("Texts", &texts);
-            ImGui::Checkbox("Quads", &quads);
-            ImGui::Checkbox("Tasks", &tasks);
+            ImGui::Checkbox("Renderables", &m_renderables);
+            ImGui::Checkbox("Lights", &m_lights);
+            ImGui::Checkbox("Shadows", &m_shadows);
+            ImGui::Checkbox("Texts", &m_texts);
+            ImGui::Checkbox("Quads", &m_quads);
+            ImGui::Checkbox("Tasks", &m_tasks);
 
-            if (ImGui::Checkbox("VSync", &vsync)) {
-                ctx.win.set_vsync(static_cast<int>(vsync));
+            if (ImGui::Checkbox("VSync", &m_vsync)) {
+                ctx.m_win.set_vsync(static_cast<int>(m_vsync));
             }
         }
 
         ImGui::End();
 
-        if (renderables) {
+        if (m_renderables) {
             draw_renderables(scene);
         }
 
-        if (lights) {
+        if (m_lights) {
             draw_lights(scene);
         }
 
-        if (shadows) {
+        if (m_shadows) {
             draw_shadows(scene);
         }
 
-        if (texts) {
+        if (m_texts) {
             draw_texts(scene);
         }
 
-        if (quads) {
+        if (m_quads) {
             draw_quads(scene);
         }
 
-        if (tasks) {
+        if (m_tasks) {
             draw_tasks(ctx);
         }
     }
 
     void DebugUi::add_lines(Scene& scene) {
-        if (shadows) {
+        if (m_shadows) {
             add_shadows_lines(
                 scene,
                 scene.m_debug.shadow_box->left,
@@ -185,8 +185,8 @@ namespace sm::internal {
 
     void DebugUi::draw_tasks(Ctx& ctx) noexcept {
         if (ImGui::Begin("Debug Tasks")) {
-            ImGui::Text("Tasks count %lu", ctx.tsk.tasks_active.size());
-            ImGui::Text("Async tasks count %lu", ctx.tsk.async_tasks.size());
+            ImGui::Text("Tasks count %lu", ctx.m_tsk.m_tasks_active.size());
+            ImGui::Text("Async tasks count %lu", ctx.m_tsk.m_async_tasks.size());
         }
 
         ImGui::End();

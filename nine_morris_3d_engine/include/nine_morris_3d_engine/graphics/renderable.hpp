@@ -24,11 +24,11 @@ namespace sm {
             std::shared_ptr<GlVertexArray> vertex_array,
             std::shared_ptr<MaterialInstance> material
         ) noexcept
-            : mesh(mesh), vertex_array(vertex_array), material(material) {}
+            : m_mesh(mesh), m_vertex_array(vertex_array), m_material(material) {}
 
-        const utils::AABB& get_aabb() const noexcept { return mesh->get_aabb(); }
-        MaterialInstance* get_material() const noexcept { return material.get(); }
-        operator bool() const noexcept { return mesh && vertex_array && material; }
+        const utils::AABB& get_aabb() const noexcept { return m_mesh->get_aabb(); }
+        MaterialInstance* get_material() const noexcept { return m_material.get(); }
+        operator bool() const noexcept { return m_mesh && m_vertex_array && m_material; }
 
         struct Transform {
             glm::vec3 position {};
@@ -41,9 +41,9 @@ namespace sm {
             float thickness {0.1f};
         } outline;
     private:
-        std::shared_ptr<Mesh> mesh;
-        std::shared_ptr<GlVertexArray> vertex_array;
-        std::shared_ptr<MaterialInstance> material;
+        std::shared_ptr<Mesh> m_mesh;
+        std::shared_ptr<GlVertexArray> m_vertex_array;
+        std::shared_ptr<MaterialInstance> m_material;
 
         friend class internal::Renderer;
         friend class internal::DebugUi;

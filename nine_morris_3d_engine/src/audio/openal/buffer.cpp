@@ -25,18 +25,18 @@ namespace sm {
     }
 
     AlBuffer::AlBuffer(const void* data, std::size_t size, int channels, std::size_t bps, int frequency) noexcept {
-        alGenBuffers(1, &buffer);
-        alBufferData(buffer, get_format(channels, bps), data, static_cast<int>(size), frequency);
+        alGenBuffers(1, &m_buffer);
+        alBufferData(m_buffer, get_format(channels, bps), data, static_cast<int>(size), frequency);
 
         openal_debug::check_errors();
 
-        LOG_DEBUG("Created AL buffer {}", buffer);
+        LOG_DEBUG("Created AL buffer {}", m_buffer);
     }
 
     AlBuffer::AlBuffer(std::shared_ptr<SoundData> data) noexcept {
-        alGenBuffers(1, &buffer);
+        alGenBuffers(1, &m_buffer);
         alBufferData(
-            buffer,
+            m_buffer,
             get_format(data->get_channels(), data->get_bps()),
             data->get_data(),
             static_cast<int>(data->get_size()),
@@ -45,21 +45,21 @@ namespace sm {
 
         openal_debug::check_errors();
 
-        LOG_DEBUG("Created AL buffer {}", buffer);
+        LOG_DEBUG("Created AL buffer {}", m_buffer);
     }
 
     AlBuffer::~AlBuffer() {
-        for (const ALuint source : sources_attached) {
+        for (const ALuint source : m_sources_attached) {
             alSourceStop(source);
             alSourcei(source, AL_BUFFER, 0);
 
             openal_debug::check_errors();
         }
 
-        alDeleteBuffers(1, &buffer);
+        alDeleteBuffers(1, &m_buffer);
 
         openal_debug::check_errors();
 
-        LOG_DEBUG("Deleted AL buffer {}", buffer);
+        LOG_DEBUG("Deleted AL buffer {}", m_buffer);
     }
 }

@@ -18,25 +18,25 @@ namespace sm {
         const unsigned int fragment_shader {compile_shader(source_fragment, GL_FRAGMENT_SHADER)};
         create_program(vertex_shader, fragment_shader);
 
-        if (!check_linking(program)) {
-            SM_THROW_ERROR(ResourceError, "Could not link shader program {}", program);
+        if (!check_linking(m_program)) {
+            SM_THROW_ERROR(ResourceError, "Could not link shader program {}", m_program);
         }
 
         delete_intermediates(vertex_shader, fragment_shader);
         const auto uniforms {introspect_program()};
         check_and_cache_uniforms(uniforms);
 
-        LOG_DEBUG("Created GL shader {}", program);
+        LOG_DEBUG("Created GL shader {}", m_program);
     }
 
     GlShader::~GlShader() {
-        glDeleteProgram(program);
+        glDeleteProgram(m_program);
 
-        LOG_DEBUG("Deleted GL shader {}", program);
+        LOG_DEBUG("Deleted GL shader {}", m_program);
     }
 
     void GlShader::bind() const noexcept {
-        glUseProgram(program);
+        glUseProgram(m_program);
     }
 
     void GlShader::unbind() noexcept {
@@ -99,27 +99,27 @@ namespace sm {
     }
 
     unsigned int GlShader::get_id() const noexcept {
-        return program;
+        return m_program;
     }
 
     void GlShader::add_uniform_buffer(std::shared_ptr<GlUniformBuffer> uniform_buffer) {
         uniform_buffer->bind();
-        uniform_buffer->configure(program);  // No problem, if it's already configured
+        uniform_buffer->configure(m_program);  // No problem, if it's already configured
         GlUniformBuffer::unbind();
 
-        uniform_buffers.push_back(uniform_buffer);
+        m_uniform_buffers.push_back(uniform_buffer);
     }
 
     int GlShader::get_uniform_location(Id name) const {
 #ifndef SM_BUILD_DISTRIBUTION
-        if (const auto iter {cache.find(name)}; iter == cache.cend()) {
-            LOG_ERROR("Cannot get hashed uniform variable {} from program {}", static_cast<std::uint64_t>(name), program);
+        if (const auto iter {m_cache.find(name)}; iter == m_cache.cend()) {
+            LOG_ERROR("Cannot get hashed uniform variable {} from program {}", static_cast<std::uint64_t>(name), m_program);
             return -1;
         } else {
             return iter->second;
         }
 #else
-        return cache.at(name);
+        return m_cache.at(name);
 #endif
     }
 
@@ -128,20 +128,20 @@ namespace sm {
             int location {};
 
             // Don't touch uniforms that are in blocks
-            for (const auto& block : uniform_blocks) {
+            for (const auto& block : m_uniform_blocks) {
                 if (std::find(block.uniforms.cbegin(), block.uniforms.cend(), uniform) != block.uniforms.cend()) {
                     goto skip_uniform;
                 }
             }
 
-            location = glGetUniformLocation(program, uniform.c_str());
+            location = glGetUniformLocation(m_program, uniform.c_str());
 
             if (location == -1) {
-                LOG_ERROR("Uniform variable `{}` in program {} not found", uniform, program);
+                LOG_ERROR("Uniform variable `{}` in program {} not found", uniform, m_program);
                 continue;
             }
 
-            cache[Id(uniform)] = location;
+            m_cache[Id(uniform)] = location;
 
             skip_uniform:
             continue;
@@ -153,22 +153,22 @@ namespace sm {
 
         // Uniforms stuff
         int uniform_count {};
-        glGetProgramInterfaceiv(program, GL_UNIFORM, GL_ACTIVE_RESOURCES, &uniform_count);
+        glGetProgramInterfaceiv(m_program, GL_UNIFORM, GL_ACTIVE_RESOURCES, &uniform_count);
 
         uniforms.reserve(uniform_count);
 
         for (int i {0}; i < uniform_count; i++) {
             char buffer[64] {};
-            glGetProgramResourceName(program, GL_UNIFORM, static_cast<unsigned int>(i), 64, nullptr, buffer);
+            glGetProgramResourceName(m_program, GL_UNIFORM, static_cast<unsigned int>(i), 64, nullptr, buffer);
 
             uniforms.push_back(buffer);
         }
 
         // Uniform blocks stuff
         int uniform_block_count {};
-        glGetProgramInterfaceiv(program, GL_UNIFORM_BLOCK, GL_ACTIVE_RESOURCES, &uniform_block_count);
+        glGetProgramInterfaceiv(m_program, GL_UNIFORM_BLOCK, GL_ACTIVE_RESOURCES, &uniform_block_count);
 
-        uniform_blocks.reserve(uniform_block_count);
+        m_uniform_blocks.reserve(uniform_block_count);
 
         for (int i {0}; i < uniform_block_count; i++) {
             UniformBlockSpecification block;
@@ -176,7 +176,7 @@ namespace sm {
 
             {
                 char buffer[64] {};
-                glGetProgramResourceName(program, GL_UNIFORM_BLOCK, static_cast<unsigned int>(i), 64, nullptr, buffer);
+                glGetProgramResourceName(m_program, GL_UNIFORM_BLOCK, static_cast<unsigned int>(i), 64, nullptr, buffer);
 
                 block.block_name = buffer;
             }
@@ -184,7 +184,7 @@ namespace sm {
             {
                 int buffer[2] {};
                 const unsigned int properties[] { GL_BUFFER_BINDING, GL_NUM_ACTIVE_VARIABLES };
-                glGetProgramResourceiv(program, GL_UNIFORM_BLOCK, static_cast<unsigned int>(i), 2, properties, 2, nullptr, buffer);
+                glGetProgramResourceiv(m_program, GL_UNIFORM_BLOCK, static_cast<unsigned int>(i), 2, properties, 2, nullptr, buffer);
 
                 block.binding_index = static_cast<unsigned int>(buffer[0]);
                 block_active_uniforms_count = static_cast<std::size_t>(buffer[1]);
@@ -196,7 +196,7 @@ namespace sm {
 
                 const unsigned int properties[] { GL_ACTIVE_VARIABLES };
                 glGetProgramResourceiv(
-                    program,
+                    m_program,
                     GL_UNIFORM_BLOCK,
                     static_cast<unsigned int>(i),
                     1,
@@ -208,13 +208,13 @@ namespace sm {
 
                 for (std::size_t j {0}; j < block_active_uniforms_count; j++) {
                     char buffer[64] {};
-                    glGetProgramResourceName(program, GL_UNIFORM, buffer_uniforms[j], 64, nullptr, buffer);
+                    glGetProgramResourceName(m_program, GL_UNIFORM, buffer_uniforms[j], 64, nullptr, buffer);
 
                     block.uniforms.push_back(buffer);
                 }
             }
 
-            uniform_blocks.push_back(block);
+            m_uniform_blocks.push_back(block);
         }
 
         return uniforms;
@@ -224,11 +224,11 @@ namespace sm {
         assert(vertex_shader != 0);
         assert(fragment_shader != 0);
 
-        program = glCreateProgram();
-        glAttachShader(program, vertex_shader);
-        glAttachShader(program, fragment_shader);
-        glLinkProgram(program);
-        glValidateProgram(program);
+        m_program = glCreateProgram();
+        glAttachShader(m_program, vertex_shader);
+        glAttachShader(m_program, fragment_shader);
+        glLinkProgram(m_program);
+        glValidateProgram(m_program);
     }
 
     void GlShader::delete_intermediates(unsigned int vertex_shader, unsigned int fragment_shader) noexcept {
@@ -236,8 +236,8 @@ namespace sm {
         assert(vertex_shader != 0);
         assert(fragment_shader != 0);
 
-        glDetachShader(program, vertex_shader);
-        glDetachShader(program, fragment_shader);
+        glDetachShader(m_program, vertex_shader);
+        glDetachShader(m_program, fragment_shader);
         glDeleteShader(vertex_shader);
         glDeleteShader(fragment_shader);
     }
