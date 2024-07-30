@@ -131,7 +131,7 @@ namespace sm {
 
     Mesh::Mesh(const std::string& buffer, const std::string& object_name, Type type, bool flip_winding)
         : m_type(type) {
-        unsigned int flags {aiProcess_ValidateDataStructure | aiProcess_GenBoundingBoxes};
+        unsigned int flags {static_cast<unsigned int>(aiProcess_ValidateDataStructure | aiProcess_GenBoundingBoxes)};
 
         if (flip_winding) {
             flags |= aiProcess_FlipWindingOrder;

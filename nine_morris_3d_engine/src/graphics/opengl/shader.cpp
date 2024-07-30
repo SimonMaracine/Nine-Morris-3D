@@ -232,7 +232,7 @@ namespace sm {
     }
 
     void GlShader::delete_intermediates(unsigned int vertex_shader, unsigned int fragment_shader) noexcept {
-        assert(program != 0);
+        assert(m_program != 0);
         assert(vertex_shader != 0);
         assert(fragment_shader != 0);
 

@@ -165,11 +165,11 @@ namespace sm {
             m_ctx.m_rnd.pre_setup();
         }
 
-        assert(scene_next == nullptr);
+        assert(m_scene_next == nullptr);
     }
 
     void Application::change_scene(Id id, bool clear_resources) noexcept {
-        assert(scene_next == nullptr);
+        assert(m_scene_next == nullptr);
 
         for (auto& meta_scene : m_scene_meta_scenes) {
             if (meta_scene.id == id) {
@@ -200,7 +200,7 @@ namespace sm {
             }
         }
 
-        assert(scene_current != nullptr);
+        assert(m_scene_current != nullptr);
     }
 
     void Application::scene_on_start(MetaScene* meta_scene) {

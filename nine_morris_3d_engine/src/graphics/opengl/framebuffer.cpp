@@ -178,14 +178,14 @@ namespace sm {
         assert(m_specification.samples == 1 || m_specification.samples == 2 || m_specification.samples == 4);
 
         if (m_specification.white_border_depth_texture) {
-            assert(m_specification.m_depth_attachment.format != AttachmentFormat::None);
-            assert(m_specification.m_depth_attachment.type == AttachmentType::Texture);
+            assert(m_specification.depth_attachment.format != AttachmentFormat::None);
+            assert(m_specification.depth_attachment.type == AttachmentType::Texture);
             assert(m_specification.samples == 1);
         }
 
         if (m_specification.comparison_mode_depth_texture) {
-            assert(m_specification.m_depth_attachment.format != AttachmentFormat::None);
-            assert(m_specification.m_depth_attachment.type == AttachmentType::Texture);
+            assert(m_specification.depth_attachment.format != AttachmentFormat::None);
+            assert(m_specification.depth_attachment.type == AttachmentType::Texture);
             assert(m_specification.samples == 1);
         }
 

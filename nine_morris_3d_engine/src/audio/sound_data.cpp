@@ -33,7 +33,7 @@ namespace sm {
     }
 
     SoundData::~SoundData() noexcept {
-        assert(data != nullptr);
+        assert(m_data != nullptr);
 
         std::free(m_data);
 

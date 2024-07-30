@@ -210,7 +210,7 @@ namespace sm::internal {
             m_height = properties.height;
         }
 
-        assert(width > 0 && height > 0);
+        assert(m_width > 0 && m_height > 0);
 
         m_window = glfwCreateWindow(m_width, m_height, properties.title, primary_monitor, nullptr);
 

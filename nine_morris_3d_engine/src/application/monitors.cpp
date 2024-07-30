@@ -9,7 +9,7 @@
 
 namespace sm {
     std::pair<int, int> Monitors::get_resolution(std::size_t index) const {
-        assert(index < count);
+        assert(index < m_count);
 
         const GLFWvidmode* video_mode {glfwGetVideoMode(m_monitors[index])};
 
@@ -21,7 +21,7 @@ namespace sm {
     }
 
     std::pair<float, float> Monitors::get_content_scale(std::size_t index) const noexcept {
-        assert(index < count);
+        assert(index < m_count);
 
         float xscale, yscale;
         glfwGetMonitorContentScale(m_monitors[index], &xscale, &yscale);
@@ -30,7 +30,7 @@ namespace sm {
     }
 
     const char* Monitors::get_name(std::size_t index) const {
-        assert(index < count);
+        assert(index < m_count);
 
         const char* name {glfwGetMonitorName(m_monitors[index])};
 

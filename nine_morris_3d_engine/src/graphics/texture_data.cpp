@@ -53,7 +53,7 @@ namespace sm {
     }
 
     TextureData::~TextureData() noexcept {
-        assert(data != nullptr);
+        assert(m_data != nullptr);
 
         stbi_image_free(m_data);
 

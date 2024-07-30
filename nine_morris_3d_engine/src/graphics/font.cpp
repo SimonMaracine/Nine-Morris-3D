@@ -17,7 +17,7 @@
 namespace sm {
     Font::Font(const std::string& buffer, const FontSpecification& specification)
         : m_font_buffer(buffer), m_size_height(specification.size_height), m_bitmap_size(specification.bitmap_size) {
-        assert(bitmap_size % 4 == 0);  // Needs 4 byte alignment
+        assert(m_bitmap_size % 4 == 0);  // Needs 4 byte alignment
 
         m_font_info = new stbtt_fontinfo;
 
@@ -210,7 +210,7 @@ namespace sm {
 
         width = std::max(width, line_width);
 
-        return std::make_pair(width * std::min(scale, 1.0f), height * std::min(scale, 1.0f));
+        return std::make_pair(static_cast<int>(width * std::min(scale, 1.0f)), static_cast<int>(height * std::min(scale, 1.0f)));
     }
 
     void Font::get_character_quad(int codepoint, float* x, float* y, Quad* quad) const noexcept {
