@@ -16,7 +16,7 @@ namespace sm {
     Ctx::Ctx(const ApplicationProperties& properties)
         : fs(properties.path_logs, properties.path_saved_data, properties.path_assets, properties.assets_directory),
         log(properties.log_file, fs),
-        shd({fs.path_engine_assets(), fs.path_assets()}),
+        shd({fs.path_engine_assets().string(), fs.path_assets().string()}),
         win(properties, &evt),
         rnd(properties.width, properties.height, properties.samples, fs, shd),
         snd(properties.audio), inp(win.get_handle()) {
@@ -270,7 +270,7 @@ namespace sm {
         return result;
     }
 
-    std::shared_ptr<Mesh> Ctx::load_mesh(Id id, const std::string& file_path, const std::string& mesh_name, Mesh::Type type) {
+    std::shared_ptr<Mesh> Ctx::load_mesh(Id id, const std::filesystem::path& file_path, const std::string& mesh_name, Mesh::Type type) {
         if (res.mesh->contains(id)) {
             return res.mesh->get(id);
         }
@@ -278,7 +278,7 @@ namespace sm {
         return res.mesh->force_load(id, utils::read_file(file_path), mesh_name, type);
     }
 
-    std::shared_ptr<Mesh> Ctx::load_mesh(const std::string& file_path, const std::string& mesh_name, Mesh::Type type) {
+    std::shared_ptr<Mesh> Ctx::load_mesh(const std::filesystem::path& file_path, const std::string& mesh_name, Mesh::Type type) {
         const auto id {Id(utils::file_name(file_path))};
 
         if (res.mesh->contains(id)) {
@@ -329,7 +329,7 @@ namespace sm {
         return vertex_array;
     }
 
-    std::shared_ptr<TextureData> Ctx::load_texture_data(const std::string& file_path, const TexturePostProcessing& post_processing) {
+    std::shared_ptr<TextureData> Ctx::load_texture_data(const std::filesystem::path& file_path, const TexturePostProcessing& post_processing) {
         const auto id {Id(utils::file_name(file_path))};
 
         if (res.texture_data->contains(id)) {
@@ -489,7 +489,7 @@ namespace sm {
         return {};
     }
 
-    std::shared_ptr<Material> Ctx::load_material(Id id, const std::string& vertex_file_path, const std::string& fragment_file_path, MaterialType type, unsigned int flags) {
+    std::shared_ptr<Material> Ctx::load_material(Id id, const std::filesystem::path& vertex_file_path, const std::filesystem::path& fragment_file_path, MaterialType type, unsigned int flags) {
         using namespace resmanager::literals;
 
         const auto shader {load_shader(id, vertex_file_path, fragment_file_path)};
@@ -535,7 +535,7 @@ namespace sm {
         return res.material_instance->load(id, material);
     }
 
-    std::shared_ptr<GlShader> Ctx::load_shader(Id id, const std::string& vertex_file_path, const std::string& fragment_file_path) {
+    std::shared_ptr<GlShader> Ctx::load_shader(Id id, const std::filesystem::path& vertex_file_path, std::filesystem::path& fragment_file_path) {
         if (res.shader->contains(id)) {
             return res.shader->get(id);
         }
@@ -571,7 +571,7 @@ namespace sm {
         return framebuffer;
     }
 
-    std::shared_ptr<Font> Ctx::load_font(Id id, const std::string& file_path, const FontSpecification& specification, const std::function<void(Font*)>& bake) {
+    std::shared_ptr<Font> Ctx::load_font(Id id, std::filesystem::path& file_path, const FontSpecification& specification, const std::function<void(Font*)>& bake) {
         if (res.font->contains(id)) {
             return res.font->get(id);
         }
@@ -583,7 +583,7 @@ namespace sm {
         return font;
     }
 
-    std::shared_ptr<SoundData> Ctx::load_sound_data(const std::string& file_path) {
+    std::shared_ptr<SoundData> Ctx::load_sound_data(const std::filesystem::path& file_path) {
         const auto id {Id(utils::file_name(file_path))};
 
         if (res.sound_data->contains(id)) {

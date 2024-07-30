@@ -131,7 +131,7 @@ namespace sm {
 
     Mesh::Mesh(const std::string& buffer, const std::string& object_name, Type type, bool flip_winding)
         : type(type) {
-        unsigned int flags {aiProcess_ValidateDataStructure | aiProcess_GenBoundingBoxes};
+        int flags {aiProcess_ValidateDataStructure | aiProcess_GenBoundingBoxes};
 
         if (flip_winding) {
             flags |= aiProcess_FlipWindingOrder;
@@ -147,7 +147,7 @@ namespace sm {
 
         Assimp::Importer importer;
 
-        const aiScene* scene {importer.ReadFileFromMemory(buffer.data(), buffer.size(), flags)};
+        const aiScene* scene {importer.ReadFileFromMemory(buffer.data(), buffer.size(), static_cast<unsigned int>(flags))};
 
         if (scene == nullptr) {
             SM_THROW_ERROR(ResourceError, "Could not load model data: {}", importer.GetErrorString());

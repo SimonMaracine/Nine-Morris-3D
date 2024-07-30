@@ -52,17 +52,17 @@ namespace sm::internal {
         void add_text(const Text& text);
         void add_quad(const Quad& quad);
     private:
-        std::vector<Renderable> renderables;
-        DirectionalLight directional_light;
-        std::vector<PointLight> point_lights;
-        ShadowBox shadow_box;
-        std::vector<Text> texts;
-        std::vector<Quad> quads;
-        std::vector<std::shared_ptr<PostProcessingStep>> post_processing_steps;
-        std::shared_ptr<GlTextureCubemap> skybox_texture;
-        Camera camera;
-        glm::vec3 camera_position {};
-        Camera2D camera_2d;
+        std::vector<Renderable> m_renderables;
+        DirectionalLight m_directional_light;
+        std::vector<PointLight> m_point_lights;
+        ShadowBox m_shadow_box;
+        std::vector<Text> m_texts;
+        std::vector<Quad> m_quads;
+        std::vector<std::shared_ptr<PostProcessingStep>> m_post_processing_steps;
+        std::shared_ptr<GlTextureCubemap> m_skybox_texture;
+        Camera m_camera;
+        glm::vec3 m_camera_position {};
+        Camera2D m_camera_2d;
 
 #ifndef SM_BUILD_DISTRIBUTION
         struct {
@@ -73,7 +73,7 @@ namespace sm::internal {
             ShadowBox* shadow_box {};
             std::vector<Text*> texts;
             std::vector<Quad*> quads;
-        } debug;
+        } m_debug;
 #endif
 
         friend class Renderer;

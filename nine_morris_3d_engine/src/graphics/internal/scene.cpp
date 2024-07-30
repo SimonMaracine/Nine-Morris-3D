@@ -10,21 +10,21 @@
 
 namespace sm::internal {
     void Scene::capture(const Camera& camera, glm::vec3 position) noexcept {
-        this->camera = camera;
-        camera_position = position;
+        m_camera = camera;
+        m_camera_position = position;
     }
 
     void Scene::capture(const Camera2D& camera_2d) noexcept {
-        this->camera_2d = camera_2d;
+        m_camera_2d = camera_2d;
     }
 
     void Scene::skybox(std::shared_ptr<GlTextureCubemap> texture) noexcept {
-        skybox_texture = texture;
+        m_skybox_texture = texture;
     }
 
     void Scene::shadow(ShadowBox& box) noexcept {
         const glm::mat4 view_matrix {
-            glm::lookAt(glm::vec3(0.0f), directional_light.direction, glm::vec3(0.0f, 1.0f, 0.0f))
+            glm::lookAt(glm::vec3(0.0f), m_directional_light.direction, glm::vec3(0.0f, 1.0f, 0.0f))
         };
 
         float max_x_positive {std::numeric_limits<float>::min()};
@@ -34,7 +34,7 @@ namespace sm::internal {
         float max_z_positive {std::numeric_limits<float>::min()};
         float max_z_negative {std::numeric_limits<float>::max()};
 
-        for (const Renderable& renderable : renderables) {
+        for (const Renderable& renderable : m_renderables) {
             if (!(renderable.get_material()->flags & Material::CastShadow)) {
                 continue;
             }
@@ -58,26 +58,26 @@ namespace sm::internal {
         box.top = max_y_positive;
 
         // After calculating some bound values, offset the position according to those values
-        box.position = glm::normalize(directional_light.direction) * -max_z_positive;
-        box.near = 1.0f;
-        box.far = -max_z_negative + max_z_positive;
+        box.position = glm::normalize(m_directional_light.direction) * -max_z_positive;
+        box.near_ = 1.0f;
+        box.far_ = -max_z_negative + max_z_positive;
 
         shadow(const_cast<const ShadowBox&>(box));
 
 #ifndef SM_BUILD_DISTRIBUTION
-        debug.shadow_box = &box;
+        m_debug.shadow_box = &box;
 #endif
     }
 
     void Scene::add_post_processing(std::shared_ptr<PostProcessingStep> step) {
-        post_processing_steps.push_back(step);
+        m_post_processing_steps.push_back(step);
     }
 
     void Scene::add_renderable(Renderable& renderable) {
         add_renderable(const_cast<const Renderable&>(renderable));
 
 #ifndef SM_BUILD_DISTRIBUTION
-        debug.renderables.push_back(&renderable);
+        m_debug.renderables.push_back(&renderable);
 #endif
     }
 
@@ -85,7 +85,7 @@ namespace sm::internal {
         add_light(const_cast<const DirectionalLight&>(light));
 
 #ifndef SM_BUILD_DISTRIBUTION
-        debug.directional_light = &light;
+        m_debug.directional_light = &light;
 #endif
     }
 
@@ -93,7 +93,7 @@ namespace sm::internal {
         add_light(const_cast<const PointLight&>(light));
 
 #ifndef SM_BUILD_DISTRIBUTION
-        debug.point_lights.push_back(&light);
+        m_debug.point_lights.push_back(&light);
 #endif
     }
 
@@ -101,7 +101,7 @@ namespace sm::internal {
         add_text(const_cast<const Text&>(text));
 
 #ifndef SM_BUILD_DISTRIBUTION
-        debug.texts.push_back(&text);
+        m_debug.texts.push_back(&text);
 #endif
     }
 
@@ -109,7 +109,7 @@ namespace sm::internal {
         add_quad(const_cast<const Quad&>(quad));
 
 #ifndef SM_BUILD_DISTRIBUTION
-        debug.quads.push_back(&quad);
+        m_debug.quads.push_back(&quad);
 #endif
     }
 
@@ -120,7 +120,7 @@ namespace sm::internal {
         line.color = color;
 
 #ifndef SM_BUILD_DISTRIBUTION
-        debug.debug_lines.push_back(line);
+        m_debug.debug_lines.push_back(line);
 #endif
     }
 
@@ -135,7 +135,7 @@ namespace sm::internal {
             line.position2 = positions.begin()[i];
 
 #ifndef SM_BUILD_DISTRIBUTION
-            debug.debug_lines.push_back(line);
+            m_debug.debug_lines.push_back(line);
 #endif
         }
     }
@@ -199,49 +199,49 @@ namespace sm::internal {
     }
 
     void Scene::clear() noexcept {
-        renderables.clear();
-        directional_light = {};
-        point_lights.clear();
-        shadow_box = {};
-        texts.clear();
-        quads.clear();
-        skybox_texture = {};
-        post_processing_steps.clear();
-        camera = {};
-        camera_2d = {};
+        m_renderables.clear();
+        m_directional_light = {};
+        m_point_lights.clear();
+        m_shadow_box = {};
+        m_texts.clear();
+        m_quads.clear();
+        m_skybox_texture = {};
+        m_post_processing_steps.clear();
+        m_camera = {};
+        m_camera_2d = {};
 
 #ifndef SM_BUILD_DISTRIBUTION
-        debug.debug_lines.clear();
-        debug.renderables.clear();
-        debug.directional_light = {};
-        debug.point_lights.clear();
-        debug.shadow_box = {};
-        debug.texts.clear();
-        debug.quads.clear();
+        m_debug.debug_lines.clear();
+        m_debug.renderables.clear();
+        m_debug.directional_light = {};
+        m_debug.point_lights.clear();
+        m_debug.shadow_box = {};
+        m_debug.texts.clear();
+        m_debug.quads.clear();
 #endif
     }
 
     void Scene::shadow(const ShadowBox& box) noexcept {
-        shadow_box = box;
+        m_shadow_box = box;
     }
 
     void Scene::add_renderable(const Renderable& renderable) {
-        renderables.push_back(renderable);
+        m_renderables.push_back(renderable);
     }
 
     void Scene::add_light(const DirectionalLight& light) {
-        directional_light = light;
+        m_directional_light = light;
     }
 
     void Scene::add_light(const PointLight& light) {
-        point_lights.push_back(light);
+        m_point_lights.push_back(light);
     }
 
     void Scene::add_text(const Text& text) {
-        texts.push_back(text);
+        m_texts.push_back(text);
     }
 
     void Scene::add_quad(const Quad& quad) {
-        quads.push_back(quad);
+        m_quads.push_back(quad);
     }
 }

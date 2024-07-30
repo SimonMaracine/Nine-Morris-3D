@@ -55,14 +55,14 @@ namespace sm::internal {
         if (shadows) {
             add_shadows_lines(
                 scene,
-                scene.debug.shadow_box->left,
-                scene.debug.shadow_box->right,
-                scene.debug.shadow_box->bottom,
-                scene.debug.shadow_box->top,
-                scene.debug.shadow_box->near,
-                scene.debug.shadow_box->far,
-                scene.debug.shadow_box->position,
-                scene.debug.directional_light->direction
+                scene.m_debug.shadow_box->left,
+                scene.m_debug.shadow_box->right,
+                scene.m_debug.shadow_box->bottom,
+                scene.m_debug.shadow_box->top,
+                scene.m_debug.shadow_box->near_,
+                scene.m_debug.shadow_box->far_,
+                scene.m_debug.shadow_box->position,
+                scene.m_debug.directional_light->direction
             );
         }
     }
@@ -71,7 +71,7 @@ namespace sm::internal {
         if (ImGui::Begin("Debug Renderables")) {
             int index {};  // TODO C++20
 
-            for (Renderable* renderable : scene.debug.renderables) {
+            for (Renderable* renderable : scene.m_debug.renderables) {
                 ImGui::PushID(index);
                 ImGui::Text("Renderable %d", index);
                 ImGui::DragFloat3("Position", glm::value_ptr(renderable->transform.position), 1.0f, -200.0f, 200.0f);
@@ -89,10 +89,10 @@ namespace sm::internal {
 
     void DebugUi::draw_lights(Scene& scene) noexcept {
         if (ImGui::Begin("Debug Directional Light")) {
-            ImGui::DragFloat3("Direction", glm::value_ptr(scene.debug.directional_light->direction), 0.01f, -1.0f, 1.0f);
-            ImGui::DragFloat3("Ambient", glm::value_ptr(scene.debug.directional_light->ambient_color), 0.01f, 0.0f, 1.0f);
-            ImGui::DragFloat3("Diffuse", glm::value_ptr(scene.debug.directional_light->diffuse_color), 0.01f, 0.0f, 1.0f);
-            ImGui::DragFloat3("Specular", glm::value_ptr(scene.debug.directional_light->specular_color), 0.01f, 0.0f, 1.0f);
+            ImGui::DragFloat3("Direction", glm::value_ptr(scene.m_debug.directional_light->direction), 0.01f, -1.0f, 1.0f);
+            ImGui::DragFloat3("Ambient", glm::value_ptr(scene.m_debug.directional_light->ambient_color), 0.01f, 0.0f, 1.0f);
+            ImGui::DragFloat3("Diffuse", glm::value_ptr(scene.m_debug.directional_light->diffuse_color), 0.01f, 0.0f, 1.0f);
+            ImGui::DragFloat3("Specular", glm::value_ptr(scene.m_debug.directional_light->specular_color), 0.01f, 0.0f, 1.0f);
         }
 
         ImGui::End();
@@ -100,7 +100,7 @@ namespace sm::internal {
         if (ImGui::Begin("Debug Point Lights")) {
             int index {};  // TODO C++20
 
-            for (PointLight* point_light : scene.debug.point_lights) {
+            for (PointLight* point_light : scene.m_debug.point_lights) {
                 ImGui::PushID(index);
                 ImGui::Text("Light %d", index);
                 ImGui::DragFloat3("Position", glm::value_ptr(point_light->position), 1.0f, -30.0f, 30.0f);
@@ -121,17 +121,17 @@ namespace sm::internal {
 
     void DebugUi::draw_shadows(Scene& scene) noexcept {
         if (ImGui::Begin("Debug Shadows")) {
-            ImGui::DragFloat("Left", &scene.debug.shadow_box->left, 1.0f, -500.0f, 0.0f);
-            ImGui::DragFloat("Right", &scene.debug.shadow_box->right, 1.0f, 0.0f, 500.0f);
-            ImGui::DragFloat("Bottom", &scene.debug.shadow_box->bottom, 1.0f, -500.0f, 0.0f);
-            ImGui::DragFloat("Top", &scene.debug.shadow_box->top, 1.0f, 0.0f, 500.0f);
-            ImGui::DragFloat("Near", &scene.debug.shadow_box->near, 1.0f, 0.1f, 2.0f);
-            ImGui::DragFloat("Far", &scene.debug.shadow_box->far, 1.0f, 2.0f, 500.0f);
+            ImGui::DragFloat("Left", &scene.m_debug.shadow_box->left, 1.0f, -500.0f, 0.0f);
+            ImGui::DragFloat("Right", &scene.m_debug.shadow_box->right, 1.0f, 0.0f, 500.0f);
+            ImGui::DragFloat("Bottom", &scene.m_debug.shadow_box->bottom, 1.0f, -500.0f, 0.0f);
+            ImGui::DragFloat("Top", &scene.m_debug.shadow_box->top, 1.0f, 0.0f, 500.0f);
+            ImGui::DragFloat("Near", &scene.m_debug.shadow_box->near_, 1.0f, 0.1f, 2.0f);
+            ImGui::DragFloat("Far", &scene.m_debug.shadow_box->far_, 1.0f, 2.0f, 500.0f);
             ImGui::Text(
                 "Position %f, %f, %f",
-                scene.debug.shadow_box->position.x,
-                scene.debug.shadow_box->position.y,
-                scene.debug.shadow_box->position.z
+                scene.m_debug.shadow_box->position.x,
+                scene.m_debug.shadow_box->position.y,
+                scene.m_debug.shadow_box->position.z
             );
         }
 
@@ -142,7 +142,7 @@ namespace sm::internal {
         if (ImGui::Begin("Debug Texts")) {
             int index {};  // TODO C++20
 
-            for (Text* text : scene.debug.texts) {
+            for (Text* text : scene.m_debug.texts) {
                 char buffer[512] {};
                 std::strncpy(buffer, text->text.c_str(), sizeof(buffer) - 1);
 
@@ -168,7 +168,7 @@ namespace sm::internal {
         if (ImGui::Begin("Debug Quads")) {
             int index {};  // TODO C++20
 
-            for (Quad* quad : scene.debug.quads) {
+            for (Quad* quad : scene.m_debug.quads) {
                 ImGui::PushID(index);
                 ImGui::Text("Quad %d", index);
                 ImGui::DragFloat2("Position", glm::value_ptr(quad->position), 1.0f, -2000.0f, 2000.0f);

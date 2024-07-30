@@ -41,8 +41,8 @@ namespace sm {
         float right {};
         float bottom {};
         float top {};
-        float near {};
-        float far {};
+        float near_ {};
+        float far_ {};
         glm::vec3 position {};
     };
 }

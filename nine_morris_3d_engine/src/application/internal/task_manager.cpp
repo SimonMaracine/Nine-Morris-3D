@@ -46,7 +46,7 @@ namespace sm::internal {
         while (!async_tasks.empty()) {
             try {
                 update_async_tasks();
-            } catch (const OtherError& e) {
+            } catch (const OtherError&) {
                 last_exception = std::current_exception();
             }
         }

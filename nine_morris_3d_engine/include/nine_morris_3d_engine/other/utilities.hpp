@@ -3,6 +3,7 @@
 #include <string>
 #include <initializer_list>
 #include <iterator>
+#include <filesystem>
 
 #include <glm/glm.hpp>
 
@@ -27,9 +28,12 @@ namespace sm {
             float& height
         ) noexcept;
 
+        std::string file_name(const std::filesystem::path& file_path);
         std::string file_name(const std::string& file_path);
 
+        std::string read_file_ex(const std::filesystem::path& file_path);
         std::string read_file_ex(const std::string& file_path);
+        std::string read_file(const std::filesystem::path& file_path);
         std::string read_file(const std::string& file_path);
 
         template<typename T>

@@ -53,7 +53,7 @@ namespace sm::internal {
                 if (entry.is_regular_file() && entry.path().extension() == ".glsl") {
                     const auto file_path {entry.path()};
 
-                    include_shader_sources[file_path.filename()] = utils::read_file(file_path);
+                    include_shader_sources[file_path.filename().string()] = utils::read_file(file_path);
                     LOG_DEBUG("Loaded shader `{}` as `{}`", file_path.string(), file_path.filename().string());
                 }
             }
@@ -61,7 +61,7 @@ namespace sm::internal {
     }
 
     std::string ShaderLibrary::match_and_include(std::string&& string) const {
-        const std::regex pattern (R"(^[ \t]*#include[ \t]*"[\w\-\/\.]+"[ \t]*$)", std::regex::ECMAScript | std::regex::multiline);
+        const std::regex pattern (R"(^[ \t]*#include[ \t]*"[\w\-\/\.]+"[ \t]*$)", std::regex::ECMAScript | std::regex::multiline);  // FIXME MSVC doesn't work
         std::smatch results;
 
         std::sregex_iterator begin_regex {string.cbegin(), string.cend(), pattern};

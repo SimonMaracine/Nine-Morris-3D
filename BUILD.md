@@ -59,7 +59,7 @@ cd scripts
 ```txt
 cd scripts
 python setup.py
-cd build
+cd ..\build
 cmake --build . --config Debug -j8
 :: Or open in Visual Studio and build from there
 ```
@@ -69,7 +69,7 @@ cmake --build . --config Debug -j8
 ```txt
 cd scripts
 python setup.py dist
-cd build
+cd ..\build
 cmake --build . --config Release -j8
 :: Or open in Visual Studio, change to Release mode and build from there
 ```

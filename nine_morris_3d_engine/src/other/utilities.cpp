@@ -1,7 +1,6 @@
 #include "nine_morris_3d_engine/other/utilities.hpp"
 
 #include <fstream>
-#include <filesystem>
 #include <cstddef>
 #include <cassert>
 
@@ -46,14 +45,17 @@ namespace sm {
         }
     }
 
-    std::string utils::file_name(const std::string& file_path) {
-        const auto path {std::filesystem::path(file_path)};
-        assert(path.has_filename());
+    std::string utils::file_name(const std::filesystem::path& file_path) {
+        assert(file_path.has_filename());
 
-        return path.filename().string();
+        return file_path.filename().string();
     }
 
-    std::string utils::read_file_ex(const std::string& file_path) {
+    std::string utils::file_name(const std::string& file_path) {
+        return file_name(std::filesystem::path(file_path));
+    }
+
+    std::string utils::read_file_ex(const std::filesystem::path& file_path) {
         std::ifstream stream {file_path, std::ios::binary};
 
         if (!stream.is_open()) {
@@ -76,13 +78,21 @@ namespace sm {
         return buffer;
     }
 
-    std::string utils::read_file(const std::string& file_path) {
-        LOG_DEBUG("Reading file `{}`...", file_path);
+    std::string utils::read_file_ex(const std::string& file_path) {
+        return read_file_ex(std::filesystem::path(file_path));
+    }
+
+    std::string utils::read_file(const std::filesystem::path& file_path) {
+        LOG_DEBUG("Reading file `{}`...", file_path.string());
 
         try {
             return read_file_ex(file_path);
         } catch (const ResourceError& e) {
-            SM_THROW_ERROR(ResourceError, "Could not read file `{}`: {}", file_path, e.what());
+            SM_THROW_ERROR(ResourceError, "Could not read file `{}`: {}", file_path.string(), e.what());
         }
+    }
+
+    std::string utils::read_file(const std::string& file_path) {
+        return read_file(std::filesystem::path(file_path));
     }
 }

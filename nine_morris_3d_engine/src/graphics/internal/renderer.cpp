@@ -50,7 +50,7 @@ namespace sm::internal {
     }
 
     void DebugRenderer::render(const Scene& scene) {
-        for (const DebugLine& line : scene.debug.debug_lines) {
+        for (const DebugLine& line : scene.m_debug.debug_lines) {
             BufferVertex v1;
             v1.position = line.position1;
             v1.color = line.color;
@@ -79,7 +79,7 @@ namespace sm::internal {
         storage.shader->bind();
         storage.vertex_array->bind();
 
-        opengl::draw_arrays_lines(static_cast<int>(scene.debug.debug_lines.size()) * 2);
+        opengl::draw_arrays_lines(static_cast<int>(scene.m_debug.debug_lines.size()) * 2);
 
         GlVertexArray::unbind();
     }
@@ -342,7 +342,7 @@ namespace sm::internal {
         draw_renderables(scene);
 
         // Skybox is rendered last, but with its depth values modified to keep it in the background
-        if (scene.skybox_texture != nullptr) {
+        if (scene.m_skybox_texture != nullptr) {
             draw_skybox(scene);
         }
 
@@ -409,16 +409,16 @@ namespace sm::internal {
 
             switch (binding_index) {
                 case PROJECTON_VIEW_UNIFORM_BLOCK_BINDING:
-                    uniform_buffer->set(&scene.camera.projection_view_matrix, "u_projection_view_matrix"_H);
+                    uniform_buffer->set(&scene.m_camera.projection_view_matrix, "u_projection_view_matrix"_H);
                     break;
                 case DIRECTIONAL_LIGHT_UNIFORM_BLOCK_BINDING:
-                    uniform_buffer->set(&scene.directional_light.direction, "u_directional_light.direction"_H);
-                    uniform_buffer->set(&scene.directional_light.ambient_color, "u_directional_light.ambient"_H);
-                    uniform_buffer->set(&scene.directional_light.diffuse_color, "u_directional_light.diffuse"_H);
-                    uniform_buffer->set(&scene.directional_light.specular_color, "u_directional_light.specular"_H);
+                    uniform_buffer->set(&scene.m_directional_light.direction, "u_directional_light.direction"_H);
+                    uniform_buffer->set(&scene.m_directional_light.ambient_color, "u_directional_light.ambient"_H);
+                    uniform_buffer->set(&scene.m_directional_light.diffuse_color, "u_directional_light.diffuse"_H);
+                    uniform_buffer->set(&scene.m_directional_light.specular_color, "u_directional_light.specular"_H);
                     break;
                 case VIEW_UNIFORM_BLOCK_BINDING:
-                    uniform_buffer->set(&scene.camera_position, "u_view_position"_H);
+                    uniform_buffer->set(&scene.m_camera_position, "u_view_position"_H);
                     break;
                 case POINT_LIGHT_UNIFORM_BLOCK_BINDING:
                     setup_point_light_uniform_buffer(scene, uniform_buffer);
@@ -443,7 +443,7 @@ namespace sm::internal {
         post_processing_context.last_texture = post_processing_context.original_texture;
         post_processing_context.textures.clear();
 
-        for (const auto& step : scene.post_processing_steps) {
+        for (const auto& step : scene.m_post_processing_steps) {
             step->framebuffer->bind();
             opengl::clear(opengl::Buffers::C);
             opengl::viewport(step->framebuffer->get_specification().width, step->framebuffer->get_specification().height);
@@ -532,7 +532,7 @@ namespace sm::internal {
     }
 
     void Renderer::draw_renderables(const Scene& scene) {
-        for (const Renderable& renderable : scene.renderables) {
+        for (const Renderable& renderable : scene.m_renderables) {
             const auto material {renderable.material};
 
             if (material->flags & Material::Outline) {
@@ -564,15 +564,15 @@ namespace sm::internal {
     void Renderer::draw_renderables_outlined(const Scene& scene) {
         std::vector<Renderable> outline_renderables;
 
-        std::for_each(scene.renderables.cbegin(), scene.renderables.cend(), [&](const Renderable& renderable) {
+        std::for_each(scene.m_renderables.cbegin(), scene.m_renderables.cend(), [&](const Renderable& renderable) {
             if (renderable.material->flags & Material::Outline) {
                 outline_renderables.push_back(renderable);
             }
         });
 
         std::sort(outline_renderables.begin(), outline_renderables.end(), [&](const Renderable& lhs, const Renderable& rhs) {
-            const float distance_left {glm::distance(lhs.transform.position, scene.camera_position)};
-            const float distance_right {glm::distance(rhs.transform.position, scene.camera_position)};
+            const float distance_left {glm::distance(lhs.transform.position, scene.m_camera_position)};
+            const float distance_right {glm::distance(rhs.transform.position, scene.m_camera_position)};
 
             return distance_left < distance_right;
         });
@@ -626,7 +626,7 @@ namespace sm::internal {
 
         storage.shadow_shader->bind();
 
-        for (const Renderable& renderable : scene.renderables) {
+        for (const Renderable& renderable : scene.m_renderables) {
             if (!(renderable.material->flags & Material::CastShadow)) {
                 continue;
             }
@@ -644,14 +644,14 @@ namespace sm::internal {
     }
 
     void Renderer::draw_skybox(const Scene& scene) {
-        const glm::mat4& projection {scene.camera.projection_matrix};
-        const glm::mat4 view {glm::mat4(glm::mat3(scene.camera.view_matrix))};
+        const glm::mat4& projection {scene.m_camera.projection_matrix};
+        const glm::mat4 view {glm::mat4(glm::mat3(scene.m_camera.view_matrix))};
 
         storage.skybox_shader->bind();
         storage.skybox_shader->upload_uniform_mat4("u_projection_view_matrix"_H, projection * view);
 
         storage.skybox_vertex_array->bind();
-        scene.skybox_texture->bind(0);
+        scene.m_skybox_texture->bind(0);
 
         opengl::draw_arrays(36);
 
@@ -663,7 +663,7 @@ namespace sm::internal {
 
         storage.text_shader->bind();
 
-        auto texts {scene.texts};
+        auto texts {scene.m_texts};
 
         std::stable_sort(texts.begin(), texts.end(), [](const Text& lhs, const Text& rhs) {
             return lhs.font.get() < rhs.font.get();
@@ -721,7 +721,7 @@ namespace sm::internal {
         // Uniforms must be set as arrays
         storage.text_shader->upload_uniform_mat4_array("u_model_matrix[0]"_H, storage.text.batch_matrices);
         storage.text_shader->upload_uniform_vec3_array("u_color[0]"_H, storage.text.batch_colors);
-        storage.text_shader->upload_uniform_mat4("u_projection_matrix"_H, scene.camera_2d.projection_matrix);
+        storage.text_shader->upload_uniform_mat4("u_projection_matrix"_H, scene.m_camera_2d.projection_matrix);
 
         const auto vertex_buffer {storage.wtext_vertex_buffer.lock()};
         vertex_buffer->bind();
@@ -743,11 +743,11 @@ namespace sm::internal {
         storage.quad_shader->bind();
         storage.quad_vertex_array->bind();
 
-        storage.quad_shader->upload_uniform_mat4("u_projection_matrix"_H, scene.camera_2d.projection_matrix);
+        storage.quad_shader->upload_uniform_mat4("u_projection_matrix"_H, scene.m_camera_2d.projection_matrix);
 
         begin_quads_batch();
 
-        for (const Quad& quad : scene.quads) {
+        for (const Quad& quad : scene.m_quads) {
             draw_quad(
                 quad.position,
                 glm::vec2(static_cast<float>(quad.texture->get_width()), static_cast<float>(quad.texture->get_height())),
@@ -838,14 +838,14 @@ namespace sm::internal {
 
     void Renderer::setup_point_light_uniform_buffer(const Scene& scene, const std::shared_ptr<GlUniformBuffer> uniform_buffer) {
         // Sort front to back with respect to the camera; lights in the front of the list will be used
-        auto point_lights {scene.point_lights};
+        auto point_lights {scene.m_point_lights};
 
         std::sort(
             point_lights.begin(),
             point_lights.end(),
             [&](const PointLight& lhs, const PointLight& rhs) {
-                const float distance_left {glm::distance(lhs.position, scene.camera_position)};
-                const float distance_right {glm::distance(rhs.position, scene.camera_position)};
+                const float distance_left {glm::distance(lhs.position, scene.m_camera_position)};
+                const float distance_right {glm::distance(rhs.position, scene.m_camera_position)};
 
                 return distance_left < distance_right;
             }
@@ -873,19 +873,19 @@ namespace sm::internal {
     void Renderer::setup_light_space_uniform_buffer(const Scene& scene, std::shared_ptr<GlUniformBuffer> uniform_buffer) {
         const glm::mat4 projection {
             glm::ortho(
-                scene.shadow_box.left,
-                scene.shadow_box.right,
-                scene.shadow_box.bottom,
-                scene.shadow_box.top,
-                scene.shadow_box.near,
-                scene.shadow_box.far
+                scene.m_shadow_box.left,
+                scene.m_shadow_box.right,
+                scene.m_shadow_box.bottom,
+                scene.m_shadow_box.top,
+                scene.m_shadow_box.near_,
+                scene.m_shadow_box.far_
             )
         };
 
         const glm::mat4 view {
             glm::lookAt(
-                scene.shadow_box.position,
-                scene.directional_light.direction,
+                scene.m_shadow_box.position,
+                scene.m_directional_light.direction,
                 glm::vec3(0.0f, 1.0f, 0.0f)
             )
         };
