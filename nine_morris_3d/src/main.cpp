@@ -86,7 +86,7 @@ int application_main() {
                 game.add_scene<GameScene>();
                 game.set_global_data<Global>();
                 exit_code = game.run("game"_H, functions);
-            } catch (const sm::RuntimeError& e) {  // FIXME exceptions from other threads
+            } catch (const sm::RuntimeError& e) {  // FIXME once an exception from a thread managed to not be caught; don't know how; seems to be working now
                 std::cerr << "Terminated game with error: " << e.what() << '\n';
                 return 1;
             }

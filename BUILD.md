@@ -9,7 +9,9 @@
 
 - Visual Studio (version >= 2022)
 
-### Linux - Fedora
+### Linux (dnf)
+
+<!-- FIXME update these -->
 
 - GCC (version >= 13)
 - X11: libXcursor-devel libXi-devel libXinerama-devel libXrandr-devel
@@ -18,7 +20,7 @@
 - mesa-libGL-devel.x86_64
 - libasan libubsan
 
-### Linux - Ubuntu
+### Linux (apt)
 
 - GCC (version >= 13)
 - X11: xorg-dev
@@ -26,31 +28,48 @@
 - PulseAudio: libasound2-dev libpulse-dev
 - libopengl-dev | libegl1-mesa-dev | mesa-common-dev (one of these)
 
-## Linux distribution
+## Downloading
 
-    mkdir build-release
-    cd build-release
-    cmake .. -DCMAKE_BUILD_TYPE=Release -DNM3D_DISTRIBUTION_MODE=ON
-    cmake --build . -j8
+```txt
+git clone https://github.com/SimonMaracine/Nine-Morris-3D
+cd Nine-Morris-3D
+git submodule update --init
+```
 
-## Windows distribution
+## Building
 
-    mkdir build
-    cd build
-    cmake .. -DCMAKE_BUILD_TYPE=Release -DNM3D_DISTRIBUTION_MODE=ON -A x64
-    cmake --build . --config Release -j8
-    :: Or open in Visual Studio, change to Release mode and build from there
+### Linux debug
 
-## Linux debug
+```txt
+cd scripts
+./setup.py
+./build.sh
+```
 
-    cd scripts
-    setup.sh <type>
-    build.sh
-    # test.sh
+### Linux distribution
 
-## Windows debug
+```txt
+cd scripts
+./setup.py dist
+./build.sh dist
+```
 
-    cd scripts
-    setup.bat
-    cmake --build . --config Release -j8
-    :: Or open in Visual Studio and build from there
+### Windows debug
+
+```txt
+cd scripts
+python setup.py
+cd build
+cmake --build . --config Debug -j8
+:: Or open in Visual Studio and build from there
+```
+
+### Windows distribution
+
+```txt
+cd scripts
+python setup.py dist
+cd build
+cmake --build . --config Release -j8
+:: Or open in Visual Studio, change to Release mode and build from there
+```

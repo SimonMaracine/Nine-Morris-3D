@@ -1,8 +1,11 @@
 #include "nine_morris_3d_engine/application/internal/task_manager.hpp"
 
 #include <algorithm>
+#include <exception>
 
 #include "nine_morris_3d_engine/application/internal/window.hpp"
+#include "nine_morris_3d_engine/application/error.hpp"
+#include "nine_morris_3d_engine/application/logging.hpp"
 
 namespace sm::internal {
     void TaskManager::add(const Task::TaskFunction& function, void* user_data) {
@@ -18,31 +21,50 @@ namespace sm::internal {
     }
 
     void TaskManager::update() {
-        update_tasks();
-        update_async_tasks();
-    }
+        {
+            std::lock_guard<std::mutex> lock {mutex};
 
-    void TaskManager::wait_async() {
-        for (const auto& async_task : async_tasks) {
-            async_task->stop.store(true);
+            update_tasks();
         }
 
-        while (!async_tasks.empty()) {
+        {
+            std::lock_guard<std::mutex> lock {async_mutex};
+
             update_async_tasks();
         }
     }
 
-    void TaskManager::update_tasks() {
-        std::lock_guard<std::mutex> lock {mutex};
+    void TaskManager::wait_async() {
+        std::lock_guard<std::mutex> lock {async_mutex};
 
+        for (const auto& async_task : async_tasks) {
+            async_task->m_stop.store(true);
+        }
+
+        std::exception_ptr last_exception;
+
+        while (!async_tasks.empty()) {
+            try {
+                update_async_tasks();
+            } catch (const OtherError& e) {
+                last_exception = std::current_exception();
+            }
+        }
+
+        if (last_exception) {
+            std::rethrow_exception(last_exception);
+        }
+    }
+
+    void TaskManager::update_tasks() {
         for (Task& task : tasks_active) {
-            if (task.start_time == 0.0) {
-                task.start_time = Window::get_time();
+            if (task.m_start_time == 0.0) {
+                task.m_start_time = Window::get_time();
             } else {
-                task.total_time = Window::get_time() - task.start_time;
+                task.m_total_time = Window::get_time() - task.m_start_time;
             }
 
-            const Task::Result result {task.function(task, task.user_data)};
+            const Task::Result result {task.m_function(task, task.m_user_data)};
 
             switch (result) {
                 case Task::Result::Done:
@@ -58,13 +80,34 @@ namespace sm::internal {
     }
 
     void TaskManager::update_async_tasks() {
-        std::lock_guard<std::mutex> lock {async_mutex};
+        bool tasks_done {false};
+        std::exception_ptr exception;
 
-        async_tasks.erase(
-            std::remove_if(async_tasks.begin(), async_tasks.end(), [](const std::unique_ptr<AsyncTask>& async_task) {
-                return async_task->done.load();
-            }),
-            async_tasks.cend()
-        );
+        for (const auto& async_task : async_tasks) {
+            if (async_task->m_done.load()) {
+                if (async_task->m_exception) {
+                    exception = async_task->m_exception;
+                }
+
+                tasks_done = true;
+            }
+        }
+
+        if (tasks_done) {
+            async_tasks.erase(
+                std::remove_if(async_tasks.begin(), async_tasks.end(), [](const std::unique_ptr<AsyncTask>& async_task) {
+                    return async_task->m_done.load();
+                }),
+                async_tasks.cend()
+            );
+        }
+
+        if (exception) {
+            try {
+                std::rethrow_exception(exception);
+            } catch (const RuntimeError& e) {
+                SM_THROW_ERROR(OtherError, "An error occurred inside an async task: {}", e.what());
+            }
+        }
     }
 }

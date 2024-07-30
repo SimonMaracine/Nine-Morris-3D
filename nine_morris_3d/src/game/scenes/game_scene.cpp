@@ -41,7 +41,13 @@ void GameScene::on_start() {
     });
 
     ctx.add_task_async([this](sm::AsyncTask& async_task, void*) {
-        load_heavy_resources();
+        try {
+            load_heavy_resources();
+        } catch (const sm::RuntimeError& e) {
+            async_task.set_done(std::current_exception());
+            return;
+        }
+
         async_task.set_done();
     });
 

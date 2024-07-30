@@ -21,6 +21,7 @@ shaders/internal/skybox.frag
 shaders/internal/skybox.vert
 shaders/internal/text.frag
 shaders/internal/text.vert
+shaders/flat.frag
 shaders/flat.vert
 shaders/phong_diffuse_normal_shadow.frag
 shaders/phong_diffuse_normal_shadow.vert

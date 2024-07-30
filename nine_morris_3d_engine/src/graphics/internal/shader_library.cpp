@@ -51,15 +51,13 @@ namespace sm::internal {
 
             for (const std::filesystem::directory_entry& entry : iter) {
                 if (entry.is_regular_file() && entry.path().extension() == ".glsl") {
-                    const auto file_path {entry.path().string()};
-                    const auto first_slash {file_path.find_first_of("/")};
+                    const auto file_path {entry.path()};
 
-                    include_shader_sources[file_path.substr(first_slash + 1)] = utils::read_file(file_path);
+                    include_shader_sources[file_path.filename()] = utils::read_file(file_path);
+                    LOG_DEBUG("Loaded shader `{}` as `{}`", file_path.string(), file_path.filename().string());
                 }
             }
         }
-
-        LOG_INFO("Loaded shaders from include directories");
     }
 
     std::string ShaderLibrary::match_and_include(std::string&& string) const {
@@ -76,7 +74,7 @@ namespace sm::internal {
             const auto& sub_match {*match.cbegin()};
 
             const auto argument {get_include_argument(match.str())};
-            const auto iter_arg {include_shader_sources.find(argument)};
+            const auto iter_arg {include_shader_sources.find(utils::file_name(argument))};
 
             if (iter_arg == include_shader_sources.cend()) {
                 SM_THROW_ERROR(ResourceError, "Cannot include `{}`; file not found", argument);

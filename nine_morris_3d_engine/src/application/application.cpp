@@ -40,8 +40,13 @@ namespace sm {
         fixed_update.previous_seconds = internal::Window::get_time();
     }
 
-    Application::~Application() {  // Destructor is called before all member variables
+    // Destructor is called before all member variables
+    Application::~Application() {
         internal::imgui_context::uninitialize();
+
+        LOG_INFO("Waiting for other threads...");
+
+        ctx.tsk.wait_async();
     }
 
     int Application::run(Id start_scene_id, const UserFunctions& user_functions) {
