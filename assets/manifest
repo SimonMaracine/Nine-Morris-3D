@@ -21,3 +21,4 @@ textures/barrelNormal.png
 sounds/piece_move-01.ogg
 sounds/piece_place-01.ogg
 sounds/music/relaxing.ogg
+shaders/post_processing/blur.frag

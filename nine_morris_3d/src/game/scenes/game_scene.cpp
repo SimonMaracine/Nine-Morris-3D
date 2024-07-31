@@ -648,7 +648,6 @@ void GameScene::load_heavy_resources() {
         });
     }
 
-
     {
         const auto mesh {ctx.load_mesh(ctx.path_assets("models/dragon.obj"), "default", sm::Mesh::Type::PN)};
 

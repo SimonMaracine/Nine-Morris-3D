@@ -27,6 +27,10 @@ namespace sm::internal {
         std::size_t count {0};
 
         while (std::getline(stream, line)) {
+            if (line.back() == '\r') {  // Stupid Windows :P
+                line.pop_back();
+            }
+
             result += match_and_include(std::move(line), ++count) + '\n';
         }
 

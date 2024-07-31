@@ -156,7 +156,7 @@ void PointCameraController::set_position(glm::vec3 position) {
     m_camera->set_position_orientation(position, point - position, glm::vec3(0.0f, 1.0f, 0.0f));
 
     // Calculate yaw, pitch and angle_around_point
-    const glm::vec3 direction {glm::vec3(glm::transpose(m_camera->view_matrix)[2])};
+    const glm::vec3 direction {glm::vec3(glm::transpose(m_camera->view())[2])};
     yaw = glm::degrees(glm::atan(-direction.x, direction.z));
     pitch = glm::degrees(glm::asin(direction.y));
     angle_around_point = 180.0f - yaw;

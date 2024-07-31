@@ -10,8 +10,8 @@
 
 ; General
 
-  Name "${ApplicationName}"
-  OutFile "Nine-Morris-3D-v${ApplicationVersion}-Windows.exe"
+  Name "Nine Morris 3D"
+  OutFile "Nine-Morris-3D-${ApplicationVersion}-Windows.exe"
   Unicode True
 
   ; Default installation folder
@@ -50,10 +50,10 @@ Section "Nine Morris 3D (required)" section_game
 
   SetOutPath "$INSTDIR"
 
-  File /r "data"
-  File /r "engine_data"
+  File /r "assets"
+  File /r "engine_assets"
   File "README.txt"
-  File "Nine-Morris-3D.exe"
+  File "NineMorris3D.exe"
 
   ; Store installation folder
   WriteRegStr HKLM "Software\${ApplicationName}" "InstallationDirectory" "$INSTDIR"
@@ -78,7 +78,7 @@ Section "Nine Morris 3D (required)" section_game
 
     CreateDirectory "$SMPROGRAMS\$StartMenuFolder"
     CreateShortcut "$SMPROGRAMS\$StartMenuFolder\Uninstall.lnk" "$INSTDIR\Uninstall.exe"
-    CreateShortcut "$SMPROGRAMS\$StartMenuFolder\Nine-Morris-3D.lnk" "$INSTDIR\Nine-Morris-3D.exe"
+    CreateShortcut "$SMPROGRAMS\$StartMenuFolder\${ApplicationName}.lnk" "$INSTDIR\${ApplicationName}.exe"
 
   !insertmacro MUI_STARTMENU_WRITE_END
 
@@ -100,16 +100,15 @@ SectionEnd
 
 Section "Uninstall"
 
-  Delete "$INSTDIR\Nine-Morris-3D.exe"
+  Delete "$INSTDIR\${ApplicationName}.exe"
   Delete "$INSTDIR\README.txt"
-  RMDir /r "$INSTDIR\engine_data"
-  RMDir /r "$INSTDIR\data"
+  RMDir /r "$INSTDIR\engine_assets"
+  RMDir /r "$INSTDIR\assets"
 
   Delete "$INSTDIR\Uninstall.exe"
 
   RMDir "$INSTDIR"
   RMDir /r "$DOCUMENTS\${ApplicationName}"
-  RMDir /r "$APPDATA\${ApplicationName}"
 
   !insertmacro MUI_STARTMENU_GETFOLDER Application $StartMenuFolder
 

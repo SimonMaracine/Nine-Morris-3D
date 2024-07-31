@@ -36,9 +36,14 @@ static Paths get_paths() {
     paths.saved_data = home_directory / ".ninemorris3d";
     paths.assets = "/usr/local/share/ninemorris3d";
     #elif defined(SM_PLATFORM_WINDOWS)
-    // TODO
-    paths.logs = "";
-    paths.saved_data = "";
+    const char* username {std::getenv("USERNAME")};
+
+    if (username == nullptr) {
+        throw std::runtime_error("Could not get `USERNAME` environment variable");
+    }
+
+    paths.logs = "C:\\Users\\" + std::string(username) + "\\Documents\\NineMorris3D";
+    paths.saved_data = "C:\\Users\\" + std::string(username) + "\\Documents\\NineMorris3D";
     paths.assets = "";
     #endif
 #else

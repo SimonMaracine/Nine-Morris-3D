@@ -409,7 +409,7 @@ namespace sm::internal {
 
             switch (binding_index) {
                 case PROJECTON_VIEW_UNIFORM_BLOCK_BINDING:
-                    uniform_buffer->set(&scene.m_camera.projection_view_matrix, "u_projection_view_matrix"_H);
+                    uniform_buffer->set(&scene.m_camera.projection_view(), "u_projection_view_matrix"_H);
                     break;
                 case DIRECTIONAL_LIGHT_UNIFORM_BLOCK_BINDING:
                     uniform_buffer->set(&scene.m_directional_light.direction, "u_directional_light.direction"_H);
@@ -644,8 +644,8 @@ namespace sm::internal {
     }
 
     void Renderer::draw_skybox(const Scene& scene) {
-        const glm::mat4& projection {scene.m_camera.projection_matrix};
-        const glm::mat4 view {glm::mat4(glm::mat3(scene.m_camera.view_matrix))};
+        const glm::mat4& projection {scene.m_camera.projection()};
+        const glm::mat4 view {glm::mat4(glm::mat3(scene.m_camera.view()))};
 
         m_storage.skybox_shader->bind();
         m_storage.skybox_shader->upload_uniform_mat4("u_projection_view_matrix"_H, projection * view);
@@ -721,7 +721,7 @@ namespace sm::internal {
         // Uniforms must be set as arrays
         m_storage.text_shader->upload_uniform_mat4_array("u_model_matrix[0]"_H, m_storage.text.batch_matrices);
         m_storage.text_shader->upload_uniform_vec3_array("u_color[0]"_H, m_storage.text.batch_colors);
-        m_storage.text_shader->upload_uniform_mat4("u_projection_matrix"_H, scene.m_camera_2d.projection_matrix);
+        m_storage.text_shader->upload_uniform_mat4("u_projection_matrix"_H, scene.m_camera_2d.projection());
 
         const auto vertex_buffer {m_storage.wtext_vertex_buffer.lock()};
         vertex_buffer->bind();
@@ -743,7 +743,7 @@ namespace sm::internal {
         m_storage.quad_shader->bind();
         m_storage.quad_vertex_array->bind();
 
-        m_storage.quad_shader->upload_uniform_mat4("u_projection_matrix"_H, scene.m_camera_2d.projection_matrix);
+        m_storage.quad_shader->upload_uniform_mat4("u_projection_matrix"_H, scene.m_camera_2d.projection());
 
         begin_quads_batch();
 

@@ -3,18 +3,6 @@
 #include "nine_morris_3d_engine/application/platform.hpp"
 #include "nine_morris_3d_engine/application/error.hpp"
 
-// #if defined(SM_PLATFORM_LINUX)
-//     #define USER_DATA_DIRECTORY_PATH(user_name, application_name) \
-//         ("/home/" + (user_name) + "/." + (application_name) + "/")
-//     #define DATA_DIRECTORY_PATH(application_name) \
-//         ("/usr/local/share/" + (application_name) + "/")
-// #elif defined(SM_PLATFORM_WINDOWS)
-//     #define USER_DATA_DIRECTORY_PATH(user_name, application_name) \
-//         ("C:\\Users\\" + (user_name) + "\\AppData\\Roaming\\" + (application_name) + "\\")
-//     #define USER_DATA2_DIRECTORY_PATH(user_name, application_name) \
-//         ("C:\\Users\\" + (user_name) + "\\Documents\\" + (application_name) + "\\")
-// #endif
-
 namespace sm::internal {
     FileSystem::FileSystem(
         const std::string& path_logs,
@@ -89,62 +77,18 @@ namespace sm::internal {
 
     std::filesystem::path FileSystem::path_logs() const {
         return m_path_logs;
-
-// #ifdef SM_BUILD_DISTRIBUTION
-//     #if defined(SM_PLATFORM_LINUX)
-//         return USER_DATA_DIRECTORY_PATH(user_name, application_name);
-//     #elif defined(SM_PLATFORM_WINDOWS)
-//         return USER_DATA2_DIRECTORY_PATH(user_name, application_name);
-//     #endif
-// #else
-//         return {};
-// #endif
     }
 
     std::filesystem::path FileSystem::path_saved_data() const {
         return m_path_saved_data;
-
-// #ifdef SM_BUILD_DISTRIBUTION
-//     #if defined(SM_PLATFORM_LINUX)
-//         return USER_DATA_DIRECTORY_PATH(user_name, application_name);
-//     #elif defined(SM_PLATFORM_WINDOWS)
-//         return USER_DATA_DIRECTORY_PATH(user_name, application_name);
-//     #endif
-// #else
-//         return {};
-// #endif
     }
 
     std::filesystem::path FileSystem::path_assets() const {
         return std::filesystem::path(m_path_assets) / m_assets_directory;
-
-// #ifdef SM_BUILD_DISTRIBUTION
-//     #if defined(SM_PLATFORM_LINUX)
-//         return DATA_DIRECTORY_PATH(application_name) + assets_directory + '/';
-//     #elif defined(SM_PLATFORM_WINDOWS)
-//         return assets_directory + '\\';
-//     #endif
-// #else
-//     #if defined(SM_PLATFORM_LINUX)
-//         return assets_directory + '/';
-//     #elif defined(SM_PLATFORM_WINDOWS)
-//         return assets_directory + '\\';
-//     #endif
-// #endif
     }
 
     std::filesystem::path FileSystem::path_engine_assets() const {
         return std::filesystem::path(m_path_assets) / "engine_assets";
-
-// #ifdef SM_BUILD_DISTRIBUTION
-//     #if defined(SM_PLATFORM_LINUX)
-//         return DATA_DIRECTORY_PATH(application_name) + "engine_assets/";
-//     #elif defined(SM_PLATFORM_WINDOWS)
-//         return "engine_assets/";
-//     #endif
-// #else
-//         return "engine_assets/";
-// #endif
     }
 
     std::filesystem::path FileSystem::path_logs(const std::string& path) const {

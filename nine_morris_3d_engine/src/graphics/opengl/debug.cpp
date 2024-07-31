@@ -56,8 +56,6 @@ namespace sm {
         "GL_MAX_VIEWPORT_DIMS"
     };
 
-    static constexpr std::size_t BUFFER_LENGTH {128};
-
     void opengl_debug::initialize() noexcept {
         glDebugMessageCallback(
             [](
@@ -101,42 +99,40 @@ namespace sm {
     }
 
     std::string opengl_debug::get_information() {
-        char buffer[BUFFER_LENGTH] {};
         std::string result;
 
         result += "*** OpenGL Version And Driver ***\n";
 
         {
-            static constexpr std::size_t BUFFER_LENGTH {256};  // Should be enough
+            char buffer[256] {};  // Should be enough
 
-            char buffer[BUFFER_LENGTH] {};
-
-            std::snprintf(buffer, BUFFER_LENGTH, "OpenGL version: %s\n", glGetString(GL_VERSION));
+            std::snprintf(buffer, sizeof(buffer), "OpenGL version: %s\n", glGetString(GL_VERSION));
             result += buffer;
-            std::snprintf(buffer, BUFFER_LENGTH, "GLSL version: %s\n", glGetString(GL_SHADING_LANGUAGE_VERSION));
+            std::snprintf(buffer, sizeof(buffer), "GLSL version: %s\n", glGetString(GL_SHADING_LANGUAGE_VERSION));
             result += buffer;
-            std::snprintf(buffer, BUFFER_LENGTH, "Renderer: %s\n", glGetString(GL_RENDERER));
+            std::snprintf(buffer, sizeof(buffer), "Renderer: %s\n", glGetString(GL_RENDERER));
             result += buffer;
-            std::snprintf(buffer, BUFFER_LENGTH, "Vendor: %s\n", glGetString(GL_VENDOR));
+            std::snprintf(buffer, sizeof(buffer), "Vendor: %s\n", glGetString(GL_VENDOR));
             result += buffer;
         }
 
         result += "*** OpenGL Context Parameters ***\n";
 
+        char buffer[128] {};
         std::size_t parameter_index {18};
 
         for (std::size_t i {0}; i <= parameter_index; i++) {
             int value {};
             glGetIntegerv(parameters[i], &value);
 
-            std::snprintf(buffer, BUFFER_LENGTH, "%s %i\n", names[i], value);
+            std::snprintf(buffer, sizeof(buffer), "%s %i\n", names[i], value);
             result += buffer;
         }
         {
             int value[2] {};
-            glGetIntegerv(parameters[++parameter_index], value);
+            glGetIntegerv(parameters[parameter_index + 1], value);
 
-            std::snprintf(buffer, BUFFER_LENGTH, "%s %i %i\n", names[parameter_index], value[0], value[1]);
+            std::snprintf(buffer, sizeof(buffer), "%s %i %i\n", names[parameter_index + 1], value[0], value[1]);
             result += buffer;
         }
 
@@ -144,7 +140,7 @@ namespace sm {
 
         std::snprintf(
             buffer,
-            BUFFER_LENGTH,
+            sizeof(buffer),
             "GL_EXT_texture_filter_anisotropic max samples: %d\n",
             capabilities::max_anisotropic_filtering_supported()
         );
