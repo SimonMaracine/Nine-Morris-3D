@@ -210,21 +210,21 @@ namespace sm {
     }
 
     void GlUniformBuffer::set(const void* field_data, Id field) {
-        assert(configured);
-        assert(data != nullptr && size > 0);
+        assert(m_configured);
+        assert(m_data != nullptr && m_size > 0);
 
         std::memcpy(m_data + m_fields.at(field).offset, field_data, m_fields.at(field).size);
     }
 
     void GlUniformBuffer::upload() const noexcept {
-        assert(data != nullptr && size > 0);
+        assert(m_data != nullptr && m_size > 0);
 
         glBufferSubData(GL_UNIFORM_BUFFER, 0, m_size, m_data);
     }
 
     void GlUniformBuffer::set_and_upload(const void* field_data, Id field) {
-        assert(configured);
-        assert(data != nullptr && size > 0);
+        assert(m_configured);
+        assert(m_data != nullptr && m_size > 0);
 
         const std::size_t offset {m_fields.at(field).offset};
         const std::size_t size {m_fields.at(field).size};

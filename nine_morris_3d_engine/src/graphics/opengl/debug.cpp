@@ -2,7 +2,6 @@
 
 #include <cstddef>
 #include <cstdio>
-#include <cstdlib>
 #include <cassert>
 
 #include <glad/glad.h>
@@ -73,7 +72,6 @@ namespace sm {
                 switch (severity) {
                     case GL_DEBUG_SEVERITY_HIGH:
                         LOG_CRITICAL("({}) OpenGL: {}", id, message);
-                        std::abort();
                         break;
                     case GL_DEBUG_SEVERITY_MEDIUM:
                     case GL_DEBUG_SEVERITY_LOW:

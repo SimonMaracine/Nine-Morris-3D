@@ -4,7 +4,9 @@
 #include <regex>
 #include <iterator>
 #include <vector>
+#include <sstream>
 
+#include "nine_morris_3d_engine/application/platform.hpp"
 #include "nine_morris_3d_engine/application/error.hpp"
 #include "nine_morris_3d_engine/application/logging.hpp"
 #include "nine_morris_3d_engine/other/utilities.hpp"
@@ -15,7 +17,21 @@ namespace sm::internal {
     }
 
     std::string ShaderLibrary::load_shader(const std::string& source) const {
-        return match_and_include(std::string(source));
+#if defined(SM_PLATFORM_LINUX)
+        return match_and_include(std::string(source), 0);
+#elif defined(SM_PLATFORM_WINDOWS)
+        std::string result;
+
+        std::stringstream stream {source};
+        std::string line;
+        std::size_t count {0};
+
+        while (std::getline(stream, line)) {
+            result += match_and_include(std::move(line), ++count) + '\n';
+        }
+
+        return result;
+#endif
     }
 
     std::string ShaderLibrary::load_shader(const std::string& source, std::initializer_list<Define> defines) const {
@@ -60,8 +76,16 @@ namespace sm::internal {
         }
     }
 
-    std::string ShaderLibrary::match_and_include(std::string&& string) const {
-        const std::regex pattern (R"(^[ \t]*#include[ \t]*"[\w\-\/\.]+"[ \t]*$)", std::regex::ECMAScript | std::regex::multiline);  // FIXME MSVC doesn't work
+    std::string ShaderLibrary::match_and_include(std::string&& string, [[maybe_unused]] std::size_t count) const {
+        const std::regex pattern (
+            R"(^[ \t]*#include[ \t]*"[\w\-\/\.]+"[ \t]*$)",
+#if defined(SM_PLATFORM_LINUX)
+            std::regex::ECMAScript | std::regex::multiline
+#elif defined(SM_PLATFORM_WINDOWS)
+            std::regex::ECMAScript  // Stupid Windows :P
+#endif
+        );
+
         std::smatch results;
 
         std::sregex_iterator begin_regex {string.cbegin(), string.cend(), pattern};
@@ -80,7 +104,11 @@ namespace sm::internal {
                 SM_THROW_ERROR(ResourceError, "Cannot include `{}`; file not found", argument);
             }
 
+#if defined(SM_PLATFORM_LINUX)
             const std::size_t line {get_line(string.cbegin(), sub_match.first)};
+#elif defined(SM_PLATFORM_WINDOWS)
+            const std::size_t line {count};
+#endif
 
             matches.push_back(std::make_tuple(sub_match.first, sub_match.second, line, iter_arg->second));
         }

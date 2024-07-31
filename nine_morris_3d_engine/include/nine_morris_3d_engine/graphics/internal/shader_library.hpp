@@ -21,7 +21,7 @@ namespace sm::internal {
 
         void load_shaders_from_include_directories(std::initializer_list<std::string> include_directories);
     private:
-        std::string match_and_include(std::string&& string) const;
+        std::string match_and_include(std::string&& string, std::size_t count) const;
         static std::string get_include_argument(const std::string& string);
         static std::size_t get_line(std::string::const_iterator begin, std::string::const_iterator end);
 
