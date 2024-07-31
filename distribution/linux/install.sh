@@ -12,3 +12,9 @@ BASE=$(basename $SOURCE)
 
 cp -v -r /tmp/${BASE%.*.*}/usr/local/bin/* /usr/local/bin
 cp -v -r /tmp/${BASE%.*.*}/usr/local/share/* /usr/local/share
+
+if [[ -x "$(command -v gtk-update-icon-cache)" ]]; then
+    gtk-update-icon-cache --force --ignore-theme-index /usr/local/share/icons/hicolor/
+else
+    echo "Please refresh your icon cache"
+fi
