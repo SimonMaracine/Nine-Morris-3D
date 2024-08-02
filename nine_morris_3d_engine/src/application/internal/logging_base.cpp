@@ -8,6 +8,7 @@
 #include <spdlog/sinks/stdout_color_sinks.h>
 
 #include "nine_morris_3d_engine/application/platform.hpp"
+#include "nine_morris_3d_engine/application/logging.hpp"
 
 [[maybe_unused]] static const char* LOG_PATTERN_DEVELOPMENT {"%^[%l] [%t] [%H:%M:%S]%$ %v"};
 static const char* LOG_PATTERN_DISTRIBUTION {"%^[%l] [%t] [%!:%#] [%c]%$ %v"};
@@ -54,7 +55,7 @@ namespace sm::internal {
         g_logger->set_pattern(LOG_PATTERN_DISTRIBUTION);
         g_logger->set_level(spdlog::level::trace);
 
-        g_logger->error("Using fallback distribution logger: {}", error_message);
+        LOG_DIST_ERROR("Using fallback distribution logger: {}", error_message);
     }
 
     std::shared_ptr<spdlog::logger> Logging::g_logger;
