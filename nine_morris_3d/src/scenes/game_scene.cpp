@@ -1,11 +1,11 @@
-#include "game/scenes/game_scene.hpp"
+#include "scenes/game_scene.hpp"
 
 #include <nine_morris_3d_engine/external/resmanager.h++>
 #include <nine_morris_3d_engine/external/imgui.h++>
 #include <nine_morris_3d_engine/external/glm.h++>
 
-#include "game/global.hpp"
-#include "game/game.hpp"
+#include "global.hpp"
+#include "game.hpp"
 
 void GameScene::on_start() {
     // ctx.add_task([this](const sm::Task& task, void*) {
@@ -54,11 +54,10 @@ void GameScene::on_start() {
     ctx.connect_event<sm::WindowResizedEvent, &GameScene::on_window_resized>(this);
     ctx.connect_event<sm::KeyReleasedEvent, &GameScene::on_key_released>(this);
 
-    ctx.set_clear_color(glm::vec3(0.1f, 0.05f, 0.1f));
+    ctx.set_clear_color(glm::vec3(0.1f, 0.1f, 0.1f));
 
     // setup_texts();
     // setup_quads();
-    // setup_lights();
 
     cam_controller = PointCameraController(
         cam,
@@ -73,6 +72,10 @@ void GameScene::on_start() {
     cam_controller.connect_events(ctx);
 
     cam_2d.set_projection(0, ctx.get_window_width(), 0, ctx.get_window_height());
+
+    setup_skybox();
+    setup_lights();
+    setup_board();
 
     // ctx.set_color_correction(color_correction);
 }
@@ -92,11 +95,16 @@ void GameScene::on_update() {
     ctx.capture(cam_2d);
 
     ctx.add_light(directional_light);
+
+    board.update(ctx);
+
     // ctx.add_light(point_light);
 
     // if (sky && field) {
     //     ctx.skybox(field);
     // }
+
+    ctx.skybox(field);
 
     // if (blur) {
     //     ctx.add_post_processing(ctx.global<Global>().blur_step);
@@ -116,7 +124,7 @@ void GameScene::on_update() {
     //     if (brick) ctx.add_renderable(brick);
     // }
 
-    // ctx.show_info_text();
+    ctx.show_info_text();
 
     // {
     //     ctx.add_text(text1);
@@ -168,9 +176,9 @@ void GameScene::on_update() {
     // ctx.add_quad(white);
 
     // Origin
-    ctx.debug_add_line(glm::vec3(-5.0f, 0.0f, 0.0f), glm::vec3(5.0f, 0.0f, 0.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-    ctx.debug_add_line(glm::vec3(0.0f, -5.0f, 0.0f), glm::vec3(0.0f, 5.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-    ctx.debug_add_line(glm::vec3(0.0f, 0.0f, -5.0f), glm::vec3(0.0f, 0.0f, 5.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+    ctx.debug_add_line(glm::vec3(-1.0f, 0.0f, 0.0f), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+    ctx.debug_add_line(glm::vec3(0.0f, -1.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+    ctx.debug_add_line(glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(0.0f, 0.0f, 1.0f));
 
     // Whatever
     // ctx.debug_add_lines(
@@ -250,6 +258,66 @@ void GameScene::on_key_released(const sm::KeyReleasedEvent& event) {
     //     default:
     //         break;
     // }
+}
+
+void GameScene::setup_skybox() {
+    sm::TexturePostProcessing post_processing;
+    post_processing.flip = false;
+
+    field = ctx.load_texture_cubemap(
+        "field"_H,
+        {
+            ctx.load_texture_data(ctx.path_assets("textures/skybox/field/px.png"), post_processing),
+            ctx.load_texture_data(ctx.path_assets("textures/skybox/field/nx.png"), post_processing),
+            ctx.load_texture_data(ctx.path_assets("textures/skybox/field/py.png"), post_processing),
+            ctx.load_texture_data(ctx.path_assets("textures/skybox/field/ny.png"), post_processing),
+            ctx.load_texture_data(ctx.path_assets("textures/skybox/field/pz.png"), post_processing),
+            ctx.load_texture_data(ctx.path_assets("textures/skybox/field/nz.png"), post_processing)
+        },
+        sm::TextureFormat::Srgba8Alpha
+    );
+}
+
+void GameScene::setup_lights() {
+    directional_light.direction = glm::normalize(glm::vec3(-0.2f, -1.0f, -0.3f));
+    directional_light.ambient_color = glm::vec3(0.1f);
+    directional_light.diffuse_color = glm::vec3(0.9f);
+    directional_light.specular_color = glm::vec3(1.0f);
+}
+
+void GameScene::setup_board() {
+    const auto mesh {ctx.load_mesh(ctx.path_assets("models/board/board.obj"), "Board_Cube", sm::Mesh::Type::PNTT)};
+
+    const auto vertex_array {ctx.load_vertex_array("board"_H, mesh)};
+
+    sm::TextureSpecification specification;
+    specification.format = sm::TextureFormat::Srgba8Alpha;
+
+    const auto diffuse {ctx.load_texture(
+        "board_diffuse"_H,
+        ctx.load_texture_data(ctx.path_assets("textures/board/board_diffuse.png"), sm::TexturePostProcessing()),
+        specification
+    )};
+
+    const auto normal {ctx.load_texture(
+        "board_normal"_H,
+        ctx.load_texture_data(ctx.path_assets("textures/board/board_normal.png"), sm::TexturePostProcessing()),
+        specification
+    )};
+
+    const auto material {ctx.load_material(sm::MaterialType::PhongDiffuseNormalShadow, sm::Material::CastShadow)};
+
+    const auto material_instance {ctx.load_material_instance("board"_H, material)};
+    material_instance->set_texture("u_material.ambient_diffuse"_H, diffuse, 0);
+    material_instance->set_vec3("u_material.specular"_H, glm::vec3(0.9f));
+    material_instance->set_float("u_material.shininess"_H, 32.0f);
+    material_instance->set_texture("u_material.normal"_H, normal, 1);
+
+    board = StandardBoard(sm::Renderable(mesh, vertex_array, material_instance));
+}
+
+void GameScene::setup_nodes() {
+
 }
 
 // void GameScene::setup_skybox(
@@ -527,20 +595,6 @@ void GameScene::on_key_released(const sm::KeyReleasedEvent& event) {
 //         white.texture = texture;
 //         white.position = glm::vec2(210.0f, 210.0f);
 //     }
-// }
-
-// void GameScene::setup_lights() {
-//     directional_light.direction = glm::normalize(glm::vec3(-0.2f, -1.0f, -0.3f));
-//     directional_light.ambient_color = glm::vec3(0.1f);
-//     directional_light.diffuse_color = glm::vec3(0.9f);
-//     directional_light.specular_color = glm::vec3(1.0f);
-
-//     point_light.position = glm::vec3(3.0f, 3.0f, 1.0f);
-//     point_light.ambient_color = glm::vec3(0.1f, 0.08f, 0.02f);
-//     point_light.diffuse_color = glm::vec3(0.9f, 0.8f, 0.2f);
-//     point_light.specular_color = glm::vec3(1.0f);
-//     point_light.falloff_linear = 0.09f;
-//     point_light.falloff_quadratic = 0.032f;
 // }
 
 // void GameScene::setup_sounds() {

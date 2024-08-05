@@ -4,7 +4,8 @@
 
 #include <nine_morris_3d_engine/nine_morris_3d.hpp>
 
-#include "game/point_camera_controller.hpp"
+#include "point_camera_controller.hpp"
+#include "game/standard_board.hpp"
 
 struct GameScene : sm::ApplicationScene {
     explicit GameScene(sm::Ctx& ctx)
@@ -21,14 +22,11 @@ struct GameScene : sm::ApplicationScene {
     void on_window_resized(const sm::WindowResizedEvent& event);
     void on_key_released(const sm::KeyReleasedEvent& event);
 
-    // void setup_skybox(
-    //     std::shared_ptr<sm::TextureData> px,
-    //     std::shared_ptr<sm::TextureData> nx,
-    //     std::shared_ptr<sm::TextureData> py,
-    //     std::shared_ptr<sm::TextureData> ny,
-    //     std::shared_ptr<sm::TextureData> pz,
-    //     std::shared_ptr<sm::TextureData> nz
-    // );
+    void setup_skybox();
+    void setup_lights();
+    void setup_board();
+    void setup_nodes();
+
     // void setup_ground(std::shared_ptr<sm::Mesh> mesh);
     // void setup_dragon(std::shared_ptr<sm::Mesh> mesh);
     // void setup_teapot(std::shared_ptr<sm::Mesh> mesh);
@@ -39,7 +37,7 @@ struct GameScene : sm::ApplicationScene {
     // void setup_textured_bricks(std::shared_ptr<sm::Mesh> mesh, std::shared_ptr<sm::TextureData> texture_data);
     // void setup_texts();
     // void setup_quads();
-    // void setup_lights();
+
     // void setup_sounds();
 
     // void reload_textures(bool srgb);
@@ -51,6 +49,8 @@ struct GameScene : sm::ApplicationScene {
     sm::DirectionalLight directional_light;
     // sm::PointLight point_light;
     sm::ShadowBox shadow_box;
+
+    StandardBoard board;
 
     // sm::Renderable ground;
     // sm::Renderable dragon1;
@@ -70,7 +70,7 @@ struct GameScene : sm::ApplicationScene {
     // sm::Quad wait;
     // sm::Quad white;
 
-    // std::shared_ptr<sm::GlTextureCubemap> field;
+    std::shared_ptr<sm::GlTextureCubemap> field;
     // std::shared_ptr<sm::Font> sans;
     // std::shared_ptr<sm::AlSource> emitter;
     // std::shared_ptr<sm::AlBuffer> sound_move;

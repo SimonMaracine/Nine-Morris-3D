@@ -1,4 +1,4 @@
-#include "game/point_camera_controller.hpp"
+#include "point_camera_controller.hpp"
 
 static constexpr float ZOOM_BASE_VELOCITY {0.03f};
 static constexpr float ZOOM_VARIABLE_VELOCITY {5.0f};
@@ -8,7 +8,7 @@ static constexpr float X_BASE_VELOCITY {0.03f};
 static constexpr float X_VARIABLE_VELOCITY {5.0f};
 
 static constexpr float MIN_DISTANCE_TO_POINT {5.0f};
-static constexpr float MAX_DISTANCE_TO_POINT {134.0f};
+static constexpr float MAX_DISTANCE_TO_POINT {35.0f};
 
 static constexpr float FRICTION {0.81f};
 

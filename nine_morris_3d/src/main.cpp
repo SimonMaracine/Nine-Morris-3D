@@ -9,9 +9,9 @@
 #include <nine_morris_3d_engine/nine_morris_3d.hpp>
 #include <nine_morris_3d_engine/external/resmanager.h++>
 
-#include "game/scenes/game_scene.hpp"
-#include "game/game.hpp"
-#include "game/global.hpp"
+#include "scenes/game_scene.hpp"
+#include "game.hpp"
+#include "global.hpp"
 
 struct Paths {
     std::string logs;

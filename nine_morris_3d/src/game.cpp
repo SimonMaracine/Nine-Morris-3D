@@ -1,6 +1,6 @@
-#include "game/game.hpp"
+#include "game.hpp"
 
-#include "game/global.hpp"
+#include "global.hpp"
 
 void create_post_processing(sm::Ctx& ctx) {
 
