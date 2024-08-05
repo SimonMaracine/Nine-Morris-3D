@@ -18,4 +18,5 @@ private:
     std::array<Piece, 18> pieces {};
 
     sm::Renderable renderable;
+    sm::Renderable paint_renderable;
 };

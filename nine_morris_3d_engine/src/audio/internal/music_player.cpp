@@ -6,10 +6,12 @@
 #include "nine_morris_3d_engine/audio/openal/source.hpp"
 
 namespace sm::internal {
-    MusicPlayer::MusicPlayer()
-        : m_source(std::make_unique<AlSource>()) {
-        m_source->set_rolloff_factor(0.0f);
-        m_source->set_looping(true);
+    MusicPlayer::MusicPlayer(bool audio) {
+        if (audio) {
+            m_source = std::make_unique<AlSource>();
+            m_source->set_rolloff_factor(0.0f);
+            m_source->set_looping(true);
+        }
     }
 
     void MusicPlayer::play(std::shared_ptr<MusicTrack> music_track) {

@@ -148,7 +148,7 @@ namespace sm {
 
     void Application::check_changed_scene() {
         if (m_scene_next != nullptr) {
-            LOG_INFO("Changing scene to {}...", m_scene_next->scene->name());
+            LOG_INFO("Changing scene...");
 
             m_ctx.m_rnd.post_setup();
             scene_on_stop(m_scene_current);

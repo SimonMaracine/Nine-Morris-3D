@@ -19,7 +19,9 @@ namespace sm {
         m_shd({m_fs.path_engine_assets().string(), m_fs.path_assets().string()}),
         m_win(properties, &m_evt),
         m_rnd(properties.width, properties.height, properties.samples, m_fs, m_shd),
-        m_snd(properties.audio), m_inp(m_win.get_handle()) {
+        m_snd(properties.audio),
+        m_inp(m_win.get_handle()),
+        m_mus(properties.audio) {
         if (!m_fs.get_error_string().empty()) {
             LOG_DIST_ERROR("{}", m_fs.get_error_string());
         }
@@ -270,6 +272,10 @@ namespace sm {
         return result;
     }
 
+    std::shared_ptr<Mesh> Ctx::get_mesh(Id id) const {
+        return m_res.mesh->get(id);
+    }
+
     std::shared_ptr<Mesh> Ctx::load_mesh(Id id, const std::filesystem::path& file_path, const std::string& mesh_name, Mesh::Type type) {
         if (m_res.mesh->contains(id)) {
             return m_res.mesh->get(id);
@@ -327,6 +333,10 @@ namespace sm {
         });
 
         return vertex_array;
+    }
+
+    std::shared_ptr<TextureData> Ctx::get_texture_data(Id id) const {
+        return m_res.texture_data->get(id);
     }
 
     std::shared_ptr<TextureData> Ctx::load_texture_data(const std::filesystem::path& file_path, const TexturePostProcessing& post_processing) {

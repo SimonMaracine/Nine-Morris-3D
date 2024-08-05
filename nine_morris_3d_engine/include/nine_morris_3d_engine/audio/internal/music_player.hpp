@@ -15,7 +15,7 @@ namespace sm {
 namespace sm::internal {
     class MusicPlayer {
     public:
-        MusicPlayer();
+        explicit MusicPlayer(bool audio);
 
         // Must be called before the OpenAL context is destroyed
         void play(std::shared_ptr<MusicTrack> music_track);

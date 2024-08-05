@@ -1,7 +1,6 @@
 #include "nine_morris_3d_engine/audio/openal/debug.hpp"
 
 #include <cstdio>
-#include <cstdlib>
 
 #include <AL/al.h>
 
@@ -39,8 +38,6 @@ namespace sm {
                     break;
             }
         } catch (...) {}
-
-        std::abort();
 #endif
     }
 

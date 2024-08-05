@@ -151,9 +151,11 @@ namespace sm {
         float get_fps() const noexcept;
         static std::string get_information();
 
+        std::shared_ptr<Mesh> get_mesh(Id id) const;
         std::shared_ptr<Mesh> load_mesh(Id id, const std::filesystem::path& file_path, const std::string& mesh_name, Mesh::Type type);
         std::shared_ptr<Mesh> load_mesh(const std::filesystem::path& file_path, const std::string& mesh_name, Mesh::Type type);
         std::shared_ptr<GlVertexArray> load_vertex_array(Id id, std::shared_ptr<Mesh> mesh);
+        std::shared_ptr<TextureData> get_texture_data(Id id) const;
         std::shared_ptr<TextureData> load_texture_data(const std::filesystem::path& file_path, const TexturePostProcessing& post_processing);
         std::shared_ptr<GlTexture> load_texture(Id id, std::shared_ptr<TextureData> texture_data, const TextureSpecification& specification);
         std::shared_ptr<GlTexture> reload_texture(Id id, std::shared_ptr<TextureData> texture_data, const TextureSpecification& specification);

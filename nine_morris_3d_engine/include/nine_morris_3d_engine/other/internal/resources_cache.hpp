@@ -28,14 +28,26 @@ namespace sm::internal {
             return m_cache;
         }
 
+        const resmanager::Cache<T>& operator*() const {
+            std::lock_guard<std::mutex> lock {m_mutex};
+
+            return m_cache;
+        }
+
         resmanager::Cache<T>* operator->() {
+            std::lock_guard<std::mutex> lock {m_mutex};
+
+            return &m_cache;
+        }
+
+        const resmanager::Cache<T>* operator->() const {
             std::lock_guard<std::mutex> lock {m_mutex};
 
             return &m_cache;
         }
     private:
         resmanager::Cache<T> m_cache;
-        std::mutex m_mutex;
+        mutable std::mutex m_mutex;
     };
 
     // Global cache of resources

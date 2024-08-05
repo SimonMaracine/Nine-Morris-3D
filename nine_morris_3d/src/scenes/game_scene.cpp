@@ -64,7 +64,7 @@ void GameScene::on_start() {
         ctx.get_window_width(),
         ctx.get_window_height(),
         glm::vec3(0.0f),
-        40.0f,
+        20.0f,
         47.0f,
         0.5f
     );
@@ -89,7 +89,7 @@ void GameScene::on_update() {
     cam_controller.update_controls(ctx.get_delta(), ctx);
     cam_controller.update_camera(ctx.get_delta());
 
-    sm::listener::set_position(cam_controller.get_position());
+    // sm::listener::set_position(cam_controller.get_position());
 
     ctx.capture(cam, cam_controller.get_position());
     ctx.capture(cam_2d);
@@ -261,18 +261,15 @@ void GameScene::on_key_released(const sm::KeyReleasedEvent& event) {
 }
 
 void GameScene::setup_skybox() {
-    sm::TexturePostProcessing post_processing;
-    post_processing.flip = false;
-
     field = ctx.load_texture_cubemap(
         "field"_H,
         {
-            ctx.load_texture_data(ctx.path_assets("textures/skybox/field/px.png"), post_processing),
-            ctx.load_texture_data(ctx.path_assets("textures/skybox/field/nx.png"), post_processing),
-            ctx.load_texture_data(ctx.path_assets("textures/skybox/field/py.png"), post_processing),
-            ctx.load_texture_data(ctx.path_assets("textures/skybox/field/ny.png"), post_processing),
-            ctx.load_texture_data(ctx.path_assets("textures/skybox/field/pz.png"), post_processing),
-            ctx.load_texture_data(ctx.path_assets("textures/skybox/field/nz.png"), post_processing)
+            ctx.get_texture_data("px.png"_H),
+            ctx.get_texture_data("nx.png"_H),
+            ctx.get_texture_data("py.png"_H),
+            ctx.get_texture_data("ny.png"_H),
+            ctx.get_texture_data("pz.png"_H),
+            ctx.get_texture_data("nz.png"_H)
         },
         sm::TextureFormat::Srgba8Alpha
     );
@@ -286,7 +283,7 @@ void GameScene::setup_lights() {
 }
 
 void GameScene::setup_board() {
-    const auto mesh {ctx.load_mesh(ctx.path_assets("models/board/board.obj"), "Board_Cube", sm::Mesh::Type::PNTT)};
+    const auto mesh {ctx.get_mesh("board.obj"_H)};
 
     const auto vertex_array {ctx.load_vertex_array("board"_H, mesh)};
 
@@ -295,13 +292,13 @@ void GameScene::setup_board() {
 
     const auto diffuse {ctx.load_texture(
         "board_diffuse"_H,
-        ctx.load_texture_data(ctx.path_assets("textures/board/board_diffuse.png"), sm::TexturePostProcessing()),
+        ctx.get_texture_data("board_diffuse.png"_H),
         specification
     )};
 
     const auto normal {ctx.load_texture(
         "board_normal"_H,
-        ctx.load_texture_data(ctx.path_assets("textures/board/board_normal.png"), sm::TexturePostProcessing()),
+        ctx.get_texture_data("board_normal.png"_H),
         specification
     )};
 

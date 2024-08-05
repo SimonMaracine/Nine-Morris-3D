@@ -9,6 +9,7 @@
 #include <nine_morris_3d_engine/nine_morris_3d.hpp>
 #include <nine_morris_3d_engine/external/resmanager.h++>
 
+#include "scenes/loading_scene.hpp"
 #include "scenes/game_scene.hpp"
 #include "game.hpp"
 #include "global.hpp"
@@ -80,7 +81,7 @@ int application_main() {
             properties.path_logs = paths.logs;
             properties.path_saved_data = paths.saved_data;
             properties.path_assets = paths.assets;
-            properties.audio = true;
+            // properties.audio = true;
 
             sm::UserFunctions functions;
             functions.start = game_start;
@@ -88,9 +89,10 @@ int application_main() {
 
             try {
                 sm::Application game {properties};
+                game.add_scene<LoadingScene>();
                 game.add_scene<GameScene>();
                 game.set_global_data<Global>();
-                exit_code = game.run("game"_H, functions);
+                exit_code = game.run("loading"_H, functions);
             } catch (const sm::RuntimeError& e) {  // FIXME once an exception from a thread managed to not be caught; don't know how; seems to be working now
                 std::cerr << "Terminated game with error: " << e.what() << '\n';
                 return 1;
