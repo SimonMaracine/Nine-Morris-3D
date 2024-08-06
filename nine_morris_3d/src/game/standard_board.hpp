@@ -1,6 +1,7 @@
 #pragma once
 
 #include <array>
+#include <vector>
 
 #include <nine_morris_3d_engine/nine_morris_3d.hpp>
 
@@ -10,13 +11,19 @@
 class StandardBoard {
 public:
     StandardBoard() = default;
-    StandardBoard(sm::Renderable&& renderable);
+    StandardBoard(
+        const sm::Renderable& board,
+        const sm::Renderable& board_paint,
+        const std::vector<sm::Renderable>& nodes,
+        const std::vector<sm::Renderable>& white_pieces,
+        const std::vector<sm::Renderable>& black_pieces
+    );
 
     void update(sm::Ctx& ctx);
 private:
-    std::array<Node, 24> nodes {};
-    std::array<Piece, 18> pieces {};
+    std::array<Node, 24> m_nodes {};
+    std::array<Piece, 18> m_pieces {};
 
-    sm::Renderable renderable;
-    sm::Renderable paint_renderable;
+    sm::Renderable m_renderable;
+    sm::Renderable m_paint_renderable;
 };

@@ -29,7 +29,6 @@ void main() {
         v_fragment_position,
         u_view_position,
         u_directional_light.direction
-        shadow
     );
 
     for (int i = 0; i < D_POINT_LIGHTS; i++) {

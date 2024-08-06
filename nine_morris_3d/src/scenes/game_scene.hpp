@@ -24,8 +24,12 @@ struct GameScene : sm::ApplicationScene {
 
     void setup_skybox();
     void setup_lights();
-    void setup_board();
-    void setup_nodes();
+    void setup_renderables();
+    sm::Renderable setup_board();
+    sm::Renderable setup_board_paint();
+    std::vector<sm::Renderable> setup_nodes();
+    std::vector<sm::Renderable> setup_white_pieces();
+    std::vector<sm::Renderable> setup_black_pieces();
 
     // void setup_ground(std::shared_ptr<sm::Mesh> mesh);
     // void setup_dragon(std::shared_ptr<sm::Mesh> mesh);

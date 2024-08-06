@@ -5,12 +5,12 @@
 class Node {
 public:
     Node() = default;
-    Node(unsigned int index, glm::vec3 position, sm::Renderable&& renderable);
+    Node(unsigned int index, glm::vec3 position, const sm::Renderable& renderable);
 
     void update(sm::Ctx& ctx);
 private:
-    bool highlighted {false};
-    unsigned int index {};
+    unsigned int m_index {};
+    bool m_highlighted {false};
 
-    sm::Renderable renderable;
+    sm::Renderable m_renderable;
 };
