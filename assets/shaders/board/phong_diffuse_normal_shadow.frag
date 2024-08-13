@@ -36,8 +36,8 @@ void main() {
         u_shadow_map
     );
 
-    vec4 color = calculate_directional_light(
-        ambient_diffuse,
+    vec3 color = calculate_directional_light(
+        ambient_diffuse.rgb,
         normal,
         v_fragment_position_tangent_space,
         v_view_position_tangent_space,
@@ -45,10 +45,10 @@ void main() {
         shadow
     );
 
-    for (int i = 0; i < D_POINT_LIGHTS; i++) {  // FIXME
+    for (int i = 0; i < D_POINT_LIGHTS; i++) {
         color += calculate_point_light(
             i,
-            ambient_diffuse,
+            ambient_diffuse.rgb,
             normal,
             v_fragment_position_tangent_space,
             v_view_position_tangent_space,
@@ -56,5 +56,5 @@ void main() {
         );
     }
 
-    o_fragment_color = color;
+    o_fragment_color = vec4(color, ambient_diffuse.a);
 }
