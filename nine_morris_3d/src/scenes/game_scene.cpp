@@ -6,6 +6,7 @@
 
 #include "global.hpp"
 #include "game.hpp"
+#include "game/ray.hpp"
 
 void GameScene::on_start() {
     // ctx.add_task([this](const sm::Task& task, void*) {
@@ -96,7 +97,9 @@ void GameScene::on_update() {
 
     ctx.add_light(directional_light);
 
-    board.update(ctx);
+    const auto ray {cast_mouse_ray(ctx, cam)};
+
+    board.update(ctx, ray, cam_controller.get_position());
 
     // ctx.add_light(point_light);
 

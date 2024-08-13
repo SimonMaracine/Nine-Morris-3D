@@ -19,8 +19,13 @@ public:
         const std::vector<sm::Renderable>& black_pieces
     );
 
-    void update(sm::Ctx& ctx);
+    void update(sm::Ctx& ctx, glm::vec3 ray, glm::vec3 camera);
 private:
+    void update_hovered_index(glm::vec3 ray, glm::vec3 camera);
+
+    unsigned int m_hovered_node_index {};
+    unsigned int m_hovered_piece_index {};
+
     std::array<Node, 24> m_nodes {};
     std::array<Piece, 18> m_pieces {};
 

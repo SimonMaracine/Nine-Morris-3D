@@ -7,6 +7,9 @@ public:
     Node() = default;
     Node(unsigned int index, glm::vec3 position, const sm::Renderable& renderable);
 
+    const sm::utils::AABB& get_aabb() const { return m_renderable.get_aabb(); }
+    unsigned int get_index() const { return m_index; }
+
     void update(sm::Ctx& ctx);
 private:
     unsigned int m_index {};

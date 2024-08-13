@@ -7,7 +7,7 @@ Node::Node(unsigned int index, glm::vec3 position, const sm::Renderable& rendera
 }
 
 void Node::update(sm::Ctx& ctx) {
-    // if (m_highlighted) {
+    if (m_highlighted) {
         ctx.add_renderable(m_renderable);
-    // }
+    }
 }
