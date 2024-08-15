@@ -1,5 +1,9 @@
 #include "game/standard_board.hpp"
 
+#include <nine_morris_3d_engine/external/glm.h++>
+
+#include "game/ray.hpp"
+
 static constexpr float NODE_Y_POSITION = 0.063f;
 static const glm::vec3 NODE_POSITIONS[24] = {
     glm::vec3(2.046f, NODE_Y_POSITION, 2.062f),    // 0
@@ -28,37 +32,15 @@ static const glm::vec3 NODE_POSITIONS[24] = {
     glm::vec3(-2.081f, NODE_Y_POSITION, -2.045f)   // 23
 };
 
-// https://gamedev.stackexchange.com/questions/18436/most-efficient-aabb-vs-ray-collision-algorithms
+static glm::mat4 transformation_matrix(glm::vec3 position, glm::vec3 rotation, float scale) {
+    glm::mat4 matrix {1.0f};
+    matrix = glm::translate(matrix, position);
+    matrix = glm::rotate(matrix, rotation.x, glm::vec3(1.0f, 0.0f, 0.0f));
+    matrix = glm::rotate(matrix, rotation.y, glm::vec3(0.0f, 1.0f, 0.0f));
+    matrix = glm::rotate(matrix, rotation.z, glm::vec3(0.0f, 0.0f, 1.0f));
+    matrix = glm::scale(matrix, glm::vec3(scale));
 
-static bool ray_aabb_collision(glm::vec3 ray, glm::vec3 origin, const sm::utils::AABB& aabb) {
-    // r.dir is unit direction vector of ray
-    const float dirfrac_x {1.0f / ray.x};  // FIXME
-    const float dirfrac_y {1.0f / ray.y};
-    const float dirfrac_z {1.0f / ray.z};
-
-    // lb is the corner of AABB with minimal coordinates - left bottom, rt is maximal corner
-    // r.org is origin of ray
-    const float t1 {(aabb.min.x - origin.x) * dirfrac_x};
-    const float t2 {(aabb.max.x - origin.x) * dirfrac_x};
-    const float t3 {(aabb.min.y - origin.y) * dirfrac_y};
-    const float t4 {(aabb.max.y - origin.y) * dirfrac_y};
-    const float t5 {(aabb.min.z - origin.z) * dirfrac_z};
-    const float t6 {(aabb.max.z - origin.z) * dirfrac_z};
-
-    const float tmin {glm::max(glm::max(glm::min(t1, t2), glm::min(t3, t4)), glm::min(t5, t6))};
-    const float tmax {glm::min(glm::min(glm::max(t1, t2), glm::max(t3, t4)), glm::max(t5, t6))};
-
-    // if tmax < 0, ray (line) is intersecting AABB, but the whole AABB is behind us
-    if (tmax < 0) {
-        return false;
-    }
-
-    // if tmin > tmax, ray doesn't intersect AABB
-    if (tmin > tmax) {
-        return false;
-    }
-
-    return true;
+    return matrix;
 }
 
 StandardBoard::StandardBoard(
@@ -75,15 +57,15 @@ StandardBoard::StandardBoard(
     m_paint_renderable.transform.scale = 20.0f;
     m_paint_renderable.transform.position.y = 0.062f;
 
-    for (unsigned int i {0}; i < 24; i++) {
+    for (int i {0}; i < 24; i++) {
         m_nodes[i] = Node(i, NODE_POSITIONS[i], nodes[i]);
     }
 
-    for (unsigned int i {0}; i < 9; i++) {
+    for (int i {0}; i < 9; i++) {
         m_pieces[i] = Piece(i, glm::vec3(3.0f, 0.5f, static_cast<float>(i) * 0.5f - 2.0f), white_pieces[i]);
     }
 
-    for (unsigned int i {9}; i < 18; i++) {
+    for (int i {9}; i < 18; i++) {
         m_pieces[i] = Piece(i, glm::vec3(-3.0f, 0.5f, static_cast<float>(i - 9) * 0.5f - 2.0f), black_pieces[i - 9]);
     }
 }
@@ -102,21 +84,53 @@ void StandardBoard::update(sm::Ctx& ctx, glm::vec3 ray, glm::vec3 camera) {
 
     update_hovered_index(ray, camera);
 
-    // LOG_DEBUG("{}, {}, {}", ray.x, ray.y, ray.z);
-
     LOG_DEBUG("node: {}, piece: {}", m_hovered_node_index, m_hovered_piece_index);
 }
 
 void StandardBoard::update_hovered_index(glm::vec3 ray, glm::vec3 camera) {
-    for (const auto& node : m_nodes) {
-        if (ray_aabb_collision(ray, camera, node.get_aabb())) {
-            m_hovered_node_index = node.get_index();
+    if (camera.y > 0.0f) {
+        bool hover {false};
+
+        for (const auto& node : m_nodes) {
+            const auto& transform {node.get_renderable().transform};
+            const glm::mat4 to_world_space {transformation_matrix(transform.position, transform.rotation, transform.scale)};
+
+            sm::utils::AABB aabb;
+            aabb.min = to_world_space * glm::vec4(node.get_renderable().get_aabb().min, 1.0f);
+            aabb.max = to_world_space * glm::vec4(node.get_renderable().get_aabb().max, 1.0f);
+
+            if (ray_aabb_collision(ray, camera, aabb)) {
+                m_hovered_node_index = node.get_index();
+                hover = true;
+            }
         }
+
+        if (!hover) {
+            m_hovered_node_index = -1;
+        }
+    } else {
+        m_hovered_node_index = -1;
     }
 
-    for (const auto& piece : m_pieces) {
-        if (ray_aabb_collision(ray, camera, piece.get_aabb())) {
-            m_hovered_piece_index = piece.get_index();
+    {
+        bool hover {false};
+
+        for (const auto& piece : m_pieces) {
+            const auto& transform {piece.get_renderable().transform};
+            const glm::mat4 to_world_space {transformation_matrix(transform.position, transform.rotation, transform.scale)};
+
+            sm::utils::AABB aabb;
+            aabb.min = to_world_space * glm::vec4(piece.get_renderable().get_aabb().min, 1.0f);
+            aabb.max = to_world_space * glm::vec4(piece.get_renderable().get_aabb().max, 1.0f);
+
+            if (ray_aabb_collision(ray, camera, aabb)) {
+                m_hovered_piece_index = piece.get_index();
+                hover = true;
+            }
+        }
+
+        if (!hover) {
+            m_hovered_piece_index = -1;
         }
     }
 }

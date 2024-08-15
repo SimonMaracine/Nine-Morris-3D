@@ -5,14 +5,14 @@
 class Node {
 public:
     Node() = default;
-    Node(unsigned int index, glm::vec3 position, const sm::Renderable& renderable);
+    Node(int index, glm::vec3 position, const sm::Renderable& renderable);
 
-    const sm::utils::AABB& get_aabb() const { return m_renderable.get_aabb(); }
-    unsigned int get_index() const { return m_index; }
+    const sm::Renderable& get_renderable() const { return m_renderable; }
+    int get_index() const { return m_index; }
 
     void update(sm::Ctx& ctx);
 private:
-    unsigned int m_index {};
+    int m_index {};
     bool m_highlighted {false};
 
     sm::Renderable m_renderable;
