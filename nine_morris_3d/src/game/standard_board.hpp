@@ -20,7 +20,7 @@ public:
     );
 
     void update(sm::Ctx& ctx, glm::vec3 ray, glm::vec3 camera);
-
+private:
     void update_hovered_index(glm::vec3 ray, glm::vec3 camera);
 
     int m_hovered_node_index {-1};
