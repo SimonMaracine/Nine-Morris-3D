@@ -1,5 +1,7 @@
 #include "game/standard_board.hpp"
 
+#include <cassert>
+
 #include <nine_morris_3d_engine/external/glm.h++>
 
 #include "game/ray.hpp"
@@ -58,15 +60,15 @@ StandardBoard::StandardBoard(
     m_paint_renderable.transform.position.y = 0.062f;
 
     for (int i {0}; i < 24; i++) {
-        m_nodes[i] = Node(i, NODE_POSITIONS[i], nodes[i]);
+        m_nodes[i] = NodeObj(i, NODE_POSITIONS[i], nodes[i]);
     }
 
     for (int i {0}; i < 9; i++) {
-        m_pieces[i] = Piece(i, glm::vec3(3.0f, 0.5f, static_cast<float>(i) * 0.5f - 2.0f), white_pieces[i]);
+        m_pieces[i] = PieceObj(i, glm::vec3(3.0f, 0.5f, static_cast<float>(i) * 0.5f - 2.0f), white_pieces[i]);
     }
 
     for (int i {9}; i < 18; i++) {
-        m_pieces[i] = Piece(i, glm::vec3(-3.0f, 0.5f, static_cast<float>(i - 9) * 0.5f - 2.0f), black_pieces[i - 9]);
+        m_pieces[i] = PieceObj(i, glm::vec3(-3.0f, 0.5f, static_cast<float>(i - 9) * 0.5f - 2.0f), black_pieces[i - 9]);
     }
 }
 
@@ -132,5 +134,502 @@ void StandardBoard::update_hovered_index(glm::vec3 ray, glm::vec3 camera) {
         if (!hover) {
             m_hovered_piece_index = -1;
         }
+    }
+}
+
+bool StandardBoard::select_piece(int index) {
+
+}
+
+void StandardBoard::try_place(int place_index) {
+
+}
+
+void StandardBoard::try_place_take(int place_index, int take_index) {
+
+}
+
+void StandardBoard::try_move(int source_index, int destination_index) {
+
+}
+
+void StandardBoard::try_move_take(int source_index, int destination_index, int take_index) {
+
+}
+
+void StandardBoard::finish_turn(bool advancement = true) {
+
+}
+
+void StandardBoard::check_winner_material() {
+
+}
+
+void StandardBoard::check_winner_blocking() {
+
+}
+
+void StandardBoard::check_fifty_move_rule() {
+
+}
+
+void StandardBoard::check_threefold_repetition(const Position& position) {
+
+}
+
+std::vector<Move> StandardBoard::generate_moves() const {
+    std::vector<Move> moves;
+    Board board {m_board};
+
+    if (m_plies < 18) {
+        generate_moves_phase1(board, moves, m_turn);
+    } else {
+        if (count_pieces(board, m_turn) == 3) {
+            generate_moves_phase3(board, moves, m_turn);
+        } else {
+            generate_moves_phase2(board, moves, m_turn);
+        }
+    }
+
+    return moves;
+}
+
+void StandardBoard::generate_moves_phase1(Board& board, std::vector<Move>& moves, Player player) {
+    for (int i {0}; i < 24; i++) {
+        if (board[i] != Piece::None) {
+            continue;
+        }
+
+        make_place_move(board, player, i);
+
+        if (is_mill(board, player, i)) {
+            const Player opponent_player {opponent(player)};
+            const bool all_in_mills {all_pieces_in_mills(board, opponent_player)};
+
+            for (int j {0}; j < 24; j++) {
+                if (board[j] != static_cast<Piece>(opponent_player)) {
+                    continue;
+                }
+
+                if (is_mill(board, opponent_player, j) && !all_in_mills) {
+                    continue;
+                }
+
+                moves.push_back(create_place_take(i, j));
+            }
+        } else {
+            moves.push_back(create_place(i));
+        }
+
+        unmake_place_move(board, i);
+    }
+}
+
+void StandardBoard::generate_moves_phase2(Board& board, std::vector<Move>& moves, Player player) {
+    for (int i {0}; i < 24; i++) {
+        if (board[i] != static_cast<Piece>(player)) {
+            continue;
+        }
+
+        const auto free_positions {neighbor_free_positions(board, i)};
+
+        for (int j {0}; j < static_cast<int>(free_positions.size()); j++) {
+            make_move_move(board, i, free_positions[j]);
+
+            if (is_mill(board, player, free_positions[j])) {
+                const Player opponent_player {opponent(player)};
+                const bool all_in_mills {all_pieces_in_mills(board, opponent_player)};
+
+                for (int k {0}; k < 24; k++) {
+                    if (board[k] != static_cast<Piece>(opponent_player)) {
+                        continue;
+                    }
+
+                    if (is_mill(board, opponent_player, k) && !all_in_mills) {
+                        continue;
+                    }
+
+                    moves.push_back(create_move_take(i, free_positions[j], k));
+                }
+            } else {
+                moves.push_back(create_move(i, free_positions[j]));
+            }
+
+            unmake_move_move(board, i, free_positions[j]);
+        }
+    }
+}
+
+void StandardBoard::generate_moves_phase3(Board& board, std::vector<Move>& moves, Player player) {
+    for (int i {0}; i < 24; i++) {
+        if (board[i] != static_cast<Piece>(player)) {
+            continue;
+        }
+
+        for (int j {0}; j < 24; j++) {
+            if (board[j] != Piece::None) {
+                continue;
+            }
+
+            make_move_move(board, i, j);
+
+            if (is_mill(board, player, j)) {
+                const Player opponent_player {opponent(player)};
+                const bool all_in_mills {all_pieces_in_mills(board, opponent_player)};
+
+                for (int k {0}; k < 24; k++) {
+                    if (board[k] != static_cast<Piece>(opponent_player)) {
+                        continue;
+                    }
+
+                    if (is_mill(board, opponent_player, k) && !all_in_mills) {
+                        continue;
+                    }
+
+                    moves.push_back(create_move_take(i, j, k));
+                }
+            } else {
+                moves.push_back(create_move(i, j));
+            }
+
+            unmake_move_move(board, i, j);
+        }
+    }
+}
+
+void StandardBoard::make_place_move(Board& board, Player player, int place_index) {
+    assert(board[place_index] == Piece::None);
+
+    board[place_index] = static_cast<Piece>(player);
+}
+
+void StandardBoard::unmake_place_move(Board& board, int place_index) {
+    assert(board[place_index] != Piece::None);
+
+    board[place_index] = Piece::None;
+}
+
+void StandardBoard::make_move_move(Board& board, int source_index, int destination_index) {
+    assert(board[source_index] != Piece::None);
+    assert(board[destination_index] == Piece::None);
+
+    std::swap(board[source_index], board[destination_index]);
+}
+
+void StandardBoard::unmake_move_move(Board& board, int source_index, int destination_index) {
+    assert(board[source_index] == Piece::None);
+    assert(board[destination_index] != Piece::None);
+
+    std::swap(board[source_index], board[destination_index]);
+}
+
+#ifdef __GNUG__
+    #pragma GCC diagnostic push
+    #pragma GCC diagnostic ignored "-Wparentheses"
+#endif
+
+#define IS_PC(const_index) (board[const_index] == piece)
+
+bool StandardBoard::is_mill(const Board& board, Player player, int index) {
+    const Piece piece {static_cast<Piece>(player)};
+
+    switch (index) {
+        case 0:
+            if (IS_PC(1) && IS_PC(2) || IS_PC(9) && IS_PC(21))
+                return true;
+            break;
+        case 1:
+            if (IS_PC(0) && IS_PC(2) || IS_PC(4) && IS_PC(7))
+                return true;
+            break;
+        case 2:
+            if (IS_PC(0) && IS_PC(1) || IS_PC(14) && IS_PC(23))
+                return true;
+            break;
+        case 3:
+            if (IS_PC(4) && IS_PC(5) || IS_PC(10) && IS_PC(18))
+                return true;
+            break;
+        case 4:
+            if (IS_PC(3) && IS_PC(5) || IS_PC(1) && IS_PC(7))
+                return true;
+            break;
+        case 5:
+            if (IS_PC(3) && IS_PC(4) || IS_PC(13) && IS_PC(20))
+                return true;
+            break;
+        case 6:
+            if (IS_PC(7) && IS_PC(8) || IS_PC(11) && IS_PC(15))
+                return true;
+            break;
+        case 7:
+            if (IS_PC(6) && IS_PC(8) || IS_PC(1) && IS_PC(4))
+                return true;
+            break;
+        case 8:
+            if (IS_PC(6) && IS_PC(7) || IS_PC(12) && IS_PC(17))
+                return true;
+            break;
+        case 9:
+            if (IS_PC(0) && IS_PC(21) || IS_PC(10) && IS_PC(11))
+                return true;
+            break;
+        case 10:
+            if (IS_PC(9) && IS_PC(11) || IS_PC(3) && IS_PC(18))
+                return true;
+            break;
+        case 11:
+            if (IS_PC(9) && IS_PC(10) || IS_PC(6) && IS_PC(15))
+                return true;
+            break;
+        case 12:
+            if (IS_PC(13) && IS_PC(14) || IS_PC(8) && IS_PC(17))
+                return true;
+            break;
+        case 13:
+            if (IS_PC(12) && IS_PC(14) || IS_PC(5) && IS_PC(20))
+                return true;
+            break;
+        case 14:
+            if (IS_PC(12) && IS_PC(13) || IS_PC(2) && IS_PC(23))
+                return true;
+            break;
+        case 15:
+            if (IS_PC(16) && IS_PC(17) || IS_PC(6) && IS_PC(11))
+                return true;
+            break;
+        case 16:
+            if (IS_PC(15) && IS_PC(17) || IS_PC(19) && IS_PC(22))
+                return true;
+            break;
+        case 17:
+            if (IS_PC(15) && IS_PC(16) || IS_PC(8) && IS_PC(12))
+                return true;
+            break;
+        case 18:
+            if (IS_PC(19) && IS_PC(20) || IS_PC(3) && IS_PC(10))
+                return true;
+            break;
+        case 19:
+            if (IS_PC(18) && IS_PC(20) || IS_PC(16) && IS_PC(22))
+                return true;
+            break;
+        case 20:
+            if (IS_PC(18) && IS_PC(19) || IS_PC(5) && IS_PC(13))
+                return true;
+            break;
+        case 21:
+            if (IS_PC(22) && IS_PC(23) || IS_PC(0) && IS_PC(9))
+                return true;
+            break;
+        case 22:
+            if (IS_PC(21) && IS_PC(23) || IS_PC(16) && IS_PC(19))
+                return true;
+            break;
+        case 23:
+            if (IS_PC(21) && IS_PC(22) || IS_PC(2) && IS_PC(14))
+                return true;
+            break;
+    }
+
+    return false;
+}
+
+#ifdef __GNUG__
+    #pragma GCC diagnostic pop
+#endif
+
+bool StandardBoard::all_pieces_in_mills(const Board& board, Player player) {
+    for (int i {0}; i < 24; i++) {
+        if (board[i] != static_cast<Piece>(player)) {
+            continue;
+        }
+
+        if (!is_mill(board, player, i)) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+#define IS_FREE_CHECK(const_index) \
+    if (board[const_index] == Piece::None) { \
+        result.push_back(const_index); \
+    }
+
+std::vector<int> StandardBoard::neighbor_free_positions(const Board& board, int index) {
+    std::vector<int> result;
+    result.reserve(4);
+
+    switch (index) {
+        case 0:
+            IS_FREE_CHECK(1)
+            IS_FREE_CHECK(9)
+            break;
+        case 1:
+            IS_FREE_CHECK(0)
+            IS_FREE_CHECK(2)
+            IS_FREE_CHECK(4)
+            break;
+        case 2:
+            IS_FREE_CHECK(1)
+            IS_FREE_CHECK(14)
+            break;
+        case 3:
+            IS_FREE_CHECK(4)
+            IS_FREE_CHECK(10)
+            break;
+        case 4:
+            IS_FREE_CHECK(1)
+            IS_FREE_CHECK(3)
+            IS_FREE_CHECK(5)
+            IS_FREE_CHECK(7)
+            break;
+        case 5:
+            IS_FREE_CHECK(4)
+            IS_FREE_CHECK(13)
+            break;
+        case 6:
+            IS_FREE_CHECK(7)
+            IS_FREE_CHECK(11)
+            break;
+        case 7:
+            IS_FREE_CHECK(4)
+            IS_FREE_CHECK(6)
+            IS_FREE_CHECK(8)
+            break;
+        case 8:
+            IS_FREE_CHECK(7)
+            IS_FREE_CHECK(12)
+            break;
+        case 9:
+            IS_FREE_CHECK(0)
+            IS_FREE_CHECK(10)
+            IS_FREE_CHECK(21)
+            break;
+        case 10:
+            IS_FREE_CHECK(3)
+            IS_FREE_CHECK(9)
+            IS_FREE_CHECK(11)
+            IS_FREE_CHECK(18)
+            break;
+        case 11:
+            IS_FREE_CHECK(6)
+            IS_FREE_CHECK(10)
+            IS_FREE_CHECK(15)
+            break;
+        case 12:
+            IS_FREE_CHECK(8)
+            IS_FREE_CHECK(13)
+            IS_FREE_CHECK(17)
+            break;
+        case 13:
+            IS_FREE_CHECK(5)
+            IS_FREE_CHECK(12)
+            IS_FREE_CHECK(14)
+            IS_FREE_CHECK(20)
+            break;
+        case 14:
+            IS_FREE_CHECK(2)
+            IS_FREE_CHECK(13)
+            IS_FREE_CHECK(23)
+            break;
+        case 15:
+            IS_FREE_CHECK(11)
+            IS_FREE_CHECK(16)
+            break;
+        case 16:
+            IS_FREE_CHECK(15)
+            IS_FREE_CHECK(17)
+            IS_FREE_CHECK(19)
+            break;
+        case 17:
+            IS_FREE_CHECK(12)
+            IS_FREE_CHECK(16)
+            break;
+        case 18:
+            IS_FREE_CHECK(10)
+            IS_FREE_CHECK(19)
+            break;
+        case 19:
+            IS_FREE_CHECK(16)
+            IS_FREE_CHECK(18)
+            IS_FREE_CHECK(20)
+            IS_FREE_CHECK(22)
+            break;
+        case 20:
+            IS_FREE_CHECK(13)
+            IS_FREE_CHECK(19)
+            break;
+        case 21:
+            IS_FREE_CHECK(9)
+            IS_FREE_CHECK(22)
+            break;
+        case 22:
+            IS_FREE_CHECK(19)
+            IS_FREE_CHECK(21)
+            IS_FREE_CHECK(23)
+            break;
+        case 23:
+            IS_FREE_CHECK(14)
+            IS_FREE_CHECK(22)
+            break;
+    }
+
+    return result;
+}
+
+Move StandardBoard::create_place(int place_index) {
+    Move move;
+    move.type = MoveType::Place;
+    move.place.place_index = place_index;
+
+    return move;
+}
+
+Move StandardBoard::create_place_take(int place_index, int take_index) {
+    Move move;
+    move.type = MoveType::PlaceTake;
+    move.place_take.place_index = place_index;
+    move.place_take.take_index = take_index;
+
+    return move;
+}
+
+Move StandardBoard::create_move(int source_index, int destination_index) {
+    Move move;
+    move.type = MoveType::Move;
+    move.move.source_index = source_index;
+    move.move.destination_index = destination_index;
+
+    return move;
+}
+
+Move StandardBoard::create_move_take(int source_index, int destination_index, int take_index) {
+    Move move;
+    move.type = MoveType::MoveTake;
+    move.move_take.source_index = source_index;
+    move.move_take.destination_index = destination_index;
+    move.move_take.take_index = take_index;
+
+    return move;
+}
+
+unsigned int StandardBoard::count_pieces(const Board& board, Player player) {
+    unsigned int result {0};
+
+    for (const Piece piece : board) {
+        result += static_cast<unsigned int>(piece == static_cast<Piece>(player));
+    }
+
+    return result;
+}
+
+Player StandardBoard::opponent(Player player) {
+    if (player == Player::White) {
+        return Player::Black;
+    } else {
+        return Player::White;
     }
 }
