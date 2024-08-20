@@ -90,6 +90,8 @@ public:
     void move_take(int source_index, int destination_index, int take_index);
 private:
     void update_hovered_id(glm::vec3 ray, glm::vec3 camera);
+    void update_nodes();
+    void update_pieces();
     bool select_piece(int index);
     void try_place(int place_index);
     void try_place_take(int place_index, int take_index);
@@ -100,6 +102,8 @@ private:
     void check_winner_blocking();
     void check_fifty_move_rule();
     void check_threefold_repetition(const Position& position);
+
+    int new_piece_to_place(PieceType type);
 
     // Move generation
     std::vector<Move> generate_moves() const;

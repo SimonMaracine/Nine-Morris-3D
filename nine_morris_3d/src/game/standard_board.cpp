@@ -71,12 +71,14 @@ StandardBoard::StandardBoard(
     for (int i {9}; i < 18; i++) {
         m_pieces[i] = PieceObj(i, glm::vec3(-3.0f, 0.5f, static_cast<float>(i - 9) * 0.5f - 2.0f), black_pieces[i - 9], PieceType::Black);
     }
+
+    m_legal_moves = generate_moves();
 }
 
 void StandardBoard::update(sm::Ctx& ctx, glm::vec3 ray, glm::vec3 camera) {
     update_hovered_id(ray, camera);
-
-
+    update_nodes();
+    update_pieces();  // FIXME
 
     ctx.add_renderable(m_renderable);
     ctx.add_renderable(m_paint_renderable);
@@ -88,8 +90,6 @@ void StandardBoard::update(sm::Ctx& ctx, glm::vec3 ray, glm::vec3 camera) {
     for (auto& piece : m_pieces) {
         piece.update(ctx);
     }
-
-    // LOG_DEBUG("node: {}, piece: {}", m_hovered_node_index, m_hovered_piece_index);
 }
 
 void StandardBoard::user_click() {
@@ -105,7 +105,7 @@ void StandardBoard::user_click() {
 
     if (phase_two) {
         if (m_hovered_piece_id != -1) {
-            if (select_piece(m_hovered_piece_id)) {  // TODO
+            if (select_piece(m_pieces[m_hovered_piece_id].get_node_id())) {
                 return;
             }
         }
@@ -114,21 +114,21 @@ void StandardBoard::user_click() {
     if (phase_two) {
         if (m_user_must_take_piece) {
             if (m_hovered_piece_id != -1) {
-                try_move_take(m_user_stored_index1, m_user_stored_index2, m_hovered_piece_id);  // TODO
+                try_move_take(m_user_stored_index1, m_user_stored_index2, m_pieces[m_hovered_piece_id].get_node_id());
             }
         } else {
             if (m_hovered_node_id != -1) {
-                try_move(m_user_stored_index1, m_hovered_node_id);  // TODO
+                try_move(m_user_stored_index1, m_nodes[m_hovered_node_id].get_id());
             }
         }
     } else {
         if (m_user_must_take_piece) {
             if (m_hovered_piece_id != -1) {
-                try_place_take(m_user_stored_index2, m_hovered_piece_id);  // TODO
+                try_place_take(m_user_stored_index2, m_pieces[m_hovered_piece_id].get_node_id());
             }
         } else {
             if (m_hovered_node_id != -1) {
-                try_place(m_hovered_node_id);  // TODO
+                try_place(m_nodes[m_hovered_node_id].get_id());
             }
         }
     }
@@ -138,6 +138,18 @@ void StandardBoard::place(int place_index) {
     assert(m_board[place_index] == Piece::None);
 
     m_board[place_index] = static_cast<Piece>(m_turn);
+
+
+
+
+    // Do the thing
+    const int id {new_piece_to_place(static_cast<PieceType>(m_turn))};
+    m_pieces[id].set_node_id(place_index);
+    m_pieces[id].get_renderable().transform.position = m_nodes[place_index].get_renderable().transform.position;
+    m_pieces[id].get_renderable().transform.position.y = 0.135f;
+    m_nodes[place_index].set_piece_id(id);
+
+
 
     Move move;
     move.type = MoveType::Place;
@@ -155,6 +167,20 @@ void StandardBoard::place_take(int place_index, int take_index) {
     m_board[place_index] = static_cast<Piece>(m_turn);
     m_board[take_index] = Piece::None;
 
+
+
+    // Do the thing
+    const int id {new_piece_to_place(static_cast<PieceType>(m_turn))};
+    m_pieces[id].set_node_id(place_index);
+    m_pieces[id].get_renderable().transform.position = m_nodes[place_index].get_renderable().transform.position;
+    m_pieces[id].get_renderable().transform.position.y = 0.135f;
+    m_pieces[m_nodes[take_index].get_piece_id()].set_active(false);
+    m_pieces[m_nodes[take_index].get_piece_id()].set_node_id(-1);
+    m_nodes[place_index].set_piece_id(id);
+    m_nodes[take_index].set_piece_id(-1);
+
+
+
     Move move;
     move.type = MoveType::PlaceTake;
     move.place_take.place_index = place_index;
@@ -171,6 +197,17 @@ void StandardBoard::move(int source_index, int destination_index) {
     assert(m_board[destination_index] == Piece::None);
 
     std::swap(m_board[source_index], m_board[destination_index]);
+
+
+
+    // Do the thing
+    m_pieces[m_nodes[source_index].get_piece_id()].get_renderable().transform.position = m_nodes[destination_index].get_renderable().transform.position;
+    m_pieces[m_nodes[source_index].get_piece_id()].get_renderable().transform.position.y = 0.135f;;
+    m_pieces[m_nodes[source_index].get_piece_id()].set_node_id(destination_index);
+    m_nodes[destination_index].set_piece_id(m_nodes[source_index].get_piece_id());
+    m_nodes[source_index].set_piece_id(-1);
+
+
 
     Move move;
     move.type = MoveType::Move;
@@ -191,6 +228,20 @@ void StandardBoard::move_take(int source_index, int destination_index, int take_
 
     std::swap(m_board[source_index], m_board[destination_index]);
     m_board[take_index] = Piece::None;
+
+
+
+    // Do the thing
+    m_pieces[m_nodes[source_index].get_piece_id()].get_renderable().transform.position = m_nodes[destination_index].get_renderable().transform.position;
+    m_pieces[m_nodes[source_index].get_piece_id()].get_renderable().transform.position.y = 0.135f;
+    m_pieces[m_nodes[source_index].get_piece_id()].set_node_id(destination_index);
+    m_pieces[m_nodes[take_index].get_piece_id()].set_active(false);
+    m_pieces[m_nodes[take_index].get_piece_id()].set_node_id(-1);
+    m_nodes[destination_index].set_piece_id(m_nodes[source_index].get_piece_id());
+    m_nodes[source_index].set_piece_id(-1);
+    m_nodes[take_index].set_piece_id(-1);
+
+
 
     Move move;
     move.type = MoveType::MoveTake;
@@ -268,10 +319,46 @@ void StandardBoard::update_hovered_id(glm::vec3 ray, glm::vec3 camera) {
     }
 }
 
+void StandardBoard::update_nodes() {
+    if (m_game_over != GameOver::None) {
+        return;
+    }
+
+    if (m_hovered_node_id == -1) {
+        std::for_each(m_nodes.begin(), m_nodes.end(), [](NodeObj& node) {
+            node.set_highlighted(false);
+        });
+
+        return;
+    }
+
+    m_nodes[m_hovered_node_id].set_highlighted(true);
+}
+
+void StandardBoard::update_pieces() {
+    if (m_game_over != GameOver::None) {
+        return;
+    }
+
+    if (m_hovered_piece_id == -1) {
+        std::for_each(m_pieces.begin(), m_pieces.end(), [](PieceObj& piece) {
+            piece.get_renderable().get_material()->flags &= ~sm::Material::Outline;
+        });
+
+        return;
+    }
+
+    m_pieces[m_hovered_piece_id].get_renderable().get_material()->flags |= sm::Material::Outline;
+    m_pieces[m_hovered_piece_id].get_renderable().outline.color = glm::vec3(0.96f, 0.58f, 0.15f);
+}
+
 bool StandardBoard::select_piece(int index) {
     if (m_user_stored_index1 == -1) {
         if (m_board[index] == static_cast<Piece>(m_turn)) {
             m_user_stored_index1 = index;
+            m_pieces[m_nodes[index].get_piece_id()].get_renderable().get_material()->flags |= sm::Material::Outline;
+            m_pieces[m_nodes[index].get_piece_id()].get_renderable().outline.color = glm::vec3(0.8f, 0.16f, 0.3f);
+
             return true;
         }
     } else {
@@ -284,6 +371,8 @@ bool StandardBoard::select_piece(int index) {
         } else if (m_board[index] == static_cast<Piece>(m_turn)) {
             if (m_user_stored_index2 == -1) {
                 m_user_stored_index1 = index;
+                m_pieces[m_nodes[index].get_piece_id()].get_renderable().get_material()->flags |= sm::Material::Outline;
+                m_pieces[m_nodes[index].get_piece_id()].get_renderable().outline.color = glm::vec3(0.8f, 0.16f, 0.3f);
             }
 
             return true;
@@ -436,6 +525,16 @@ void StandardBoard::check_threefold_repetition(const Position& position) {
             }
         }
     }
+}
+
+int StandardBoard::new_piece_to_place(PieceType type) {
+    for (const PieceObj& piece : m_pieces) {
+        if (piece.get_type() == type && piece.get_active() && piece.get_node_id() == -1) {
+            return piece.get_id();
+        }
+    }
+
+    assert(false);
 }
 
 std::vector<Move> StandardBoard::generate_moves() const {

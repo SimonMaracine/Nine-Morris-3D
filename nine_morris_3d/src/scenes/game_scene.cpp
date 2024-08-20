@@ -54,6 +54,7 @@ void GameScene::on_start() {
 
     ctx.connect_event<sm::WindowResizedEvent, &GameScene::on_window_resized>(this);
     ctx.connect_event<sm::KeyReleasedEvent, &GameScene::on_key_released>(this);
+    ctx.connect_event<sm::MouseButtonReleasedEvent, &GameScene::on_mouse_button_released>(this);
 
     ctx.set_clear_color(glm::vec3(0.1f, 0.1f, 0.1f));
 
@@ -383,7 +384,7 @@ std::vector<sm::Renderable> GameScene::setup_nodes() {
 
     for (unsigned int i {0}; i < 24; i++) {
         const auto material_instance {ctx.load_material_instance(sm::Id("node" + std::to_string(i)), material)};
-        material_instance->set_vec3("u_material.ambient_diffuse"_H, glm::vec3(1.0f));
+        material_instance->set_vec3("u_material.ambient_diffuse"_H, glm::vec3(0.075f));
         material_instance->set_vec3("u_material.specular"_H, glm::vec3(0.9f));
         material_instance->set_float("u_material.shininess"_H, 32.0f);
 
