@@ -1,5 +1,6 @@
 #include "game/standard_board.hpp"
 
+#include <algorithm>
 #include <cassert>
 
 #include <nine_morris_3d_engine/external/glm.h++>
@@ -91,9 +92,17 @@ void StandardBoard::update(sm::Ctx& ctx, glm::vec3 ray, glm::vec3 camera) {
 
 void StandardBoard::update_hovered_index(glm::vec3 ray, glm::vec3 camera) {
     if (camera.y > 0.0f) {
+        auto nodes {m_nodes};
+        std::sort(nodes.begin(), nodes.end(), [camera](const NodeObj& lhs, const NodeObj& rhs) {
+            const auto left {glm::distance(lhs.get_renderable().transform.position, camera)};
+            const auto right {glm::distance(rhs.get_renderable().transform.position, camera)};
+
+            return left > right;
+        });
+
         bool hover {false};
 
-        for (const auto& node : m_nodes) {
+        for (const auto& node : nodes) {
             const auto& transform {node.get_renderable().transform};
             const glm::mat4 to_world_space {transformation_matrix(transform.position, transform.rotation, transform.scale)};
 
@@ -115,9 +124,17 @@ void StandardBoard::update_hovered_index(glm::vec3 ray, glm::vec3 camera) {
     }
 
     {
+        auto pieces {m_pieces};
+        std::sort(pieces.begin(), pieces.end(), [camera](const PieceObj& lhs, const PieceObj& rhs) {
+            const auto left {glm::distance(lhs.get_renderable().transform.position, camera)};
+            const auto right {glm::distance(rhs.get_renderable().transform.position, camera)};
+
+            return left > right;
+        });
+
         bool hover {false};
 
-        for (const auto& piece : m_pieces) {
+        for (const auto& piece : pieces) {
             const auto& transform {piece.get_renderable().transform};
             const glm::mat4 to_world_space {transformation_matrix(transform.position, transform.rotation, transform.scale)};
 
@@ -157,7 +174,7 @@ void StandardBoard::try_move_take(int source_index, int destination_index, int t
 
 }
 
-void StandardBoard::finish_turn(bool advancement = true) {
+void StandardBoard::finish_turn(bool advancement) {
 
 }
 
