@@ -2,8 +2,8 @@
 
 #include <utility>
 
-PieceObj::PieceObj(int index, glm::vec3 position, const sm::Renderable& renderable)
-    : m_index(index), m_renderable(renderable) {
+PieceObj::PieceObj(int id, glm::vec3 position, const sm::Renderable& renderable, PieceType type)
+    : m_id(id), m_type(type), m_renderable(renderable) {
     m_renderable.transform.position = position;
     m_renderable.transform.scale = 20.0f;
 }

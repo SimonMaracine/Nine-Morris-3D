@@ -263,6 +263,12 @@ void GameScene::on_key_released(const sm::KeyReleasedEvent& event) {
     // }
 }
 
+void GameScene::on_mouse_button_released(const sm::MouseButtonReleasedEvent& event) {
+    if (event.button == sm::MouseButton::Left) {
+        board.user_click();
+    }
+}
+
 void GameScene::setup_skybox() {
     field = ctx.load_texture_cubemap(
         "field"_H,

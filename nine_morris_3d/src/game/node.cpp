@@ -1,7 +1,7 @@
 #include "game/node.hpp"
 
-NodeObj::NodeObj(int index, glm::vec3 position, const sm::Renderable& renderable)
-    : m_index(index), m_renderable(renderable) {
+NodeObj::NodeObj(int id, glm::vec3 position, const sm::Renderable& renderable)
+    : m_id(id), m_renderable(renderable) {
     m_renderable.transform.position = position;
     m_renderable.transform.scale = 20.0f;
 }

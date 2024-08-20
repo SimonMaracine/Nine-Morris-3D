@@ -21,6 +21,7 @@ struct GameScene : sm::ApplicationScene {
 
     void on_window_resized(const sm::WindowResizedEvent& event);
     void on_key_released(const sm::KeyReleasedEvent& event);
+    void on_mouse_button_released(const sm::MouseButtonReleasedEvent& event);
 
     void setup_skybox();
     void setup_lights();

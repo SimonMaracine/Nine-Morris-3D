@@ -82,8 +82,14 @@ public:
     );
 
     void update(sm::Ctx& ctx, glm::vec3 ray, glm::vec3 camera);
+    void user_click();
+
+    void place(int place_index);
+    void place_take(int place_index, int take_index);
+    void move(int source_index, int destination_index);
+    void move_take(int source_index, int destination_index, int take_index);
 private:
-    void update_hovered_index(glm::vec3 ray, glm::vec3 camera);
+    void update_hovered_id(glm::vec3 ray, glm::vec3 camera);
     bool select_piece(int index);
     void try_place(int place_index);
     void try_place_take(int place_index, int take_index);
@@ -114,13 +120,6 @@ private:
     static unsigned int count_pieces(const Board& board, Player player);
     static Player opponent(Player player);
 
-    int m_hovered_node_index {-1};
-    int m_hovered_piece_index {-1};
-
-    // Scene data
-    std::array<NodeObj, 24> m_nodes {};
-    std::array<PieceObj, 18> m_pieces {};
-
     // Game data
     Board m_board {};
     Player m_turn {Player::White};
@@ -128,6 +127,20 @@ private:
     unsigned int m_plies {};
     unsigned int m_plies_without_advancement {};
     std::vector<Position> m_positions;
+
+    // Management data
+    std::vector<Move> m_legal_moves;
+
+    int m_hovered_node_id {-1};
+    int m_hovered_piece_id {-1};
+
+    int m_user_stored_index1 {-1};
+    int m_user_stored_index2 {-1};
+    bool m_user_must_take_piece {false};
+
+    // Scene data
+    std::array<NodeObj, 24> m_nodes {};
+    std::array<PieceObj, 18> m_pieces {};
 
     sm::Renderable m_renderable;
     sm::Renderable m_paint_renderable;
