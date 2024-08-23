@@ -38,7 +38,7 @@ namespace sm {
 
         struct {
             glm::vec3 color {1.0f};
-            float thickness {0.1f};
+            float thickness {1.1f};
         } outline;
     private:
         std::shared_ptr<Mesh> m_mesh;

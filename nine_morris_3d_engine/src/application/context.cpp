@@ -20,8 +20,8 @@ namespace sm {
         m_win(properties, &m_evt),
         m_rnd(properties.width, properties.height, properties.samples, m_fs, m_shd),
         m_snd(properties.audio),
-        m_inp(m_win.get_handle()),
-        m_mus(properties.audio) {
+        m_mus(properties.audio),
+        m_inp(m_win.get_handle()) {
         if (!m_fs.get_error_string().empty()) {
             LOG_DIST_ERROR("{}", m_fs.get_error_string());
         }

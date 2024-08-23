@@ -255,7 +255,7 @@ void StandardBoard::move_take(int source_index, int destination_index, int take_
     check_winner_blocking();
 }
 
-void StandardBoard::update_hovered_id(glm::vec3 ray, glm::vec3 camera) {
+void StandardBoard::update_hovered_id(glm::vec3 ray, glm::vec3 camera) {  // FIXME manage one single hovered id
     if (camera.y > 0.0f) {
         auto nodes {m_nodes};
         std::sort(nodes.begin(), nodes.end(), [camera](const NodeObj& lhs, const NodeObj& rhs) {
@@ -340,16 +340,14 @@ void StandardBoard::update_pieces() {
         return;
     }
 
-    if (m_hovered_piece_id == -1) {
-        std::for_each(m_pieces.begin(), m_pieces.end(), [](PieceObj& piece) {
+    for (PieceObj& piece : m_pieces) {
+        if (piece.get_id() == m_hovered_piece_id) {
+            piece.get_renderable().get_material()->flags |= sm::Material::Outline;
+            piece.get_renderable().outline.color = glm::vec3(0.96f, 0.58f, 0.15f);  // TODO
+        } else {
             piece.get_renderable().get_material()->flags &= ~sm::Material::Outline;
-        });
-
-        return;
+        }
     }
-
-    m_pieces[m_hovered_piece_id].get_renderable().get_material()->flags |= sm::Material::Outline;
-    m_pieces[m_hovered_piece_id].get_renderable().outline.color = glm::vec3(0.96f, 0.58f, 0.15f);
 }
 
 bool StandardBoard::select_piece(int index) {

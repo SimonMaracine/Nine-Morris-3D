@@ -608,9 +608,8 @@ namespace sm::internal {
             };
 
             m_storage.outline_shader->bind();
-            m_storage.outline_shader->upload_uniform_mat4("u_model_matrix"_H, transform);
+            m_storage.outline_shader->upload_uniform_mat4("u_model_matrix"_H, glm::scale(transform, glm::vec3(renderable.outline.thickness)));
             m_storage.outline_shader->upload_uniform_vec3("u_color"_H, color);
-            m_storage.outline_shader->upload_uniform_float("u_outline_thickness"_H, renderable.outline.thickness);
 
             opengl::draw_elements(renderable.m_vertex_array->get_index_buffer()->get_index_count());
 

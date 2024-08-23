@@ -72,9 +72,9 @@ namespace sm {
         for (unsigned int i {0}; i < mesh->mNumVertices; i++) {
             VertexPNT vertex;
             vertex.position = mesh->mVertices[i];
+            vertex.normal = mesh->mNormals[i];
             vertex.texture_coordinate.x = mesh->mTextureCoords[0][i].x;
             vertex.texture_coordinate.y = mesh->mTextureCoords[0][i].y;
-            vertex.normal = mesh->mNormals[i];
 
             vertices.push_back(vertex);
         }
@@ -92,9 +92,9 @@ namespace sm {
         for (unsigned int i {0}; i < mesh->mNumVertices; i++) {
             VertexPNTT vertex;
             vertex.position = mesh->mVertices[i];
+            vertex.normal = mesh->mNormals[i];
             vertex.texture_coordinate.x = mesh->mTextureCoords[0][i].x;
             vertex.texture_coordinate.y = mesh->mTextureCoords[0][i].y;
-            vertex.normal = mesh->mNormals[i];
             vertex.tangent = mesh->mTangents[i];
 
             vertices.push_back(vertex);
