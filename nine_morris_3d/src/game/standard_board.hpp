@@ -88,6 +88,8 @@ public:
     void place_take(int place_index, int take_index);
     void move(int source_index, int destination_index);
     void move_take(int source_index, int destination_index, int take_index);
+
+    void debug();
 private:
     void update_hovered_id(glm::vec3 ray, glm::vec3 camera);
     void update_nodes();
@@ -134,10 +136,7 @@ private:
 
     // Management data
     std::vector<Move> m_legal_moves;
-
-    int m_hovered_node_id {-1};
-    int m_hovered_piece_id {-1};
-
+    int m_hovered_id {-1};
     int m_user_stored_index1 {-1};
     int m_user_stored_index2 {-1};
     bool m_user_must_take_piece {false};

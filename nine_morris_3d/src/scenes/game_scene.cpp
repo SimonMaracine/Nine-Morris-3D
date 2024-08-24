@@ -210,6 +210,8 @@ void GameScene::on_fixed_update() {
 }
 
 void GameScene::on_imgui_update() {
+    board.debug();
+
     // ImGui::Begin("Features");
     // ImGui::Checkbox("Skybox", &sky);
     // if (ImGui::Checkbox("Blur", &blur)) {

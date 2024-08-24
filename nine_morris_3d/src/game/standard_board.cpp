@@ -4,6 +4,7 @@
 #include <cassert>
 
 #include <nine_morris_3d_engine/external/glm.h++>
+#include <nine_morris_3d_engine/external/imgui.h++>
 
 #include "game/ray.hpp"
 
@@ -65,11 +66,11 @@ StandardBoard::StandardBoard(
     }
 
     for (int i {0}; i < 9; i++) {
-        m_pieces[i] = PieceObj(i, glm::vec3(3.0f, 0.5f, static_cast<float>(i) * 0.5f - 2.0f), white_pieces[i], PieceType::White);
+        m_pieces[i] = PieceObj(i + 24, glm::vec3(3.0f, 0.5f, static_cast<float>(i) * 0.5f - 2.0f), white_pieces[i], PieceType::White);
     }
 
     for (int i {9}; i < 18; i++) {
-        m_pieces[i] = PieceObj(i, glm::vec3(-3.0f, 0.5f, static_cast<float>(i - 9) * 0.5f - 2.0f), black_pieces[i - 9], PieceType::Black);
+        m_pieces[i] = PieceObj(i + 24, glm::vec3(-3.0f, 0.5f, static_cast<float>(i - 9) * 0.5f - 2.0f), black_pieces[i - 9], PieceType::Black);
     }
 
     m_legal_moves = generate_moves();
@@ -78,7 +79,7 @@ StandardBoard::StandardBoard(
 void StandardBoard::update(sm::Ctx& ctx, glm::vec3 ray, glm::vec3 camera) {
     update_hovered_id(ray, camera);
     update_nodes();
-    update_pieces();  // FIXME
+    update_pieces();
 
     ctx.add_renderable(m_renderable);
     ctx.add_renderable(m_paint_renderable);
@@ -97,15 +98,15 @@ void StandardBoard::user_click() {
         return;
     }
 
-    if (m_hovered_node_id == -1 && m_hovered_piece_id == -1) {
+    if (m_hovered_id == -1) {
         return;
     }
 
     const bool phase_two {m_plies >= 18};
 
     if (phase_two) {
-        if (m_hovered_piece_id != -1) {
-            if (select_piece(m_pieces[m_hovered_piece_id].get_node_id())) {
+        if (m_hovered_id >= 24 && m_hovered_id <= 24 + 17) {
+            if (select_piece(m_pieces[m_hovered_id].get_node_id())) {
                 return;
             }
         }
@@ -113,22 +114,22 @@ void StandardBoard::user_click() {
 
     if (phase_two) {
         if (m_user_must_take_piece) {
-            if (m_hovered_piece_id != -1) {
-                try_move_take(m_user_stored_index1, m_user_stored_index2, m_pieces[m_hovered_piece_id].get_node_id());
+            if (m_hovered_id >= 24 && m_hovered_id <= 24 + 17) {
+                try_move_take(m_user_stored_index1, m_user_stored_index2, m_pieces[m_hovered_id].get_node_id());
             }
         } else {
-            if (m_hovered_node_id != -1) {
-                try_move(m_user_stored_index1, m_nodes[m_hovered_node_id].get_id());
+            if (m_hovered_id >= 0 && m_hovered_id <= 23) {
+                try_move(m_user_stored_index1, m_nodes[m_hovered_id].get_id());
             }
         }
     } else {
         if (m_user_must_take_piece) {
-            if (m_hovered_piece_id != -1) {
-                try_place_take(m_user_stored_index2, m_pieces[m_hovered_piece_id].get_node_id());
+            if (m_hovered_id >= 24 && m_hovered_id <= 24 + 17) {
+                try_place_take(m_user_stored_index2, m_pieces[m_hovered_id].get_node_id());
             }
         } else {
-            if (m_hovered_node_id != -1) {
-                try_place(m_nodes[m_hovered_node_id].get_id());
+            if (m_hovered_id >= 0 && m_hovered_id <= 23) {
+                try_place(m_nodes[m_hovered_id].get_id());
             }
         }
     }
@@ -138,7 +139,6 @@ void StandardBoard::place(int place_index) {
     assert(m_board[place_index] == Piece::None);
 
     m_board[place_index] = static_cast<Piece>(m_turn);
-
 
 
 
@@ -255,67 +255,90 @@ void StandardBoard::move_take(int source_index, int destination_index, int take_
     check_winner_blocking();
 }
 
-void StandardBoard::update_hovered_id(glm::vec3 ray, glm::vec3 camera) {  // FIXME manage one single hovered id
-    if (camera.y > 0.0f) {
-        auto nodes {m_nodes};
-        std::sort(nodes.begin(), nodes.end(), [camera](const NodeObj& lhs, const NodeObj& rhs) {
-            const auto left {glm::distance(lhs.get_renderable().transform.position, camera)};
-            const auto right {glm::distance(rhs.get_renderable().transform.position, camera)};
-
-            return left > right;
-        });
-
-        bool hover {false};
-
-        for (const auto& node : nodes) {
-            const auto& transform {node.get_renderable().transform};
-            const glm::mat4 to_world_space {transformation_matrix(transform.position, transform.rotation, transform.scale)};
-
-            sm::utils::AABB aabb;
-            aabb.min = to_world_space * glm::vec4(node.get_renderable().get_aabb().min, 1.0f);
-            aabb.max = to_world_space * glm::vec4(node.get_renderable().get_aabb().max, 1.0f);
-
-            if (ray_aabb_collision(ray, camera, aabb)) {
-                m_hovered_node_id = node.get_id();
-                hover = true;
-            }
+void StandardBoard::debug() {
+    if (ImGui::Begin("Debug Board")) {
+        const char* turn {};
+        switch (m_turn) {
+            case Player::White:
+                turn = "White";
+                break;
+            case Player::Black:
+                turn = "Black";
+                break;
         }
 
-        if (!hover) {
-            m_hovered_node_id = -1;
+        const char* game_over {};
+        switch (m_game_over) {
+            case GameOver::None:
+                game_over = "None";
+                break;
+            case GameOver::WinnerWhite:
+                game_over = "WinnerWhite";
+                break;
+            case GameOver::WinnerBlack:
+                game_over = "WinnerBlack";
+                break;
+            case GameOver::TieBetweenBothPlayers:
+                game_over = "TieBetweenBothPlayers";
+                break;
         }
-    } else {
-        m_hovered_node_id = -1;
+
+        ImGui::Text("m_turn %s", turn);
+        ImGui::Text("m_game_over %s", game_over);
+        ImGui::Text("m_plies %u", m_plies);
+        ImGui::Text("m_plies_without_advancement %u", m_plies_without_advancement);
+        ImGui::Text("m_positions %lu", m_positions.size());
+        ImGui::Text("m_legal_moves %lu", m_legal_moves.size());
+        ImGui::Text("m_hovered_id %d", m_hovered_id);
+        ImGui::Text("m_user_stored_index1 %d", m_user_stored_index1);
+        ImGui::Text("m_user_stored_index2 %d", m_user_stored_index2);
+        ImGui::Text("m_user_must_take_piece %s", m_user_must_take_piece ? "true" : "false");
     }
 
-    {
-        auto pieces {m_pieces};
-        std::sort(pieces.begin(), pieces.end(), [camera](const PieceObj& lhs, const PieceObj& rhs) {
-            const auto left {glm::distance(lhs.get_renderable().transform.position, camera)};
-            const auto right {glm::distance(rhs.get_renderable().transform.position, camera)};
+    ImGui::End();
+}
 
-            return left > right;
-        });
+void StandardBoard::update_hovered_id(glm::vec3 ray, glm::vec3 camera) {
+    if (camera.y < 0.0f) {
+        m_hovered_id = -1;
+        return;
+    }
 
-        bool hover {false};
+    std::vector<std::pair<int, sm::Renderable>> renderables;
 
-        for (const auto& piece : pieces) {
-            const auto& transform {piece.get_renderable().transform};
-            const glm::mat4 to_world_space {transformation_matrix(transform.position, transform.rotation, transform.scale)};
+    for (const NodeObj& node : m_nodes) {
+        renderables.push_back(std::make_pair(node.get_id(), node.get_renderable()));
+    }
 
-            sm::utils::AABB aabb;
-            aabb.min = to_world_space * glm::vec4(piece.get_renderable().get_aabb().min, 1.0f);
-            aabb.max = to_world_space * glm::vec4(piece.get_renderable().get_aabb().max, 1.0f);
+    for (const PieceObj& piece : m_pieces) {
+        renderables.push_back(std::make_pair(piece.get_id(), piece.get_renderable()));
+    }
 
-            if (ray_aabb_collision(ray, camera, aabb)) {
-                m_hovered_piece_id = piece.get_id();
-                hover = true;
-            }
+    std::sort(renderables.begin(), renderables.end(), [camera](const auto& lhs, const auto& rhs) {
+        const auto left {glm::distance(lhs.second.transform.position, camera)};
+        const auto right {glm::distance(rhs.second.transform.position, camera)};
+
+        return left > right;
+    });
+
+    bool hover {false};
+
+    for (const auto& [id, renderable] : renderables) {
+        const auto& transform {renderable.transform};
+        const glm::mat4 to_world_space {transformation_matrix(transform.position, transform.rotation, transform.scale)};
+
+        sm::utils::AABB aabb;
+        aabb.min = to_world_space * glm::vec4(renderable.get_aabb().min, 1.0f);
+        aabb.max = to_world_space * glm::vec4(renderable.get_aabb().max, 1.0f);
+
+        if (ray_aabb_collision(ray, camera, aabb)) {
+            m_hovered_id = id;
+            hover = true;
         }
+    }
 
-        if (!hover) {
-            m_hovered_piece_id = -1;
-        }
+    if (!hover) {
+        m_hovered_id = -1;
     }
 }
 
@@ -324,15 +347,9 @@ void StandardBoard::update_nodes() {
         return;
     }
 
-    if (m_hovered_node_id == -1) {
-        std::for_each(m_nodes.begin(), m_nodes.end(), [](NodeObj& node) {
-            node.set_highlighted(false);
-        });
-
-        return;
+    for (NodeObj& node : m_nodes) {
+        node.set_highlighted(node.get_id() == m_hovered_id);
     }
-
-    m_nodes[m_hovered_node_id].set_highlighted(true);
 }
 
 void StandardBoard::update_pieces() {
@@ -341,7 +358,7 @@ void StandardBoard::update_pieces() {
     }
 
     for (PieceObj& piece : m_pieces) {
-        if (piece.get_id() == m_hovered_piece_id) {
+        if (piece.get_id() == m_hovered_id) {
             piece.get_renderable().get_material()->flags |= sm::Material::Outline;
             piece.get_renderable().outline.color = glm::vec3(0.96f, 0.58f, 0.15f);  // TODO
         } else {
