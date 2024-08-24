@@ -106,6 +106,8 @@ private:
     void check_threefold_repetition(const Position& position);
 
     int new_piece_to_place(PieceType type);
+    static bool is_node_id(int id);
+    static bool is_piece_id(int id);
 
     // Move generation
     std::vector<Move> generate_moves() const;
