@@ -668,9 +668,7 @@ namespace sm::internal {
             return lhs.font.get() < rhs.font.get();
         });
 
-        const void* last {};  // TODO C++20
-
-        for (const auto& text : texts) {
+        for (const void* last {}; const auto& text : texts) {
             const void* current {text.font.get()};
 
             assert(current != nullptr);
@@ -701,9 +699,7 @@ namespace sm::internal {
     }
 
     void Renderer::draw_text_batch(const Scene& scene, const TextBatch& batch) {
-        std::size_t i {};  // TODO C++20
-
-        for (const Text& text : batch.texts) {
+        for (std::size_t i {0}; const Text& text : batch.texts) {
             assert(i < SHADER_MAX_BATCH_TEXTS);
 
             // Pushes the rendered text onto the buffer

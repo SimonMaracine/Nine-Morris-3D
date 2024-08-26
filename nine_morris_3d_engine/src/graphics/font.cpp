@@ -116,15 +116,12 @@ namespace sm {
     void Font::render(const std::string& string, int index, std::vector<CharacterBuffer>& buffer) const {
         const std::u32string utf32_string {utf8::utf8to32(string)};
 
-        float x {0.0f};  // TODO C++20
-        float y {-m_baseline};
-
         // This makes multi-line text have its origin at bottom-left
         float vertical_positioning {0.0f};
 
         std::size_t character_count {};
 
-        for (const char32_t character : utf32_string) {
+        for (float x {0.0f}, y {-m_baseline}; const char32_t character : utf32_string) {
             if (character == '\n') {
                 y -= (-m_vertical_advance);
                 vertical_positioning += m_vertical_advance;

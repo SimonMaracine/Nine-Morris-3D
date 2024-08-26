@@ -69,9 +69,7 @@ namespace sm::internal {
 
     void DebugUi::draw_renderables(Scene& scene) noexcept {
         if (ImGui::Begin("Debug Renderables")) {
-            int index {};  // TODO C++20
-
-            for (Renderable* renderable : scene.m_debug.renderables) {
+            for (int index {0}; Renderable* renderable : scene.m_debug.renderables) {
                 ImGui::PushID(index);
                 ImGui::Text("Renderable %d", index);
                 ImGui::DragFloat3("Position", glm::value_ptr(renderable->transform.position), 1.0f, -200.0f, 200.0f);
@@ -98,9 +96,7 @@ namespace sm::internal {
         ImGui::End();
 
         if (ImGui::Begin("Debug Point Lights")) {
-            int index {};  // TODO C++20
-
-            for (PointLight* point_light : scene.m_debug.point_lights) {
+            for (int index {0}; PointLight* point_light : scene.m_debug.point_lights) {
                 ImGui::PushID(index);
                 ImGui::Text("Light %d", index);
                 ImGui::DragFloat3("Position", glm::value_ptr(point_light->position), 1.0f, -30.0f, 30.0f);
@@ -140,9 +136,7 @@ namespace sm::internal {
 
     void DebugUi::draw_texts(Scene& scene) noexcept {
         if (ImGui::Begin("Debug Texts")) {
-            int index {};  // TODO C++20
-
-            for (Text* text : scene.m_debug.texts) {
+            for (int index {0}; Text* text : scene.m_debug.texts) {
                 char buffer[512] {};
                 std::strncpy(buffer, text->text.c_str(), sizeof(buffer) - 1);
 
@@ -166,9 +160,7 @@ namespace sm::internal {
 
     void DebugUi::draw_quads(Scene& scene) noexcept {
         if (ImGui::Begin("Debug Quads")) {
-            int index {};  // TODO C++20
-
-            for (Quad* quad : scene.m_debug.quads) {
+            for (int index {0}; Quad* quad : scene.m_debug.quads) {
                 ImGui::PushID(index);
                 ImGui::Text("Quad %d", index);
                 ImGui::DragFloat2("Position", glm::value_ptr(quad->position), 1.0f, -2000.0f, 2000.0f);
