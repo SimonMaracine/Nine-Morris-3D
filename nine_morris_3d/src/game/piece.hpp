@@ -1,10 +1,18 @@
 #pragma once
 
+#include <functional>
+
 #include <nine_morris_3d_engine/nine_morris_3d.hpp>
 
 enum class PieceType {
     White = 1,
     Black = 2
+};
+
+enum class PieceMovement {
+    None,
+    Direct,
+    ThreeStep
 };
 
 class PieceObj {
@@ -23,11 +31,29 @@ public:
     void set_active(bool active) { m_active = active; }
 
     void update(sm::Ctx& ctx);
+    void update_movement();
+
+    void move_direct(glm::vec3 origin, glm::vec3 target, std::function<void()> on_finish);
+    void move_three_step(glm::vec3 origin, glm::vec3 target0, glm::vec3 target1, glm::vec3 target, std::function<void()> on_finish);
 private:
+    void direct_movement(glm::vec3 origin, glm::vec3 target, auto on_arrive);
+    void direct_movement();
+    void threestep_movement();
+    void finish_movement();
+
     int m_id {-1};
     int m_node_id {-1};
     PieceType m_type {};
     bool m_active {true};
+
+    PieceMovement m_movement {PieceMovement::None};
+    glm::vec3 m_origin {};
+    glm::vec3 m_target0 {};
+    glm::vec3 m_target1 {};
+    glm::vec3 m_target {};
+    bool m_reached_target0 {false};
+    bool m_reached_target1 {false};
+    std::function<void()> m_on_finish;
 
     sm::Renderable m_renderable;
 };

@@ -2,6 +2,7 @@
 
 #include <array>
 #include <vector>
+#include <functional>
 
 #include <nine_morris_3d_engine/nine_morris_3d.hpp>
 
@@ -82,29 +83,37 @@ public:
     );
 
     void update(sm::Ctx& ctx, glm::vec3 ray, glm::vec3 camera);
+    void update_movement();
     void user_click();
 
-    void place(int place_index);
-    void place_take(int place_index, int take_index);
-    void move(int source_index, int destination_index);
-    void move_take(int source_index, int destination_index, int take_index);
+    void place_piece(int place_index);
+    void place_take_piece(int place_index, int take_index);
+    void move_piece(int source_index, int destination_index);
+    void move_take_piece(int source_index, int destination_index, int take_index);
 
     void debug();
 private:
     void update_hovered_id(glm::vec3 ray, glm::vec3 camera);
     void update_nodes();
     void update_pieces();
-    bool select_piece(int index);
+    void select_piece(int index);
     void try_place(int place_index);
     void try_place_take(int place_index, int take_index);
     void try_move(int source_index, int destination_index);
     void try_move_take(int source_index, int destination_index, int take_index);
+    void place(int place_index);
+    void place_take(int place_index, int take_index);
+    void move(int source_index, int destination_index);
+    void move_take(int source_index, int destination_index, int take_index);
     void finish_turn(bool advancement = true);
     void check_winner_material();
     void check_winner_blocking();
     void check_fifty_move_rule();
     void check_threefold_repetition(const Position& position);
 
+    static void do_place_animation(PieceObj& piece, const NodeObj& node, std::function<void()> on_finish);
+    static void do_move_animation();
+    static void do_take_animation(PieceObj& piece);
     int new_piece_to_place(PieceType type);
     static bool is_node_id(int id);
     static bool is_piece_id(int id);

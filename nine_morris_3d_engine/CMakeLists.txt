@@ -190,7 +190,7 @@ if(WIN32)
     target_compile_options(nine_morris_3d_engine PUBLIC "/utf-8")
 endif()
 
-target_compile_features(nine_morris_3d_engine PUBLIC cxx_std_17)
+target_compile_features(nine_morris_3d_engine PUBLIC cxx_std_20)
 set_target_properties(nine_morris_3d_engine PROPERTIES CXX_EXTENSIONS OFF)
 
 if(NM3D_DISTRIBUTION_MODE)

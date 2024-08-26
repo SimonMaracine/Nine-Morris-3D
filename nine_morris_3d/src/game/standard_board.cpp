@@ -1,6 +1,7 @@
 #include "game/standard_board.hpp"
 
 #include <algorithm>
+#include <utility>
 #include <cassert>
 
 #include <nine_morris_3d_engine/external/glm.h++>
@@ -11,7 +12,7 @@
 #define PIECE(index) (index - 24)
 
 static constexpr float NODE_Y_POSITION = 0.063f;
-static const glm::vec3 NODE_POSITIONS[24] = {
+static const glm::vec3 NODE_POSITIONS[24] {
     glm::vec3(2.046f, NODE_Y_POSITION, 2.062f),    // 0
     glm::vec3(-0.008f, NODE_Y_POSITION, 2.089f),   // 1
     glm::vec3(-2.101f, NODE_Y_POSITION, 2.076f),   // 2
@@ -97,6 +98,12 @@ void StandardBoard::update(sm::Ctx& ctx, glm::vec3 ray, glm::vec3 camera) {
     }
 }
 
+void StandardBoard::update_movement() {
+    for (PieceObj& piece : m_pieces) {
+        piece.update_movement();
+    }
+}
+
 void StandardBoard::user_click() {
     if (m_game_over != GameOver::None) {
         return;
@@ -109,14 +116,6 @@ void StandardBoard::user_click() {
     const bool phase_two {m_plies >= 18};
 
     if (phase_two) {
-        if (is_piece_id(m_hovered_id)) {
-            if (select_piece(m_pieces[PIECE(m_hovered_id)].get_node_id())) {
-                return;
-            }
-        }
-    }
-
-    if (phase_two) {
         if (m_user_must_take_piece) {
             if (is_piece_id(m_hovered_id)) {
                 try_move_take(m_user_stored_index1, m_user_stored_index2, m_pieces[PIECE(m_hovered_id)].get_node_id());
@@ -124,6 +123,10 @@ void StandardBoard::user_click() {
         } else {
             if (is_node_id(m_hovered_id)) {
                 try_move(m_user_stored_index1, m_nodes[m_hovered_id].get_id());
+            }
+
+            if (is_piece_id(m_hovered_id)) {
+                select_piece(m_pieces[PIECE(m_hovered_id)].get_node_id());
             }
         }
     } else {
@@ -139,70 +142,40 @@ void StandardBoard::user_click() {
     }
 }
 
-void StandardBoard::place(int place_index) {
-    assert(m_board[place_index] == Piece::None);
-
-    m_board[place_index] = static_cast<Piece>(m_turn);
-
-
+void StandardBoard::place_piece(int place_index) {
+    place(place_index);
 
     // Do the thing
     const int id {new_piece_to_place(static_cast<PieceType>(m_turn))};
+
     m_pieces[PIECE(id)].set_node_id(place_index);
-    m_pieces[PIECE(id)].get_renderable().transform.position = m_nodes[place_index].get_renderable().transform.position;
-    m_pieces[PIECE(id)].get_renderable().transform.position.y = 0.135f;
     m_nodes[place_index].set_piece_id(id);
 
-
-
-    Move move;
-    move.type = MoveType::Place;
-    move.place.place_index = place_index;
-    // move_callback(move, m_turn);
-
-    finish_turn();
-    check_winner_blocking();
+    do_place_animation(m_pieces[PIECE(id)], m_nodes[place_index], []() {});
 }
 
-void StandardBoard::place_take(int place_index, int take_index) {
-    assert(m_board[place_index] == Piece::None);
-    assert(m_board[take_index] != Piece::None);
-
-    m_board[place_index] = static_cast<Piece>(m_turn);
-    m_board[take_index] = Piece::None;
-
-
+void StandardBoard::place_take_piece(int place_index, int take_index) {
+    place_take(place_index, take_index);
 
     // Do the thing
     const int id {new_piece_to_place(static_cast<PieceType>(m_turn))};
+
     m_pieces[PIECE(id)].set_node_id(place_index);
-    m_pieces[PIECE(id)].get_renderable().transform.position = m_nodes[place_index].get_renderable().transform.position;
-    m_pieces[PIECE(id)].get_renderable().transform.position.y = 0.135f;
-    m_pieces[PIECE(m_nodes[take_index].get_piece_id())].set_active(false);
-    m_pieces[PIECE(m_nodes[take_index].get_piece_id())].set_node_id(-1);
     m_nodes[place_index].set_piece_id(id);
+
+    const int take_piece_id {m_nodes[take_index].get_piece_id()};
+
+    do_place_animation(m_pieces[PIECE(id)], m_nodes[place_index], [this, take_piece_id]() {
+        do_take_animation(m_pieces[PIECE(take_piece_id)]);
+    });
+
+    m_pieces[PIECE(take_piece_id)].set_active(false);
+    m_pieces[PIECE(take_piece_id)].set_node_id(-1);
     m_nodes[take_index].set_piece_id(-1);
-
-
-
-    Move move;
-    move.type = MoveType::PlaceTake;
-    move.place_take.place_index = place_index;
-    move.place_take.take_index = take_index;
-    // move_callback(move, m_turn);
-
-    finish_turn();
-    check_winner_material();
-    check_winner_blocking();
 }
 
-void StandardBoard::move(int source_index, int destination_index) {
-    assert(m_board[source_index] != Piece::None);
-    assert(m_board[destination_index] == Piece::None);
-
-    std::swap(m_board[source_index], m_board[destination_index]);
-
-
+void StandardBoard::move_piece(int source_index, int destination_index) {
+    move(source_index, destination_index);
 
     // Do the thing
     m_pieces[PIECE(m_nodes[source_index].get_piece_id())].get_renderable().transform.position = m_nodes[destination_index].get_renderable().transform.position;
@@ -211,29 +184,11 @@ void StandardBoard::move(int source_index, int destination_index) {
     m_nodes[destination_index].set_piece_id(m_nodes[source_index].get_piece_id());
     m_nodes[source_index].set_piece_id(-1);
 
-
-
-    Move move;
-    move.type = MoveType::Move;
-    move.move.source_index = source_index;
-    move.move.destination_index = destination_index;
-    // move_callback(move, m_turn);
-
-    finish_turn(false);
-    check_winner_blocking();
-    check_fifty_move_rule();
-    check_threefold_repetition({m_board, m_turn});
+    // TODO animation
 }
 
-void StandardBoard::move_take(int source_index, int destination_index, int take_index) {
-    assert(m_board[source_index] != Piece::None);
-    assert(m_board[destination_index] == Piece::None);
-    assert(m_board[take_index] != Piece::None);
-
-    std::swap(m_board[source_index], m_board[destination_index]);
-    m_board[take_index] = Piece::None;
-
-
+void StandardBoard::move_take_piece(int source_index, int destination_index, int take_index) {
+    move_take(source_index, destination_index, take_index);
 
     // Do the thing
     m_pieces[PIECE(m_nodes[source_index].get_piece_id())].get_renderable().transform.position = m_nodes[destination_index].get_renderable().transform.position;
@@ -245,18 +200,7 @@ void StandardBoard::move_take(int source_index, int destination_index, int take_
     m_nodes[source_index].set_piece_id(-1);
     m_nodes[take_index].set_piece_id(-1);
 
-
-
-    Move move;
-    move.type = MoveType::MoveTake;
-    move.move_take.source_index = source_index;
-    move.move_take.destination_index = destination_index;
-    move.move_take.take_index = take_index;
-    // move_callback(move, m_turn);
-
-    finish_turn();
-    check_winner_material();
-    check_winner_blocking();
+    // TODO animation
 }
 
 void StandardBoard::debug() {
@@ -371,41 +315,33 @@ void StandardBoard::update_pieces() {
     }
 }
 
-bool StandardBoard::select_piece(int index) {
+void StandardBoard::select_piece(int index) {
     if (m_user_stored_index1 == -1) {
         if (m_board[index] == static_cast<Piece>(m_turn)) {
             m_user_stored_index1 = index;
             m_pieces[PIECE(m_nodes[index].get_piece_id())].get_renderable().get_material()->flags |= sm::Material::Outline;
             m_pieces[PIECE(m_nodes[index].get_piece_id())].get_renderable().outline.color = glm::vec3(0.8f, 0.16f, 0.3f);
-
-            return true;
         }
     } else {
         if (index == m_user_stored_index1) {
             if (m_user_stored_index2 == -1) {
                 m_user_stored_index1 = -1;
             }
-
-            return true;
         } else if (m_board[index] == static_cast<Piece>(m_turn)) {
             if (m_user_stored_index2 == -1) {
                 m_user_stored_index1 = index;
                 m_pieces[PIECE(m_nodes[index].get_piece_id())].get_renderable().get_material()->flags |= sm::Material::Outline;
                 m_pieces[PIECE(m_nodes[index].get_piece_id())].get_renderable().outline.color = glm::vec3(0.8f, 0.16f, 0.3f);
             }
-
-            return true;
         }
     }
-
-    return false;
 }
 
 void StandardBoard::try_place(int place_index) {
     for (const Move& m : m_legal_moves) {
         if (m.type == MoveType::Place) {
             if (m.place.place_index == place_index) {
-                place(place_index);
+                place(place_index);  // TODO
                 return;
             }
         }
@@ -414,7 +350,7 @@ void StandardBoard::try_place(int place_index) {
     for (const Move& m : m_legal_moves) {
         if (m.type == MoveType::PlaceTake) {
             if (m.place_take.place_index == place_index) {
-                m_user_must_take_piece = true;
+                m_user_must_take_piece = true;  // TODO
                 m_user_stored_index2 = place_index;
                 return;
             }
@@ -426,7 +362,7 @@ void StandardBoard::try_place_take(int place_index, int take_index) {
     for (const Move& m : m_legal_moves) {
         if (m.type == MoveType::PlaceTake) {
             if (m.place_take.place_index == place_index && m.place_take.take_index == take_index) {
-                place_take(place_index, take_index);
+                place_take(place_index, take_index);  // TODO
                 return;
             }
         }
@@ -437,7 +373,7 @@ void StandardBoard::try_move(int source_index, int destination_index) {
     for (const Move& m : m_legal_moves) {
         if (m.type == MoveType::Move) {
             if (m.move.source_index == source_index && m.move.destination_index == destination_index) {
-                move(source_index, destination_index);
+                move(source_index, destination_index);  // TODO
                 return;
             }
         }
@@ -446,7 +382,7 @@ void StandardBoard::try_move(int source_index, int destination_index) {
     for (const Move& m : m_legal_moves) {
         if (m.type == MoveType::MoveTake) {
             if (m.move_take.source_index == source_index && m.move_take.destination_index == destination_index) {
-                m_user_must_take_piece = true;
+                m_user_must_take_piece = true;  // TODO
                 m_user_stored_index2 = destination_index;
                 return;
             }
@@ -464,11 +400,81 @@ void StandardBoard::try_move_take(int source_index, int destination_index, int t
             };
 
             if (match) {
-                move_take(source_index, destination_index, take_index);
+                move_take(source_index, destination_index, take_index);  // TODO
                 return;
             }
         }
     }
+}
+
+void StandardBoard::place(int place_index) {
+    assert(m_board[place_index] == Piece::None);
+
+    m_board[place_index] = static_cast<Piece>(m_turn);
+
+    Move move;
+    move.type = MoveType::Place;
+    move.place.place_index = place_index;
+    // move_callback(move, m_turn);
+
+    finish_turn();
+    check_winner_blocking();
+}
+
+void StandardBoard::place_take(int place_index, int take_index) {
+    assert(m_board[place_index] == Piece::None);
+    assert(m_board[take_index] != Piece::None);
+
+    m_board[place_index] = static_cast<Piece>(m_turn);
+    m_board[take_index] = Piece::None;
+
+    Move move;
+    move.type = MoveType::PlaceTake;
+    move.place_take.place_index = place_index;
+    move.place_take.take_index = take_index;
+    // move_callback(move, m_turn);
+
+    finish_turn();
+    check_winner_material();
+    check_winner_blocking();
+}
+
+void StandardBoard::move(int source_index, int destination_index) {
+    assert(m_board[source_index] != Piece::None);
+    assert(m_board[destination_index] == Piece::None);
+
+    std::swap(m_board[source_index], m_board[destination_index]);
+
+    Move move;
+    move.type = MoveType::Move;
+    move.move.source_index = source_index;
+    move.move.destination_index = destination_index;
+    // move_callback(move, m_turn);
+
+    finish_turn(false);
+    check_winner_blocking();
+    check_fifty_move_rule();
+    check_threefold_repetition({m_board, m_turn});
+}
+
+void StandardBoard::move_take(int source_index, int destination_index, int take_index) {
+    assert(m_board[source_index] != Piece::None);
+    assert(m_board[destination_index] == Piece::None);
+    assert(m_board[take_index] != Piece::None);
+
+    std::swap(m_board[source_index], m_board[destination_index]);
+    m_board[take_index] = Piece::None;
+
+    Move move;
+    move.type = MoveType::MoveTake;
+    move.move_take.source_index = source_index;
+    move.move_take.destination_index = destination_index;
+    move.move_take.take_index = take_index;
+    // move_callback(move, m_turn);
+
+    finish_turn();
+    check_winner_material();
+    check_winner_blocking();
 }
 
 void StandardBoard::finish_turn(bool advancement) {
@@ -544,6 +550,26 @@ void StandardBoard::check_threefold_repetition(const Position& position) {
             }
         }
     }
+}
+
+void StandardBoard::do_place_animation(PieceObj& piece, const NodeObj& node, std::function<void()> on_finish) {
+    const glm::vec3 origin {piece.get_renderable().transform.position};
+    const glm::vec3 target0 {piece.get_renderable().transform.position.x, 0.75f, piece.get_renderable().transform.position.z};
+    const glm::vec3 target1 {node.get_renderable().transform.position.x, 0.75f, node.get_renderable().transform.position.z};
+    const glm::vec3 target {node.get_renderable().transform.position.x, 0.135f, node.get_renderable().transform.position.z};
+
+    piece.move_three_step(origin, target0, target1, target, std::move(on_finish));
+}
+
+void StandardBoard::do_move_animation() {
+
+}
+
+void StandardBoard::do_take_animation(PieceObj& piece) {
+    const glm::vec3 origin {piece.get_renderable().transform.position};
+    const glm::vec3 target {piece.get_renderable().transform.position.x, 2.0f, piece.get_renderable().transform.position.z};
+
+    piece.move_direct(origin, target, []() {});
 }
 
 int StandardBoard::new_piece_to_place(PieceType type) {

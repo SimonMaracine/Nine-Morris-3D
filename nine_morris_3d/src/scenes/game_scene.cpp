@@ -207,6 +207,7 @@ void GameScene::on_update() {
 
 void GameScene::on_fixed_update() {
     cam_controller.update_friction();
+    board.update_movement();
 }
 
 void GameScene::on_imgui_update() {
@@ -233,6 +234,8 @@ void GameScene::on_imgui_update() {
     //     reload_textures(color_correction);
     // }
     // ImGui::End();
+
+    // ctx.add_task()
 }
 
 void GameScene::on_window_resized(const sm::WindowResizedEvent& event) {
