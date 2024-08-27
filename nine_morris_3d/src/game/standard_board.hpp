@@ -96,15 +96,26 @@ private:
     void update_hovered_id(glm::vec3 ray, glm::vec3 camera);
     void update_nodes();
     void update_pieces();
-    void select_piece(int index);
+
+    void select(int index);
     void try_place(int place_index);
     void try_place_take(int place_index, int take_index);
     void try_move(int source_index, int destination_index);
     void try_move_take(int source_index, int destination_index, int take_index);
+
+    void user_place(int place_index);
+    void user_place_take_just_place(int place_index);
+    void user_place_take(int place_index, int take_index);
+    void user_move(int source_index, int destination_index);
+    void user_move_take_just_move(int source_index, int destination_index);
+    void user_move_take(int source_index, int destination_index, int take_index);
+
+    // These just update the game data
     void place(int place_index);
     void place_take(int place_index, int take_index);
     void move(int source_index, int destination_index);
     void move_take(int source_index, int destination_index, int take_index);
+
     void finish_turn(bool advancement = true);
     void check_winner_material();
     void check_winner_blocking();
@@ -112,8 +123,8 @@ private:
     void check_threefold_repetition(const Position& position);
 
     static void do_place_animation(PieceObj& piece, const NodeObj& node, std::function<void()> on_finish);
-    static void do_move_animation();
-    static void do_take_animation(PieceObj& piece);
+    void do_move_animation(PieceObj& piece, const NodeObj& node, std::function<void()> on_finish);
+    static void do_take_animation(PieceObj& piece, std::function<void()> on_finish);
     int new_piece_to_place(PieceType type);
     static bool is_node_id(int id);
     static bool is_piece_id(int id);

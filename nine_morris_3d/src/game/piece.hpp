@@ -23,18 +23,17 @@ public:
     const sm::Renderable& get_renderable() const { return m_renderable; }
     sm::Renderable& get_renderable() { return m_renderable; }
     int get_id() const { return m_id; }
-    int get_node_id() const { return m_node_id; }
     PieceType get_type() const { return m_type; }
-    bool get_active() const { return m_active; }
-
-    void set_node_id(int node_id) { m_node_id = node_id; }
-    void set_active(bool active) { m_active = active; }
 
     void update(sm::Ctx& ctx);
     void update_movement();
 
     void move_direct(glm::vec3 origin, glm::vec3 target, std::function<void()> on_finish);
     void move_three_step(glm::vec3 origin, glm::vec3 target0, glm::vec3 target1, glm::vec3 target, std::function<void()> on_finish);
+
+    bool active {true};
+    bool to_remove {false};
+    int node_id {-1};
 private:
     void direct_movement(glm::vec3 origin, glm::vec3 target, auto on_arrive);
     void direct_movement();
@@ -42,9 +41,7 @@ private:
     void finish_movement();
 
     int m_id {-1};
-    int m_node_id {-1};
     PieceType m_type {};
-    bool m_active {true};
 
     PieceMovement m_movement {PieceMovement::None};
     glm::vec3 m_origin {};

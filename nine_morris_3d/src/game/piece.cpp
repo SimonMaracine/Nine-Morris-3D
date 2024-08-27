@@ -12,7 +12,7 @@ PieceObj::PieceObj(int id, glm::vec3 position, const sm::Renderable& renderable,
 }
 
 void PieceObj::update(sm::Ctx& ctx) {
-    if (m_active) {
+    if (active) {
         ctx.add_renderable(m_renderable);
     }
 }
@@ -34,7 +34,7 @@ void PieceObj::move_direct(glm::vec3 origin, glm::vec3 target, std::function<voi
     m_movement = PieceMovement::Direct;
     m_origin = origin;
     m_target = target;
-    m_on_finish = on_finish;
+    m_on_finish = std::move(on_finish);
 }
 
 void PieceObj::move_three_step(glm::vec3 origin, glm::vec3 target0, glm::vec3 target1, glm::vec3 target, std::function<void()> on_finish) {
@@ -43,7 +43,7 @@ void PieceObj::move_three_step(glm::vec3 origin, glm::vec3 target0, glm::vec3 ta
     m_target0 = target0;
     m_target1 = target1;
     m_target = target;
-    m_on_finish = on_finish;
+    m_on_finish = std::move(on_finish);
 }
 
 void PieceObj::direct_movement(glm::vec3 origin, glm::vec3 target, auto on_arrive) {
@@ -90,6 +90,7 @@ void PieceObj::threestep_movement() {
 
 void PieceObj::finish_movement() {
     m_renderable.transform.position = m_target;
+    m_on_finish();
 
     m_movement = PieceMovement::None;
     m_origin = {};
@@ -98,4 +99,5 @@ void PieceObj::finish_movement() {
     m_target = {};
     m_reached_target0 = false;
     m_reached_target1 = false;
+    m_on_finish = {};
 }
