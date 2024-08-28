@@ -11,7 +11,7 @@
 
 #define PIECE(index) (index - 24)
 
-static constexpr float NODE_Y_POSITION = 0.063f;
+static constexpr float NODE_Y_POSITION {0.063f};
 static const glm::vec3 NODE_POSITIONS[24] {
     glm::vec3(2.046f, NODE_Y_POSITION, 2.062f),    // 0
     glm::vec3(-0.008f, NODE_Y_POSITION, 2.089f),   // 1
@@ -300,7 +300,7 @@ void StandardBoard::update_hovered_id(glm::vec3 ray, glm::vec3 camera) {
 
     for (const PieceObj& piece : m_pieces) {
         if (!(piece.active && !piece.to_remove)) {
-            return;
+            continue;
         }
 
         renderables.push_back(std::make_pair(piece.get_id(), piece.get_renderable()));
@@ -336,6 +336,23 @@ void StandardBoard::update_hovered_id(glm::vec3 ray, glm::vec3 camera) {
 
 void StandardBoard::update_nodes() {
     if (m_game_over != GameOver::None) {
+        std::for_each(m_nodes.begin(), m_nodes.end(), [](NodeObj& node) {
+            node.set_highlighted(false);
+        });
+
+        return;
+    }
+
+    /*
+        Highlight if:
+        first phase and not must take piece
+        second phase and piece selected and not must take piece
+    */
+    if (!(m_plies < 18 && m_user_stored_index2 == -1 || m_plies >= 18 && m_user_stored_index1 != -1 && m_user_stored_index2 == -1)) {
+        std::for_each(m_nodes.begin(), m_nodes.end(), [](NodeObj& node) {
+            node.set_highlighted(false);
+        });
+
         return;
     }
 
@@ -346,15 +363,39 @@ void StandardBoard::update_nodes() {
 
 void StandardBoard::update_pieces() {
     if (m_game_over != GameOver::None) {
+        std::for_each(m_pieces.begin(), m_pieces.end(), [](PieceObj& piece) {
+            piece.get_renderable().get_material()->flags &= ~sm::Material::Outline;
+        });
+
         return;
     }
 
+    /*
+        Highlight if:
+        must take piece and piece is opponent's piece and piece is on the board
+        second phase and piece is ours and not must take piece
+    */
     for (PieceObj& piece : m_pieces) {
-        if (piece.get_id() == m_hovered_id) {
+        const bool highlight {
+            m_user_stored_index2 != -1 && static_cast<Player>(piece.get_type()) != m_turn && piece.node_id != -1 ||
+            m_plies >= 18 && static_cast<Player>(piece.get_type()) == m_turn && m_user_stored_index2 == -1
+        };
+
+        if (piece.get_id() == m_hovered_id && highlight) {
             piece.get_renderable().get_material()->flags |= sm::Material::Outline;
-            piece.get_renderable().outline.color = glm::vec3(0.96f, 0.58f, 0.15f);  // TODO
+            piece.get_renderable().outline.color = glm::vec3(0.96f, 0.58f, 0.15f);
         } else {
             piece.get_renderable().get_material()->flags &= ~sm::Material::Outline;
+        }
+    }
+
+    // Override, if the piece is actually selected
+    if (m_user_stored_index1 != -1) {
+        const int piece_id {m_nodes[m_user_stored_index1].piece_id};
+
+        if (piece_id != -1) {
+            m_pieces[PIECE(piece_id)].get_renderable().get_material()->flags |= sm::Material::Outline;
+            m_pieces[PIECE(piece_id)].get_renderable().outline.color = glm::vec3(0.8f, 0.16f, 0.3f);
         }
     }
 }
@@ -363,8 +404,6 @@ void StandardBoard::select(int index) {
     if (m_user_stored_index1 == -1) {
         if (m_board[index] == static_cast<Piece>(m_turn)) {
             m_user_stored_index1 = index;
-            m_pieces[PIECE(m_nodes[index].piece_id)].get_renderable().get_material()->flags |= sm::Material::Outline;
-            m_pieces[PIECE(m_nodes[index].piece_id)].get_renderable().outline.color = glm::vec3(0.8f, 0.16f, 0.3f);
         }
     } else {
         if (index == m_user_stored_index1) {
@@ -374,8 +413,6 @@ void StandardBoard::select(int index) {
         } else if (m_board[index] == static_cast<Piece>(m_turn)) {
             if (m_user_stored_index2 == -1) {
                 m_user_stored_index1 = index;
-                m_pieces[PIECE(m_nodes[index].piece_id)].get_renderable().get_material()->flags |= sm::Material::Outline;
-                m_pieces[PIECE(m_nodes[index].piece_id)].get_renderable().outline.color = glm::vec3(0.8f, 0.16f, 0.3f);
             }
         }
     }
@@ -682,7 +719,7 @@ void StandardBoard::check_threefold_repetition(const Position& position) {
 }
 
 void StandardBoard::do_place_animation(PieceObj& piece, const NodeObj& node, std::function<void()> on_finish) {
-    const glm::vec3 origin {piece.get_renderable().transform.position};  // TODO make dry
+    const glm::vec3 origin {piece.get_renderable().transform.position};
     const glm::vec3 target0 {piece.get_renderable().transform.position.x, 0.75f, piece.get_renderable().transform.position.z};
     const glm::vec3 target1 {node.get_renderable().transform.position.x, 0.75f, node.get_renderable().transform.position.z};
     const glm::vec3 target {node.get_renderable().transform.position.x, 0.135f, node.get_renderable().transform.position.z};
