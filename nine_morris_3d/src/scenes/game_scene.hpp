@@ -5,6 +5,7 @@
 #include <nine_morris_3d_engine/nine_morris_3d.hpp>
 
 #include "point_camera_controller.hpp"
+#include "ui.hpp"
 #include "game/standard_board.hpp"
 
 struct GameScene : sm::ApplicationScene {
@@ -88,4 +89,6 @@ struct GameScene : sm::ApplicationScene {
     // bool blur {false};
     // bool outline {true};
     // bool color_correction {true};
+
+    Ui ui;
 };

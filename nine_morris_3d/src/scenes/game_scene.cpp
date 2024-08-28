@@ -128,7 +128,9 @@ void GameScene::on_update() {
     //     if (brick) ctx.add_renderable(brick);
     // }
 
-    ctx.show_info_text();
+    if (ui.get_show_information()) {
+        ctx.show_info_text();
+    }
 
     // {
     //     ctx.add_text(text1);
@@ -211,6 +213,7 @@ void GameScene::on_fixed_update() {
 }
 
 void GameScene::on_imgui_update() {
+    ui.update(ctx);
     board.debug();
 
     // ImGui::Begin("Features");
