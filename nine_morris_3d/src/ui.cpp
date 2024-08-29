@@ -2,11 +2,16 @@
 
 #include <nine_morris_3d_engine/external/imgui.h++>
 
+#include "global.hpp"
+#include "enums.hpp"
+
 void Ui::update(sm::Ctx& ctx) {
     main_menu_bar(ctx);
 }
 
 void Ui::main_menu_bar(sm::Ctx& ctx) {
+    auto& g {ctx.global<Global>()};
+
     if (ImGui::BeginMainMenuBar()) {
         const bool enabled {true};
 
@@ -34,7 +39,7 @@ void Ui::main_menu_bar(sm::Ctx& ctx) {
                 // last_save_game_date = ctime(&current);
             }
             if (ImGui::BeginMenu("Game Mode", enabled)) {
-                if (ImGui::RadioButton("Standard Game", &m_game_mode, 0)) {
+                if (ImGui::RadioButton("Standard Game", &m_options.game_mode, static_cast<int>(GameMode::Standard))) {
                     // if (data.imgui_option.scene != data.options.scene) {
                     //     data.options.scene = data.imgui_option.scene;
                     //     ctx->change_scene("standard_game"_H);
@@ -42,7 +47,7 @@ void Ui::main_menu_bar(sm::Ctx& ctx) {
                     //     LOG_INFO("Changed scene to standard game");
                     // }
                 }
-                if (ImGui::RadioButton("Jump Variant", &m_game_mode, 1)) {
+                if (ImGui::RadioButton("Jump Variant", &m_options.game_mode, static_cast<int>(GameMode::Jump))) {
                     // if (data.imgui_option.scene != data.options.scene) {
                     //     data.options.scene = data.imgui_option.scene;
                     //     ctx->change_scene("jump_variant"_H);
@@ -50,7 +55,7 @@ void Ui::main_menu_bar(sm::Ctx& ctx) {
                     //     LOG_INFO("Changed scene to jump variant");
                     // }
                 }
-                if (ImGui::RadioButton("Jump Plus Variant", &m_game_mode, 2)) {
+                if (ImGui::RadioButton("Jump Plus Variant", &m_options.game_mode, static_cast<int>(GameMode::JumpPlus))) {
                     // if (data.imgui_option.scene != data.options.scene) {
                     //     data.options.scene = data.imgui_option.scene;
                     //     ctx->change_scene("jump_plus_variant"_H);
@@ -63,7 +68,7 @@ void Ui::main_menu_bar(sm::Ctx& ctx) {
             }
             if (ImGui::BeginMenu("Players", enabled)) {
                 if (ImGui::BeginMenu("White")) {
-                    if (ImGui::RadioButton("Human", &m_white_player, 0)) {
+                    if (ImGui::RadioButton("Human", &m_options.white_player, static_cast<int>(PlayerType::Human))) {
                         // game.white_player = GamePlayer::Human;
 
                         // if (game.state != GameState::Stop) {
@@ -72,7 +77,7 @@ void Ui::main_menu_bar(sm::Ctx& ctx) {
 
                         // LOG_INFO("Set white player to human");
                     }
-                    if (ImGui::RadioButton("Computer", &m_white_player, 1)) {
+                    if (ImGui::RadioButton("Computer", &m_options.white_player, static_cast<int>(PlayerType::Computer))) {
                         // game.white_player = GamePlayer::Computer;
 
                         // if (game.state != GameState::Stop) {
@@ -85,7 +90,7 @@ void Ui::main_menu_bar(sm::Ctx& ctx) {
                     ImGui::EndMenu();
                 }
                 if (ImGui::BeginMenu("Black")) {
-                    if (ImGui::RadioButton("Human", &m_black_player, 0)) {
+                    if (ImGui::RadioButton("Human", &m_options.black_player, static_cast<int>(PlayerType::Human))) {
                         // game.black_player = GamePlayer::Human;
 
                         // if (game.state != GameState::Stop) {
@@ -94,7 +99,7 @@ void Ui::main_menu_bar(sm::Ctx& ctx) {
 
                         // LOG_INFO("Set black player to human");
                     }
-                    if (ImGui::RadioButton("Computer", &m_black_player, 1)) {
+                    if (ImGui::RadioButton("Computer", &m_options.black_player, static_cast<int>(PlayerType::Computer))) {
                         // game.black_player = GamePlayer::Computer;
 
                         // if (game.state != GameState::Stop) {
@@ -129,18 +134,12 @@ void Ui::main_menu_bar(sm::Ctx& ctx) {
         }
         if (ImGui::BeginMenu("Options")) {
             if (ImGui::BeginMenu("Graphics")) {
-                if (ImGui::MenuItem("VSync", nullptr, &m_vsync)) {
-                    // if (data.options.vsync) {
-                    //     ctx->window->set_vsync(data.options.vsync);
+                if (ImGui::MenuItem("VSync", nullptr, &m_options.vsync)) {
+                    g.options.vsync = m_options.vsync;
 
-                    //     LOG_INFO("VSync enabled");
-                    // } else {
-                    //     ctx->window->set_vsync(data.options.vsync);
-
-                    //     LOG_INFO("VSync disabled");
-                    // }
+                    ctx.set_window_vsync(g.options.vsync ? 1 : 0);
                 }
-                if (ImGui::MenuItem("Custom Cursor", nullptr, &m_custom_cursor)) {
+                if (ImGui::MenuItem("Custom Cursor", nullptr, &m_options.custom_cursor)) {
                     // if (data.options.custom_cursor) {
                     //     if (get_board().must_take_piece) {
                     //         ctx->window->set_cursor("cross"_H);
@@ -161,7 +160,7 @@ void Ui::main_menu_bar(sm::Ctx& ctx) {
             if (ImGui::BeginMenu("Audio")) {
                 if (ImGui::BeginMenu("Master Volume")) {
                     ImGui::PushItemWidth(100.0f);  // TODO DPI scale
-                    if (ImGui::SliderFloat("##", &m_master_volume, 0.0f, 1.0f, "%.01f")) {
+                    if (ImGui::SliderFloat("##", &m_options.master_volume, 0.0f, 1.0f, "%.01f")) {
                         // ctx->snd->get_listener().set_gain(data.options.master_volume);
 
                         // LOG_INFO("Changed master volume to {}", data.options.master_volume);
@@ -172,7 +171,7 @@ void Ui::main_menu_bar(sm::Ctx& ctx) {
                 }
                 if (ImGui::BeginMenu("Music Volume")) {
                     ImGui::PushItemWidth(100.0f);
-                    if (ImGui::SliderFloat("##", &m_music_volume, 0.0f, 1.0f, "%.01f")) {
+                    if (ImGui::SliderFloat("##", &m_options.music_volume, 0.0f, 1.0f, "%.01f")) {
                         // sm::music::set_music_gain(data.options.music_volume);
 
                         // LOG_INFO("Changed music volume to {}", data.options.music_volume);
@@ -181,7 +180,7 @@ void Ui::main_menu_bar(sm::Ctx& ctx) {
 
                     ImGui::EndMenu();
                 }
-                if (ImGui::MenuItem("Enable Music", nullptr, &m_enable_music)) {
+                if (ImGui::MenuItem("Enable Music", nullptr, &m_options.enable_music)) {
                     // if (data.options.enable_music) {
                     //     auto& data = ctx->data<Data>();
 
@@ -200,7 +199,7 @@ void Ui::main_menu_bar(sm::Ctx& ctx) {
             if (ImGui::MenuItem("Computer AI")) {
                 // window = WindowImGui::ShowAiSettings;
             }
-            if (ImGui::MenuItem("Save On Exit", nullptr, &m_save_on_exit)) {
+            if (ImGui::MenuItem("Save On Exit", nullptr, &m_options.save_on_exit)) {
                 // if (data.options.save_on_exit) {
                 //     LOG_INFO("The game will be saved on exit");
                 // } else {
@@ -213,7 +212,7 @@ void Ui::main_menu_bar(sm::Ctx& ctx) {
                     ImGui::RadioButton("Field", false);
                     ImGui::RadioButton("Autumn", false);
                 } else {
-                    if (ImGui::RadioButton("None", &m_skybox, 0)) {
+                    if (ImGui::RadioButton("None", &m_options.skybox, static_cast<int>(Skybox::None))) {
                         // if (data.imgui_option.skybox != data.options.skybox) {
                         //     data.options.skybox = data.imgui_option.skybox;
                         //     set_skybox(Skybox::None);
@@ -221,7 +220,7 @@ void Ui::main_menu_bar(sm::Ctx& ctx) {
                         //     LOG_INFO("Skybox set to None");
                         // }
                     }
-                    if (ImGui::RadioButton("Field", &m_skybox, 1)) {
+                    if (ImGui::RadioButton("Field", &m_options.skybox, static_cast<int>(Skybox::Field))) {
                         // if (data.imgui_option.skybox != data.options.skybox) {
                         //     data.options.skybox = data.imgui_option.skybox;
                         //     set_skybox(Skybox::Field);
@@ -229,7 +228,7 @@ void Ui::main_menu_bar(sm::Ctx& ctx) {
                         //     LOG_INFO("Skybox set to Field");
                         // }
                     }
-                    if (ImGui::RadioButton("Autumn", &m_skybox, 2)) {
+                    if (ImGui::RadioButton("Autumn", &m_options.skybox, static_cast<int>(Skybox::Autumn))) {
                         // if (data.imgui_option.skybox != data.options.skybox) {
                         //     data.options.skybox = data.imgui_option.skybox;
                         //     set_skybox(Skybox::Autumn);
@@ -244,7 +243,7 @@ void Ui::main_menu_bar(sm::Ctx& ctx) {
             ImGui::MenuItem("Show Information", nullptr, &m_show_information);
             if (ImGui::BeginMenu("Camera Sensitivity")) {
                 ImGui::PushItemWidth(100.0f);
-                if (ImGui::SliderFloat("##", &m_camera_sensitivity, 0.5f, 2.0f, "%.01f", ImGuiSliderFlags_Logarithmic)) {
+                if (ImGui::SliderFloat("##", &m_options.camera_sensitivity, 0.5f, 2.0f, "%.01f", ImGuiSliderFlags_Logarithmic)) {
                     // camera_controller.sensitivity = data.options.sensitivity;
 
                     // LOG_INFO("Changed camera sensitivity to {}", camera_controller.sensitivity);
@@ -254,7 +253,7 @@ void Ui::main_menu_bar(sm::Ctx& ctx) {
                 ImGui::EndMenu();
             }
             if (ImGui::BeginMenu("User Interface")) {
-                if (ImGui::MenuItem("Hide Timer", nullptr, &m_hide_timer)) {
+                if (ImGui::MenuItem("Hide Timer", nullptr, &m_options.hide_timer)) {
                     // auto& data = ctx->data<Data>();
 
                     // if (data.options.hide_timer) {
@@ -270,7 +269,7 @@ void Ui::main_menu_bar(sm::Ctx& ctx) {
 
                 ImGui::EndMenu();
             }
-            if (ImGui::MenuItem("Labeled Board", nullptr, &m_labeled_board)) {
+            if (ImGui::MenuItem("Labeled Board", nullptr, &m_options.labeled_board)) {
                 // if (data.imgui_option.labeled_board != data.options.labeled_board) {
                 //     data.options.labeled_board = data.imgui_option.labeled_board;
                 //     set_board_paint_texture();

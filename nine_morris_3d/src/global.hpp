@@ -2,6 +2,8 @@
 
 #include <nine_morris_3d_engine/nine_morris_3d.hpp>
 
-struct Global {
+#include "options.hpp"
 
+struct Global {
+    Options options;
 };

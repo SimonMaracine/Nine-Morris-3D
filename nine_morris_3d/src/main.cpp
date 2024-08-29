@@ -13,6 +13,7 @@
 #include "scenes/game_scene.hpp"
 #include "game.hpp"
 #include "global.hpp"
+#include "ver.hpp"
 
 struct Paths {
     std::string logs;
@@ -75,9 +76,9 @@ int application_main() {
             properties.height = 576;
             properties.min_width = 512;
             properties.min_height = 288;
-            properties.version_major = 0;
-            properties.version_minor = 4;
-            properties.version_patch = 0;
+            properties.version_major = VERSION_MAJOR;
+            properties.version_minor = VERSION_MINOR;
+            properties.version_patch = VERSION_PATCH;
             properties.path_logs = paths.logs;
             properties.path_saved_data = paths.saved_data;
             properties.path_assets = paths.assets;
