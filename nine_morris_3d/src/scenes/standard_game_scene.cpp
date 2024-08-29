@@ -79,6 +79,8 @@ void StandardGameScene::on_start() {
     setup_lights();
     setup_renderables();
 
+    ui.initialize(ctx);
+
     // ctx.set_color_correction(color_correction);
 }
 

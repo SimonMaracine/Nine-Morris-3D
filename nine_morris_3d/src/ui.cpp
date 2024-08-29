@@ -1,9 +1,16 @@
 #include "ui.hpp"
 
 #include <nine_morris_3d_engine/external/imgui.h++>
+#include <nine_morris_3d_engine/external/glm.h++>
 
 #include "global.hpp"
 #include "enums.hpp"
+
+void Ui::initialize(sm::Ctx& ctx) {
+    auto& g {ctx.global<Global>()};
+
+    set_scale(ctx, g.options.scale);
+}
 
 void Ui::update(sm::Ctx& ctx, GameScene& game_scene) {
     main_menu_bar(ctx, game_scene);
@@ -132,6 +139,20 @@ void Ui::main_menu_bar(sm::Ctx& ctx, GameScene& game_scene) {
         }
         if (ImGui::BeginMenu("Options")) {
             if (ImGui::BeginMenu("Graphics")) {
+                if (ImGui::BeginMenu("Scale")) {
+                    if (ImGui::RadioButton("100%", &m_options.scale, 1)) {
+                        g.options.scale = m_options.scale;
+
+                        set_scale_task(ctx, g.options.scale);
+                    }
+                    if (ImGui::RadioButton("200%", &m_options.scale, 2)) {
+                        g.options.scale = m_options.scale;
+
+                        set_scale_task(ctx, g.options.scale);
+                    }
+
+                    ImGui::EndMenu();
+                }
                 if (ImGui::MenuItem("VSync", nullptr, &m_options.vsync)) {
                     g.options.vsync = m_options.vsync;
 
@@ -307,4 +328,58 @@ void Ui::main_menu_bar(sm::Ctx& ctx, GameScene& game_scene) {
 
         ImGui::EndMainMenuBar();
     }
+}
+
+void Ui::set_scale_task(sm::Ctx& ctx, int scale) {
+    ctx.add_task([this, &ctx, scale](const sm::Task&, void*) {
+        set_scale(ctx, scale);
+
+        return sm::Task::Result::Done;
+    });
+}
+
+void Ui::set_scale(sm::Ctx& ctx, int scale) {
+    create_font(ctx, scale);
+    set_style();
+
+    ImGuiStyle& style {ImGui::GetStyle()};
+    style.ScaleAllSizes(static_cast<float>(scale));
+}
+
+void Ui::create_font(sm::Ctx& ctx, int scale) {
+    const float font_size {glm::floor(22.0f * static_cast<float>(scale))};
+
+    ImGuiIO& io {ImGui::GetIO()};
+
+    // This is very needed :P
+    io.Fonts->Clear();
+
+    ImFontGlyphRangesBuilder builder;
+    builder.AddRanges(io.Fonts->GetGlyphRangesDefault());
+    builder.AddText(reinterpret_cast<const char*>(u8"ă"));
+    ImVector<ImWchar> ranges;
+    builder.BuildRanges(&ranges);
+
+    const auto font {io.Fonts->AddFontFromFileTTF(
+        ctx.path_assets("fonts/OpenSans/OpenSans-Semibold.ttf").c_str(),
+        font_size,
+        nullptr,
+        ranges.Data
+    )};
+
+    io.FontDefault = font;
+    io.Fonts->Build();
+
+    ctx.invalidate_dear_imgui_texture();
+}
+
+void Ui::set_style() {
+    ImGuiStyle& style {ImGui::GetStyle()};
+
+    style = {};
+    // TODO
+}
+
+float Ui::rem(float size) {
+    return ImGui::GetFontSize() * size;
 }

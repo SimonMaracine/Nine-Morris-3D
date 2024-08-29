@@ -8,6 +8,7 @@
 #include "nine_morris_3d_engine/application/scene.hpp"
 #include "nine_morris_3d_engine/application/logging.hpp"
 #include "nine_morris_3d_engine/audio/openal/debug.hpp"
+#include "nine_morris_3d_engine/graphics/internal/imgui_context.hpp"
 #include "nine_morris_3d_engine/graphics/opengl/debug.hpp"
 #include "nine_morris_3d_engine/other/dependencies.hpp"
 #include "nine_morris_3d_engine/other/utilities.hpp"
@@ -229,6 +230,10 @@ namespace sm {
 
     void Ctx::debug_add_lamp(glm::vec3 position, glm::vec3 color) {
         m_scn.debug_add_lamp(position, color);
+    }
+
+    void Ctx::invalidate_dear_imgui_texture() noexcept {
+        internal::imgui_context::invalidate_texture();
     }
 
     void Ctx::change_scene(Id id, bool clear_resources) noexcept {

@@ -192,6 +192,10 @@ namespace sm::internal {
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
     }
 
+    void imgui_context::invalidate_texture() noexcept {
+        ImGui_ImplOpenGL3_DestroyFontsTexture();
+    }
+
     bool imgui_context::on_mouse_wheel_scrolled(float yoffset) noexcept {
         ImGuiIO& io {ImGui::GetIO()};
         io.AddMouseWheelEvent(0.0f, yoffset);

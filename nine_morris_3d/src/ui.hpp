@@ -11,9 +11,16 @@ class Ui {
 public:
     bool get_show_information() const { return m_show_information; }
 
+    void initialize(sm::Ctx& ctx);
     void update(sm::Ctx& ctx, GameScene& game_scene);
 private:
     void main_menu_bar(sm::Ctx& ctx, GameScene& game_scene);
+
+    void set_scale_task(sm::Ctx& ctx, int scale);
+    void set_scale(sm::Ctx& ctx, int scale);
+    void create_font(sm::Ctx& ctx, int scale);
+    void set_style();
+    static float rem(float size);
 
     // Local options data
     // When changed, update the options from the global data

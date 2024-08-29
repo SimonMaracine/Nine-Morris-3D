@@ -144,6 +144,9 @@ namespace sm {
         void debug_add_point(glm::vec3 position, glm::vec3 color);
         void debug_add_lamp(glm::vec3 position, glm::vec3 color);
 
+        // Dear ImGui
+        static void invalidate_dear_imgui_texture() noexcept;
+
         // Context
         void change_scene(Id id, bool clear_resources = false) noexcept;
         void show_information_text();

@@ -10,6 +10,8 @@ namespace sm::internal {
         void begin_frame() noexcept;
         void end_frame() noexcept;
 
+        void invalidate_texture() noexcept;
+
         bool on_mouse_wheel_scrolled(float yoffset) noexcept;
         bool on_mouse_moved(float xpos, float ypos) noexcept;
         bool on_mouse_button_pressed(int button) noexcept;
