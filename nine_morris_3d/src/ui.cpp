@@ -5,11 +5,11 @@
 #include "global.hpp"
 #include "enums.hpp"
 
-void Ui::update(sm::Ctx& ctx) {
-    main_menu_bar(ctx);
+void Ui::update(sm::Ctx& ctx, GameScene& game_scene) {
+    main_menu_bar(ctx, game_scene);
 }
 
-void Ui::main_menu_bar(sm::Ctx& ctx) {
+void Ui::main_menu_bar(sm::Ctx& ctx, GameScene& game_scene) {
     auto& g {ctx.global<Global>()};
 
     if (ImGui::BeginMainMenuBar()) {
@@ -17,9 +17,7 @@ void Ui::main_menu_bar(sm::Ctx& ctx) {
 
         if (ImGui::BeginMenu("Game")) {
             if (ImGui::MenuItem("New Game", nullptr, false, enabled)) {
-                // ctx->change_scene(ctx->get_current_scene()->get_id());
-
-                // LOG_INFO("Restarted current game");
+                ctx.change_scene(dynamic_cast<sm::ApplicationScene&>(game_scene).get_id());
             }
             if (ImGui::MenuItem("Load Last Game", nullptr, false, enabled)) {
                 // if (last_save_game_date == save_load::NO_LAST_GAME) {
@@ -200,11 +198,7 @@ void Ui::main_menu_bar(sm::Ctx& ctx) {
                 // window = WindowImGui::ShowAiSettings;
             }
             if (ImGui::MenuItem("Save On Exit", nullptr, &m_options.save_on_exit)) {
-                // if (data.options.save_on_exit) {
-                //     LOG_INFO("The game will be saved on exit");
-                // } else {
-                //     LOG_INFO("The game will not be saved on exit");
-                // }
+                g.options.save_on_exit = m_options.save_on_exit;
             }
             if (ImGui::BeginMenu("Skybox")) {
                 if (m_loading_skybox) {
@@ -244,9 +238,9 @@ void Ui::main_menu_bar(sm::Ctx& ctx) {
             if (ImGui::BeginMenu("Camera Sensitivity")) {
                 ImGui::PushItemWidth(100.0f);
                 if (ImGui::SliderFloat("##", &m_options.camera_sensitivity, 0.5f, 2.0f, "%.01f", ImGuiSliderFlags_Logarithmic)) {
-                    // camera_controller.sensitivity = data.options.sensitivity;
+                    g.options.camera_sensitivity = m_options.camera_sensitivity;
 
-                    // LOG_INFO("Changed camera sensitivity to {}", camera_controller.sensitivity);
+                    game_scene.get_camera_controller().sensitivity = g.options.camera_sensitivity;;
                 }
                 ImGui::PopItemWidth();
 
@@ -302,12 +296,10 @@ void Ui::main_menu_bar(sm::Ctx& ctx) {
                 ImGui::EndMenu();
             }
             if (ImGui::MenuItem("Log Information")) {
-                // sm::logging::log_general_information(sm::logging::LogTarget::File);
-
-                // LOG_INFO("Logged OpenGL and dependencies information");
+                sm::utils::write_file(ctx.path_logs("information.txt"), ctx.get_information(), true);
             }
             if (ImGui::IsItemHovered()) {
-                ImGui::SetTooltip("%s", ctx.path_logs("some_file.txt").c_str());
+                ImGui::SetTooltip("%s", ctx.path_logs("information.txt").c_str());
             }
 
             ImGui::EndMenu();

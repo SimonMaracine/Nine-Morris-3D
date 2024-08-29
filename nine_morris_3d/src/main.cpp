@@ -10,7 +10,7 @@
 #include <nine_morris_3d_engine/external/resmanager.h++>
 
 #include "scenes/loading_scene.hpp"
-#include "scenes/game_scene.hpp"
+#include "scenes/standard_game_scene.hpp"
 #include "game.hpp"
 #include "global.hpp"
 #include "ver.hpp"
@@ -91,7 +91,7 @@ int application_main() {
             try {
                 sm::Application game {properties};
                 game.add_scene<LoadingScene>();
-                game.add_scene<GameScene>();
+                game.add_scene<StandardGameScene>();
                 game.set_global_data<Global>();
                 exit_code = game.run("loading"_H, functions);
             } catch (const sm::RuntimeError& e) {  // FIXME once an exception from a thread managed to not be caught; don't know how; seems to be working now

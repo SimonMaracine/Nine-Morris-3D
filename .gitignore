@@ -2,7 +2,7 @@
 build
 build_dist
 *.log
-*info.txt
+*information.txt
 imgui.ini
 *.blend1
 bitmap_*.png

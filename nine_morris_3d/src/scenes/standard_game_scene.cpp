@@ -1,4 +1,4 @@
-#include "scenes/game_scene.hpp"
+#include "scenes/standard_game_scene.hpp"
 
 #include <nine_morris_3d_engine/external/resmanager.h++>
 #include <nine_morris_3d_engine/external/imgui.h++>
@@ -8,7 +8,7 @@
 #include "game.hpp"
 #include "game/ray.hpp"
 
-void GameScene::on_start() {
+void StandardGameScene::on_start() {
     // ctx.add_task([this](const sm::Task& task, void*) {
     //     if (task.get_total_time() > 3.0) {
     //         LOG_INFO("Three second task done");
@@ -52,9 +52,9 @@ void GameScene::on_start() {
     //     async_task.set_done();
     // });
 
-    ctx.connect_event<sm::WindowResizedEvent, &GameScene::on_window_resized>(this);
-    ctx.connect_event<sm::KeyReleasedEvent, &GameScene::on_key_released>(this);
-    ctx.connect_event<sm::MouseButtonReleasedEvent, &GameScene::on_mouse_button_released>(this);
+    ctx.connect_event<sm::WindowResizedEvent, &StandardGameScene::on_window_resized>(this);
+    ctx.connect_event<sm::KeyReleasedEvent, &StandardGameScene::on_key_released>(this);
+    ctx.connect_event<sm::MouseButtonReleasedEvent, &StandardGameScene::on_mouse_button_released>(this);
 
     ctx.set_clear_color(glm::vec3(0.1f, 0.1f, 0.1f));
 
@@ -82,12 +82,12 @@ void GameScene::on_start() {
     // ctx.set_color_correction(color_correction);
 }
 
-void GameScene::on_stop() {
+void StandardGameScene::on_stop() {
     cam_controller.disconnect_events(ctx);
     ctx.disconnect_events(this);
 }
 
-void GameScene::on_update() {
+void StandardGameScene::on_update() {
     cam_controller.update_controls(ctx.get_delta(), ctx);
     cam_controller.update_camera(ctx.get_delta());
 
@@ -129,7 +129,7 @@ void GameScene::on_update() {
     // }
 
     if (ui.get_show_information()) {
-        ctx.show_info_text();
+        ctx.show_information_text();
     }
 
     // {
@@ -207,13 +207,13 @@ void GameScene::on_update() {
     ctx.shadow(shadow_box);
 }
 
-void GameScene::on_fixed_update() {
+void StandardGameScene::on_fixed_update() {
     cam_controller.update_friction();
     board.update_movement();
 }
 
-void GameScene::on_imgui_update() {
-    ui.update(ctx);
+void StandardGameScene::on_imgui_update() {
+    ui.update(ctx, *this);
     board.debug();
 
     // ImGui::Begin("Features");
@@ -241,12 +241,16 @@ void GameScene::on_imgui_update() {
     // ctx.add_task()
 }
 
-void GameScene::on_window_resized(const sm::WindowResizedEvent& event) {
+PointCameraController& StandardGameScene::get_camera_controller() {
+    return cam_controller;
+}
+
+void StandardGameScene::on_window_resized(const sm::WindowResizedEvent& event) {
     cam.set_projection(event.width, event.height, LENS_FOV, LENS_NEAR, LENS_FAR);
     cam_2d.set_projection(0, event.width, 0, event.height);
 }
 
-void GameScene::on_key_released(const sm::KeyReleasedEvent& event) {
+void StandardGameScene::on_key_released(const sm::KeyReleasedEvent& event) {
     // switch (event.key) {
     //     case sm::Key::Escape:
     //         ctx.change_scene("game"_H);
@@ -272,13 +276,13 @@ void GameScene::on_key_released(const sm::KeyReleasedEvent& event) {
     // }
 }
 
-void GameScene::on_mouse_button_released(const sm::MouseButtonReleasedEvent& event) {
+void StandardGameScene::on_mouse_button_released(const sm::MouseButtonReleasedEvent& event) {
     if (event.button == sm::MouseButton::Left) {
         board.user_click();
     }
 }
 
-void GameScene::setup_skybox() {
+void StandardGameScene::setup_skybox() {
     field = ctx.load_texture_cubemap(
         "field"_H,
         {
@@ -293,14 +297,14 @@ void GameScene::setup_skybox() {
     );
 }
 
-void GameScene::setup_lights() {
+void StandardGameScene::setup_lights() {
     directional_light.direction = glm::normalize(glm::vec3(-0.2f, -1.0f, -0.3f));
     directional_light.ambient_color = glm::vec3(0.1f);
     directional_light.diffuse_color = glm::vec3(0.9f);
     directional_light.specular_color = glm::vec3(1.0f);
 }
 
-void GameScene::setup_renderables() {
+void StandardGameScene::setup_renderables() {
     const auto renderable_board {setup_board()};
     const auto renderable_board_paint {setup_board_paint()};
     const auto renderable_nodes {setup_nodes()};
@@ -310,7 +314,7 @@ void GameScene::setup_renderables() {
     board = StandardBoard(renderable_board, renderable_board_paint, renderable_nodes, renderable_white_pieces, renderable_black_pieces);
 }
 
-sm::Renderable GameScene::setup_board() {
+sm::Renderable StandardGameScene::setup_board() {
     const auto mesh {ctx.get_mesh("board.obj"_H)};
 
     const auto vertex_array {ctx.load_vertex_array("board"_H, mesh)};
@@ -343,7 +347,7 @@ sm::Renderable GameScene::setup_board() {
     return sm::Renderable(mesh, vertex_array, material_instance);
 }
 
-sm::Renderable GameScene::setup_board_paint() {
+sm::Renderable StandardGameScene::setup_board_paint() {
     const auto mesh {ctx.get_mesh("board_paint.obj"_H)};
 
     const auto vertex_array {ctx.load_vertex_array("board_paint"_H, mesh)};
@@ -381,7 +385,7 @@ sm::Renderable GameScene::setup_board_paint() {
     return sm::Renderable(mesh, vertex_array, material_instance);
 }
 
-std::vector<sm::Renderable> GameScene::setup_nodes() {
+std::vector<sm::Renderable> StandardGameScene::setup_nodes() {
     const auto mesh {ctx.get_mesh("node.obj"_H)};
 
     const auto vertex_array {ctx.load_vertex_array("node"_H, mesh)};
@@ -402,7 +406,7 @@ std::vector<sm::Renderable> GameScene::setup_nodes() {
     return renderables;
 }
 
-std::vector<sm::Renderable> GameScene::setup_white_pieces() {
+std::vector<sm::Renderable> StandardGameScene::setup_white_pieces() {
     const auto mesh {ctx.get_mesh("piece_white.obj"_H)};
 
     const auto vertex_array {ctx.load_vertex_array("piece_white"_H, mesh)};
@@ -441,7 +445,7 @@ std::vector<sm::Renderable> GameScene::setup_white_pieces() {
     return renderables;
 }
 
-std::vector<sm::Renderable> GameScene::setup_black_pieces() {
+std::vector<sm::Renderable> StandardGameScene::setup_black_pieces() {
     const auto mesh {ctx.get_mesh("piece_black.obj"_H)};
 
     const auto vertex_array {ctx.load_vertex_array("piece_black"_H, mesh)};
@@ -480,7 +484,7 @@ std::vector<sm::Renderable> GameScene::setup_black_pieces() {
     return renderables;
 }
 
-// void GameScene::setup_skybox(
+// void StandardGameScene::setup_skybox(
 //     std::shared_ptr<sm::TextureData> px,
 //     std::shared_ptr<sm::TextureData> nx,
 //     std::shared_ptr<sm::TextureData> py,
@@ -495,7 +499,7 @@ std::vector<sm::Renderable> GameScene::setup_black_pieces() {
 //     );
 // }
 
-// void GameScene::setup_ground(std::shared_ptr<sm::Mesh> mesh) {
+// void StandardGameScene::setup_ground(std::shared_ptr<sm::Mesh> mesh) {
 //     const auto vertex_array {ctx.load_vertex_array("ground"_H, mesh)};
 
 //     const auto material {ctx.load_material(sm::MaterialType::PhongShadow, sm::Material::CastShadow)};
@@ -510,7 +514,7 @@ std::vector<sm::Renderable> GameScene::setup_black_pieces() {
 //     ground.transform.scale = 2.0f;
 // }
 
-// void GameScene::setup_dragon(std::shared_ptr<sm::Mesh> mesh) {
+// void StandardGameScene::setup_dragon(std::shared_ptr<sm::Mesh> mesh) {
 //     const auto vertex_array {ctx.load_vertex_array("dragon"_H, mesh)};
 
 //     const auto material {ctx.load_material(sm::MaterialType::PhongShadow, sm::Material::CastShadow)};
@@ -540,7 +544,7 @@ std::vector<sm::Renderable> GameScene::setup_black_pieces() {
 //     }
 // }
 
-// void GameScene::setup_teapot(std::shared_ptr<sm::Mesh> mesh) {
+// void StandardGameScene::setup_teapot(std::shared_ptr<sm::Mesh> mesh) {
 //     const auto vertex_array {ctx.load_vertex_array("teapot"_H, mesh)};
 
 //     const auto material {ctx.load_material(sm::MaterialType::PhongShadow, sm::Material::CastShadow)};
@@ -556,7 +560,7 @@ std::vector<sm::Renderable> GameScene::setup_black_pieces() {
 //     teapot.transform.rotation = glm::vec3(0.0f, 5.3f, 0.0f);
 // }
 
-// void GameScene::setup_cube(std::shared_ptr<sm::Mesh> mesh) {
+// void StandardGameScene::setup_cube(std::shared_ptr<sm::Mesh> mesh) {
 //     const auto vertex_array {ctx.load_vertex_array("cube"_H, mesh)};
 
 //     const auto material {ctx.load_material(sm::MaterialType::PhongShadow, sm::Material::CastShadow)};
@@ -571,7 +575,7 @@ std::vector<sm::Renderable> GameScene::setup_black_pieces() {
 //     cube.transform.scale = 0.8f;
 // }
 
-// void GameScene::setup_brick(std::shared_ptr<sm::Mesh> mesh, std::shared_ptr<sm::TextureData> texture_data) {
+// void StandardGameScene::setup_brick(std::shared_ptr<sm::Mesh> mesh, std::shared_ptr<sm::TextureData> texture_data) {
 //     const auto vertex_array {ctx.load_vertex_array("brick"_H, mesh)};
 
 //     const auto material {ctx.load_material(sm::MaterialType::PhongDiffuseShadow, sm::Material::CastShadow)};
@@ -595,7 +599,7 @@ std::vector<sm::Renderable> GameScene::setup_black_pieces() {
 //     brick.transform.rotation = glm::vec3(10.0f);
 // }
 
-// void GameScene::setup_lamp(std::shared_ptr<sm::Mesh> mesh_stand, std::shared_ptr<sm::TextureData> texture_data_stand, std::shared_ptr<sm::Mesh> mesh_bulb) {
+// void StandardGameScene::setup_lamp(std::shared_ptr<sm::Mesh> mesh_stand, std::shared_ptr<sm::TextureData> texture_data_stand, std::shared_ptr<sm::Mesh> mesh_bulb) {
 //     {
 //         const auto vertex_array {ctx.load_vertex_array("lamp_stand"_H, mesh_stand)};
 
@@ -632,7 +636,7 @@ std::vector<sm::Renderable> GameScene::setup_black_pieces() {
 //     }
 // }
 
-// void GameScene::setup_barrel(std::shared_ptr<sm::Mesh> mesh, std::shared_ptr<sm::TextureData> texture_data_diffuse, std::shared_ptr<sm::TextureData> texture_data_normal) {
+// void StandardGameScene::setup_barrel(std::shared_ptr<sm::Mesh> mesh, std::shared_ptr<sm::TextureData> texture_data_diffuse, std::shared_ptr<sm::TextureData> texture_data_normal) {
 //     const auto vertex_array {ctx.load_vertex_array("barrel"_H, mesh)};
 
 //     const auto material {ctx.load_material(sm::MaterialType::PhongDiffuseNormalShadow, sm::Material::CastShadow)};
@@ -663,7 +667,7 @@ std::vector<sm::Renderable> GameScene::setup_black_pieces() {
 //     barrel.transform.scale = 0.5f;
 // }
 
-// void GameScene::setup_textured_bricks(std::shared_ptr<sm::Mesh> mesh, std::shared_ptr<sm::TextureData> texture_data) {
+// void StandardGameScene::setup_textured_bricks(std::shared_ptr<sm::Mesh> mesh, std::shared_ptr<sm::TextureData> texture_data) {
 //     const auto vertex_array {ctx.load_vertex_array("brick"_H, mesh)};
 
 //     const auto material {ctx.load_material(sm::MaterialType::PhongDiffuseShadow, sm::Material::CastShadow)};
@@ -689,7 +693,7 @@ std::vector<sm::Renderable> GameScene::setup_black_pieces() {
 //     }
 // }
 
-// void GameScene::setup_texts() {
+// void StandardGameScene::setup_texts() {
 //     sm::FontSpecification specification;
 //     specification.bitmap_size = 512;
 //     specification.size_height = 40.0f;
@@ -724,7 +728,7 @@ std::vector<sm::Renderable> GameScene::setup_black_pieces() {
 //     text4.font = sans;
 // }
 
-// void GameScene::setup_quads() {
+// void StandardGameScene::setup_quads() {
 //     {
 //         sm::TextureSpecification specification;
 //         specification.format = sm::TextureFormat::Rgba8;
@@ -757,7 +761,7 @@ std::vector<sm::Renderable> GameScene::setup_black_pieces() {
 //     }
 // }
 
-// void GameScene::setup_sounds() {
+// void StandardGameScene::setup_sounds() {
 //     sound_move = ctx.load_buffer("piece_move"_H, ctx.load_sound_data(ctx.path_assets("sounds/piece_move-01.ogg")));
 //     sound_place = ctx.load_buffer("piece_place"_H, ctx.load_sound_data(ctx.path_assets("sounds/piece_place-01.ogg")));
 //     relaxing = ctx.load_music_track("relaxing"_H, ctx.load_sound_data(ctx.path_assets("sounds/music/relaxing.ogg")));
@@ -766,7 +770,7 @@ std::vector<sm::Renderable> GameScene::setup_black_pieces() {
 //     emitter->set_position(glm::vec3(0.0f));
 // }
 
-// void GameScene::reload_textures(bool srgb) {
+// void StandardGameScene::reload_textures(bool srgb) {
 //     const sm::TextureFormat format {srgb ? sm::TextureFormat::Srgba8Alpha : sm::TextureFormat::Rgba8};
 
 //     sm::TextureSpecification specification;
@@ -834,7 +838,7 @@ std::vector<sm::Renderable> GameScene::setup_black_pieces() {
 //     }
 // }
 
-// void GameScene::load_heavy_resources() {
+// void StandardGameScene::load_heavy_resources() {
 //     {
 //         sm::TexturePostProcessing post_processing;
 //         post_processing.size = sm::Size::Half;  // Half looks better

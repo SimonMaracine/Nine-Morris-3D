@@ -146,7 +146,7 @@ namespace sm {
 
         // Context
         void change_scene(Id id, bool clear_resources = false) noexcept;
-        void show_info_text();
+        void show_information_text();
         float get_delta() const noexcept;
         float get_fps() const noexcept;
         static std::string get_information();

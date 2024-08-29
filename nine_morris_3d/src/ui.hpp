@@ -4,15 +4,16 @@
 
 #include <nine_morris_3d_engine/nine_morris_3d.hpp>
 
+#include "scenes/game_scene.hpp"
 #include "options.hpp"
 
 class Ui {
 public:
-    void update(sm::Ctx& ctx);
-
     bool get_show_information() const { return m_show_information; }
+
+    void update(sm::Ctx& ctx, GameScene& game_scene);
 private:
-    void main_menu_bar(sm::Ctx& ctx);
+    void main_menu_bar(sm::Ctx& ctx, GameScene& game_scene);
 
     // Local options data
     // When changed, update the options from the global data

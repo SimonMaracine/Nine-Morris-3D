@@ -235,18 +235,18 @@ namespace sm {
         m_application->change_scene(id, clear_resources);
     }
 
-    void Ctx::show_info_text() {
-        std::string info_text;
-        info_text += std::string(reinterpret_cast<const char*>(opengl_debug::get_opengl_version())) + '\n';
-        info_text += std::string(reinterpret_cast<const char*>(opengl_debug::get_glsl_version())) + '\n';
-        info_text += std::string(reinterpret_cast<const char*>(opengl_debug::get_renderer())) + '\n';
-        info_text += std::string(reinterpret_cast<const char*>(opengl_debug::get_vendor())) + '\n';
-        info_text += std::to_string(static_cast<int>(m_fps)) + " FPS ";
-        info_text += std::to_string(static_cast<int>(m_delta * 1000.0f)) + " ms";
+    void Ctx::show_information_text() {
+        std::string information_text;
+        information_text += std::string(reinterpret_cast<const char*>(opengl_debug::get_opengl_version())) + '\n';
+        information_text += std::string(reinterpret_cast<const char*>(opengl_debug::get_glsl_version())) + '\n';
+        information_text += std::string(reinterpret_cast<const char*>(opengl_debug::get_renderer())) + '\n';
+        information_text += std::string(reinterpret_cast<const char*>(opengl_debug::get_vendor())) + '\n';
+        information_text += std::to_string(static_cast<int>(m_fps)) + " FPS ";
+        information_text += std::to_string(static_cast<int>(m_delta * 1000.0f)) + " ms";
 
         Text text;
         text.font = m_rnd.get_default_font();
-        text.text = std::move(info_text);
+        text.text = std::move(information_text);
         text.color = glm::vec3(1.0f);
 
         // Don't add it to the debug lists

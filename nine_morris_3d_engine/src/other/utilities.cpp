@@ -55,8 +55,8 @@ namespace sm {
         return file_name(std::filesystem::path(file_path));
     }
 
-    std::string utils::read_file_ex(const std::filesystem::path& file_path) {
-        std::ifstream stream {file_path, std::ios::binary};
+    std::string utils::read_file_ex(const std::filesystem::path& file_path, bool text) {
+        std::ifstream stream {file_path, text ? std::ios::in : std::ios::binary};
 
         if (!stream.is_open()) {
             throw ResourceError("Could not open file for reading");
@@ -78,21 +78,53 @@ namespace sm {
         return buffer;
     }
 
-    std::string utils::read_file_ex(const std::string& file_path) {
-        return read_file_ex(std::filesystem::path(file_path));
+    std::string utils::read_file_ex(const std::string& file_path, bool text) {
+        return read_file_ex(std::filesystem::path(file_path), text);
     }
 
-    std::string utils::read_file(const std::filesystem::path& file_path) {
+    std::string utils::read_file(const std::filesystem::path& file_path, bool text) {
         LOG_DEBUG("Reading file `{}`...", file_path.string());
 
         try {
-            return read_file_ex(file_path);
+            return read_file_ex(file_path, text);
         } catch (const ResourceError& e) {
             SM_THROW_ERROR(ResourceError, "Could not read file `{}`: {}", file_path.string(), e.what());
         }
     }
 
-    std::string utils::read_file(const std::string& file_path) {
-        return read_file(std::filesystem::path(file_path));
+    std::string utils::read_file(const std::string& file_path, bool text) {
+        return read_file(std::filesystem::path(file_path), text);
+    }
+
+    void utils::write_file_ex(const std::filesystem::path& file_path, const std::string& buffer, bool text) {
+        std::ofstream stream {file_path, text ? std::ios::out : std::ios::binary};
+
+        if (!stream.is_open()) {
+            throw ResourceError("Could not open file for writing");
+        }
+
+        stream.write(buffer.data(), buffer.size());
+
+        if (stream.fail()) {
+            throw ResourceError("Error writing file");
+        }
+    }
+
+    void utils::write_file_ex(const std::string& file_path, const std::string& buffer, bool text) {
+        write_file_ex(std::filesystem::path(file_path), buffer, text);
+    }
+
+    void utils::write_file(const std::filesystem::path& file_path, const std::string& buffer, bool text) {
+        LOG_DEBUG("Writing file `{}`...", file_path.string());
+
+        try {
+            write_file_ex(file_path, buffer, text);
+        } catch (const ResourceError& e) {
+            SM_THROW_ERROR(ResourceError, "Could not write file `{}`: {}", file_path.string(), e.what());
+        }
+    }
+
+    void utils::write_file(const std::string& file_path, const std::string& buffer, bool text) {
+        write_file(std::filesystem::path(file_path), buffer, text);
     }
 }
