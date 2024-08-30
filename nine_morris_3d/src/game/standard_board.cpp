@@ -718,7 +718,7 @@ void StandardBoard::check_threefold_repetition(const Position& position) {
     }
 }
 
-void StandardBoard::do_place_animation(PieceObj& piece, const NodeObj& node, std::function<void()> on_finish) {
+void StandardBoard::do_place_animation(PieceObj& piece, const NodeObj& node, std::function<void()>&& on_finish) {
     const glm::vec3 origin {piece.get_renderable().transform.position};
     const glm::vec3 target0 {piece.get_renderable().transform.position.x, 0.75f, piece.get_renderable().transform.position.z};
     const glm::vec3 target1 {node.get_renderable().transform.position.x, 0.75f, node.get_renderable().transform.position.z};
@@ -727,7 +727,7 @@ void StandardBoard::do_place_animation(PieceObj& piece, const NodeObj& node, std
     piece.move_three_step(origin, target0, target1, target, std::move(on_finish));
 }
 
-void StandardBoard::do_move_animation(PieceObj& piece, const NodeObj& node, std::function<void()> on_finish) {
+void StandardBoard::do_move_animation(PieceObj& piece, const NodeObj& node, std::function<void()>&& on_finish) {
     if (count_pieces(m_board, static_cast<Player>(piece.get_type())) > 3) {
         const glm::vec3 origin {piece.get_renderable().transform.position};
         const glm::vec3 target {node.get_renderable().transform.position.x, 0.135f, node.get_renderable().transform.position.z};
@@ -743,7 +743,7 @@ void StandardBoard::do_move_animation(PieceObj& piece, const NodeObj& node, std:
     }
 }
 
-void StandardBoard::do_take_animation(PieceObj& piece, std::function<void()> on_finish) {
+void StandardBoard::do_take_animation(PieceObj& piece, std::function<void()>&& on_finish) {
     const glm::vec3 origin {piece.get_renderable().transform.position};
     const glm::vec3 target {piece.get_renderable().transform.position.x, 2.0f, piece.get_renderable().transform.position.z};
 

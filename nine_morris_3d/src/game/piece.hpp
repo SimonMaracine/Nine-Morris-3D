@@ -28,8 +28,8 @@ public:
     void update(sm::Ctx& ctx);
     void update_movement();
 
-    void move_direct(glm::vec3 origin, glm::vec3 target, std::function<void()> on_finish);
-    void move_three_step(glm::vec3 origin, glm::vec3 target0, glm::vec3 target1, glm::vec3 target, std::function<void()> on_finish);
+    void move_direct(glm::vec3 origin, glm::vec3 target, std::function<void()>&& on_finish);
+    void move_three_step(glm::vec3 origin, glm::vec3 target0, glm::vec3 target1, glm::vec3 target, std::function<void()>&& on_finish);
 
     bool active {true};
     bool to_remove {false};

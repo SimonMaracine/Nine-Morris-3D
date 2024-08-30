@@ -122,9 +122,9 @@ private:
     void check_fifty_move_rule();
     void check_threefold_repetition(const Position& position);
 
-    static void do_place_animation(PieceObj& piece, const NodeObj& node, std::function<void()> on_finish);
-    void do_move_animation(PieceObj& piece, const NodeObj& node, std::function<void()> on_finish);
-    static void do_take_animation(PieceObj& piece, std::function<void()> on_finish);
+    static void do_place_animation(PieceObj& piece, const NodeObj& node, std::function<void()>&& on_finish);
+    void do_move_animation(PieceObj& piece, const NodeObj& node, std::function<void()>&& on_finish);
+    static void do_take_animation(PieceObj& piece, std::function<void()>&& on_finish);
     int new_piece_to_place(PieceType type);
     static bool is_node_id(int id);
     static bool is_piece_id(int id);
