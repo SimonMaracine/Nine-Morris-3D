@@ -11,6 +11,7 @@ PieceObj::PieceObj(int id, glm::vec3 position, const sm::Renderable& renderable,
     : m_id(id), m_type(type), m_renderable(renderable) {
     m_renderable.transform.position = position;
     m_renderable.transform.scale = 20.0f;
+    m_renderable.outline.thickness = 1.15f;
 }
 
 void PieceObj::update(sm::Ctx& ctx) {

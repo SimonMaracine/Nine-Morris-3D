@@ -28,9 +28,9 @@ namespace sm {
     };
 
     struct TextureMipmapping {
-        int levels {1};
-        float bias {};
-        int anisotropic_filtering {};
+        int levels {4};
+        float bias {0.0f};
+        int anisotropic_filtering {0};
     };
 
     struct TextureSpecification {

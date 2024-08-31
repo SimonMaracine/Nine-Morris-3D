@@ -25,9 +25,11 @@ public:
     glm::vec3 get_position() const noexcept override;
     glm::vec3 get_rotation() const noexcept override;
 
-    glm::vec3 get_point() const { return point; }
-    float get_distance_to_point() const { return distance_to_point; }
-    float get_angle_around_point() const { return angle_around_point; }
+    glm::vec3 get_point() const { return m_point; }
+    float get_distance_to_point() const { return m_distance_to_point; }
+    float get_angle_around_point() const { return m_angle_around_point; }
+
+    void set_distance_to_point(float distance_to_point);
 
     // Call these every frame
     void update_controls(float dt, const sm::Ctx&) override;
@@ -61,17 +63,17 @@ private:
     void calculate_auto_pitch(float dt);
     void calculate_auto_distance_to_point(float dt);
 
-    glm::vec3 position {};
-    float pitch {};
-    float yaw {};
+    glm::vec3 m_position {};
+    float m_pitch {};
+    float m_yaw {};
 
-    glm::vec3 point {};
-    float distance_to_point {};
-    float angle_around_point {};
+    glm::vec3 m_point {};
+    float m_distance_to_point {};
+    float m_angle_around_point {};
 
-    float x_velocity {};
-    float y_velocity {};
-    float zoom_velocity {};
+    float m_velocity_x {};
+    float m_velocity_y {};
+    float m_velocity_zoom {};
 
     // Interpolated movement stuff
     struct {
@@ -92,7 +94,7 @@ private:
 
         glm::vec3 cached_towards_position {};
         bool dont_auto_call_go_towards_position {false};
-    } movement;
+    } m_movement;
 
     struct {
         float mouse_wheel {};
@@ -107,5 +109,5 @@ private:
         bool key_d {false};
         bool key_r {false};
         bool key_f {false};
-    } input;
+    } m_input;
 };

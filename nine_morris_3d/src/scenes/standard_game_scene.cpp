@@ -4,9 +4,10 @@
 #include <nine_morris_3d_engine/external/imgui.h++>
 #include <nine_morris_3d_engine/external/glm.h++>
 
+#include "game/ray.hpp"
 #include "global.hpp"
 #include "game.hpp"
-#include "game/ray.hpp"
+#include "enums.hpp"
 
 void StandardGameScene::on_start() {
     // ctx.add_task([this](const sm::Task& task, void*) {
@@ -61,22 +62,7 @@ void StandardGameScene::on_start() {
     // setup_texts();
     // setup_quads();
 
-    auto& g {ctx.global<Global>()};
-
-    cam_controller = PointCameraController(
-        cam,
-        ctx.get_window_width(),
-        ctx.get_window_height(),
-        glm::vec3(0.0f),
-        20.0f,
-        47.0f,
-        g.options.camera_sensitivity
-    );
-
-    cam_controller.connect_events(ctx);
-
-    cam_2d.set_projection(0, ctx.get_window_width(), 0, ctx.get_window_height());
-
+    setup_camera();
     setup_skybox();
     setup_lights();
     setup_renderables();
@@ -113,6 +99,13 @@ void StandardGameScene::on_update() {
     // }
 
     ctx.skybox(field);
+
+#if 0
+    // TODO
+    temp.transform.position = glm::normalize(-directional_light.direction) * 7.0f;
+    temp.transform.scale = 30.0f;
+    ctx.add_renderable(temp);
+#endif
 
     // if (blur) {
     //     ctx.add_post_processing(ctx.global<Global>().blur_step);
@@ -286,6 +279,28 @@ void StandardGameScene::on_mouse_button_released(const sm::MouseButtonReleasedEv
     }
 }
 
+void StandardGameScene::setup_camera() {
+    auto& g {ctx.global<Global>()};
+
+    cam_controller = PointCameraController(
+        cam,
+        ctx.get_window_width(),
+        ctx.get_window_height(),
+        glm::vec3(0.0f),
+        8.0f,
+        47.0f,
+        g.options.camera_sensitivity
+    );
+
+    cam_controller.connect_events(ctx);
+
+    const auto default_position {cam_controller.get_position()};
+    cam_controller.set_distance_to_point(cam_controller.get_distance_to_point() + 1.0f);
+    cam_controller.go_towards_position(default_position);
+
+    cam_2d.set_projection(0, ctx.get_window_width(), 0, ctx.get_window_height());
+}
+
 void StandardGameScene::setup_skybox() {
     field = ctx.load_texture_cubemap(
         "field"_H,
@@ -302,10 +317,22 @@ void StandardGameScene::setup_skybox() {
 }
 
 void StandardGameScene::setup_lights() {
-    directional_light.direction = glm::normalize(glm::vec3(-0.2f, -1.0f, -0.3f));
-    directional_light.ambient_color = glm::vec3(0.1f);
-    directional_light.diffuse_color = glm::vec3(0.9f);
-    directional_light.specular_color = glm::vec3(1.0f);
+    auto& g {ctx.global<Global>()};
+
+    switch (g.options.skybox) {
+        case Skybox::None:
+            // TODO
+            break;
+        case Skybox::Field:
+            directional_light.direction = glm::normalize(glm::vec3(-0.198f, -0.192f, -0.282f));
+            directional_light.ambient_color = glm::vec3(0.08f);
+            directional_light.diffuse_color = glm::vec3(0.95f);
+            directional_light.specular_color = glm::vec3(1.0f);
+            break;
+        case Skybox::Autumn:
+            // TODO
+            break;
+    }
 }
 
 void StandardGameScene::setup_renderables() {
@@ -314,6 +341,11 @@ void StandardGameScene::setup_renderables() {
     const auto renderable_nodes {setup_nodes()};
     const auto renderable_white_pieces {setup_white_pieces()};
     const auto renderable_black_pieces {setup_black_pieces()};
+
+#if 0
+    // TODO
+    temp = renderable_black_pieces[0];
+#endif
 
     board = StandardBoard(renderable_board, renderable_board_paint, renderable_nodes, renderable_white_pieces, renderable_black_pieces);
 }
@@ -325,6 +357,8 @@ sm::Renderable StandardGameScene::setup_board() {
 
     sm::TextureSpecification specification;
     specification.format = sm::TextureFormat::Srgba8Alpha;
+    specification.mipmapping.emplace();
+    specification.mipmapping->bias = -0.8f;
 
     const auto diffuse {ctx.load_texture(
         "board_diffuse"_H,
@@ -344,8 +378,8 @@ sm::Renderable StandardGameScene::setup_board() {
 
     const auto material_instance {ctx.load_material_instance("board"_H, material)};
     material_instance->set_texture("u_material.ambient_diffuse"_H, diffuse, 0);
-    material_instance->set_vec3("u_material.specular"_H, glm::vec3(0.9f));
-    material_instance->set_float("u_material.shininess"_H, 32.0f);
+    material_instance->set_vec3("u_material.specular"_H, glm::vec3(0.3f));
+    material_instance->set_float("u_material.shininess"_H, 8.0f);
     material_instance->set_texture("u_material.normal"_H, normal, 1);
 
     return sm::Renderable(mesh, vertex_array, material_instance);
@@ -358,6 +392,8 @@ sm::Renderable StandardGameScene::setup_board_paint() {
 
     sm::TextureSpecification specification;
     specification.format = sm::TextureFormat::Srgba8Alpha;
+    specification.mipmapping.emplace();
+    specification.mipmapping->bias = -0.8f;
 
     const auto diffuse {ctx.load_texture(
         "board_paint_labeled_diffuse"_H,
@@ -382,8 +418,8 @@ sm::Renderable StandardGameScene::setup_board_paint() {
 
     const auto material_instance {ctx.load_material_instance("board_paint"_H, material)};
     material_instance->set_texture("u_material.ambient_diffuse"_H, diffuse, 0);
-    material_instance->set_vec3("u_material.specular"_H, glm::vec3(0.9f));
-    material_instance->set_float("u_material.shininess"_H, 32.0f);
+    material_instance->set_vec3("u_material.specular"_H, glm::vec3(0.3f));
+    material_instance->set_float("u_material.shininess"_H, 8.0f);
     material_instance->set_texture("u_material.normal"_H, normal, 1);
 
     return sm::Renderable(mesh, vertex_array, material_instance);
@@ -401,8 +437,8 @@ std::vector<sm::Renderable> StandardGameScene::setup_nodes() {
     for (unsigned int i {0}; i < 24; i++) {
         const auto material_instance {ctx.load_material_instance(sm::Id("node" + std::to_string(i)), material)};
         material_instance->set_vec3("u_material.ambient_diffuse"_H, glm::vec3(0.075f));
-        material_instance->set_vec3("u_material.specular"_H, glm::vec3(0.9f));
-        material_instance->set_float("u_material.shininess"_H, 32.0f);
+        material_instance->set_vec3("u_material.specular"_H, glm::vec3(0.3f));
+        material_instance->set_float("u_material.shininess"_H, 8.0f);
 
         renderables.emplace_back(mesh, vertex_array, material_instance);
     }
@@ -417,6 +453,8 @@ std::vector<sm::Renderable> StandardGameScene::setup_white_pieces() {
 
     sm::TextureSpecification specification;
     specification.format = sm::TextureFormat::Srgba8Alpha;
+    specification.mipmapping.emplace();
+    specification.mipmapping->bias = -0.8f;
 
     const auto diffuse {ctx.load_texture(
         "piece_white_diffuse.png"_H,
@@ -439,8 +477,8 @@ std::vector<sm::Renderable> StandardGameScene::setup_white_pieces() {
     for (unsigned int i {0}; i < 9; i++) {
         const auto material_instance {ctx.load_material_instance(sm::Id("piece_white" + std::to_string(i)), material)};
         material_instance->set_texture("u_material.ambient_diffuse"_H, diffuse, 0);
-        material_instance->set_vec3("u_material.specular"_H, glm::vec3(0.9f));
-        material_instance->set_float("u_material.shininess"_H, 32.0f);
+        material_instance->set_vec3("u_material.specular"_H, glm::vec3(0.3f));
+        material_instance->set_float("u_material.shininess"_H, 8.0f);
         material_instance->set_texture("u_material.normal"_H, normal, 1);
 
         renderables.emplace_back(mesh, vertex_array, material_instance);
@@ -456,6 +494,8 @@ std::vector<sm::Renderable> StandardGameScene::setup_black_pieces() {
 
     sm::TextureSpecification specification;
     specification.format = sm::TextureFormat::Srgba8Alpha;
+    specification.mipmapping.emplace();
+    specification.mipmapping->bias = -0.8f;
 
     const auto diffuse {ctx.load_texture(
         "piece_black_diffuse.png"_H,
@@ -478,8 +518,8 @@ std::vector<sm::Renderable> StandardGameScene::setup_black_pieces() {
     for (unsigned int i {0}; i < 9; i++) {
         const auto material_instance {ctx.load_material_instance(sm::Id("piece_black" + std::to_string(i)), material)};
         material_instance->set_texture("u_material.ambient_diffuse"_H, diffuse, 0);
-        material_instance->set_vec3("u_material.specular"_H, glm::vec3(0.9f));
-        material_instance->set_float("u_material.shininess"_H, 32.0f);
+        material_instance->set_vec3("u_material.specular"_H, glm::vec3(0.3f));
+        material_instance->set_float("u_material.shininess"_H, 8.0f);
         material_instance->set_texture("u_material.normal"_H, normal, 1);
 
         renderables.emplace_back(mesh, vertex_array, material_instance);

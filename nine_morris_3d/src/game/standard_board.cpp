@@ -71,11 +71,11 @@ StandardBoard::StandardBoard(
     // Offset pieces' IDs, so that they are different from nodes' IDs
 
     for (int i {0}; i < 9; i++) {
-        m_pieces[i] = PieceObj(i + 24, glm::vec3(3.0f, 0.5f, static_cast<float>(i) * 0.5f - 2.0f), white_pieces[i], PieceType::White);
+        m_pieces[i] = PieceObj(i + 24, glm::vec3(-3.0f, 0.5f, static_cast<float>(i) * 0.5f - 2.0f), white_pieces[i], PieceType::White);
     }
 
     for (int i {9}; i < 18; i++) {
-        m_pieces[i] = PieceObj(i + 24, glm::vec3(-3.0f, 0.5f, static_cast<float>(i - 9) * 0.5f - 2.0f), black_pieces[i - 9], PieceType::Black);
+        m_pieces[i] = PieceObj(i + 24, glm::vec3(3.0f, 0.5f, static_cast<float>(i - 9) * -0.5f + 2.0f), black_pieces[i - 9], PieceType::Black);
     }
 
     m_legal_moves = generate_moves();
@@ -271,16 +271,16 @@ void StandardBoard::debug() {
                 break;
         }
 
-        ImGui::Text("m_turn %s", turn);
-        ImGui::Text("m_game_over %s", game_over);
-        ImGui::Text("m_plies %u", m_plies);
-        ImGui::Text("m_plies_without_advancement %u", m_plies_without_advancement);
-        ImGui::Text("m_positions %lu", m_positions.size());
-        ImGui::Text("m_legal_moves %lu", m_legal_moves.size());
-        ImGui::Text("m_hovered_id %d", m_hovered_id);
-        ImGui::Text("m_user_stored_index1 %d", m_user_stored_index1);
-        ImGui::Text("m_user_stored_index2 %d", m_user_stored_index2);
-        ImGui::Text("m_user_must_take_piece %s", m_user_must_take_piece ? "true" : "false");
+        ImGui::Text("turn %s", turn);
+        ImGui::Text("game_over %s", game_over);
+        ImGui::Text("plies %u", m_plies);
+        ImGui::Text("plies_without_advancement %u", m_plies_without_advancement);
+        ImGui::Text("positions %lu", m_positions.size());
+        ImGui::Text("legal_moves %lu", m_legal_moves.size());
+        ImGui::Text("hovered_id %d", m_hovered_id);
+        ImGui::Text("user_stored_index1 %d", m_user_stored_index1);
+        ImGui::Text("user_stored_index2 %d", m_user_stored_index2);
+        ImGui::Text("user_must_take_piece %s", m_user_must_take_piece ? "true" : "false");
     }
 
     ImGui::End();

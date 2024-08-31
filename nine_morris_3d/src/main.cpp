@@ -76,13 +76,15 @@ int application_main() {
             properties.height = 576;
             properties.min_width = 512;
             properties.min_height = 288;
+            properties.title = "Nine Morris 3D";
+            properties.log_file = "log.txt";
             properties.version_major = VERSION_MAJOR;
             properties.version_minor = VERSION_MINOR;
             properties.version_patch = VERSION_PATCH;
             properties.path_logs = paths.logs;
             properties.path_saved_data = paths.saved_data;
             properties.path_assets = paths.assets;
-            // properties.audio = true;
+            // properties.audio = true;  // TODO
 
             sm::UserFunctions functions;
             functions.start = game_start;

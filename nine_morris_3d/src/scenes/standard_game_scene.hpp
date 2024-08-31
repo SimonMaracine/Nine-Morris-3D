@@ -27,6 +27,7 @@ struct StandardGameScene : sm::ApplicationScene, GameScene {
     void on_key_released(const sm::KeyReleasedEvent& event);
     void on_mouse_button_released(const sm::MouseButtonReleasedEvent& event);
 
+    void setup_camera();
     void setup_skybox();
     void setup_lights();
     void setup_renderables();
@@ -92,6 +93,11 @@ struct StandardGameScene : sm::ApplicationScene, GameScene {
     // bool blur {false};
     // bool outline {true};
     // bool color_correction {true};
+
+#if 0
+    // TODO
+    sm::Renderable temp;
+#endif
 
     Ui ui;
 };
