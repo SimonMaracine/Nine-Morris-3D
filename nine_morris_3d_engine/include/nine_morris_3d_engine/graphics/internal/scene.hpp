@@ -29,7 +29,7 @@ namespace sm::internal {
 
         // 3D API
         void add_renderable(Renderable& renderable);
-        void add_light(DirectionalLight& light);
+        void add_light(DirectionalLight& light) noexcept;
         void add_light(PointLight& light);
 
         // 2D API
@@ -47,7 +47,7 @@ namespace sm::internal {
 
         void shadow(const ShadowBox& box) noexcept;
         void add_renderable(const Renderable& renderable);
-        void add_light(const DirectionalLight& light);
+        void add_light(const DirectionalLight& light) noexcept;
         void add_light(const PointLight& light);
         void add_text(const Text& text);
         void add_quad(const Quad& quad);

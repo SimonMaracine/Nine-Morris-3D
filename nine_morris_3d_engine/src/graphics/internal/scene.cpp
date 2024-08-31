@@ -58,7 +58,7 @@ namespace sm::internal {
         box.top = max_y_positive;
 
         // After calculating some bound values, offset the position according to those values
-        box.position = glm::normalize(m_directional_light.direction) * -max_z_positive;
+        box.position = glm::normalize(m_directional_light.direction) * -(max_z_positive + 1.0f);
         box.near_ = 1.0f;
         box.far_ = -max_z_negative + max_z_positive;
 
@@ -81,7 +81,7 @@ namespace sm::internal {
 #endif
     }
 
-    void Scene::add_light(DirectionalLight& light) {
+    void Scene::add_light(DirectionalLight& light) noexcept {
         add_light(const_cast<const DirectionalLight&>(light));
 
 #ifndef SM_BUILD_DISTRIBUTION
@@ -229,7 +229,7 @@ namespace sm::internal {
         m_renderables.push_back(renderable);
     }
 
-    void Scene::add_light(const DirectionalLight& light) {
+    void Scene::add_light(const DirectionalLight& light) noexcept {
         m_directional_light = light;
     }
 

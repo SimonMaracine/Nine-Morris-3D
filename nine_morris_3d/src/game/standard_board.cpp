@@ -113,9 +113,7 @@ void StandardBoard::user_click() {
         return;
     }
 
-    const bool phase_two {m_plies >= 18};
-
-    if (phase_two) {
+    if (m_plies >= 18) {
         if (m_user_must_take_piece) {
             if (is_piece_id(m_hovered_id)) {
                 try_move_take(m_user_stored_index1, m_user_stored_index2, m_pieces[PIECE(m_hovered_id)].node_id);
