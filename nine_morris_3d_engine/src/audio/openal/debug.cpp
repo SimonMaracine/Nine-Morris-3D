@@ -16,28 +16,26 @@ namespace sm {
             return;
         }
 
-        try {
-            switch(error) {
-                case AL_INVALID_NAME:
-                    LOG_CRITICAL("({}) OpenAL AL_INVALID_NAME: a bad name (ID) was passed to an OpenAL function", error);
-                    break;
-                case AL_INVALID_ENUM:
-                    LOG_CRITICAL("({}) OpenAL AL_INVALID_ENUM: an invalid enum value was passed to an OpenAL function", error);
-                    break;
-                case AL_INVALID_VALUE:
-                    LOG_CRITICAL("({}) OpenAL AL_INVALID_VALUE: an invalid value was passed to an OpenAL function", error);
-                    break;
-                case AL_INVALID_OPERATION:
-                    LOG_CRITICAL("({}) OpenAL AL_INVALID_OPERATION: the requested operation is not valid", error);
-                    break;
-                case AL_OUT_OF_MEMORY:
-                    LOG_CRITICAL("({}) OpenAL AL_OUT_OF_MEMORY: the requested operation resulted in OpenAL running out of memory", error);
-                    break;
-                default:
-                    LOG_CRITICAL("({}) OpenAL: unknown error", error);
-                    break;
-            }
-        } catch (...) {}
+        switch(error) {
+            case AL_INVALID_NAME:
+                LOG_CRITICAL("({}) OpenAL AL_INVALID_NAME: a bad name (ID) was passed to an OpenAL function", error);
+                break;
+            case AL_INVALID_ENUM:
+                LOG_CRITICAL("({}) OpenAL AL_INVALID_ENUM: an invalid enum value was passed to an OpenAL function", error);
+                break;
+            case AL_INVALID_VALUE:
+                LOG_CRITICAL("({}) OpenAL AL_INVALID_VALUE: an invalid value was passed to an OpenAL function", error);
+                break;
+            case AL_INVALID_OPERATION:
+                LOG_CRITICAL("({}) OpenAL AL_INVALID_OPERATION: the requested operation is not valid", error);
+                break;
+            case AL_OUT_OF_MEMORY:
+                LOG_CRITICAL("({}) OpenAL AL_OUT_OF_MEMORY: the requested operation resulted in OpenAL running out of memory", error);
+                break;
+            default:
+                LOG_CRITICAL("({}) OpenAL: unknown error", error);
+                break;
+        }
 #endif
     }
 
@@ -48,7 +46,7 @@ namespace sm {
 
         char buffer[256] {};  // Should be enough
 
-        std::snprintf(buffer, sizeof(buffer), "OpenAL version: %s\n", alGetString(AL_VERSION));
+        std::snprintf(buffer, sizeof(buffer), "OpenAL: %s\n", alGetString(AL_VERSION));
         result += buffer;
 
         std::snprintf(buffer, sizeof(buffer), "Renderer: %s\n", alGetString(AL_RENDERER));

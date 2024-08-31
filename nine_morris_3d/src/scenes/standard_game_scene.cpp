@@ -61,6 +61,8 @@ void StandardGameScene::on_start() {
     // setup_texts();
     // setup_quads();
 
+    auto& g {ctx.global<Global>()};
+
     cam_controller = PointCameraController(
         cam,
         ctx.get_window_width(),
@@ -68,7 +70,7 @@ void StandardGameScene::on_start() {
         glm::vec3(0.0f),
         20.0f,
         47.0f,
-        0.5f
+        g.options.camera_sensitivity
     );
 
     cam_controller.connect_events(ctx);

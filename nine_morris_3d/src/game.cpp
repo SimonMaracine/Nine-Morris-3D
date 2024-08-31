@@ -15,6 +15,8 @@ void game_start(sm::Ctx& ctx) {
     } catch (const OptionsFileError& e) {
         LOG_DIST_ERROR("Could not load options: {}", e.what());
     }
+
+    ctx.set_window_vsync(g.options.vsync ? 1 : 0);
 }
 
 void game_stop(sm::Ctx& ctx) {

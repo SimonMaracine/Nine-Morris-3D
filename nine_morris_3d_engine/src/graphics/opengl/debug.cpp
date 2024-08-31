@@ -106,9 +106,9 @@ namespace sm {
         {
             char buffer[256] {};  // Should be enough
 
-            std::snprintf(buffer, sizeof(buffer), "OpenGL version: %s\n", glGetString(GL_VERSION));
+            std::snprintf(buffer, sizeof(buffer), "OpenGL: %s\n", glGetString(GL_VERSION));
             result += buffer;
-            std::snprintf(buffer, sizeof(buffer), "GLSL version: %s\n", glGetString(GL_SHADING_LANGUAGE_VERSION));
+            std::snprintf(buffer, sizeof(buffer), "GLSL: %s\n", glGetString(GL_SHADING_LANGUAGE_VERSION));
             result += buffer;
             std::snprintf(buffer, sizeof(buffer), "Renderer: %s\n", glGetString(GL_RENDERER));
             result += buffer;
