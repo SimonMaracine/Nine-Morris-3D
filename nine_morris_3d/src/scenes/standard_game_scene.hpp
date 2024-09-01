@@ -7,6 +7,8 @@
 #include "game/standard_board.hpp"
 #include "scenes/game_scene.hpp"
 #include "point_camera_controller.hpp"
+#include "turn_indicator.hpp"
+#include "timer.hpp"
 #include "ui.hpp"
 
 struct StandardGameScene : sm::ApplicationScene, GameScene {
@@ -30,6 +32,8 @@ struct StandardGameScene : sm::ApplicationScene, GameScene {
     void setup_camera();
     void setup_skybox();
     void setup_lights();
+    void setup_turn_indicator();
+    void setup_timer();
     void setup_renderables();
     sm::Renderable setup_board();
     sm::Renderable setup_board_paint();
@@ -53,6 +57,8 @@ struct StandardGameScene : sm::ApplicationScene, GameScene {
     // void reload_textures(bool srgb);
     // void load_heavy_resources();
 
+    bool game_started {false};
+
     sm::Camera cam;
     sm::Camera2D cam_2d;
     PointCameraController cam_controller;
@@ -61,6 +67,8 @@ struct StandardGameScene : sm::ApplicationScene, GameScene {
     sm::ShadowBox shadow_box;
 
     StandardBoard board;
+    TurnIndicator turn_indicator;
+    Timer timer;
 
     // sm::Renderable ground;
     // sm::Renderable dragon1;

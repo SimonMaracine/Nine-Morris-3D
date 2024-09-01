@@ -55,8 +55,10 @@ StandardBoard::StandardBoard(
     const sm::Renderable& board_paint,
     const std::vector<sm::Renderable>& nodes,
     const std::vector<sm::Renderable>& white_pieces,
-    const std::vector<sm::Renderable>& black_pieces
-) {
+    const std::vector<sm::Renderable>& black_pieces,
+    std::function<void(const Move&)>&& move_callback
+)
+    : m_move_callback(std::move(move_callback)) {
     m_renderable = board;
     m_renderable.transform.scale = 20.0f;
 
@@ -579,10 +581,11 @@ void StandardBoard::place(int place_index) {
     Move move;
     move.type = MoveType::Place;
     move.place.place_index = place_index;
-    // move_callback(move, m_turn);
 
     finish_turn();
     check_winner_blocking();
+
+    m_move_callback(move);
 }
 
 void StandardBoard::place_take(int place_index, int take_index) {
@@ -596,11 +599,12 @@ void StandardBoard::place_take(int place_index, int take_index) {
     move.type = MoveType::PlaceTake;
     move.place_take.place_index = place_index;
     move.place_take.take_index = take_index;
-    // move_callback(move, m_turn);
 
     finish_turn();
     check_winner_material();
     check_winner_blocking();
+
+    m_move_callback(move);
 }
 
 void StandardBoard::move(int source_index, int destination_index) {
@@ -613,12 +617,13 @@ void StandardBoard::move(int source_index, int destination_index) {
     move.type = MoveType::Move;
     move.move.source_index = source_index;
     move.move.destination_index = destination_index;
-    // move_callback(move, m_turn);
 
     finish_turn(false);
     check_winner_blocking();
     check_fifty_move_rule();
     check_threefold_repetition({m_board, m_turn});
+
+    m_move_callback(move);
 }
 
 void StandardBoard::move_take(int source_index, int destination_index, int take_index) {
@@ -634,11 +639,12 @@ void StandardBoard::move_take(int source_index, int destination_index, int take_
     move.move_take.source_index = source_index;
     move.move_take.destination_index = destination_index;
     move.move_take.take_index = take_index;
-    // move_callback(move, m_turn);
 
     finish_turn();
     check_winner_material();
     check_winner_blocking();
+
+    m_move_callback(move);
 }
 
 void StandardBoard::finish_turn(bool advancement) {

@@ -60,7 +60,7 @@ namespace sm::internal {
         // After calculating some bound values, offset the position according to those values
         box.position = glm::normalize(m_directional_light.direction) * -(max_z_positive + 1.0f);
         box.near_ = 1.0f;
-        box.far_ = -max_z_negative + max_z_positive;
+        box.far_ = -max_z_negative + max_z_positive + 1.0f;
 
         shadow(const_cast<const ShadowBox&>(box));
 

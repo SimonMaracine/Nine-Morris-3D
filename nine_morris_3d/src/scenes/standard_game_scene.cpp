@@ -65,6 +65,8 @@ void StandardGameScene::on_start() {
     setup_camera();
     setup_skybox();
     setup_lights();
+    setup_turn_indicator();
+    setup_timer();
     setup_renderables();
 
     ui.initialize(ctx);
@@ -91,6 +93,11 @@ void StandardGameScene::on_update() {
     const auto ray {cast_mouse_ray(ctx, cam)};
 
     board.update(ctx, ray, cam_controller.get_position());
+
+    turn_indicator.update(ctx, static_cast<TurnIndicatorType>(board.get_turn()));
+
+    timer.update(ctx);
+    timer.render(ctx);
 
     // ctx.add_light(point_light);
 
@@ -312,7 +319,7 @@ void StandardGameScene::setup_skybox() {
             ctx.get_texture_data("pz.png"_H),
             ctx.get_texture_data("nz.png"_H)
         },
-        sm::TextureFormat::Srgba8Alpha
+        sm::TextureFormat::Srgb8Alpha8
     );
 }
 
@@ -335,6 +342,35 @@ void StandardGameScene::setup_lights() {
     }
 }
 
+void StandardGameScene::setup_turn_indicator() {
+    sm::TextureSpecification specification;
+    specification.format = sm::TextureFormat::Rgba8;
+
+    const auto white_texture {ctx.load_texture("white_indicator"_H, ctx.get_texture_data("white_indicator.png"_H), specification)};
+    const auto black_texture {ctx.load_texture("black_indicator"_H, ctx.get_texture_data("black_indicator.png"_H), specification)};
+
+    turn_indicator = TurnIndicator(white_texture, black_texture);
+}
+
+void StandardGameScene::setup_timer() {
+    sm::FontSpecification specification;
+    specification.size_height = 70.0f;
+    specification.bitmap_size = 512;
+
+    const auto font {ctx.load_font(
+        "open_sans"_H,
+        ctx.path_assets("fonts/OpenSans/OpenSans-Regular.ttf"),
+        specification,
+        [](sm::Font* font) {
+            font->begin_baking();
+            font->bake_ascii();
+            font->end_baking();
+        }
+    )};
+
+    timer = Timer(font);
+}
+
 void StandardGameScene::setup_renderables() {
     const auto renderable_board {setup_board()};
     const auto renderable_board_paint {setup_board_paint()};
@@ -347,7 +383,24 @@ void StandardGameScene::setup_renderables() {
     temp = renderable_black_pieces[0];
 #endif
 
-    board = StandardBoard(renderable_board, renderable_board_paint, renderable_nodes, renderable_white_pieces, renderable_black_pieces);
+    board = StandardBoard(
+        renderable_board,
+        renderable_board_paint,
+        renderable_nodes,
+        renderable_white_pieces,
+        renderable_black_pieces,
+        [this](const Move&) {
+            if (!game_started) {
+                timer.start();
+
+                game_started = true;
+            }
+
+            if (board.get_game_over() != GameOver::None) {
+                timer.stop();
+            }
+        }
+    );
 }
 
 sm::Renderable StandardGameScene::setup_board() {
@@ -356,7 +409,6 @@ sm::Renderable StandardGameScene::setup_board() {
     const auto vertex_array {ctx.load_vertex_array("board"_H, mesh)};
 
     sm::TextureSpecification specification;
-    specification.format = sm::TextureFormat::Srgba8Alpha;
     specification.mipmapping.emplace();
     specification.mipmapping->bias = -0.8f;
 
@@ -391,7 +443,6 @@ sm::Renderable StandardGameScene::setup_board_paint() {
     const auto vertex_array {ctx.load_vertex_array("board_paint"_H, mesh)};
 
     sm::TextureSpecification specification;
-    specification.format = sm::TextureFormat::Srgba8Alpha;
     specification.mipmapping.emplace();
     specification.mipmapping->bias = -0.8f;
 
@@ -452,7 +503,6 @@ std::vector<sm::Renderable> StandardGameScene::setup_white_pieces() {
     const auto vertex_array {ctx.load_vertex_array("piece_white"_H, mesh)};
 
     sm::TextureSpecification specification;
-    specification.format = sm::TextureFormat::Srgba8Alpha;
     specification.mipmapping.emplace();
     specification.mipmapping->bias = -0.8f;
 
@@ -493,7 +543,6 @@ std::vector<sm::Renderable> StandardGameScene::setup_black_pieces() {
     const auto vertex_array {ctx.load_vertex_array("piece_black"_H, mesh)};
 
     sm::TextureSpecification specification;
-    specification.format = sm::TextureFormat::Srgba8Alpha;
     specification.mipmapping.emplace();
     specification.mipmapping->bias = -0.8f;
 

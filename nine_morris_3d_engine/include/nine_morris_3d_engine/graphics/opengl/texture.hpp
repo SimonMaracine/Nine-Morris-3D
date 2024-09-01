@@ -21,9 +21,10 @@ namespace sm {
     };
 
     enum class TextureFormat {
+        Rgb8,
         Rgba8,
-        Srgba8,
-        Srgba8Alpha,
+        Srgb8,
+        Srgb8Alpha8,
         R8
     };
 
@@ -34,7 +35,7 @@ namespace sm {
     };
 
     struct TextureSpecification {
-        TextureFormat format {TextureFormat::Rgba8};
+        TextureFormat format {TextureFormat::Srgb8Alpha8};
 
         TextureFilter min_filter {TextureFilter::Linear};
         TextureFilter mag_filter {TextureFilter::Linear};

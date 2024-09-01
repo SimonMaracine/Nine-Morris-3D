@@ -87,8 +87,8 @@ namespace sm {
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wrap_to_int(specification.wrap_t));
 
         if (specification.border_color) {
-            const glm::vec4 color {*specification.border_color};
-            glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, glm::value_ptr(color));
+            const glm::vec4 color {};
+            glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, glm::value_ptr(*specification.border_color));
         }
     }
 
@@ -161,15 +161,19 @@ namespace sm {
         const int levels {use_mipmapping(m_specification) ? m_specification.mipmapping->levels : 1};
 
         switch (m_specification.format) {
+            case TextureFormat::Rgb8:
+                glTexStorage2D(GL_TEXTURE_2D, levels, GL_RGB8, width, height);
+                glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, data);
+                break;
             case TextureFormat::Rgba8:
                 glTexStorage2D(GL_TEXTURE_2D, levels, GL_RGBA8, width, height);
                 glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, data);
                 break;
-            case TextureFormat::Srgba8:
+            case TextureFormat::Srgb8:
                 glTexStorage2D(GL_TEXTURE_2D, levels, GL_SRGB8, width, height);
                 glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, data);
                 break;
-            case TextureFormat::Srgba8Alpha:
+            case TextureFormat::Srgb8Alpha8:
                 glTexStorage2D(GL_TEXTURE_2D, levels, GL_SRGB8_ALPHA8, width, height);
                 glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, data);
                 break;
@@ -199,13 +203,16 @@ namespace sm {
         }
 
         switch (format) {
+            case TextureFormat::Rgb8:
+                glTexStorage2D(GL_TEXTURE_CUBE_MAP, 1, GL_RGB8, width, height);
+                break;
             case TextureFormat::Rgba8:
                 glTexStorage2D(GL_TEXTURE_CUBE_MAP, 1, GL_RGBA8, width, height);
                 break;
-            case TextureFormat::Srgba8:
+            case TextureFormat::Srgb8:
                 glTexStorage2D(GL_TEXTURE_CUBE_MAP, 1, GL_SRGB8, width, height);
                 break;
-            case TextureFormat::Srgba8Alpha:
+            case TextureFormat::Srgb8Alpha8:
                 glTexStorage2D(GL_TEXTURE_CUBE_MAP, 1, GL_SRGB8_ALPHA8, width, height);
                 break;
             default:

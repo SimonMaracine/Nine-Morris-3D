@@ -55,7 +55,12 @@ void LoadingScene::load_assets() {
         ctx.load_texture_data(ctx.path_assets("textures/piece/piece_normal.png"), sm::TexturePostProcessing());
     }
 
-    ctx.add_task([this](const sm::Task& task, void*) {
+    {
+        ctx.load_texture_data(ctx.path_assets("textures/indicator/white_indicator.png"), sm::TexturePostProcessing());
+        ctx.load_texture_data(ctx.path_assets("textures/indicator/black_indicator.png"), sm::TexturePostProcessing());
+    }
+
+    ctx.add_task([this](const sm::Task&, void*) {
         done = true;
         return sm::Task::Result::Done;
     });

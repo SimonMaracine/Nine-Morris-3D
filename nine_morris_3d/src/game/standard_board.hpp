@@ -79,8 +79,12 @@ public:
         const sm::Renderable& board_paint,
         const std::vector<sm::Renderable>& nodes,
         const std::vector<sm::Renderable>& white_pieces,
-        const std::vector<sm::Renderable>& black_pieces
+        const std::vector<sm::Renderable>& black_pieces,
+        std::function<void(const Move&)>&& move_callback
     );
+
+    Player get_turn() const { return m_turn; }
+    GameOver get_game_over() const { return m_game_over; }
 
     void update(sm::Ctx& ctx, glm::vec3 ray, glm::vec3 camera);
     void update_movement();
@@ -157,6 +161,7 @@ private:
     std::vector<Position> m_positions;
 
     // Management data
+    std::function<void(const Move&)> m_move_callback;
     std::vector<Move> m_legal_moves;
     int m_hovered_id {-1};
     int m_user_stored_index1 {-1};
