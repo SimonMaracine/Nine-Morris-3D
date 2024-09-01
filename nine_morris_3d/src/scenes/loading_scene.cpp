@@ -14,7 +14,7 @@ void LoadingScene::on_stop() {
 }
 
 void LoadingScene::on_update() {
-    if (done) {
+    if (m_done) {
         ctx.change_scene("game"_H);
     }
 }
@@ -61,7 +61,7 @@ void LoadingScene::load_assets() {
     }
 
     ctx.add_task([this](const sm::Task&, void*) {
-        done = true;
+        m_done = true;
         return sm::Task::Result::Done;
     });
 }

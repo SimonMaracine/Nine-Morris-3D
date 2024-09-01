@@ -11,7 +11,8 @@
 #include "timer.hpp"
 #include "ui.hpp"
 
-struct StandardGameScene : sm::ApplicationScene, GameScene {
+class StandardGameScene : public sm::ApplicationScene, public GameScene {
+public:
     explicit StandardGameScene(sm::Ctx& ctx)
         : sm::ApplicationScene(ctx) {}
 
@@ -22,7 +23,7 @@ struct StandardGameScene : sm::ApplicationScene, GameScene {
     void on_update() override;
     void on_fixed_update() override;
     void on_imgui_update() override;
-
+private:
     PointCameraController& get_camera_controller() override;
 
     void on_window_resized(const sm::WindowResizedEvent& event);
@@ -35,11 +36,11 @@ struct StandardGameScene : sm::ApplicationScene, GameScene {
     void setup_turn_indicator();
     void setup_timer();
     void setup_renderables();
-    sm::Renderable setup_board();
-    sm::Renderable setup_board_paint();
-    std::vector<sm::Renderable> setup_nodes();
-    std::vector<sm::Renderable> setup_white_pieces();
-    std::vector<sm::Renderable> setup_black_pieces();
+    sm::Renderable setup_board() const;
+    sm::Renderable setup_board_paint() const;
+    std::vector<sm::Renderable> setup_nodes() const;
+    std::vector<sm::Renderable> setup_white_pieces() const;
+    std::vector<sm::Renderable> setup_black_pieces() const;
 
     // void setup_ground(std::shared_ptr<sm::Mesh> mesh);
     // void setup_dragon(std::shared_ptr<sm::Mesh> mesh);
@@ -57,18 +58,18 @@ struct StandardGameScene : sm::ApplicationScene, GameScene {
     // void reload_textures(bool srgb);
     // void load_heavy_resources();
 
-    bool game_started {false};
+    bool m_game_started {false};
 
-    sm::Camera cam;
-    sm::Camera2D cam_2d;
-    PointCameraController cam_controller;
-    sm::DirectionalLight directional_light;
+    sm::Camera m_cam;
+    sm::Camera2D m_cam_2d;
+    PointCameraController m_cam_controller;
+    sm::DirectionalLight m_directional_light;
     // sm::PointLight point_light;
-    sm::ShadowBox shadow_box;
+    sm::ShadowBox m_shadow_box;
 
-    StandardBoard board;
-    TurnIndicator turn_indicator;
-    Timer timer;
+    StandardBoard m_board;
+    TurnIndicator m_turn_indicator;
+    Timer m_timer;
 
     // sm::Renderable ground;
     // sm::Renderable dragon1;
@@ -88,7 +89,7 @@ struct StandardGameScene : sm::ApplicationScene, GameScene {
     // sm::Quad wait;
     // sm::Quad white;
 
-    std::shared_ptr<sm::GlTextureCubemap> field;
+    std::shared_ptr<sm::GlTextureCubemap> m_field;
     // std::shared_ptr<sm::Font> sans;
     // std::shared_ptr<sm::AlSource> emitter;
     // std::shared_ptr<sm::AlBuffer> sound_move;
@@ -107,5 +108,5 @@ struct StandardGameScene : sm::ApplicationScene, GameScene {
     sm::Renderable temp;
 #endif
 
-    Ui ui;
+    Ui m_ui;
 };

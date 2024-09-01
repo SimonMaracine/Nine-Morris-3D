@@ -69,35 +69,42 @@ void StandardGameScene::on_start() {
     setup_timer();
     setup_renderables();
 
-    ui.initialize(ctx);
+    m_ui.initialize(ctx);
 
     // ctx.set_color_correction(color_correction);
 }
 
 void StandardGameScene::on_stop() {
-    cam_controller.disconnect_events(ctx);
+    m_cam_controller.disconnect_events(ctx);
     ctx.disconnect_events(this);
 }
 
 void StandardGameScene::on_update() {
-    cam_controller.update_controls(ctx.get_delta(), ctx);
-    cam_controller.update_camera(ctx.get_delta());
+    m_cam_controller.update_controls(ctx.get_delta(), ctx);
+    m_cam_controller.update_camera(ctx.get_delta());
 
     // sm::listener::set_position(cam_controller.get_position());
 
-    ctx.capture(cam, cam_controller.get_position());
-    ctx.capture(cam_2d);
+    ctx.capture(m_cam, m_cam_controller.get_position());
+    ctx.capture(m_cam_2d);
 
-    ctx.add_light(directional_light);
+    ctx.add_light(m_directional_light);
 
-    const auto ray {cast_mouse_ray(ctx, cam)};
+    const auto ray {cast_mouse_ray(ctx, m_cam)};
 
-    board.update(ctx, ray, cam_controller.get_position());
+    m_board.update(ctx, ray, m_cam_controller.get_position());
 
-    turn_indicator.update(ctx, static_cast<TurnIndicatorType>(board.get_turn()));
+    auto& g {ctx.global<Global>()};
 
-    timer.update(ctx);
-    timer.render(ctx);
+    if (!g.options.hide_turn_indicator) {
+        m_turn_indicator.update(ctx, static_cast<TurnIndicatorType>(m_board.get_turn()));
+    }
+
+    m_timer.update(ctx);
+
+    if (!g.options.hide_timer) {
+        m_timer.render(ctx);
+    }
 
     // ctx.add_light(point_light);
 
@@ -105,7 +112,7 @@ void StandardGameScene::on_update() {
     //     ctx.skybox(field);
     // }
 
-    ctx.skybox(field);
+    ctx.skybox(m_field);
 
 #if 0
     // TODO
@@ -132,7 +139,7 @@ void StandardGameScene::on_update() {
     //     if (brick) ctx.add_renderable(brick);
     // }
 
-    if (ui.get_show_information()) {
+    if (m_ui.get_show_information()) {
         ctx.show_information_text();
     }
 
@@ -208,17 +215,17 @@ void StandardGameScene::on_update() {
     // Whatever part two
     // ctx.debug_add_point(glm::vec3(0.0f, -3.0f, 4.0f), glm::vec3(0.0f, 1.0f, 1.0f));
 
-    ctx.shadow(shadow_box);
+    ctx.shadow(m_shadow_box);
 }
 
 void StandardGameScene::on_fixed_update() {
-    cam_controller.update_friction();
-    board.update_movement();
+    m_cam_controller.update_friction();
+    m_board.update_movement();
 }
 
 void StandardGameScene::on_imgui_update() {
-    ui.update(ctx, *this);
-    board.debug();
+    m_ui.update(ctx, *this);
+    m_board.debug();
 
     // ImGui::Begin("Features");
     // ImGui::Checkbox("Skybox", &sky);
@@ -246,12 +253,12 @@ void StandardGameScene::on_imgui_update() {
 }
 
 PointCameraController& StandardGameScene::get_camera_controller() {
-    return cam_controller;
+    return m_cam_controller;
 }
 
 void StandardGameScene::on_window_resized(const sm::WindowResizedEvent& event) {
-    cam.set_projection(event.width, event.height, LENS_FOV, LENS_NEAR, LENS_FAR);
-    cam_2d.set_projection(0, event.width, 0, event.height);
+    m_cam.set_projection(event.width, event.height, LENS_FOV, LENS_NEAR, LENS_FAR);
+    m_cam_2d.set_projection(0, event.width, 0, event.height);
 }
 
 void StandardGameScene::on_key_released(const sm::KeyReleasedEvent& event) {
@@ -282,15 +289,15 @@ void StandardGameScene::on_key_released(const sm::KeyReleasedEvent& event) {
 
 void StandardGameScene::on_mouse_button_released(const sm::MouseButtonReleasedEvent& event) {
     if (event.button == sm::MouseButton::Left) {
-        board.user_click();
+        m_board.user_click();
     }
 }
 
 void StandardGameScene::setup_camera() {
     auto& g {ctx.global<Global>()};
 
-    cam_controller = PointCameraController(
-        cam,
+    m_cam_controller = PointCameraController(
+        m_cam,
         ctx.get_window_width(),
         ctx.get_window_height(),
         glm::vec3(0.0f),
@@ -299,17 +306,17 @@ void StandardGameScene::setup_camera() {
         g.options.camera_sensitivity
     );
 
-    cam_controller.connect_events(ctx);
+    m_cam_controller.connect_events(ctx);
 
-    const auto default_position {cam_controller.get_position()};
-    cam_controller.set_distance_to_point(cam_controller.get_distance_to_point() + 1.0f);
-    cam_controller.go_towards_position(default_position);
+    const auto default_position {m_cam_controller.get_position()};
+    m_cam_controller.set_distance_to_point(m_cam_controller.get_distance_to_point() + 1.0f);
+    m_cam_controller.go_towards_position(default_position);
 
-    cam_2d.set_projection(0, ctx.get_window_width(), 0, ctx.get_window_height());
+    m_cam_2d.set_projection(0, ctx.get_window_width(), 0, ctx.get_window_height());
 }
 
 void StandardGameScene::setup_skybox() {
-    field = ctx.load_texture_cubemap(
+    m_field = ctx.load_texture_cubemap(
         "field"_H,
         {
             ctx.get_texture_data("px.png"_H),
@@ -331,10 +338,10 @@ void StandardGameScene::setup_lights() {
             // TODO
             break;
         case Skybox::Field:
-            directional_light.direction = glm::normalize(glm::vec3(-0.198f, -0.192f, -0.282f));
-            directional_light.ambient_color = glm::vec3(0.08f);
-            directional_light.diffuse_color = glm::vec3(0.95f);
-            directional_light.specular_color = glm::vec3(1.0f);
+            m_directional_light.direction = glm::normalize(glm::vec3(-0.198f, -0.192f, -0.282f));
+            m_directional_light.ambient_color = glm::vec3(0.08f);
+            m_directional_light.diffuse_color = glm::vec3(0.95f);
+            m_directional_light.specular_color = glm::vec3(1.0f);
             break;
         case Skybox::Autumn:
             // TODO
@@ -349,7 +356,7 @@ void StandardGameScene::setup_turn_indicator() {
     const auto white_texture {ctx.load_texture("white_indicator"_H, ctx.get_texture_data("white_indicator.png"_H), specification)};
     const auto black_texture {ctx.load_texture("black_indicator"_H, ctx.get_texture_data("black_indicator.png"_H), specification)};
 
-    turn_indicator = TurnIndicator(white_texture, black_texture);
+    m_turn_indicator = TurnIndicator(white_texture, black_texture);
 }
 
 void StandardGameScene::setup_timer() {
@@ -368,7 +375,7 @@ void StandardGameScene::setup_timer() {
         }
     )};
 
-    timer = Timer(font);
+    m_timer = Timer(font);
 }
 
 void StandardGameScene::setup_renderables() {
@@ -383,27 +390,27 @@ void StandardGameScene::setup_renderables() {
     temp = renderable_black_pieces[0];
 #endif
 
-    board = StandardBoard(
+    m_board = StandardBoard(
         renderable_board,
         renderable_board_paint,
         renderable_nodes,
         renderable_white_pieces,
         renderable_black_pieces,
         [this](const Move&) {
-            if (!game_started) {
-                timer.start();
+            if (!m_game_started) {
+                m_timer.start();
 
-                game_started = true;
+                m_game_started = true;
             }
 
-            if (board.get_game_over() != GameOver::None) {
-                timer.stop();
+            if (m_board.get_game_over() != GameOver::None) {
+                m_timer.stop();
             }
         }
     );
 }
 
-sm::Renderable StandardGameScene::setup_board() {
+sm::Renderable StandardGameScene::setup_board() const {
     const auto mesh {ctx.get_mesh("board.obj"_H)};
 
     const auto vertex_array {ctx.load_vertex_array("board"_H, mesh)};
@@ -430,14 +437,14 @@ sm::Renderable StandardGameScene::setup_board() {
 
     const auto material_instance {ctx.load_material_instance("board"_H, material)};
     material_instance->set_texture("u_material.ambient_diffuse"_H, diffuse, 0);
-    material_instance->set_vec3("u_material.specular"_H, glm::vec3(0.3f));
+    material_instance->set_vec3("u_material.specular"_H, glm::vec3(0.2f));
     material_instance->set_float("u_material.shininess"_H, 8.0f);
     material_instance->set_texture("u_material.normal"_H, normal, 1);
 
     return sm::Renderable(mesh, vertex_array, material_instance);
 }
 
-sm::Renderable StandardGameScene::setup_board_paint() {
+sm::Renderable StandardGameScene::setup_board_paint() const {
     const auto mesh {ctx.get_mesh("board_paint.obj"_H)};
 
     const auto vertex_array {ctx.load_vertex_array("board_paint"_H, mesh)};
@@ -469,14 +476,14 @@ sm::Renderable StandardGameScene::setup_board_paint() {
 
     const auto material_instance {ctx.load_material_instance("board_paint"_H, material)};
     material_instance->set_texture("u_material.ambient_diffuse"_H, diffuse, 0);
-    material_instance->set_vec3("u_material.specular"_H, glm::vec3(0.3f));
+    material_instance->set_vec3("u_material.specular"_H, glm::vec3(0.2f));
     material_instance->set_float("u_material.shininess"_H, 8.0f);
     material_instance->set_texture("u_material.normal"_H, normal, 1);
 
     return sm::Renderable(mesh, vertex_array, material_instance);
 }
 
-std::vector<sm::Renderable> StandardGameScene::setup_nodes() {
+std::vector<sm::Renderable> StandardGameScene::setup_nodes() const {
     const auto mesh {ctx.get_mesh("node.obj"_H)};
 
     const auto vertex_array {ctx.load_vertex_array("node"_H, mesh)};
@@ -497,7 +504,7 @@ std::vector<sm::Renderable> StandardGameScene::setup_nodes() {
     return renderables;
 }
 
-std::vector<sm::Renderable> StandardGameScene::setup_white_pieces() {
+std::vector<sm::Renderable> StandardGameScene::setup_white_pieces() const {
     const auto mesh {ctx.get_mesh("piece_white.obj"_H)};
 
     const auto vertex_array {ctx.load_vertex_array("piece_white"_H, mesh)};
@@ -527,7 +534,7 @@ std::vector<sm::Renderable> StandardGameScene::setup_white_pieces() {
     for (unsigned int i {0}; i < 9; i++) {
         const auto material_instance {ctx.load_material_instance(sm::Id("piece_white" + std::to_string(i)), material)};
         material_instance->set_texture("u_material.ambient_diffuse"_H, diffuse, 0);
-        material_instance->set_vec3("u_material.specular"_H, glm::vec3(0.3f));
+        material_instance->set_vec3("u_material.specular"_H, glm::vec3(0.2f));
         material_instance->set_float("u_material.shininess"_H, 8.0f);
         material_instance->set_texture("u_material.normal"_H, normal, 1);
 
@@ -537,7 +544,7 @@ std::vector<sm::Renderable> StandardGameScene::setup_white_pieces() {
     return renderables;
 }
 
-std::vector<sm::Renderable> StandardGameScene::setup_black_pieces() {
+std::vector<sm::Renderable> StandardGameScene::setup_black_pieces() const {
     const auto mesh {ctx.get_mesh("piece_black.obj"_H)};
 
     const auto vertex_array {ctx.load_vertex_array("piece_black"_H, mesh)};
@@ -567,7 +574,7 @@ std::vector<sm::Renderable> StandardGameScene::setup_black_pieces() {
     for (unsigned int i {0}; i < 9; i++) {
         const auto material_instance {ctx.load_material_instance(sm::Id("piece_black" + std::to_string(i)), material)};
         material_instance->set_texture("u_material.ambient_diffuse"_H, diffuse, 0);
-        material_instance->set_vec3("u_material.specular"_H, glm::vec3(0.3f));
+        material_instance->set_vec3("u_material.specular"_H, glm::vec3(0.2f));
         material_instance->set_float("u_material.shininess"_H, 8.0f);
         material_instance->set_texture("u_material.normal"_H, normal, 1);
 

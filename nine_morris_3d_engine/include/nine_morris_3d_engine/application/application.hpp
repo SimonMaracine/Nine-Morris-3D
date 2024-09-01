@@ -3,6 +3,7 @@
 #include <functional>
 #include <memory>
 #include <vector>
+#include <utility>
 
 #include "nine_morris_3d_engine/application/properties.hpp"
 #include "nine_morris_3d_engine/application/context.hpp"
@@ -35,13 +36,11 @@ namespace sm {
         // Add scenes to the application before calling run()
         template<typename S>
         void add_scene() {
-            m_scene_meta_scenes.push_back({
-                Id(S::static_name()),
-                [this]() {
-                    return std::make_unique<S>(m_ctx);
-                },
-                nullptr
-            });
+            MetaScene meta_scene;
+            meta_scene.id = Id(S::static_name());
+            meta_scene.constructor = [this]() { return std::make_unique<S>(m_ctx); };
+
+            m_scene_meta_scenes.push_back(std::move(meta_scene));
         }
 
         // Setup a struct that is shared across all scenes

@@ -323,17 +323,10 @@ void Ui::main_menu_bar(sm::Ctx& ctx, GameScene& game_scene) {
             }
             if (ImGui::BeginMenu("User Interface")) {
                 if (ImGui::MenuItem("Hide Timer", nullptr, &m_options.hide_timer)) {
-                    // auto& data = ctx->data<Data>();
-
-                    // if (data.options.hide_timer) {
-                    //     scene_list.remove(objects.get<sm::gui::Text>("timer_text"_H));
-
-                    //     LOG_INFO("Hide timer");
-                    // } else {
-                    //     scene_list.add(objects.get<sm::gui::Text>("timer_text"_H));
-
-                    //     LOG_INFO("Show timer");
-                    // }
+                    g.options.hide_timer = m_options.hide_timer;
+                }
+                if (ImGui::MenuItem("Hide Turn Indicator", nullptr, &m_options.hide_turn_indicator)) {
+                    g.options.hide_turn_indicator = m_options.hide_turn_indicator;
                 }
 
                 ImGui::EndMenu();

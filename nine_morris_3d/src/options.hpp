@@ -25,6 +25,7 @@ struct Options {
     bool custom_cursor {false};
     bool save_on_exit {false};
     bool hide_timer {false};
+    bool hide_turn_indicator {false};
     bool labeled_board {true};
 
     template<typename Archive>
@@ -43,6 +44,7 @@ struct Options {
             custom_cursor,
             save_on_exit,
             hide_timer,
+            hide_turn_indicator,
             labeled_board
         );
     }

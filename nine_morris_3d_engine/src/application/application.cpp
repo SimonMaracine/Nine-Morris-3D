@@ -1,7 +1,6 @@
 #include "nine_morris_3d_engine/application/application.hpp"
 
 #include <algorithm>
-#include <utility>
 #include <cassert>
 
 #include "nine_morris_3d_engine/application/scene.hpp"
