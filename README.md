@@ -34,14 +34,14 @@ The game runs on Linux and Windows.
 
 ```txt
 cd scripts
-./export_assets.py ../build_dist/ ../assets/ ../engine_assets/
+./export_assets.py ../build_dist/ ../assets/ ../assets_engine/
 ```
 
 - Build the archive
 
 ```txt
 cd scripts
-./create_source_archive.sh ../build_dist/ X.Y.Z ../build_dist/nine_morris_3d/NineMorris3D ../assets/icons/ ../distribution/linux/ninemorris3d.desktop ../build_dist/assets/ ../build_dist/engine_assets/
+./create_source_archive.sh ../build_dist/ X.Y.Z ../build_dist/nine_morris_3d/NineMorris3D ../assets/icons/ ../distribution/linux/ninemorris3d.desktop ../build_dist/assets/ ../build_dist/assets_engine/
 ```
 
 - Create a new directory called `Nine-Morris-3D-X.Y.Z-Linux`
@@ -61,7 +61,7 @@ tar -czf Nine-Morris-3D-X.Y.Z-Linux.tar.gz Nine-Morris-3D-X.Y.Z-Linux
 
 ```txt
 cd scripts
-python export_assets.py ..\build ..\assets ..\engine_assets
+python export_assets.py ..\build ..\assets ..\assets_engine
 ```
 
 - Create a new folder called whatever

@@ -51,7 +51,7 @@ Section "Nine Morris 3D (required)" section_game
   SetOutPath "$INSTDIR"
 
   File /r "assets"
-  File /r "engine_assets"
+  File /r "assets_engine"
   File "README.txt"
   File "NineMorris3D.exe"
 
@@ -102,7 +102,7 @@ Section "Uninstall"
 
   Delete "$INSTDIR\${ApplicationName}.exe"
   Delete "$INSTDIR\README.txt"
-  RMDir /r "$INSTDIR\engine_assets"
+  RMDir /r "$INSTDIR\assets_engine"
   RMDir /r "$INSTDIR\assets"
 
   Delete "$INSTDIR\Uninstall.exe"

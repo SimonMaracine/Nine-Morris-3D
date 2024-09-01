@@ -14,7 +14,6 @@ namespace sm::internal {
         m_path_saved_data(path_saved_data),
         m_path_assets(path_assets),
         m_assets_directory(assets_directory) {
-
 #ifdef SM_BUILD_DISTRIBUTION
         check_and_fix_directories();
 #endif
@@ -88,7 +87,7 @@ namespace sm::internal {
     }
 
     std::filesystem::path FileSystem::path_engine_assets() const {
-        return std::filesystem::path(m_path_assets) / "engine_assets";
+        return std::filesystem::path(m_path_assets) / "assets_engine";
     }
 
     std::filesystem::path FileSystem::path_logs(const std::string& path) const {

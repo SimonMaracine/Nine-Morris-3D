@@ -196,7 +196,7 @@ namespace sm {
         m_scn.add_renderable(renderable);
     }
 
-    void Ctx::add_light(DirectionalLight& light) {
+    void Ctx::add_light(DirectionalLight& light) noexcept {
         m_scn.add_light(light);
     }
 
@@ -271,7 +271,6 @@ namespace sm {
 
     std::string Ctx::get_information() {
         std::string result;
-
         result += '\n';
         result += openal_debug::get_information();
         result += opengl_debug::get_information();

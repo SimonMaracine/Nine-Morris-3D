@@ -134,7 +134,7 @@ namespace sm {
         void shadow(ShadowBox& box) noexcept;
         void add_post_processing(std::shared_ptr<PostProcessingStep> step);
         void add_renderable(Renderable& renderable);
-        void add_light(DirectionalLight& light);
+        void add_light(DirectionalLight& light) noexcept;
         void add_light(PointLight& light);
         void add_text(Text& text);
         void add_quad(Quad& quad);
