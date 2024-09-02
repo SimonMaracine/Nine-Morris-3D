@@ -18,6 +18,9 @@ struct Options {
     float master_volume {1.0f};
     float music_volume {0.7f};
     int skybox {static_cast<int>(Skybox::Field)};
+    int anti_aliasing {static_cast<int>(AntiAliasing::_2x)};
+    int anisotropic_filtering {static_cast<int>(AnisotropicFiltering::_4x)};
+    int texture_quality {static_cast<int>(TextureQuality::Full)};
     int scale {1};
     float camera_sensitivity {1.0f};
     bool enable_music {false};
@@ -37,6 +40,9 @@ struct Options {
             master_volume,
             music_volume,
             skybox,
+            anti_aliasing,
+            anisotropic_filtering,
+            texture_quality,
             scale,
             camera_sensitivity,
             enable_music,

@@ -13,10 +13,27 @@ enum class PlayerType {
     Computer
 };
 
-enum Skybox {
+enum class Skybox {
     None,
     Field,
     Autumn
+};
+
+enum class AntiAliasing {
+    Off,
+    _2x,
+    _4x
+};
+
+enum class AnisotropicFiltering {
+    Off,
+    _4x,
+    _8x
+};
+
+enum class TextureQuality {
+    Half,
+    Full
 };
 
 inline constexpr int MIN_WIDTH {512};

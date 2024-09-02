@@ -203,6 +203,58 @@ void Ui::main_menu_bar(sm::Ctx& ctx, GameScene& game_scene) {
 
                     ImGui::EndMenu();
                 }
+                if (ImGui::BeginMenu("Anti-Aliasing")) {
+                    if (ImGui::RadioButton("Off", &m_options.anti_aliasing, static_cast<int>(AntiAliasing::Off))) {
+                        if (std::exchange(g.options.anti_aliasing, m_options.anti_aliasing) != static_cast<int>(AntiAliasing::Off)) {
+
+                        }
+                    }
+                    if (ImGui::RadioButton("2X", &m_options.anti_aliasing, static_cast<int>(AntiAliasing::_2x))) {
+                        if (std::exchange(g.options.anti_aliasing, m_options.anti_aliasing) != static_cast<int>(AntiAliasing::_2x)) {
+
+                        }
+                    }
+                    if (ImGui::RadioButton("4X", &m_options.anti_aliasing, static_cast<int>(AntiAliasing::_4x))) {
+                        if (std::exchange(g.options.anti_aliasing, m_options.anti_aliasing) != static_cast<int>(AntiAliasing::_4x)) {
+
+                        }
+                    }
+
+                    ImGui::EndMenu();
+                }
+                if (ImGui::BeginMenu("Anisotropic Filtering")) {
+                    if (ImGui::RadioButton("Off", &m_options.anisotropic_filtering, static_cast<int>(AnisotropicFiltering::Off))) {
+                        if (std::exchange(g.options.anisotropic_filtering, m_options.anisotropic_filtering) != static_cast<int>(AnisotropicFiltering::Off)) {
+
+                        }
+                    }
+                    if (ImGui::RadioButton("4X", &m_options.anisotropic_filtering, static_cast<int>(AnisotropicFiltering::_4x))) {
+                        if (std::exchange(g.options.anisotropic_filtering, m_options.anisotropic_filtering) != static_cast<int>(AnisotropicFiltering::_4x)) {
+
+                        }
+                    }
+                    if (ImGui::RadioButton("8X", &m_options.anisotropic_filtering, static_cast<int>(AnisotropicFiltering::_8x))) {
+                        if (std::exchange(g.options.anisotropic_filtering, m_options.anisotropic_filtering) != static_cast<int>(AnisotropicFiltering::_8x)) {
+
+                        }
+                    }
+
+                    ImGui::EndMenu();
+                }
+                if (ImGui::BeginMenu("Texture Quality")) {
+                    if (ImGui::RadioButton("Half", &m_options.texture_quality, static_cast<int>(TextureQuality::Half))) {
+                        if (std::exchange(g.options.texture_quality, m_options.texture_quality) != static_cast<int>(TextureQuality::Half)) {
+
+                        }
+                    }
+                    if (ImGui::RadioButton("Full", &m_options.texture_quality, static_cast<int>(TextureQuality::Full))) {
+                        if (std::exchange(g.options.texture_quality, m_options.texture_quality) != static_cast<int>(TextureQuality::Full)) {
+
+                        }
+                    }
+
+                    ImGui::EndMenu();
+                }
                 if (ImGui::MenuItem("VSync", nullptr, &m_options.vsync)) {
                     g.options.vsync = m_options.vsync;
 

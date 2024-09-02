@@ -331,19 +331,19 @@ void StandardGameScene::setup_skybox() {
 }
 
 void StandardGameScene::setup_lights() {
-    auto& g {ctx.global<Global>()};
+    const auto& g {ctx.global<Global>()};
 
     switch (g.options.skybox) {
-        case Skybox::None:
+        case static_cast<int>(Skybox::None):
             // TODO
             break;
-        case Skybox::Field:
+        case static_cast<int>(Skybox::Field):
             m_directional_light.direction = glm::normalize(glm::vec3(-0.198f, -0.192f, -0.282f));
             m_directional_light.ambient_color = glm::vec3(0.08f);
             m_directional_light.diffuse_color = glm::vec3(0.95f);
             m_directional_light.specular_color = glm::vec3(1.0f);
             break;
-        case Skybox::Autumn:
+        case static_cast<int>(Skybox::Autumn):
             // TODO
             break;
     }
