@@ -108,6 +108,10 @@ namespace sm {
         m_win.set_icons(icons);
     }
 
+    void Ctx::set_window_dimensions(int width, int height) {
+        m_win.set_dimensions(width, height);
+    }
+
     Monitors Ctx::get_monitors() const {
         return m_win.get_monitors();
     }

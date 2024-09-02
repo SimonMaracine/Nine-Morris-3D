@@ -73,8 +73,8 @@ int application_main() {
 
         {
             sm::ApplicationProperties properties;
-            properties.width = 1024;
-            properties.height = 576;
+            properties.width = DEFAULT_WIDTH;
+            properties.height = DEFAULT_HEIGHT;
             properties.min_width = MIN_WIDTH;
             properties.min_height = MIN_HEIGHT;
             properties.title = "Nine Morris 3D";

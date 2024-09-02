@@ -48,7 +48,7 @@ private:
     std::string m_last_saved_game_date {"No Date"};
     PopupWindow m_current_popup_window {PopupWindow::None};
     bool m_loading_skybox {false};
-    bool m_show_information {true};
+    bool m_show_information {false};
     bool m_can_undo {false};
     bool m_can_redo {false};
 };

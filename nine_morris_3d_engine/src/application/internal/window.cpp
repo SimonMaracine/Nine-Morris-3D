@@ -140,6 +140,13 @@ namespace sm::internal {
         glfwSetWindowIcon(m_window, static_cast<int>(icons.size()), icons.data());
     }
 
+    void Window::set_dimensions(int width, int height) {
+        glfwSetWindowSize(m_window, width, height);
+
+        m_width = width;
+        m_height = height;
+    }
+
     Monitors Window::get_monitors() const {
         int count {};
         GLFWmonitor** connected_monitors {glfwGetMonitors(&count)};

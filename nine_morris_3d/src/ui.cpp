@@ -10,11 +10,15 @@
 #include "ver.hpp"
 
 void Ui::initialize(sm::Ctx& ctx) {
-    auto& g {ctx.global<Global>()};
+    const auto& g {ctx.global<Global>()};
 
     m_options = g.options;
 
     set_scale(ctx, g.options.scale);
+
+#ifndef SM_BUILD_DISTRIBUTION
+    m_show_information = true;
+#endif
 }
 
 void Ui::update(sm::Ctx& ctx, GameScene& game_scene) {
