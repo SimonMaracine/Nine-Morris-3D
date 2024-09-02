@@ -1,7 +1,5 @@
 #include "nine_morris_3d_engine/graphics/font.hpp"
 
-#include <algorithm>
-#include <cmath>
 #include <cstring>
 #include <cstddef>
 #include <cassert>
@@ -193,7 +191,7 @@ namespace sm {
             if (character == '\n') {
                 height += m_vertical_advance;
 
-                width = std::max(width, line_width);
+                width = glm::max(width, line_width);
                 line_width = 0.0f;
 
                 continue;
@@ -205,9 +203,9 @@ namespace sm {
             line_width += static_cast<float>(advance_width) * m_sf;
         }
 
-        width = std::max(width, line_width);
+        width = glm::max(width, line_width);
 
-        return std::make_pair(static_cast<int>(width * std::min(scale, 1.0f)), static_cast<int>(height * std::min(scale, 1.0f)));
+        return std::make_pair(static_cast<int>(width * scale), static_cast<int>(height * scale));
     }
 
     void Font::get_character_quad(int codepoint, float* x, float* y, Quad* quad) const noexcept {
@@ -244,7 +242,7 @@ namespace sm {
     }
 
     void Font::write_bitmap_to_file(const char* name, const unsigned char* bitmap, int size) {
-        const std::string file_name {"bitmap_" + std::string(name) + ".png"};
+        const auto file_name {"bitmap_" + std::string(name) + ".png"};
 
         if (!stbi_write_png(file_name.c_str(), size, size, 1, bitmap, 0)) {
             LOG_ERROR("Failed to create bitmap png file `{}`", file_name);

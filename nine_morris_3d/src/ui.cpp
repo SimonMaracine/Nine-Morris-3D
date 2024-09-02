@@ -6,7 +6,7 @@
 #include <nine_morris_3d_engine/external/glm.h++>
 
 #include "global.hpp"
-#include "enums.hpp"
+#include "constants.hpp"
 #include "ver.hpp"
 
 void Ui::initialize(sm::Ctx& ctx) {
@@ -432,7 +432,7 @@ void Ui::wrapped_text_window(const char* title, const char* text) {
 
     generic_window(title, [=]() {
         if (wrapped) {
-            ImGui::TextWrapped("%s", text);
+            ImGui::TextWrapped("%s", text);  // FIXME
         } else {
             ImGui::Text("%s", text);
         }

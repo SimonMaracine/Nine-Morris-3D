@@ -707,7 +707,7 @@ namespace sm::internal {
 
             glm::mat4 matrix {1.0f};  // TODO upload mat3 instead
             matrix = glm::translate(matrix, glm::vec3(text.position, 0.0f));
-            matrix = glm::scale(matrix, glm::vec3(std::min(text.scale, 1.0f), std::min(text.scale, 1.0f), 1.0f));
+            matrix = glm::scale(matrix, glm::vec3(text.scale, text.scale, 1.0f));
 
             m_storage.text.batch_matrices.push_back(matrix);
             m_storage.text.batch_colors.push_back(text.color);
@@ -783,7 +783,7 @@ namespace sm::internal {
             m_storage.quad.texture_index++;
         }
 
-        size *= glm::min(scale, glm::vec2(1.0f));
+        size *= scale;
 
         m_storage.quad.buffer_pointer->position = glm::vec2(position.x + size.x, position.y + size.y);
         m_storage.quad.buffer_pointer->texture_coordinate = glm::vec2(1.0f, 1.0f);

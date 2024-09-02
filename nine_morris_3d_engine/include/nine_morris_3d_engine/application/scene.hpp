@@ -16,7 +16,7 @@ namespace sm {
         ApplicationScene(ApplicationScene&&) = delete;
         ApplicationScene& operator=(ApplicationScene&&) = delete;
 
-        virtual const char* name() const noexcept = 0;
+        virtual const char* get_name() const noexcept = 0;
         virtual void on_start() {}  // Called when the scene is entered
         virtual void on_stop() {}  // Called when the scene is exited
         virtual void on_update() {}  // Called every frame
@@ -24,7 +24,7 @@ namespace sm {
         virtual void on_imgui_update() {}  // Called every frame for Dear ImGui only
 
         Id get_id() const noexcept {
-            return Id(name());
+            return Id(get_name());
         }
 
         Ctx& ctx;
@@ -32,5 +32,5 @@ namespace sm {
 }
 
 #define SM_SCENE_NAME(NAME) \
-    static const char* static_name() noexcept { return NAME; } \
-    const char* name() const noexcept override { return static_name(); }
+    static const char* get_static_name() noexcept { return NAME; } \
+    const char* get_name() const noexcept override { return get_static_name(); }

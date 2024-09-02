@@ -2,6 +2,9 @@
 
 #include <cstdio>
 
+#include "global.hpp"
+#include "constants.hpp"
+
 Timer::Timer(std::shared_ptr<sm::Font> font) {
     m_text.font = font;
     m_text.color = glm::vec3(0.75f);
@@ -17,7 +20,7 @@ void Timer::stop() {
     m_running = false;
 }
 
-void Timer::update(sm::Ctx& ctx) {
+void Timer::update() {
     if (!m_running) {
         return;
     }
@@ -41,12 +44,27 @@ void Timer::render(sm::Ctx& ctx) {
     char buffer[32] {};
     std::snprintf(buffer, sizeof(buffer), "%.2u:%.2u", minutes, seconds);
 
-    const auto [width, height] {m_text.font->get_string_size(buffer)};
-
     m_text.text = buffer;
+
+    const auto& g {ctx.global<Global>()};
+
+    m_text.scale = (
+        sm::utils::map(
+           static_cast<float>(ctx.get_window_height()),
+            static_cast<float>(MIN_HEIGHT),
+            static_cast<float>(MAX_HEIGHT),
+            0.5f,
+            1.0f
+        ) * g.get_scale()
+    );
+
+    const auto [width, height] {m_text.font->get_string_size(buffer, m_text.scale)};
+
+    const float offset {40.0f * g.get_scale()};
+
     m_text.position = glm::vec2(
-        static_cast<float>(ctx.get_window_width()) / 2.0f - width / 2.0f,
-        static_cast<float>(ctx.get_window_height()) - height - 40.0f  // TODO scale + relative offsets
+        static_cast<float>(ctx.get_window_width()) / 2.0f - static_cast<float>(width) / 2.0f,
+        static_cast<float>(ctx.get_window_height()) - static_cast<float>(height) - offset
     );
 
     ctx.add_text(m_text);

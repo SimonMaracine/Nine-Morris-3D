@@ -37,7 +37,7 @@ namespace sm {
         template<typename S>
         void add_scene() {
             MetaScene meta_scene;
-            meta_scene.id = Id(S::static_name());
+            meta_scene.id = Id(S::get_static_name());
             meta_scene.constructor = [this]() { return std::make_unique<S>(m_ctx); };
 
             m_scene_meta_scenes.push_back(std::move(meta_scene));

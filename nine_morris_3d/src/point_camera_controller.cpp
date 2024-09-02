@@ -106,8 +106,8 @@ void PointCameraController::update_camera(float dt) {
     calculate_auto_distance_to_point(dt);
 
     // Limit distance_to_point
-    m_distance_to_point = std::max(m_distance_to_point, MIN_DISTANCE_TO_POINT);
-    m_distance_to_point = std::min(m_distance_to_point, MAX_DISTANCE_TO_POINT);
+    m_distance_to_point = glm::max(m_distance_to_point, MIN_DISTANCE_TO_POINT);
+    m_distance_to_point = glm::min(m_distance_to_point, MAX_DISTANCE_TO_POINT);
 
     m_pitch += m_velocity_y * sensitivity * dt;
 
@@ -115,8 +115,8 @@ void PointCameraController::update_camera(float dt) {
     calculate_auto_pitch(dt);
 
     // Limit pitch
-    m_pitch = std::min(m_pitch, 90.0f);
-    m_pitch = std::max(m_pitch, -90.0f);
+    m_pitch = glm::min(m_pitch, 90.0f);
+    m_pitch = glm::max(m_pitch, -90.0f);
 
     m_angle_around_point += m_velocity_x * sensitivity * dt;
 

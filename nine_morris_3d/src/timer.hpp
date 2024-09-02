@@ -13,7 +13,7 @@ public:
     bool is_running() const { return m_running; }
     unsigned int get_time() const { return m_time; }
 
-    void update(sm::Ctx& ctx);
+    void update();
     void render(sm::Ctx& ctx);
 private:
     bool m_running {false};

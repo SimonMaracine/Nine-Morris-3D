@@ -13,6 +13,7 @@
 #include "scenes/standard_game_scene.hpp"
 #include "game.hpp"
 #include "global.hpp"
+#include "constants.hpp"
 #include "ver.hpp"
 
 struct Paths {
@@ -74,8 +75,8 @@ int application_main() {
             sm::ApplicationProperties properties;
             properties.width = 1024;
             properties.height = 576;
-            properties.min_width = 512;
-            properties.min_height = 288;
+            properties.min_width = MIN_WIDTH;
+            properties.min_height = MIN_HEIGHT;
             properties.title = "Nine Morris 3D";
             properties.log_file = "log.txt";
             properties.version_major = VERSION_MAJOR;

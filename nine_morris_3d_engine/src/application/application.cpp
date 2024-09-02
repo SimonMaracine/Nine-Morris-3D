@@ -1,6 +1,5 @@
 #include "nine_morris_3d_engine/application/application.hpp"
 
-#include <algorithm>
 #include <cassert>
 
 #include "nine_morris_3d_engine/application/scene.hpp"
@@ -117,7 +116,7 @@ namespace sm {
         }
         m_frame_counter.frame_count++;
 
-        const double delta_time {std::min(elapsed_seconds, MAX_DT)};
+        const double delta_time {glm::min(elapsed_seconds, MAX_DT)};
 
         return static_cast<float>(delta_time);
     }

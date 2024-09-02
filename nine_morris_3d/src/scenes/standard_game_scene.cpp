@@ -7,7 +7,7 @@
 #include "game/ray.hpp"
 #include "global.hpp"
 #include "game.hpp"
-#include "enums.hpp"
+#include "constants.hpp"
 
 void StandardGameScene::on_start() {
     // ctx.add_task([this](const sm::Task& task, void*) {
@@ -94,13 +94,13 @@ void StandardGameScene::on_update() {
 
     m_board.update(ctx, ray, m_cam_controller.get_position());
 
-    auto& g {ctx.global<Global>()};
+    const auto& g {ctx.global<Global>()};
 
     if (!g.options.hide_turn_indicator) {
         m_turn_indicator.update(ctx, static_cast<TurnIndicatorType>(m_board.get_turn()));
     }
 
-    m_timer.update(ctx);
+    m_timer.update();
 
     if (!g.options.hide_timer) {
         m_timer.render(ctx);
@@ -361,7 +361,7 @@ void StandardGameScene::setup_turn_indicator() {
 
 void StandardGameScene::setup_timer() {
     sm::FontSpecification specification;
-    specification.size_height = 70.0f;
+    specification.size_height = 90.0f;
     specification.bitmap_size = 512;
 
     const auto font {ctx.load_font(
