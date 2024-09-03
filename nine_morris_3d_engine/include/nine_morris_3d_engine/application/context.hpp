@@ -167,6 +167,7 @@ namespace sm {
         std::shared_ptr<GlVertexArray> load_vertex_array(Id id, std::shared_ptr<Mesh> mesh);
         std::shared_ptr<TextureData> get_texture_data(Id id) const;
         std::shared_ptr<TextureData> load_texture_data(const std::filesystem::path& file_path, const TexturePostProcessing& post_processing);
+        std::shared_ptr<TextureData> reload_texture_data(const std::filesystem::path& file_path, const TexturePostProcessing& post_processing);
         std::shared_ptr<GlTexture> load_texture(Id id, std::shared_ptr<TextureData> texture_data, const TextureSpecification& specification);
         std::shared_ptr<GlTexture> reload_texture(Id id, std::shared_ptr<TextureData> texture_data, const TextureSpecification& specification);
         std::shared_ptr<GlTextureCubemap> load_texture_cubemap(Id id, std::initializer_list<std::shared_ptr<TextureData>> texture_data, TextureFormat format);

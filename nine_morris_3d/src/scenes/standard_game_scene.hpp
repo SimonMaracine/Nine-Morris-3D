@@ -23,9 +23,10 @@ public:
     void on_update() override;
     void on_fixed_update() override;
     void on_imgui_update() override;
-private:
-    PointCameraController& get_camera_controller() override;
 
+    PointCameraController& get_camera_controller() override;
+    void load_and_set_skybox() override;
+private:
     void on_window_resized(const sm::WindowResizedEvent& event);
     void on_key_released(const sm::KeyReleasedEvent& event);
     void on_mouse_button_released(const sm::MouseButtonReleasedEvent& event);
@@ -41,6 +42,8 @@ private:
     std::vector<sm::Renderable> setup_nodes() const;
     std::vector<sm::Renderable> setup_white_pieces() const;
     std::vector<sm::Renderable> setup_black_pieces() const;
+
+    void load_skybox();
 
     // void setup_ground(std::shared_ptr<sm::Mesh> mesh);
     // void setup_dragon(std::shared_ptr<sm::Mesh> mesh);
@@ -89,7 +92,8 @@ private:
     // sm::Quad wait;
     // sm::Quad white;
 
-    std::shared_ptr<sm::GlTextureCubemap> m_field;
+    std::shared_ptr<sm::GlTextureCubemap> m_skybox;
+
     // std::shared_ptr<sm::Font> sans;
     // std::shared_ptr<sm::AlSource> emitter;
     // std::shared_ptr<sm::AlBuffer> sound_move;

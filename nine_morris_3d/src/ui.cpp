@@ -345,36 +345,18 @@ void Ui::main_menu_bar(sm::Ctx& ctx, GameScene& game_scene) {
                 } else {
                     if (ImGui::RadioButton("None", &m_options.skybox, static_cast<int>(Skybox::None))) {
                         if (std::exchange(g.options.skybox, m_options.skybox) != static_cast<int>(Skybox::None)) {
-
+                            game_scene.load_and_set_skybox();
                         }
-                        // if (data.imgui_option.skybox != data.options.skybox) {
-                        //     data.options.skybox = data.imgui_option.skybox;
-                        //     set_skybox(Skybox::None);
-
-                        //     LOG_INFO("Skybox set to None");
-                        // }
                     }
                     if (ImGui::RadioButton("Field", &m_options.skybox, static_cast<int>(Skybox::Field))) {
                         if (std::exchange(g.options.skybox, m_options.skybox) != static_cast<int>(Skybox::Field)) {
-
+                            game_scene.load_and_set_skybox();
                         }
-                        // if (data.imgui_option.skybox != data.options.skybox) {
-                        //     data.options.skybox = data.imgui_option.skybox;
-                        //     set_skybox(Skybox::Field);
-
-                        //     LOG_INFO("Skybox set to Field");
-                        // }
                     }
                     if (ImGui::RadioButton("Autumn", &m_options.skybox, static_cast<int>(Skybox::Autumn))) {
                         if (std::exchange(g.options.skybox, m_options.skybox) != static_cast<int>(Skybox::Autumn)) {
-
+                            game_scene.load_and_set_skybox();
                         }
-                        // if (data.imgui_option.skybox != data.options.skybox) {
-                        //     data.options.skybox = data.imgui_option.skybox;
-                        //     set_skybox(Skybox::Autumn);
-
-                        //     LOG_INFO("Skybox set to Autumn");
-                        // }
                     }
                 }
 

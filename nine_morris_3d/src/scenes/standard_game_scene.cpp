@@ -112,11 +112,13 @@ void StandardGameScene::on_update() {
     //     ctx.skybox(field);
     // }
 
-    ctx.skybox(m_field);
+    if (m_skybox) {
+        ctx.skybox(m_skybox);
+    }
 
 #if 0
     // TODO
-    temp.transform.position = glm::normalize(-directional_light.direction) * 7.0f;
+    temp.transform.position = glm::normalize(-m_directional_light.direction) * 7.0f;
     temp.transform.scale = 30.0f;
     ctx.add_renderable(temp);
 #endif
@@ -256,6 +258,21 @@ PointCameraController& StandardGameScene::get_camera_controller() {
     return m_cam_controller;
 }
 
+void StandardGameScene::load_and_set_skybox() {
+    ctx.add_task_async([this](sm::AsyncTask& task, void*) {
+        load_skybox();
+
+        ctx.add_task([this](const sm::Task&, void*) {
+            setup_skybox();
+            setup_lights();
+
+            return sm::Task::Result::Done;
+        });
+
+        task.set_done();
+    });
+}
+
 void StandardGameScene::on_window_resized(const sm::WindowResizedEvent& event) {
     m_cam.set_projection(event.width, event.height, LENS_FOV, LENS_NEAR, LENS_FAR);
     m_cam_2d.set_projection(0, event.width, 0, event.height);
@@ -316,8 +333,24 @@ void StandardGameScene::setup_camera() {
 }
 
 void StandardGameScene::setup_skybox() {
-    m_field = ctx.load_texture_cubemap(
-        "field"_H,
+    const auto& g {ctx.global<Global>()};
+
+    sm::Id id;
+
+    switch (g.options.skybox) {
+        case static_cast<int>(Skybox::None):
+            m_skybox = nullptr;
+            return;
+        case static_cast<int>(Skybox::Field):
+            id = "field"_H;
+            break;
+        case static_cast<int>(Skybox::Autumn):
+            id = "autumn"_H;
+            break;
+    }
+
+    m_skybox = ctx.reload_texture_cubemap(
+        id,
         {
             ctx.get_texture_data("px.png"_H),
             ctx.get_texture_data("nx.png"_H),
@@ -335,7 +368,10 @@ void StandardGameScene::setup_lights() {
 
     switch (g.options.skybox) {
         case static_cast<int>(Skybox::None):
-            // TODO
+            m_directional_light.direction = glm::normalize(glm::vec3(0.1f, -0.8f, 0.1f));
+            m_directional_light.ambient_color = glm::vec3(0.07f);
+            m_directional_light.diffuse_color = glm::vec3(0.6f);
+            m_directional_light.specular_color = glm::vec3(0.75f);
             break;
         case static_cast<int>(Skybox::Field):
             m_directional_light.direction = glm::normalize(glm::vec3(-0.198f, -0.192f, -0.282f));
@@ -344,7 +380,10 @@ void StandardGameScene::setup_lights() {
             m_directional_light.specular_color = glm::vec3(1.0f);
             break;
         case static_cast<int>(Skybox::Autumn):
-            // TODO
+            m_directional_light.direction = glm::normalize(glm::vec3(0.4f, -1.0f, -0.1f));
+            m_directional_light.ambient_color = glm::vec3(0.15f);
+            m_directional_light.diffuse_color = glm::vec3(0.75f);
+            m_directional_light.specular_color = glm::vec3(0.65f);
             break;
     }
 }
@@ -582,6 +621,36 @@ std::vector<sm::Renderable> StandardGameScene::setup_black_pieces() const {
     }
 
     return renderables;
+}
+
+void StandardGameScene::load_skybox() {
+    // Global options must have been set to the desired skybox
+
+    sm::TexturePostProcessing post_processing;
+    post_processing.flip = false;
+
+    const auto& g {ctx.global<Global>()};
+
+    switch (g.options.skybox) {
+        case static_cast<int>(Skybox::None):
+            break;
+        case static_cast<int>(Skybox::Field):
+            ctx.reload_texture_data(ctx.path_assets("textures/skybox/field/px.png"), post_processing);
+            ctx.reload_texture_data(ctx.path_assets("textures/skybox/field/nx.png"), post_processing);
+            ctx.reload_texture_data(ctx.path_assets("textures/skybox/field/py.png"), post_processing);
+            ctx.reload_texture_data(ctx.path_assets("textures/skybox/field/ny.png"), post_processing);
+            ctx.reload_texture_data(ctx.path_assets("textures/skybox/field/pz.png"), post_processing);
+            ctx.reload_texture_data(ctx.path_assets("textures/skybox/field/nz.png"), post_processing);
+            break;
+        case static_cast<int>(Skybox::Autumn):
+            ctx.reload_texture_data(ctx.path_assets("textures/skybox/autumn/px.png"), post_processing);
+            ctx.reload_texture_data(ctx.path_assets("textures/skybox/autumn/nx.png"), post_processing);
+            ctx.reload_texture_data(ctx.path_assets("textures/skybox/autumn/py.png"), post_processing);
+            ctx.reload_texture_data(ctx.path_assets("textures/skybox/autumn/ny.png"), post_processing);
+            ctx.reload_texture_data(ctx.path_assets("textures/skybox/autumn/pz.png"), post_processing);
+            ctx.reload_texture_data(ctx.path_assets("textures/skybox/autumn/nz.png"), post_processing);
+            break;
+    }
 }
 
 // void StandardGameScene::setup_skybox(

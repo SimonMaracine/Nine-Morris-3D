@@ -380,6 +380,12 @@ namespace sm {
         return m_res.texture_data->force_load(id, utils::read_file(file_path), post_processing);
     }
 
+    std::shared_ptr<TextureData> Ctx::reload_texture_data(const std::filesystem::path& file_path, const TexturePostProcessing& post_processing) {
+        const auto id {Id(utils::file_name(file_path))};
+
+        return m_res.texture_data->force_load(id, utils::read_file(file_path), post_processing);
+    }
+
     std::shared_ptr<GlTexture> Ctx::load_texture(Id id, std::shared_ptr<TextureData> texture_data, const TextureSpecification& specification) {
         return m_res.texture->load(id, texture_data, specification);
     }
