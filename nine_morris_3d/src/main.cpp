@@ -85,6 +85,7 @@ int application_main() {
             properties.path_logs = paths.logs;
             properties.path_saved_data = paths.saved_data;
             properties.path_assets = paths.assets;
+            properties.default_renderer_parameters = false;
             // properties.audio = true;  // TODO
 
             sm::UserFunctions functions;

@@ -20,20 +20,30 @@ enum class Skybox {
 };
 
 enum class AntiAliasing {
-    Off,
-    _2x,
-    _4x
+    Off = 1,
+    _2x = 2,
+    _4x = 4
 };
 
 enum class AnisotropicFiltering {
-    Off,
-    _4x,
-    _8x
+    Off = 0,
+    _4x = 4,
+    _8x = 8
 };
 
 enum class TextureQuality {
     Half,
     Full
+};
+
+enum class ShadowQuality {
+    Half = 2048,
+    Full = 4096
+};
+
+enum class Scale {
+    _100 = 1,
+    _200 = 2,
 };
 
 inline constexpr int MIN_WIDTH {512};

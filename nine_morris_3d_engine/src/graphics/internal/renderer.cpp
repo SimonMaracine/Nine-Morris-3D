@@ -85,30 +85,11 @@ namespace sm::internal {
     }
 #endif
 
-    Renderer::Renderer(int width, int height, int samples, const FileSystem& fs, const ShaderLibrary& shd) {
+    Renderer::Renderer(int width, int height, const FileSystem& fs, const ShaderLibrary& shd) {
         opengl::initialize_default();
         opengl::initialize_stencil();
         opengl::enable_depth_test();
 
-        // Scene
-        {
-            FramebufferSpecification specification;
-            specification.width = width;
-            specification.height = height;
-            specification.color_attachments = {
-                Attachment(AttachmentFormat::Rgba8Float, AttachmentType::Renderbuffer)
-            };
-            specification.depth_attachment = Attachment(
-                AttachmentFormat::Depth24Stencil8, AttachmentType::Renderbuffer
-            );
-            specification.samples = samples;
-
-            m_storage.scene_framebuffer = std::make_shared<GlFramebuffer>(specification);
-
-            register_framebuffer(m_storage.scene_framebuffer);
-        }
-
-        // Final
         {
             FramebufferSpecification specification;
             specification.width = width;
@@ -123,20 +104,6 @@ namespace sm::internal {
             m_storage.final_framebuffer = std::make_shared<GlFramebuffer>(specification);
 
             register_framebuffer(m_storage.final_framebuffer);
-        }
-
-        // Shadow
-        {
-            FramebufferSpecification specification;
-            specification.width = 2048;
-            specification.height = 2048;
-            specification.depth_attachment = Attachment(AttachmentFormat::Depth32, AttachmentType::Texture);
-            specification.white_border_depth_texture = true;
-            specification.resizable = false;
-
-            m_storage.shadow_map_framebuffer = std::make_shared<GlFramebuffer>(specification);
-
-            register_framebuffer(m_storage.shadow_map_framebuffer);
         }
 
         {
@@ -203,10 +170,10 @@ namespace sm::internal {
             const float vertices[] {
                 -1.0f,  1.0f,
                 -1.0f, -1.0f,
-                1.0f,  1.0f,
-                1.0f,  1.0f,
+                 1.0f,  1.0f,
+                 1.0f,  1.0f,
                 -1.0f, -1.0f,
-                1.0f, -1.0f
+                 1.0f, -1.0f
             };
 
             const auto vertex_buffer {std::make_shared<GlVertexBuffer>(vertices, sizeof(vertices))};
@@ -268,16 +235,6 @@ namespace sm::internal {
             m_storage.quad.buffer = std::make_unique<QuadVertex[]>(MAX_QUAD_COUNT * 4);
         }
 
-        {
-            m_storage.default_font = std::make_unique<Font>(
-                utils::read_file(fs.path_engine_assets("fonts/CodeNewRoman/code-new-roman.regular.ttf"))
-            );
-
-            m_storage.default_font->begin_baking();
-            m_storage.default_font->bake_ascii();
-            m_storage.default_font->end_baking("default");
-        }
-
 #ifndef SM_BUILD_DISTRIBUTION
         m_debug = DebugRenderer(fs, *this);
 #endif
@@ -303,6 +260,24 @@ namespace sm::internal {
         }
 
         opengl::clear_color(m_clear_color.r, m_clear_color.g, m_clear_color.b);
+    }
+
+    void Renderer::set_samples(int width, int height, int samples) {
+        setup_scene_framebuffer(width, height, samples);
+    }
+
+    void Renderer::set_scale(const FileSystem& fs, int scale) {
+        setup_default_font(fs, scale);
+    }
+
+    void Renderer::set_shadow_map_size(int size) {
+        setup_shadow_framebuffer(size);
+    }
+
+    void Renderer::initialize(int width, int height, const FileSystem& fs, const RendererSpecification& specification) {
+        setup_scene_framebuffer(width, height, specification.samples);
+        setup_shadow_framebuffer(specification.shadow_map_size);
+        setup_default_font(fs, specification.scale);
     }
 
     void Renderer::register_shader(std::shared_ptr<GlShader> shader) {
@@ -888,6 +863,51 @@ namespace sm::internal {
         const glm::mat4 light_space_matrix {projection * view};
 
         uniform_buffer->set(&light_space_matrix, "u_light_space_matrix"_H);
+    }
+
+    void Renderer::setup_scene_framebuffer(int width, int height, int samples) {
+        FramebufferSpecification specification;
+        specification.width = width;
+        specification.height = height;
+        specification.color_attachments = {
+            Attachment(AttachmentFormat::Rgba8Float, AttachmentType::Renderbuffer)
+        };
+        specification.depth_attachment = Attachment(
+            AttachmentFormat::Depth24Stencil8, AttachmentType::Renderbuffer
+        );
+        specification.samples = samples;
+
+        m_storage.scene_framebuffer = std::make_shared<GlFramebuffer>(specification);
+
+        register_framebuffer(m_storage.scene_framebuffer);
+    }
+
+    void Renderer::setup_shadow_framebuffer(int size) {
+        FramebufferSpecification specification;
+        specification.width = size;
+        specification.height = size;
+        specification.depth_attachment = Attachment(AttachmentFormat::Depth32, AttachmentType::Texture);
+        specification.white_border_depth_texture = true;
+        specification.resizable = false;
+
+        m_storage.shadow_map_framebuffer = std::make_shared<GlFramebuffer>(specification);
+
+        register_framebuffer(m_storage.shadow_map_framebuffer);
+    }
+
+    void Renderer::setup_default_font(const FileSystem& fs, int scale) {
+        FontSpecification specification;
+        specification.size_height *= static_cast<float>(scale);
+        specification.bitmap_size *= scale;
+
+        m_storage.default_font = std::make_unique<Font>(
+            utils::read_file(fs.path_engine_assets("fonts/CodeNewRoman/code-new-roman.regular.ttf")),
+            specification
+        );
+
+        m_storage.default_font->begin_baking();
+        m_storage.default_font->bake_ascii();
+        m_storage.default_font->end_baking("default");
     }
 
     std::shared_ptr<GlIndexBuffer> Renderer::initialize_quads_index_buffer() {

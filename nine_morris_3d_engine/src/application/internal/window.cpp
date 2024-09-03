@@ -18,7 +18,7 @@
 #include "nine_morris_3d_engine/graphics/opengl/debug.hpp"
 
 namespace sm::internal {
-    Window::Window(const ApplicationProperties& properties, EventDispatcher* evt)
+    Window::Window(const ApplicationProperties& properties, EventDispatcher& evt)
         : m_evt(evt) {
         if (!glfwInit()) {
             SM_THROW_ERROR(InitializationError, "Could not initialize GLFW");
@@ -140,7 +140,7 @@ namespace sm::internal {
         glfwSetWindowIcon(m_window, static_cast<int>(icons.size()), icons.data());
     }
 
-    void Window::set_dimensions(int width, int height) {
+    void Window::set_dimensions(int width, int height) noexcept {
         glfwSetWindowSize(m_window, width, height);
 
         m_width = width;
@@ -230,13 +230,13 @@ namespace sm::internal {
         glfwSetWindowCloseCallback(m_window, [](GLFWwindow* window) {
             auto* win {static_cast<Window*>(glfwGetWindowUserPointer(window))};
 
-            win->m_evt->enqueue<WindowClosedEvent>();
+            win->m_evt.enqueue<WindowClosedEvent>();
         });
 
         glfwSetFramebufferSizeCallback(m_window, [](GLFWwindow* window, int width, int height) {
             auto* win {static_cast<Window*>(glfwGetWindowUserPointer(window))};
 
-            win->m_evt->enqueue<WindowResizedEvent>(width, height);
+            win->m_evt.enqueue<WindowResizedEvent>(width, height);
 
             // Sem_t these after firing the event
             win->m_width = width;
@@ -246,19 +246,19 @@ namespace sm::internal {
         glfwSetWindowFocusCallback(m_window, [](GLFWwindow* window, int focused) {
             auto* win {static_cast<Window*>(glfwGetWindowUserPointer(window))};
 
-            win->m_evt->enqueue<WindowFocusedEvent>(static_cast<bool>(focused));
+            win->m_evt.enqueue<WindowFocusedEvent>(static_cast<bool>(focused));
         });
 
         glfwSetWindowIconifyCallback(m_window, [](GLFWwindow* window, int iconified) {
             auto* win {static_cast<Window*>(glfwGetWindowUserPointer(window))};
 
-            win->m_evt->enqueue<WindowIconifiedEvent>(static_cast<bool>(iconified));
+            win->m_evt.enqueue<WindowIconifiedEvent>(static_cast<bool>(iconified));
         });
 
         glfwSetWindowPosCallback(m_window, [](GLFWwindow* window, int xpos, int ypos) {
             auto* win {static_cast<Window*>(glfwGetWindowUserPointer(window))};
 
-            win->m_evt->enqueue<WindowMovedEvent>(xpos, ypos);
+            win->m_evt.enqueue<WindowMovedEvent>(xpos, ypos);
         });
 
         glfwSetKeyCallback(m_window, [](GLFWwindow* window, int key, int scancode, int action, int mods) {
@@ -270,7 +270,7 @@ namespace sm::internal {
                         return;
                     }
 
-                    win->m_evt->enqueue<KeyPressedEvent>(
+                    win->m_evt.enqueue<KeyPressedEvent>(
                         Input::key_from_code(key),
                         false,
                         static_cast<bool>(mods & GLFW_MOD_CONTROL)
@@ -282,7 +282,7 @@ namespace sm::internal {
                         return;
                     }
 
-                    win->m_evt->enqueue<KeyReleasedEvent>(Input::key_from_code(key));
+                    win->m_evt.enqueue<KeyReleasedEvent>(Input::key_from_code(key));
 
                     break;
                 case GLFW_REPEAT:
@@ -290,7 +290,7 @@ namespace sm::internal {
                         return;
                     }
 
-                    win->m_evt->enqueue<KeyPressedEvent>(
+                    win->m_evt.enqueue<KeyPressedEvent>(
                         Input::key_from_code(key),
                         true,
                         static_cast<bool>(mods & GLFW_MOD_CONTROL)
@@ -317,7 +317,7 @@ namespace sm::internal {
                         return;
                     }
 
-                    win->m_evt->enqueue<MouseButtonPressedEvent>(Input::mouse_button_from_code(button));
+                    win->m_evt.enqueue<MouseButtonPressedEvent>(Input::mouse_button_from_code(button));
 
                     break;
                 case GLFW_RELEASE:
@@ -325,7 +325,7 @@ namespace sm::internal {
                         return;
                     }
 
-                    win->m_evt->enqueue<MouseButtonReleasedEvent>(Input::mouse_button_from_code(button));
+                    win->m_evt.enqueue<MouseButtonReleasedEvent>(Input::mouse_button_from_code(button));
 
                     break;
             }
@@ -338,7 +338,7 @@ namespace sm::internal {
                 return;
             }
 
-            win->m_evt->enqueue<MouseWheelScrolledEvent>(static_cast<float>(yoffset));
+            win->m_evt.enqueue<MouseWheelScrolledEvent>(static_cast<float>(yoffset));
         });
 
         glfwSetCursorPosCallback(m_window, [](GLFWwindow* window, double xpos, double ypos) {
@@ -348,7 +348,7 @@ namespace sm::internal {
                 return;
             }
 
-            win->m_evt->enqueue<MouseMovedEvent>(static_cast<float>(xpos), static_cast<float>(ypos));
+            win->m_evt.enqueue<MouseMovedEvent>(static_cast<float>(xpos), static_cast<float>(ypos));
         });
     }
 }

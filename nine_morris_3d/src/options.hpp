@@ -21,7 +21,8 @@ struct Options {
     int anti_aliasing {static_cast<int>(AntiAliasing::_2x)};
     int anisotropic_filtering {static_cast<int>(AnisotropicFiltering::_4x)};
     int texture_quality {static_cast<int>(TextureQuality::Full)};
-    int scale {1};
+    int shadow_quality {static_cast<int>(ShadowQuality::Full)};
+    int scale {static_cast<int>(Scale::_100)};
     float camera_sensitivity {1.0f};
     bool enable_music {false};
     bool vsync {true};
@@ -43,6 +44,7 @@ struct Options {
             anti_aliasing,
             anisotropic_filtering,
             texture_quality,
+            shadow_quality,
             scale,
             camera_sensitivity,
             enable_music,

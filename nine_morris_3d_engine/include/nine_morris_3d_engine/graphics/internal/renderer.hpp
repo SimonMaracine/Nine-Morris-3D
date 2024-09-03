@@ -49,14 +49,24 @@ namespace sm::internal {
     class DebugRenderer {};
 #endif
 
+    struct RendererSpecification {
+        int samples {1};
+        int scale {1};
+        int shadow_map_size {2048};
+    };
+
     class Renderer {
     public:
-        Renderer(int width, int height, int samples, const FileSystem& fs, const ShaderLibrary& shd);
+        Renderer(int width, int height, const FileSystem& fs, const ShaderLibrary& shd);
 
         std::shared_ptr<Font> get_default_font() const noexcept;
         void set_color_correction(bool enable) noexcept;
         bool get_color_correction() const noexcept;
         void set_clear_color(glm::vec3 color) noexcept;
+        void set_samples(int width, int height, int samples);
+        void set_scale(const FileSystem& fs, int scale);
+        void set_shadow_map_size(int size);
+        void initialize(int width, int height, const FileSystem& fs, const RendererSpecification& specification = {});
 
         void register_shader(std::shared_ptr<GlShader> shader);
         void register_framebuffer(std::shared_ptr<GlFramebuffer> framebuffer);
@@ -102,6 +112,9 @@ namespace sm::internal {
         // Helper functions
         void setup_point_light_uniform_buffer(const Scene& scene, std::shared_ptr<GlUniformBuffer> uniform_buffer);
         void setup_light_space_uniform_buffer(const Scene& scene, std::shared_ptr<GlUniformBuffer> uniform_buffer);
+        void setup_scene_framebuffer(int width, int height, int samples);
+        void setup_shadow_framebuffer(int size);
+        void setup_default_font(const FileSystem& fs, int scale);
         std::shared_ptr<GlIndexBuffer> initialize_quads_index_buffer();
         static glm::mat4 get_renderable_transform(const Renderable::Transform& transform);
 

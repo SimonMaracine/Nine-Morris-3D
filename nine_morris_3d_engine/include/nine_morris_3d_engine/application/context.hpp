@@ -48,6 +48,8 @@ namespace sm {
         PhongDiffuseNormalShadow
     };
 
+    using RendererSpecification = internal::RendererSpecification;
+
     // Wrapper around functionality exposed to the user, i.e. the API
     class Ctx {
     private:
@@ -102,15 +104,19 @@ namespace sm {
         void add_window_cursor(Id id, std::unique_ptr<TextureData>&& cursor, int x_hotspot, int y_hotspot);
         void set_window_cursor(Id id) const;
         void set_window_icons(std::initializer_list<std::unique_ptr<TextureData>> icons) const;
-        void set_window_dimensions(int width, int height);
+        void set_window_dimensions(int width, int height) noexcept;
         Monitors get_monitors() const;
         static double get_time() noexcept;
 
         // Renderer
-        std::shared_ptr<Font> get_default_font() const noexcept;
-        void set_color_correction(bool enable) noexcept;
-        bool get_color_correction() const noexcept;
-        void set_clear_color(glm::vec3 color) noexcept;
+        std::shared_ptr<Font> get_renderer_default_font() const noexcept;
+        void set_renderer_color_correction(bool enable) noexcept;
+        bool get_renderer_color_correction() const noexcept;
+        void set_renderer_clear_color(glm::vec3 color) noexcept;
+        void set_renderer_samples(int samples);
+        void set_renderer_scale(int scale);
+        void set_renderer_shadow_map_size(int size);
+        void initialize_renderer(const RendererSpecification& specification);
 
         // Music player
         void play_music_track(std::shared_ptr<MusicTrack> music_track);

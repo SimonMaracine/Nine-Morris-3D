@@ -190,13 +190,13 @@ void Ui::main_menu_bar(sm::Ctx& ctx, GameScene& game_scene) {
         if (ImGui::BeginMenu("Options")) {
             if (ImGui::BeginMenu("Graphics")) {
                 if (ImGui::BeginMenu("Scale")) {
-                    if (ImGui::RadioButton("100%", &m_options.scale, 1)) {
-                        if (std::exchange(g.options.scale, m_options.scale) != 1) {
+                    if (ImGui::RadioButton("100%", &m_options.scale, static_cast<int>(Scale::_100))) {
+                        if (std::exchange(g.options.scale, m_options.scale) != static_cast<int>(Scale::_100)) {
                             set_scale_task(ctx, g.options.scale);
                         }
                     }
-                    if (ImGui::RadioButton("200%", &m_options.scale, 2)) {
-                        if (std::exchange(g.options.scale, m_options.scale) != 2) {
+                    if (ImGui::RadioButton("200%", &m_options.scale, static_cast<int>(Scale::_200))) {
+                        if (std::exchange(g.options.scale, m_options.scale) != static_cast<int>(Scale::_200)) {
                             set_scale_task(ctx, g.options.scale);
                         }
                     }
@@ -206,17 +206,17 @@ void Ui::main_menu_bar(sm::Ctx& ctx, GameScene& game_scene) {
                 if (ImGui::BeginMenu("Anti-Aliasing")) {
                     if (ImGui::RadioButton("Off", &m_options.anti_aliasing, static_cast<int>(AntiAliasing::Off))) {
                         if (std::exchange(g.options.anti_aliasing, m_options.anti_aliasing) != static_cast<int>(AntiAliasing::Off)) {
-
+                            set_anti_aliasing_task(ctx, g.options.anti_aliasing);
                         }
                     }
                     if (ImGui::RadioButton("2X", &m_options.anti_aliasing, static_cast<int>(AntiAliasing::_2x))) {
                         if (std::exchange(g.options.anti_aliasing, m_options.anti_aliasing) != static_cast<int>(AntiAliasing::_2x)) {
-
+                            set_anti_aliasing_task(ctx, g.options.anti_aliasing);
                         }
                     }
                     if (ImGui::RadioButton("4X", &m_options.anti_aliasing, static_cast<int>(AntiAliasing::_4x))) {
                         if (std::exchange(g.options.anti_aliasing, m_options.anti_aliasing) != static_cast<int>(AntiAliasing::_4x)) {
-
+                            set_anti_aliasing_task(ctx, g.options.anti_aliasing);
                         }
                     }
 
@@ -225,17 +225,17 @@ void Ui::main_menu_bar(sm::Ctx& ctx, GameScene& game_scene) {
                 if (ImGui::BeginMenu("Anisotropic Filtering")) {
                     if (ImGui::RadioButton("Off", &m_options.anisotropic_filtering, static_cast<int>(AnisotropicFiltering::Off))) {
                         if (std::exchange(g.options.anisotropic_filtering, m_options.anisotropic_filtering) != static_cast<int>(AnisotropicFiltering::Off)) {
-
+                            // TODO
                         }
                     }
                     if (ImGui::RadioButton("4X", &m_options.anisotropic_filtering, static_cast<int>(AnisotropicFiltering::_4x))) {
                         if (std::exchange(g.options.anisotropic_filtering, m_options.anisotropic_filtering) != static_cast<int>(AnisotropicFiltering::_4x)) {
-
+                            // TODO
                         }
                     }
                     if (ImGui::RadioButton("8X", &m_options.anisotropic_filtering, static_cast<int>(AnisotropicFiltering::_8x))) {
                         if (std::exchange(g.options.anisotropic_filtering, m_options.anisotropic_filtering) != static_cast<int>(AnisotropicFiltering::_8x)) {
-
+                            // TODO
                         }
                     }
 
@@ -244,12 +244,26 @@ void Ui::main_menu_bar(sm::Ctx& ctx, GameScene& game_scene) {
                 if (ImGui::BeginMenu("Texture Quality")) {
                     if (ImGui::RadioButton("Half", &m_options.texture_quality, static_cast<int>(TextureQuality::Half))) {
                         if (std::exchange(g.options.texture_quality, m_options.texture_quality) != static_cast<int>(TextureQuality::Half)) {
-
+                            // TODO
                         }
                     }
                     if (ImGui::RadioButton("Full", &m_options.texture_quality, static_cast<int>(TextureQuality::Full))) {
                         if (std::exchange(g.options.texture_quality, m_options.texture_quality) != static_cast<int>(TextureQuality::Full)) {
+                            // TODO
+                        }
+                    }
 
+                    ImGui::EndMenu();
+                }
+                if (ImGui::BeginMenu("Shadow Quality")) {
+                    if (ImGui::RadioButton("Half", &m_options.shadow_quality, static_cast<int>(ShadowQuality::Half))) {
+                        if (std::exchange(g.options.shadow_quality, m_options.shadow_quality) != static_cast<int>(ShadowQuality::Half)) {
+                            set_shadow_quality_task(ctx, g.options.shadow_quality);
+                        }
+                    }
+                    if (ImGui::RadioButton("Full", &m_options.shadow_quality, static_cast<int>(ShadowQuality::Full))) {
+                        if (std::exchange(g.options.shadow_quality, m_options.shadow_quality) != static_cast<int>(ShadowQuality::Full)) {
+                            set_shadow_quality_task(ctx, g.options.shadow_quality);
                         }
                     }
 
@@ -538,6 +552,22 @@ void Ui::set_scale(sm::Ctx& ctx, int scale) {
 
     ImGuiStyle& style {ImGui::GetStyle()};
     style.ScaleAllSizes(static_cast<float>(scale));
+}
+
+void Ui::set_anti_aliasing_task(sm::Ctx& ctx, int samples) {
+    ctx.add_task([this, &ctx, samples](const sm::Task&, void*) {
+        ctx.set_renderer_samples(samples);
+
+        return sm::Task::Result::Done;
+    });
+}
+
+void Ui::set_shadow_quality_task(sm::Ctx& ctx, int size) {
+    ctx.add_task([this, &ctx, size](const sm::Task&, void*) {
+        ctx.set_renderer_shadow_map_size(size);
+
+        return sm::Task::Result::Done;
+    });
 }
 
 void Ui::create_font(sm::Ctx& ctx, int scale) {

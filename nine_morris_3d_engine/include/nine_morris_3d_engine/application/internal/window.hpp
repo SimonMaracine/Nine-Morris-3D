@@ -18,7 +18,7 @@ struct GLFWcursor;
 namespace sm::internal {
     class Window {
     public:
-        Window(const ApplicationProperties& properties, EventDispatcher* evt);
+        Window(const ApplicationProperties& properties, EventDispatcher& evt);
         ~Window();
 
         Window(const Window&) = delete;
@@ -34,7 +34,7 @@ namespace sm::internal {
         void add_cursor(Id id, std::unique_ptr<TextureData>&& cursor, int x_hotspot, int y_hotspot);
         void set_cursor(Id id) const;
         void set_icons(std::initializer_list<std::unique_ptr<TextureData>> icons) const;
-        void set_dimensions(int width, int height);
+        void set_dimensions(int width, int height) noexcept;
 
         Monitors get_monitors() const;
         static double get_time() noexcept;
@@ -52,6 +52,6 @@ namespace sm::internal {
 
         GLFWwindow* m_window {};
         std::unordered_map<Id, GLFWcursor*, Hash> m_cursors;
-        EventDispatcher* m_evt {};
+        EventDispatcher& m_evt;
     };
 }

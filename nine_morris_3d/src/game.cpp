@@ -22,6 +22,14 @@ void game_start(sm::Ctx& ctx) {
     if (g.get_scale() == 2.0f) {
         ctx.set_window_dimensions(DEFAULT_WIDTH_LARGE, DEFAULT_HEIGHT_LARGE);
     }
+
+    // We said earlier to not initialize the renderer with default parameters
+    sm::RendererSpecification specification;
+    specification.samples = g.options.anti_aliasing;
+    specification.scale = g.options.scale;
+    specification.shadow_map_size = g.options.shadow_quality;
+
+    ctx.initialize_renderer(specification);
 }
 
 void game_stop(sm::Ctx& ctx) {

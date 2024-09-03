@@ -18,11 +18,15 @@ namespace sm {
         : m_fs(properties.path_logs, properties.path_saved_data, properties.path_assets, properties.assets_directory),
         m_log(properties.log_file, m_fs),
         m_shd({m_fs.path_engine_assets().string(), m_fs.path_assets().string()}),
-        m_win(properties, &m_evt),
-        m_rnd(properties.width, properties.height, properties.samples, m_fs, m_shd),
+        m_win(properties, m_evt),
+        m_rnd(properties.width, properties.height, m_fs, m_shd),
         m_snd(properties.audio),
         m_mus(properties.audio),
         m_inp(m_win.get_handle()) {
+        if (properties.default_renderer_parameters) {
+            m_rnd.initialize(properties.width, properties.height, m_fs);
+        }
+
         if (!m_fs.get_error_string().empty()) {
             LOG_DIST_ERROR("{}", m_fs.get_error_string());
         }
@@ -108,7 +112,7 @@ namespace sm {
         m_win.set_icons(icons);
     }
 
-    void Ctx::set_window_dimensions(int width, int height) {
+    void Ctx::set_window_dimensions(int width, int height) noexcept {
         m_win.set_dimensions(width, height);
     }
 
@@ -120,20 +124,36 @@ namespace sm {
         return internal::Window::get_time();
     }
 
-    std::shared_ptr<Font> Ctx::get_default_font() const noexcept {
+    std::shared_ptr<Font> Ctx::get_renderer_default_font() const noexcept {
         return m_rnd.get_default_font();
     }
 
-    void Ctx::set_color_correction(bool enable) noexcept {
+    void Ctx::set_renderer_color_correction(bool enable) noexcept {
         m_rnd.set_color_correction(enable);
     }
 
-    bool Ctx::get_color_correction() const noexcept {
+    bool Ctx::get_renderer_color_correction() const noexcept {
         return m_rnd.get_color_correction();
     }
 
-    void Ctx::set_clear_color(glm::vec3 color) noexcept {
+    void Ctx::set_renderer_clear_color(glm::vec3 color) noexcept {
         m_rnd.set_clear_color(color);
+    }
+
+    void Ctx::set_renderer_samples(int samples) {
+        m_rnd.set_samples(m_win.get_width(), m_win.get_height(), samples);
+    }
+
+    void Ctx::set_renderer_scale(int scale) {
+        m_rnd.set_scale(m_fs, scale);
+    }
+
+    void Ctx::set_renderer_shadow_map_size(int size) {
+        m_rnd.set_shadow_map_size(size);
+    }
+
+    void Ctx::initialize_renderer(const RendererSpecification& specification) {
+        m_rnd.initialize(m_win.get_width(), m_win.get_height(), m_fs, specification);
     }
 
     void Ctx::play_music_track(std::shared_ptr<MusicTrack> music_track) {

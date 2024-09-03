@@ -57,7 +57,7 @@ void StandardGameScene::on_start() {
     ctx.connect_event<sm::KeyReleasedEvent, &StandardGameScene::on_key_released>(this);
     ctx.connect_event<sm::MouseButtonReleasedEvent, &StandardGameScene::on_mouse_button_released>(this);
 
-    ctx.set_clear_color(glm::vec3(0.1f, 0.1f, 0.1f));
+    ctx.set_renderer_clear_color(glm::vec3(0.1f, 0.1f, 0.1f));
 
     // setup_texts();
     // setup_quads();

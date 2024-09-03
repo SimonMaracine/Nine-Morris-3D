@@ -9,11 +9,11 @@ namespace sm {
         bool native_resolution {true};
         bool resizable {true};
         bool audio {false};
+        bool default_renderer_parameters {true};
         int width {1280};
         int height {720};
         int min_width {-1};
         int min_height {-1};
-        int samples {1};
         unsigned int version_major {0};
         unsigned int version_minor {1};
         unsigned int version_patch {0};
