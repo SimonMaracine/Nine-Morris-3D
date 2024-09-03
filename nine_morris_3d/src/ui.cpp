@@ -384,16 +384,9 @@ void Ui::main_menu_bar(sm::Ctx& ctx, GameScene& game_scene) {
                 ImGui::EndMenu();
             }
             if (ImGui::MenuItem("Labeled Board", nullptr, &m_options.labeled_board)) {
-                // if (data.imgui_option.labeled_board != data.options.labeled_board) {
-                //     data.options.labeled_board = data.imgui_option.labeled_board;
-                //     set_board_paint_texture();
+                g.options.labeled_board = m_options.labeled_board;
 
-                //     if (data.imgui_option.labeled_board) {
-                //         LOG_INFO("Board paint texture set to labeled");
-                //     } else {
-                //         LOG_INFO("Board paint texture set to non-labeled");
-                //     }
-                // }
+                game_scene.load_and_set_board_paint_texture();
             }
             ImGui::MenuItem("Show Information", nullptr, &m_show_information);
 

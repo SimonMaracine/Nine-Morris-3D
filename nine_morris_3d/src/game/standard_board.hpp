@@ -86,6 +86,8 @@ public:
     Player get_turn() const { return m_turn; }
     GameOver get_game_over() const { return m_game_over; }
 
+    void set_board_paint_renderable(const sm::Renderable& board_paint);
+
     void update(sm::Ctx& ctx, glm::vec3 ray, glm::vec3 camera);
     void update_movement();
     void user_click();

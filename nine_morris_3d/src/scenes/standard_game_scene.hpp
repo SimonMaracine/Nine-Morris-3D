@@ -26,6 +26,7 @@ public:
 
     PointCameraController& get_camera_controller() override;
     void load_and_set_skybox() override;
+    void load_and_set_board_paint_texture() override;
 private:
     void on_window_resized(const sm::WindowResizedEvent& event);
     void on_key_released(const sm::KeyReleasedEvent& event);
@@ -43,7 +44,11 @@ private:
     std::vector<sm::Renderable> setup_white_pieces() const;
     std::vector<sm::Renderable> setup_black_pieces() const;
 
-    void load_skybox();
+    void load_skybox() const;
+    void load_board_paint_texture() const;
+
+    std::shared_ptr<sm::GlTextureCubemap> get_skybox_texture_cubemap() const;
+    std::shared_ptr<sm::GlTexture> get_board_paint_texture(const sm::TextureSpecification& specification) const;
 
     // void setup_ground(std::shared_ptr<sm::Mesh> mesh);
     // void setup_dragon(std::shared_ptr<sm::Mesh> mesh);

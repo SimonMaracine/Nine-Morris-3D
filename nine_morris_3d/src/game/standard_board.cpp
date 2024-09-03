@@ -83,6 +83,14 @@ StandardBoard::StandardBoard(
     m_legal_moves = generate_moves();
 }
 
+void StandardBoard::set_board_paint_renderable(const sm::Renderable& board_paint) {
+    m_paint_renderable = board_paint;
+
+    m_paint_renderable = board_paint;  // FIXME dry
+    m_paint_renderable.transform.scale = 20.0f;
+    m_paint_renderable.transform.position.y = 0.062f;
+}
+
 void StandardBoard::update(sm::Ctx& ctx, glm::vec3 ray, glm::vec3 camera) {
     update_hovered_id(ray, camera);
     update_nodes();

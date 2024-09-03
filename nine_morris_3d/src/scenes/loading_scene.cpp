@@ -22,11 +22,11 @@ void LoadingScene::on_update() {
 }
 
 void LoadingScene::load_assets() {
+    const auto& g {ctx.global<Global>()};
+
     {
         sm::TexturePostProcessing post_processing;
         post_processing.flip = false;
-
-        const auto& g {ctx.global<Global>()};
 
         switch (g.options.skybox) {
             case static_cast<int>(Skybox::None):
@@ -58,7 +58,12 @@ void LoadingScene::load_assets() {
 
     {
         ctx.load_mesh(ctx.path_assets("models/board/board_paint.obj"), "Plane", sm::Mesh::Type::PNTT);
-        ctx.load_texture_data(ctx.path_assets("textures/board/board_paint_labeled_diffuse.png"), sm::TexturePostProcessing());
+
+        if (g.options.labeled_board) {
+            ctx.load_texture_data(ctx.path_assets("textures/board/board_paint_labeled_diffuse.png"), sm::TexturePostProcessing());
+        } else {
+            ctx.load_texture_data(ctx.path_assets("textures/board/board_paint_diffuse.png"), sm::TexturePostProcessing());
+        }
     }
 
     {

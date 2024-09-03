@@ -273,6 +273,20 @@ void StandardGameScene::load_and_set_skybox() {
     });
 }
 
+void StandardGameScene::load_and_set_board_paint_texture() {
+    ctx.add_task_async([this](sm::AsyncTask& task, void*) {
+        load_board_paint_texture();
+
+        ctx.add_task([this](const sm::Task&, void*) {
+            m_board.set_board_paint_renderable(setup_board_paint());
+
+            return sm::Task::Result::Done;
+        });
+
+        task.set_done();
+    });
+}
+
 void StandardGameScene::on_window_resized(const sm::WindowResizedEvent& event) {
     m_cam.set_projection(event.width, event.height, LENS_FOV, LENS_NEAR, LENS_FAR);
     m_cam_2d.set_projection(0, event.width, 0, event.height);
@@ -333,34 +347,7 @@ void StandardGameScene::setup_camera() {
 }
 
 void StandardGameScene::setup_skybox() {
-    const auto& g {ctx.global<Global>()};
-
-    sm::Id id;
-
-    switch (g.options.skybox) {
-        case static_cast<int>(Skybox::None):
-            m_skybox = nullptr;
-            return;
-        case static_cast<int>(Skybox::Field):
-            id = "field"_H;
-            break;
-        case static_cast<int>(Skybox::Autumn):
-            id = "autumn"_H;
-            break;
-    }
-
-    m_skybox = ctx.reload_texture_cubemap(
-        id,
-        {
-            ctx.get_texture_data("px.png"_H),
-            ctx.get_texture_data("nx.png"_H),
-            ctx.get_texture_data("py.png"_H),
-            ctx.get_texture_data("ny.png"_H),
-            ctx.get_texture_data("pz.png"_H),
-            ctx.get_texture_data("nz.png"_H)
-        },
-        sm::TextureFormat::Srgb8Alpha8
-    );
+    m_skybox = get_skybox_texture_cubemap();
 }
 
 void StandardGameScene::setup_lights() {
@@ -492,11 +479,7 @@ sm::Renderable StandardGameScene::setup_board_paint() const {
     specification.mipmapping.emplace();
     specification.mipmapping->bias = -0.8f;
 
-    const auto diffuse {ctx.load_texture(
-        "board_paint_labeled_diffuse"_H,
-        ctx.get_texture_data("board_paint_labeled_diffuse.png"_H),
-        specification
-    )};
+    const auto diffuse {get_board_paint_texture(specification)};
 
     specification.format = sm::TextureFormat::Rgba8;
 
@@ -623,13 +606,13 @@ std::vector<sm::Renderable> StandardGameScene::setup_black_pieces() const {
     return renderables;
 }
 
-void StandardGameScene::load_skybox() {
+void StandardGameScene::load_skybox() const {
     // Global options must have been set to the desired skybox
+
+    const auto& g {ctx.global<Global>()};
 
     sm::TexturePostProcessing post_processing;
     post_processing.flip = false;
-
-    const auto& g {ctx.global<Global>()};
 
     switch (g.options.skybox) {
         case static_cast<int>(Skybox::None):
@@ -650,6 +633,73 @@ void StandardGameScene::load_skybox() {
             ctx.reload_texture_data(ctx.path_assets("textures/skybox/autumn/pz.png"), post_processing);
             ctx.reload_texture_data(ctx.path_assets("textures/skybox/autumn/nz.png"), post_processing);
             break;
+    }
+}
+
+void StandardGameScene::load_board_paint_texture() const {
+    // Global options must have been set to the desired texture
+
+    const auto& g {ctx.global<Global>()};
+
+    if (g.options.labeled_board) {
+        ctx.load_texture_data(ctx.path_assets("textures/board/board_paint_labeled_diffuse.png"), sm::TexturePostProcessing());
+    } else {
+        ctx.load_texture_data(ctx.path_assets("textures/board/board_paint_diffuse.png"), sm::TexturePostProcessing());
+    }
+}
+
+std::shared_ptr<sm::GlTextureCubemap> StandardGameScene::get_skybox_texture_cubemap() const {
+    const auto& g {ctx.global<Global>()};
+
+    switch (g.options.skybox) {
+        case static_cast<int>(Skybox::None):
+            return nullptr;
+        case static_cast<int>(Skybox::Field):
+            return ctx.load_texture_cubemap(
+                "field"_H,
+                {
+                    ctx.get_texture_data("px.png"_H),
+                    ctx.get_texture_data("nx.png"_H),
+                    ctx.get_texture_data("py.png"_H),
+                    ctx.get_texture_data("ny.png"_H),
+                    ctx.get_texture_data("pz.png"_H),
+                    ctx.get_texture_data("nz.png"_H)
+                },
+                sm::TextureFormat::Srgb8Alpha8
+            );
+        case static_cast<int>(Skybox::Autumn):
+            return ctx.load_texture_cubemap(
+                "autumn"_H,
+                {
+                    ctx.get_texture_data("px.png"_H),
+                    ctx.get_texture_data("nx.png"_H),
+                    ctx.get_texture_data("py.png"_H),
+                    ctx.get_texture_data("ny.png"_H),
+                    ctx.get_texture_data("pz.png"_H),
+                    ctx.get_texture_data("nz.png"_H)
+                },
+                sm::TextureFormat::Srgb8Alpha8
+            );
+    }
+
+    return {};
+}
+
+std::shared_ptr<sm::GlTexture> StandardGameScene::get_board_paint_texture(const sm::TextureSpecification& specification) const {
+    const auto& g {ctx.global<Global>()};
+
+    if (g.options.labeled_board) {
+        return ctx.load_texture(
+            "board_paint_labeled_diffuse"_H,
+            ctx.get_texture_data("board_paint_labeled_diffuse.png"_H),
+            specification
+        );
+    } else {
+        return ctx.load_texture(
+            "board_paint_diffuse"_H,
+            ctx.get_texture_data("board_paint_diffuse.png"_H),
+            specification
+        );
     }
 }
 
