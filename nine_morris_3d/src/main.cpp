@@ -22,11 +22,7 @@ struct Paths {
     std::string assets;
 };
 
-static Paths get_paths() {
-    Paths paths;
-
-#ifdef SM_BUILD_DISTRIBUTION
-    #if defined(SM_PLATFORM_LINUX)
+static void get_paths_linux(Paths& paths) {
     const char* home {std::getenv("HOME")};
 
     if (home == nullptr) {
@@ -35,10 +31,12 @@ static Paths get_paths() {
 
     const std::filesystem::path home_directory {home};
 
-    paths.logs = home_directory / ".ninemorris3d";
-    paths.saved_data = home_directory / ".ninemorris3d";
+    paths.logs = (home_directory / ".ninemorris3d").string();
+    paths.saved_data = (home_directory / ".ninemorris3d").string();
     paths.assets = "/usr/local/share/ninemorris3d";
-    #elif defined(SM_PLATFORM_WINDOWS)
+}
+
+static void get_paths_windows(Paths& paths) {
     const char* username {std::getenv("USERNAME")};
 
     if (username == nullptr) {
@@ -48,12 +46,24 @@ static Paths get_paths() {
     paths.logs = "C:\\Users\\" + std::string(username) + "\\Documents\\NineMorris3D";
     paths.saved_data = "C:\\Users\\" + std::string(username) + "\\Documents\\NineMorris3D";
     paths.assets = "";
-    #endif
-#else
+}
+
+static Paths get_paths() {
+    Paths paths;
+
+#ifndef SM_BUILD_DISTRIBUTION
     paths.logs = "";
     paths.saved_data = "";
     paths.assets = "";
+#else
+
+#if defined(SM_PLATFORM_LINUX)
+    get_paths_linux(paths);
+#elif defined(SM_PLATFORM_WINDOWS)
+    get_paths_windows(paths);
 #endif
+
+#endif  // SM_BUILD_DISTRIBUTION
 
     return paths;
 }
@@ -71,37 +81,35 @@ int application_main() {
     while (true) {
         int exit_code {};
 
-        {
-            sm::ApplicationProperties properties;
-            properties.width = DEFAULT_WIDTH;
-            properties.height = DEFAULT_HEIGHT;
-            properties.min_width = MIN_WIDTH;
-            properties.min_height = MIN_HEIGHT;
-            properties.title = "Nine Morris 3D";
-            properties.log_file = "log.txt";
-            properties.version_major = VERSION_MAJOR;
-            properties.version_minor = VERSION_MINOR;
-            properties.version_patch = VERSION_PATCH;
-            properties.path_logs = paths.logs;
-            properties.path_saved_data = paths.saved_data;
-            properties.path_assets = paths.assets;
-            properties.default_renderer_parameters = false;
-            // properties.audio = true;  // TODO
+        sm::ApplicationProperties properties;
+        properties.width = DEFAULT_WIDTH;
+        properties.height = DEFAULT_HEIGHT;
+        properties.min_width = MIN_WIDTH;
+        properties.min_height = MIN_HEIGHT;
+        properties.title = "Nine Morris 3D";
+        properties.log_file = "log.txt";
+        properties.version_major = VERSION_MAJOR;
+        properties.version_minor = VERSION_MINOR;
+        properties.version_patch = VERSION_PATCH;
+        properties.path_logs = paths.logs;
+        properties.path_saved_data = paths.saved_data;
+        properties.path_assets = paths.assets;
+        properties.default_renderer_parameters = false;
+        // properties.audio = true;  // TODO
 
-            sm::UserFunctions functions;
-            functions.start = game_start;
-            functions.stop = game_stop;
+        sm::UserFunctions functions;
+        functions.start = game_start;
+        functions.stop = game_stop;
 
-            try {
-                sm::Application game {properties};
-                game.add_scene<LoadingScene>();
-                game.add_scene<StandardGameScene>();
-                game.set_global_data<Global>();
-                exit_code = game.run("loading"_H, functions);
-            } catch (const sm::RuntimeError& e) {  // FIXME once an exception from a thread managed to not be caught; don't know how; seems to be working now
-                std::cerr << "Terminated game with error: " << e.what() << '\n';
-                return 1;
-            }
+        try {
+            sm::Application game {properties};
+            game.add_scene<LoadingScene>();
+            game.add_scene<StandardGameScene>();
+            game.set_global_data<Global>();
+            exit_code = game.run("loading"_H, functions);
+        } catch (const sm::RuntimeError& e) {  // FIXME once an exception from a thread managed to not be caught; don't know how; seems to be working now
+            std::cerr << "Terminated game with error: " << e.what() << '\n';
+            return 1;
         }
 
         if (exit_code == 0) {

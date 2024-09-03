@@ -413,7 +413,7 @@ void Ui::main_menu_bar(sm::Ctx& ctx, GameScene& game_scene) {
                 sm::utils::write_file(ctx.path_logs("information.txt"), ctx.get_information(), true);
             }
             if (ImGui::IsItemHovered()) {
-                ImGui::SetTooltip("%s", ctx.path_logs("information.txt").c_str());
+                ImGui::SetTooltip("%s", ctx.path_logs("information.txt").string().c_str());
             }
 
             ImGui::EndMenu();
@@ -562,7 +562,7 @@ void Ui::create_font(sm::Ctx& ctx, int scale) {
     builder.BuildRanges(&ranges);
 
     const auto font {io.Fonts->AddFontFromFileTTF(
-        ctx.path_assets("fonts/OpenSans/OpenSans-Semibold.ttf").c_str(),
+        ctx.path_assets("fonts/OpenSans/OpenSans-Semibold.ttf").string().c_str(),
         font_size,
         nullptr,
         ranges.Data
