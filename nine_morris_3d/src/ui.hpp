@@ -5,8 +5,9 @@
 
 #include <nine_morris_3d_engine/nine_morris_3d.hpp>
 
-#include "scenes/game_scene.hpp"
 #include "options.hpp"
+
+class GameScene;
 
 enum class PopupWindow {
     None,

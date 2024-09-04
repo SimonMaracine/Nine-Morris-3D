@@ -5,6 +5,7 @@
 #include <nine_morris_3d_engine/external/imgui.h++>
 #include <nine_morris_3d_engine/external/glm.h++>
 
+#include "scenes/game_scene.hpp"
 #include "global.hpp"
 #include "constants.hpp"
 #include "ver.hpp"

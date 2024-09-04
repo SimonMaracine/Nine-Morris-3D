@@ -1,4 +1,4 @@
-#include "game/standard_board.hpp"
+#include "game/standard_game_board.hpp"
 
 #include <algorithm>
 #include <utility>

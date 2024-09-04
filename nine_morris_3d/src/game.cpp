@@ -3,10 +3,6 @@
 #include "global.hpp"
 #include "options.hpp"
 
-void create_post_processing(sm::Ctx&) {
-
-}
-
 void game_start(sm::Ctx& ctx) {
     auto& g {ctx.global<Global>()};
 

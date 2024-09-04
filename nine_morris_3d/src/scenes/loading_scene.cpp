@@ -17,7 +17,7 @@ void LoadingScene::on_stop() {
 
 void LoadingScene::on_update() {
     if (m_done) {
-        ctx.change_scene("game"_H);
+        ctx.change_scene("standard_game"_H);
     }
 }
 
