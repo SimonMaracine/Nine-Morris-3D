@@ -2,9 +2,9 @@
 build
 build_dist
 *.log
-*information.txt
-imgui.ini
-*.blend1
-bitmap_*.png
 *.dat
+*.blend1
 *.aup3-wal
+bitmap_*.png
+information.txt
+imgui.ini
