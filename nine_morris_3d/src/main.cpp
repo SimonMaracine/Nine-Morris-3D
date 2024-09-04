@@ -22,50 +22,40 @@ struct Paths {
     std::string assets;
 };
 
-static void get_paths_linux(Paths& paths) {
-    const char* home {std::getenv("HOME")};
+[[maybe_unused]] static const char* get_environment_variable(const char* variable) {
+    const char* value {std::getenv(variable)};
 
-    if (home == nullptr) {
-        throw std::runtime_error("Could not get `HOME` environment variable");
+    if (value == nullptr) {
+        throw std::runtime_error("Could not get `" + std::string(variable) + "` environment variable");
     }
 
-    const std::filesystem::path home_directory {home};
-
-    paths.logs = (home_directory / ".ninemorris3d").string();
-    paths.saved_data = (home_directory / ".ninemorris3d").string();
-    paths.assets = "/usr/local/share/ninemorris3d";
-}
-
-static void get_paths_windows(Paths& paths) {
-    const char* username {std::getenv("USERNAME")};
-
-    if (username == nullptr) {
-        throw std::runtime_error("Could not get `USERNAME` environment variable");
-    }
-
-    paths.logs = "C:\\Users\\" + std::string(username) + "\\Documents\\NineMorris3D";
-    paths.saved_data = "C:\\Users\\" + std::string(username) + "\\Documents\\NineMorris3D";
-    paths.assets = "";
+    return value;
 }
 
 static Paths get_paths() {
-    Paths paths;
-
 #ifndef SM_BUILD_DISTRIBUTION
-    paths.logs = "";
-    paths.saved_data = "";
-    paths.assets = "";
+    return {"", "", ""};
 #else
 
 #if defined(SM_PLATFORM_LINUX)
-    get_paths_linux(paths);
+    const std::filesystem::path home_directory {get_environment_variable("HOME")};
+
+    return {
+        (home_directory / ".ninemorris3d").string(),
+        (home_directory / ".ninemorris3d").string(),
+        "/usr/local/share/ninemorris3d"
+    };
 #elif defined(SM_PLATFORM_WINDOWS)
-    get_paths_windows(paths);
+    const std::string username {get_environment_variable("USERNAME")};
+
+    return {
+        "C:\\Users\\" + username + "\\Documents\\NineMorris3D",
+        "C:\\Users\\" + username + "\\Documents\\NineMorris3D",
+        ""
+    };
 #endif
 
 #endif  // SM_BUILD_DISTRIBUTION
-
-    return paths;
 }
 
 int application_main() {

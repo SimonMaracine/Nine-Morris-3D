@@ -55,6 +55,7 @@ void StandardGameScene::on_start() {
 
     ctx.connect_event<sm::WindowResizedEvent, &StandardGameScene::on_window_resized>(this);
     ctx.connect_event<sm::KeyReleasedEvent, &StandardGameScene::on_key_released>(this);
+    ctx.connect_event<sm::MouseButtonPressedEvent, &StandardGameScene::on_mouse_button_pressed>(this);
     ctx.connect_event<sm::MouseButtonReleasedEvent, &StandardGameScene::on_mouse_button_released>(this);
 
     ctx.set_renderer_clear_color(glm::vec3(0.1f, 0.1f, 0.1f));
@@ -293,34 +294,20 @@ void StandardGameScene::on_window_resized(const sm::WindowResizedEvent& event) {
 }
 
 void StandardGameScene::on_key_released(const sm::KeyReleasedEvent& event) {
-    // switch (event.key) {
-    //     case sm::Key::Escape:
-    //         ctx.change_scene("game"_H);
-    //         break;
-    //     case sm::Key::M:
-    //         if (emitter && sound_move) emitter->play(sound_move);
-    //         break;
-    //     case sm::Key::P:
-    //         if (emitter && sound_place) emitter->play(sound_place);
-    //         break;
-    //     case sm::Key::Space:
-    //         if (music_playing) {
-    //             if (relaxing) ctx.stop_music_track();
-    //         } else {
-    //             if (relaxing) ctx.play_music_track(relaxing);
-    //         }
+    if (event.key == sm::Key::Space) {
+        m_cam_controller.go_towards_position(m_default_camera_position);
+    }
+}
 
-    //         if (relaxing) music_playing = !music_playing;
-
-    //         break;
-    //     default:
-    //         break;
-    // }
+void StandardGameScene::on_mouse_button_pressed(const sm::MouseButtonPressedEvent& event) {
+    if (event.button == sm::MouseButton::Left) {
+        m_board.user_click_press();
+    }
 }
 
 void StandardGameScene::on_mouse_button_released(const sm::MouseButtonReleasedEvent& event) {
     if (event.button == sm::MouseButton::Left) {
-        m_board.user_click();
+        m_board.user_click_release();
     }
 }
 
@@ -339,9 +326,9 @@ void StandardGameScene::setup_camera() {
 
     m_cam_controller.connect_events(ctx);
 
-    const auto default_position {m_cam_controller.get_position()};
+    m_default_camera_position = m_cam_controller.get_position();
     m_cam_controller.set_distance_to_point(m_cam_controller.get_distance_to_point() + 1.0f);
-    m_cam_controller.go_towards_position(default_position);
+    m_cam_controller.go_towards_position(m_default_camera_position);
 
     m_cam_2d.set_projection(0, ctx.get_window_width(), 0, ctx.get_window_height());
 }

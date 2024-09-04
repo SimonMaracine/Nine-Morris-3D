@@ -30,6 +30,7 @@ public:
 private:
     void on_window_resized(const sm::WindowResizedEvent& event);
     void on_key_released(const sm::KeyReleasedEvent& event);
+    void on_mouse_button_pressed(const sm::MouseButtonPressedEvent& event);
     void on_mouse_button_released(const sm::MouseButtonReleasedEvent& event);
 
     void setup_camera();
@@ -67,6 +68,7 @@ private:
     // void load_heavy_resources();
 
     bool m_game_started {false};
+    glm::vec3 m_default_camera_position {};
 
     sm::Camera m_cam;
     sm::Camera2D m_cam_2d;

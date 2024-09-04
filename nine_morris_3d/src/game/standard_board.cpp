@@ -114,14 +114,26 @@ void StandardBoard::update_movement() {
     }
 }
 
-void StandardBoard::user_click() {
+void StandardBoard::user_click_press() {
     if (m_game_over != GameOver::None) {
         return;
     }
 
-    if (m_hovered_id == -1) {
+    m_clicked_id = m_hovered_id;
+}
+
+void StandardBoard::user_click_release() {
+    if (m_game_over != GameOver::None) {
+        m_clicked_id = -1;
         return;
     }
+
+    if (m_hovered_id == -1 || m_hovered_id != m_clicked_id) {
+        m_clicked_id = -1;
+        return;
+    }
+
+    m_clicked_id = -1;
 
     if (m_plies >= 18) {
         if (m_user_must_take_piece) {
@@ -285,6 +297,7 @@ void StandardBoard::debug() {
         ImGui::Text("plies_without_advancement %u", m_plies_without_advancement);
         ImGui::Text("positions %lu", m_positions.size());
         ImGui::Text("legal_moves %lu", m_legal_moves.size());
+        ImGui::Text("clicked_id %d", m_clicked_id);
         ImGui::Text("hovered_id %d", m_hovered_id);
         ImGui::Text("user_stored_index1 %d", m_user_stored_index1);
         ImGui::Text("user_stored_index2 %d", m_user_stored_index2);
@@ -341,6 +354,11 @@ void StandardBoard::update_hovered_id(glm::vec3 ray, glm::vec3 camera) {
         m_hovered_id = -1;
     }
 }
+
+#ifdef __GNUG__
+    #pragma GCC diagnostic push
+    #pragma GCC diagnostic ignored "-Wparentheses"
+#endif
 
 void StandardBoard::update_nodes() {
     if (m_game_over != GameOver::None) {
@@ -407,6 +425,10 @@ void StandardBoard::update_pieces() {
         }
     }
 }
+
+#ifdef __GNUG__
+    #pragma GCC diagnostic pop
+#endif
 
 void StandardBoard::select(int index) {
     if (m_user_stored_index1 == -1) {

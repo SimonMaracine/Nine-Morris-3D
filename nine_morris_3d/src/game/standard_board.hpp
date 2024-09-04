@@ -90,7 +90,8 @@ public:
 
     void update(sm::Ctx& ctx, glm::vec3 ray, glm::vec3 camera);
     void update_movement();
-    void user_click();
+    void user_click_press();
+    void user_click_release();
 
     void place_piece(int place_index);
     void place_take_piece(int place_index, int take_index);
@@ -165,6 +166,7 @@ private:
     // Management data
     std::function<void(const Move&)> m_move_callback;
     std::vector<Move> m_legal_moves;
+    int m_clicked_id {-1};
     int m_hovered_id {-1};
     int m_user_stored_index1 {-1};
     int m_user_stored_index2 {-1};
