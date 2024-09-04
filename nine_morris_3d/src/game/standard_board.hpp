@@ -6,73 +6,48 @@
 
 #include <nine_morris_3d_engine/nine_morris_3d.hpp>
 
+#include "game/common.hpp"
 #include "game/node.hpp"
 #include "game/piece.hpp"
 
-enum class Player {
-    White = 1,
-    Black = 2
-};
-
-enum class Piece {
-    None,
-    White,
-    Black
-};
-
-enum class MoveType {
-    Place,
-    PlaceTake,
-    Move,
-    MoveTake
-};
-
-enum class GameOver {
-    None,
-    WinnerWhite,
-    WinnerBlack,
-    TieBetweenBothPlayers
-};
-
-struct Move {
-    union {
-        struct {
-            int place_index;
-        } place;
-
-        struct {
-            int place_index;
-            int take_index;
-        } place_take;
-
-        struct {
-            int source_index;
-            int destination_index;
-        } move;
-
-        struct {
-            int source_index;
-            int destination_index;
-            int take_index;
-        } move_take;
-    };
-
-    MoveType type {};
-};
-
-using Board = std::array<Piece, 24>;
-
-struct Position {
-    Board board {};
-    Player turn {};
-
-    bool operator==(const Position& other) const {
-        return board == other.board && turn == other.turn;
-    }
-};
-
 class StandardBoard {
 public:
+    enum class MoveType {
+        Place,
+        PlaceTake,
+        Move,
+        MoveTake
+    };
+
+    struct Move {
+        union {
+            struct {
+                int place_index;
+            } place;
+
+            struct {
+                int place_index;
+                int take_index;
+            } place_take;
+
+            struct {
+                int source_index;
+                int destination_index;
+            } move;
+
+            struct {
+                int source_index;
+                int destination_index;
+                int take_index;
+            } move_take;
+        };
+
+        MoveType type {};
+    };
+
+    using Board = std::array<Piece, 24>;
+    using Position = ::Position<Board>;
+
     StandardBoard() = default;
     StandardBoard(
         const sm::Renderable& board,
@@ -130,11 +105,12 @@ private:
     void check_threefold_repetition(const Position& position);
 
     static void do_place_animation(PieceObj& piece, const NodeObj& node, std::function<void()>&& on_finish);
-    void do_move_animation(PieceObj& piece, const NodeObj& node, std::function<void()>&& on_finish);
+    static void do_move_animation(PieceObj& piece, const NodeObj& node, std::function<void()>&& on_finish, bool three_pieces);
     static void do_take_animation(PieceObj& piece, std::function<void()>&& on_finish);
     int new_piece_to_place(PieceType type);
     static bool is_node_id(int id);
     static bool is_piece_id(int id);
+    static bool has_three_pieces(const Board& board, const PieceObj& piece);
 
     // Move generation
     std::vector<Move> generate_moves() const;
@@ -152,8 +128,6 @@ private:
     static Move create_place_take(int place_index, int take_index);
     static Move create_move(int source_index, int destination_index);
     static Move create_move_take(int source_index, int destination_index, int take_index);
-    static unsigned int count_pieces(const Board& board, Player player);
-    static Player opponent(Player player);
 
     // Game data
     Board m_board {};

@@ -39,6 +39,14 @@ static const glm::vec3 NODE_POSITIONS[24] {
     glm::vec3(-2.081f, NODE_Y_POSITION, -2.045f)   // 23
 };
 
+static const glm::vec3 RED {0.8f, 0.16f, 0.3f};
+static const glm::vec3 ORANGE {0.96f, 0.58f, 0.15f};
+
+static constexpr float PIECE_Y_POSITION_BOARD {0.135f};
+static constexpr float PIECE_Y_POSITION_AIR {0.5f};
+static constexpr float PIECE_Y_POSITION_AIR2 {0.75f};
+static constexpr float PIECE_Y_POSITION_AIR3 {2.0f};
+
 static glm::mat4 transformation_matrix(glm::vec3 position, glm::vec3 rotation, float scale) {
     glm::mat4 matrix {1.0f};
     matrix = glm::translate(matrix, position);
@@ -62,9 +70,7 @@ StandardBoard::StandardBoard(
     m_renderable = board;
     m_renderable.transform.scale = 20.0f;
 
-    m_paint_renderable = board_paint;
-    m_paint_renderable.transform.scale = 20.0f;
-    m_paint_renderable.transform.position.y = 0.062f;
+    set_board_paint_renderable(board_paint);
 
     for (int i {0}; i < 24; i++) {
         m_nodes[i] = NodeObj(i, NODE_POSITIONS[i], nodes[i]);
@@ -73,11 +79,11 @@ StandardBoard::StandardBoard(
     // Offset pieces' IDs, so that they are different from nodes' IDs
 
     for (int i {0}; i < 9; i++) {
-        m_pieces[i] = PieceObj(i + 24, glm::vec3(-3.0f, 0.5f, static_cast<float>(i) * 0.5f - 2.0f), white_pieces[i], PieceType::White);
+        m_pieces[i] = PieceObj(i + 24, glm::vec3(-3.0f, PIECE_Y_POSITION_AIR, static_cast<float>(i) * 0.5f - 2.0f), white_pieces[i], PieceType::White);
     }
 
     for (int i {9}; i < 18; i++) {
-        m_pieces[i] = PieceObj(i + 24, glm::vec3(3.0f, 0.5f, static_cast<float>(i - 9) * -0.5f + 2.0f), black_pieces[i - 9], PieceType::Black);
+        m_pieces[i] = PieceObj(i + 24, glm::vec3(3.0f, PIECE_Y_POSITION_AIR, static_cast<float>(i - 9) * -0.5f + 2.0f), black_pieces[i - 9], PieceType::Black);
     }
 
     m_legal_moves = generate_moves();
@@ -85,8 +91,6 @@ StandardBoard::StandardBoard(
 
 void StandardBoard::set_board_paint_renderable(const sm::Renderable& board_paint) {
     m_paint_renderable = board_paint;
-
-    m_paint_renderable = board_paint;  // FIXME dry
     m_paint_renderable.transform.scale = 20.0f;
     m_paint_renderable.transform.position.y = 0.062f;
 }
@@ -228,7 +232,12 @@ void StandardBoard::move_piece(int source_index, int destination_index) {
     m_nodes[destination_index].piece_id = m_nodes[source_index].piece_id;
     m_nodes[source_index].piece_id = -1;
 
-    do_move_animation(m_pieces[PIECE(m_nodes[source_index].piece_id)], m_nodes[destination_index], []() {});
+    do_move_animation(
+        m_pieces[PIECE(m_nodes[source_index].piece_id)],
+        m_nodes[destination_index],
+        []() {},
+        has_three_pieces(m_board, m_pieces[PIECE(m_nodes[source_index].piece_id)])
+    );
 }
 
 void StandardBoard::move_take_piece(int source_index, int destination_index, int take_index) {
@@ -260,7 +269,7 @@ void StandardBoard::move_take_piece(int source_index, int destination_index, int
         do_take_animation(m_pieces[PIECE(take_piece_id)], [=, this]() {
             m_pieces[PIECE(take_piece_id)].active = false;
         });
-    });
+    }, has_three_pieces(m_board, m_pieces[PIECE(m_nodes[source_index].piece_id)]));
 }
 
 void StandardBoard::debug() {
@@ -409,7 +418,7 @@ void StandardBoard::update_pieces() {
 
         if (piece.get_id() == m_hovered_id && highlight) {
             piece.get_renderable().get_material()->flags |= sm::Material::Outline;
-            piece.get_renderable().outline.color = glm::vec3(0.96f, 0.58f, 0.15f);
+            piece.get_renderable().outline.color = ORANGE;
         } else {
             piece.get_renderable().get_material()->flags &= ~sm::Material::Outline;
         }
@@ -421,7 +430,7 @@ void StandardBoard::update_pieces() {
 
         if (piece_id != -1) {
             m_pieces[PIECE(piece_id)].get_renderable().get_material()->flags |= sm::Material::Outline;
-            m_pieces[PIECE(piece_id)].get_renderable().outline.color = glm::vec3(0.8f, 0.16f, 0.3f);
+            m_pieces[PIECE(piece_id)].get_renderable().outline.color = RED;
         }
     }
 }
@@ -571,7 +580,12 @@ void StandardBoard::user_move(int source_index, int destination_index) {
 
     m_nodes[source_index].piece_id = -1;
 
-    do_move_animation(m_pieces[PIECE(move_piece_id)], m_nodes[destination_index], []() {});
+    do_move_animation(
+        m_pieces[PIECE(move_piece_id)],
+        m_nodes[destination_index],
+        []() {},
+        has_three_pieces(m_board, m_pieces[PIECE(move_piece_id)])
+    );
 }
 
 void StandardBoard::user_move_take_just_move(int source_index, int destination_index) {
@@ -585,7 +599,12 @@ void StandardBoard::user_move_take_just_move(int source_index, int destination_i
 
     m_nodes[source_index].piece_id = -1;
 
-    do_move_animation(m_pieces[PIECE(move_piece_id)], m_nodes[destination_index], []() {});
+    do_move_animation(
+        m_pieces[PIECE(move_piece_id)],
+        m_nodes[destination_index],
+        []() {},
+        has_three_pieces(m_board, m_pieces[PIECE(move_piece_id)])
+    );
 }
 
 void StandardBoard::user_move_take(int source_index, int destination_index, int take_index) {
@@ -754,24 +773,24 @@ void StandardBoard::check_threefold_repetition(const Position& position) {
 
 void StandardBoard::do_place_animation(PieceObj& piece, const NodeObj& node, std::function<void()>&& on_finish) {
     const glm::vec3 origin {piece.get_renderable().transform.position};
-    const glm::vec3 target0 {piece.get_renderable().transform.position.x, 0.75f, piece.get_renderable().transform.position.z};
-    const glm::vec3 target1 {node.get_renderable().transform.position.x, 0.75f, node.get_renderable().transform.position.z};
-    const glm::vec3 target {node.get_renderable().transform.position.x, 0.135f, node.get_renderable().transform.position.z};
+    const glm::vec3 target0 {piece.get_renderable().transform.position.x, PIECE_Y_POSITION_AIR2, piece.get_renderable().transform.position.z};
+    const glm::vec3 target1 {node.get_renderable().transform.position.x, PIECE_Y_POSITION_AIR2, node.get_renderable().transform.position.z};
+    const glm::vec3 target {node.get_renderable().transform.position.x, PIECE_Y_POSITION_BOARD, node.get_renderable().transform.position.z};
 
     piece.move_three_step(origin, target0, target1, target, std::move(on_finish));
 }
 
-void StandardBoard::do_move_animation(PieceObj& piece, const NodeObj& node, std::function<void()>&& on_finish) {
-    if (count_pieces(m_board, static_cast<Player>(piece.get_type())) > 3) {
+void StandardBoard::do_move_animation(PieceObj& piece, const NodeObj& node, std::function<void()>&& on_finish, bool three_pieces) {
+    if (!three_pieces) {
         const glm::vec3 origin {piece.get_renderable().transform.position};
-        const glm::vec3 target {node.get_renderable().transform.position.x, 0.135f, node.get_renderable().transform.position.z};
+        const glm::vec3 target {node.get_renderable().transform.position.x, PIECE_Y_POSITION_BOARD, node.get_renderable().transform.position.z};
 
         piece.move_direct(origin, target, std::move(on_finish));
     } else {
         const glm::vec3 origin {piece.get_renderable().transform.position};
-        const glm::vec3 target0 {piece.get_renderable().transform.position.x, 0.75f, piece.get_renderable().transform.position.z};
-        const glm::vec3 target1 {node.get_renderable().transform.position.x, 0.75f, node.get_renderable().transform.position.z};
-        const glm::vec3 target {node.get_renderable().transform.position.x, 0.135f, node.get_renderable().transform.position.z};
+        const glm::vec3 target0 {piece.get_renderable().transform.position.x, PIECE_Y_POSITION_AIR2, piece.get_renderable().transform.position.z};
+        const glm::vec3 target1 {node.get_renderable().transform.position.x, PIECE_Y_POSITION_AIR2, node.get_renderable().transform.position.z};
+        const glm::vec3 target {node.get_renderable().transform.position.x, PIECE_Y_POSITION_BOARD, node.get_renderable().transform.position.z};
 
         piece.move_three_step(origin, target0, target1, target, std::move(on_finish));
     }
@@ -779,7 +798,7 @@ void StandardBoard::do_move_animation(PieceObj& piece, const NodeObj& node, std:
 
 void StandardBoard::do_take_animation(PieceObj& piece, std::function<void()>&& on_finish) {
     const glm::vec3 origin {piece.get_renderable().transform.position};
-    const glm::vec3 target {piece.get_renderable().transform.position.x, 2.0f, piece.get_renderable().transform.position.z};
+    const glm::vec3 target {piece.get_renderable().transform.position.x, PIECE_Y_POSITION_AIR3, piece.get_renderable().transform.position.z};
 
     piece.move_direct(origin, target, std::move(on_finish));
 }
@@ -802,7 +821,11 @@ bool StandardBoard::is_piece_id(int id) {
     return id >= 24 && id <= 24 + 17;
 }
 
-std::vector<Move> StandardBoard::generate_moves() const {
+bool StandardBoard::has_three_pieces(const Board& board, const PieceObj& piece) {
+    return count_pieces(board, static_cast<Player>(piece.get_type())) == 3;
+}
+
+std::vector<StandardBoard::Move> StandardBoard::generate_moves() const {
     std::vector<Move> moves;
     Board board {m_board};
 
@@ -1205,7 +1228,7 @@ std::vector<int> StandardBoard::neighbor_free_positions(const Board& board, int 
     return result;
 }
 
-Move StandardBoard::create_place(int place_index) {
+StandardBoard::Move StandardBoard::create_place(int place_index) {
     Move move;
     move.type = MoveType::Place;
     move.place.place_index = place_index;
@@ -1213,7 +1236,7 @@ Move StandardBoard::create_place(int place_index) {
     return move;
 }
 
-Move StandardBoard::create_place_take(int place_index, int take_index) {
+StandardBoard::Move StandardBoard::create_place_take(int place_index, int take_index) {
     Move move;
     move.type = MoveType::PlaceTake;
     move.place_take.place_index = place_index;
@@ -1222,7 +1245,7 @@ Move StandardBoard::create_place_take(int place_index, int take_index) {
     return move;
 }
 
-Move StandardBoard::create_move(int source_index, int destination_index) {
+StandardBoard::Move StandardBoard::create_move(int source_index, int destination_index) {
     Move move;
     move.type = MoveType::Move;
     move.move.source_index = source_index;
@@ -1231,7 +1254,7 @@ Move StandardBoard::create_move(int source_index, int destination_index) {
     return move;
 }
 
-Move StandardBoard::create_move_take(int source_index, int destination_index, int take_index) {
+StandardBoard::Move StandardBoard::create_move_take(int source_index, int destination_index, int take_index) {
     Move move;
     move.type = MoveType::MoveTake;
     move.move_take.source_index = source_index;
@@ -1239,22 +1262,4 @@ Move StandardBoard::create_move_take(int source_index, int destination_index, in
     move.move_take.take_index = take_index;
 
     return move;
-}
-
-unsigned int StandardBoard::count_pieces(const Board& board, Player player) {
-    unsigned int result {0};
-
-    for (const Piece piece : board) {
-        result += static_cast<unsigned int>(piece == static_cast<Piece>(player));
-    }
-
-    return result;
-}
-
-Player StandardBoard::opponent(Player player) {
-    if (player == Player::White) {
-        return Player::Black;
-    } else {
-        return Player::White;
-    }
 }

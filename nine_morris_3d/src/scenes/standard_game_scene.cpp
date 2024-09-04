@@ -409,7 +409,7 @@ void StandardGameScene::setup_renderables() {
         renderable_nodes,
         renderable_white_pieces,
         renderable_black_pieces,
-        [this](const Move&) {
+        [this](const StandardBoard::Move&) {
             if (!m_game_started) {
                 m_timer.start();
 
