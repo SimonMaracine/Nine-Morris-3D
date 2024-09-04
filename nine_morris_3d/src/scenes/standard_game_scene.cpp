@@ -90,7 +90,7 @@ void StandardGameScene::on_update() {
 
     ctx.add_light(m_directional_light);
 
-    const auto ray {cast_mouse_ray(ctx, m_cam)};
+    const glm::vec3 ray {cast_mouse_ray(ctx, m_cam)};
 
     m_board.update(ctx, ray, m_cam_controller.get_position());
 

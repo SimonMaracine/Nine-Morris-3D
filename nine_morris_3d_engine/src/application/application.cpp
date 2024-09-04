@@ -2,6 +2,8 @@
 
 #include <cassert>
 
+#include <glm/glm.hpp>
+
 #include "nine_morris_3d_engine/application/scene.hpp"
 #include "nine_morris_3d_engine/application/platform.hpp"
 #include "nine_morris_3d_engine/application/logging.hpp"
