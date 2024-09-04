@@ -24,19 +24,11 @@ void StandardGameScene::on_stop() {
 }
 
 void StandardGameScene::on_update() {
-    m_cam_controller.update_controls(ctx.get_delta(), ctx);
-    m_cam_controller.update_camera(ctx.get_delta());
+    GameScene::on_update();
 
     // sm::listener::set_position(cam_controller.get_position());  // TODO
 
-    ctx.capture(m_cam, m_cam_controller.get_position());
-    ctx.capture(m_cam_2d);
-
-    ctx.add_light(m_directional_light);
-
-    const glm::vec3 ray {cast_mouse_ray(ctx, m_cam)};
-
-    m_board.update(ctx, ray, m_cam_controller.get_position());
+    m_board.update(ctx, cast_mouse_ray(ctx, m_cam), m_cam_controller.get_position());
 
     const auto& g {ctx.global<Global>()};
 
@@ -50,62 +42,23 @@ void StandardGameScene::on_update() {
         m_timer.render(ctx);
     }
 
-    if (m_skybox) {
-        ctx.skybox(m_skybox);
-    }
-
-    if (m_ui.get_show_information()) {
-        ctx.show_information_text();
-    }
-
-    // Origin
-    ctx.debug_add_line(glm::vec3(-1.0f, 0.0f, 0.0f), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-    ctx.debug_add_line(glm::vec3(0.0f, -1.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-    ctx.debug_add_line(glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-
-    // Light
-    ctx.debug_add_lamp(glm::normalize(-m_directional_light.direction) * 15.0f, glm::vec3(0.6f));
-
     ctx.shadow(m_shadow_box);
 }
 
 void StandardGameScene::on_fixed_update() {
-    m_cam_controller.update_friction();
+    GameScene::on_fixed_update();
+
     m_board.update_movement();
 }
 
 void StandardGameScene::on_imgui_update() {
-    m_ui.update(ctx, *this);
+    GameScene::on_imgui_update();
+
     m_board.debug();
 }
 
-void StandardGameScene::load_and_set_skybox() {
-    ctx.add_task_async([this](sm::AsyncTask& task, void*) {
-        load_skybox();
-
-        ctx.add_task([this](const sm::Task&, void*) {
-            setup_skybox();
-            setup_lights();
-
-            return sm::Task::Result::Done;
-        });
-
-        task.set_done();
-    });
-}
-
-void StandardGameScene::load_and_set_board_paint_texture() {
-    ctx.add_task_async([this](sm::AsyncTask& task, void*) {
-        load_board_paint_texture();
-
-        ctx.add_task([this](const sm::Task&, void*) {
-            m_board.set_board_paint_renderable(setup_board_paint());
-
-            return sm::Task::Result::Done;
-        });
-
-        task.set_done();
-    });
+Board& StandardGameScene::get_board() {
+    return m_board;
 }
 
 void StandardGameScene::on_key_released(const sm::KeyReleasedEvent& event) {
@@ -162,13 +115,13 @@ void StandardGameScene::setup_renderables() {
     const auto renderable_white_pieces {setup_white_pieces()};
     const auto renderable_black_pieces {setup_black_pieces()};
 
-    m_board = StandardBoard(
+    m_board = StandardGameBoard(
         renderable_board,
         renderable_board_paint,
         renderable_nodes,
         renderable_white_pieces,
         renderable_black_pieces,
-        [this](const StandardBoard::Move&) {
+        [this](const StandardGameBoard::Move&) {
             if (!m_game_started) {
                 m_timer.start();
 

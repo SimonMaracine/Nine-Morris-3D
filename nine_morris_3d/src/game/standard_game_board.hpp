@@ -7,10 +7,11 @@
 #include <nine_morris_3d_engine/nine_morris_3d.hpp>
 
 #include "game/common.hpp"
+#include "game/board.hpp"
 #include "game/node.hpp"
 #include "game/piece.hpp"
 
-class StandardBoard {
+class StandardGameBoard : public Board {
 public:
     enum class MoveType {
         Place,
@@ -48,8 +49,8 @@ public:
     using Board = std::array<Piece, 24>;
     using Position = ::Position<Board>;
 
-    StandardBoard() = default;
-    StandardBoard(
+    StandardGameBoard() = default;
+    StandardGameBoard(
         const sm::Renderable& board,
         const sm::Renderable& board_paint,
         const std::vector<sm::Renderable>& nodes,
@@ -61,7 +62,7 @@ public:
     Player get_turn() const { return m_turn; }
     GameOver get_game_over() const { return m_game_over; }
 
-    void set_board_paint_renderable(const sm::Renderable& board_paint);
+    void set_board_paint_renderable(const sm::Renderable& board_paint) override;
 
     void update(sm::Ctx& ctx, glm::vec3 ray, glm::vec3 camera);
     void update_movement();

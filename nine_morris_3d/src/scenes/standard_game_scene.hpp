@@ -22,8 +22,7 @@ public:
     void on_fixed_update() override;
     void on_imgui_update() override;
 
-    void load_and_set_skybox() override;
-    void load_and_set_board_paint_texture() override;
+    Board& get_board() override;
 private:
     void on_key_released(const sm::KeyReleasedEvent& event);
     void on_mouse_button_pressed(const sm::MouseButtonPressedEvent& event);
@@ -38,7 +37,7 @@ private:
     std::vector<sm::Renderable> setup_white_pieces() const;
     std::vector<sm::Renderable> setup_black_pieces() const;
 
-    StandardBoard m_board;
+    StandardGameBoard m_board;
     TurnIndicator m_turn_indicator;
     Timer m_timer;
 };

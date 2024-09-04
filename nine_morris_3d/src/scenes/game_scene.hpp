@@ -2,6 +2,7 @@
 
 #include <nine_morris_3d_engine/nine_morris_3d.hpp>
 
+#include "game/board.hpp"
 #include "point_camera_controller.hpp"
 #include "ui.hpp"
 
@@ -10,14 +11,19 @@ public:
     explicit GameScene(sm::Ctx& ctx)
         : sm::ApplicationScene(ctx) {}
 
-    PointCameraController& get_camera_controller() { return m_cam_controller; }
-
     // Call these in the child scene class
     void on_start() override;
     void on_stop() override;
+    void on_update() override;
+    void on_fixed_update() override;
+    void on_imgui_update() override;
 
-    virtual void load_and_set_skybox() = 0;
-    virtual void load_and_set_board_paint_texture() = 0;
+    PointCameraController& get_camera_controller() { return m_cam_controller; }
+
+    void load_and_set_skybox();
+    void load_and_set_board_paint_texture();
+
+    virtual Board& get_board() = 0;
 protected:
     void on_window_resized(const sm::WindowResizedEvent& event);
 

@@ -21,13 +21,76 @@ void GameScene::on_stop() {
     ctx.disconnect_events(this);
 }
 
+void GameScene::on_update() {
+    m_cam_controller.update_controls(ctx.get_delta(), ctx);
+    m_cam_controller.update_camera(ctx.get_delta());
+
+    ctx.capture(m_cam, m_cam_controller.get_position());
+    ctx.capture(m_cam_2d);
+
+    ctx.add_light(m_directional_light);
+
+    if (m_skybox) {
+        ctx.skybox(m_skybox);
+    }
+
+    if (m_ui.get_show_information()) {
+        ctx.show_information_text();
+    }
+
+    // Origin
+    ctx.debug_add_line(glm::vec3(-1.0f, 0.0f, 0.0f), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+    ctx.debug_add_line(glm::vec3(0.0f, -1.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+    ctx.debug_add_line(glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+
+    // Light
+    ctx.debug_add_lamp(glm::normalize(-m_directional_light.direction) * 15.0f, glm::vec3(0.6f));
+}
+
+void GameScene::on_fixed_update() {
+    m_cam_controller.update_friction();
+}
+
+void GameScene::on_imgui_update() {
+    m_ui.update(ctx, *this);
+}
+
+void GameScene::load_and_set_skybox() {
+    ctx.add_task_async([this](sm::AsyncTask& task, void*) {
+        load_skybox();
+
+        ctx.add_task([this](const sm::Task&, void*) {
+            setup_skybox();
+            setup_lights();
+
+            return sm::Task::Result::Done;
+        });
+
+        task.set_done();
+    });
+}
+
+void GameScene::load_and_set_board_paint_texture() {
+    ctx.add_task_async([this](sm::AsyncTask& task, void*) {
+        load_board_paint_texture();
+
+        ctx.add_task([this](const sm::Task&, void*) {
+            // get_board().set_board_paint_renderable(setup_board_paint());  // FIXME
+
+            return sm::Task::Result::Done;
+        });
+
+        task.set_done();
+    });
+}
+
 void GameScene::on_window_resized(const sm::WindowResizedEvent& event) {
     m_cam.set_projection(event.width, event.height, LENS_FOV, LENS_NEAR, LENS_FAR);
     m_cam_2d.set_projection(0, event.width, 0, event.height);
 }
 
 void GameScene::setup_camera() {
-    auto& g {ctx.global<Global>()};
+    const auto& g {ctx.global<Global>()};
 
     m_cam_controller = PointCameraController(
         m_cam,
