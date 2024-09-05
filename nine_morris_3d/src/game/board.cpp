@@ -20,14 +20,6 @@ static glm::mat4 transformation_matrix(glm::vec3 position, glm::vec3 rotation, f
     return matrix;
 }
 
-Player opponent(Player player) {
-    if (player == Player::White) {
-        return Player::Black;
-    } else {
-        return Player::White;
-    }
-}
-
 BoardObj::BoardObj(const sm::Renderable& board, const sm::Renderable& board_paint) {
     m_renderable = board;
     m_renderable.transform.scale = 20.0f;
@@ -39,6 +31,30 @@ void BoardObj::set_board_paint_renderable(const sm::Renderable& board_paint) {
     m_paint_renderable = board_paint;
     m_paint_renderable.transform.scale = 20.0f;
     m_paint_renderable.transform.position.y = 0.062f;
+}
+
+void BoardObj::user_click_press(GameOver game_over) {
+    if (game_over != GameOver::None) {
+        return;
+    }
+
+    m_clicked_id = m_hovered_id;
+}
+
+void BoardObj::user_click_release(GameOver game_over, std::function<void()>&& callback) {
+    if (game_over != GameOver::None) {
+        m_clicked_id = -1;
+        return;
+    }
+
+    if (m_hovered_id == -1 || m_hovered_id != m_clicked_id) {
+        m_clicked_id = -1;
+        return;
+    }
+
+    m_clicked_id = -1;
+
+    callback();
 }
 
 void BoardObj::update_hovered_id(glm::vec3 ray, glm::vec3 camera, std::function<std::vector<std::pair<int, sm::Renderable>>()>&& get_renderables) {
@@ -74,6 +90,40 @@ void BoardObj::update_hovered_id(glm::vec3 ray, glm::vec3 camera, std::function<
 
     if (!hover) {
         m_hovered_id = -1;
+    }
+}
+
+const char* BoardObj::turn_string(Player turn) {
+    switch (turn) {
+        case Player::White:
+            return "White";
+        case Player::Black:
+            return "Black";
+    }
+
+    return {};
+}
+
+const char* BoardObj::game_over_string(GameOver game_over) {
+    switch (game_over) {
+        case GameOver::None:
+            return "None";
+        case GameOver::WinnerWhite:
+            return "WinnerWhite";
+        case GameOver::WinnerBlack:
+            return "WinnerBlack";
+        case GameOver::TieBetweenBothPlayers:
+            return "TieBetweenBothPlayers";
+    }
+
+    return {};
+}
+
+Player BoardObj::opponent(Player player) {
+    if (player == Player::White) {
+        return Player::Black;
+    } else {
+        return Player::White;
     }
 }
 

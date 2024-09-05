@@ -76,9 +76,6 @@ public:
 
     void debug();
 private:
-    void update_nodes();
-    void update_pieces();
-
     void select(int index);
     void try_place(int place_index);
     void try_place_take(int place_index, int take_index);
@@ -137,8 +134,8 @@ private:
     // Management data
     std::function<void(const Move&)> m_move_callback;
     std::vector<Move> m_legal_moves;
-    int m_user_selected_index {-1};
-    int m_user_take_action_index {-1};
+    int m_selected_index {-1};
+    int m_take_action_index {-1};
 
     // Scene data
     std::array<NodeObj, NODES> m_nodes {};

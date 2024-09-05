@@ -63,73 +63,72 @@ void StandardGameBoard::update(sm::Ctx& ctx, glm::vec3 ray, glm::vec3 camera) {
         return renderables;
     });
 
-    update_nodes();
-    update_pieces();
+#ifdef __GNUG__
+    #pragma GCC diagnostic push
+    #pragma GCC diagnostic ignored "-Wparentheses"
+#endif
+
+    update_nodes_highlight(m_nodes, m_game_over, [this]() {
+        return (
+            m_plies < 18 && m_take_action_index == -1 ||
+            m_plies >= 18 && m_selected_index != -1 && m_take_action_index == -1
+        );
+    });
+
+    update_pieces_highlight<NODES>(m_pieces, m_nodes, m_game_over, m_selected_index, [this](const PieceObj& piece) {
+        return (
+            m_take_action_index != -1 && static_cast<Player>(piece.get_type()) != m_turn && piece.node_id != -1 ||
+            m_plies >= 18 && static_cast<Player>(piece.get_type()) == m_turn && m_take_action_index == -1
+        );
+    });
+
+#ifdef __GNUG__
+    #pragma GCC diagnostic pop
+#endif
 
     ctx.add_renderable(m_renderable);
     ctx.add_renderable(m_paint_renderable);
 
-    for (NodeObj& node : m_nodes) {
-        node.update(ctx);
-    }
-
-    for (PieceObj& piece : m_pieces) {
-        piece.update(ctx);
-    }
+    update_nodes(ctx, m_nodes);
+    update_pieces(ctx, m_pieces);
 }
 
 void StandardGameBoard::update_movement() {
-    for (PieceObj& piece : m_pieces) {
-        piece.update_movement();
-    }
+    BoardObj::update_movement(m_pieces);
 }
 
 void StandardGameBoard::user_click_press() {
-    if (m_game_over != GameOver::None) {
-        return;
-    }
-
-    m_clicked_id = m_hovered_id;
+    BoardObj::user_click_press(m_game_over);
 }
 
 void StandardGameBoard::user_click_release() {
-    if (m_game_over != GameOver::None) {
-        m_clicked_id = -1;
-        return;
-    }
+    BoardObj::user_click_release(m_game_over, [this]() {
+        if (m_plies >= 18) {
+            if (m_take_action_index != -1) {
+                if (is_piece_id(m_hovered_id)) {
+                    try_move_take(m_selected_index, m_take_action_index, m_pieces[PIECE(m_hovered_id)].node_id);
+                }
+            } else {
+                if (is_node_id(m_hovered_id)) {
+                    try_move(m_selected_index, m_nodes[m_hovered_id].get_id());
+                }
 
-    if (m_hovered_id == -1 || m_hovered_id != m_clicked_id) {
-        m_clicked_id = -1;
-        return;
-    }
-
-    m_clicked_id = -1;
-
-    if (m_plies >= 18) {
-        if (m_user_take_action_index != -1) {
-            if (is_piece_id(m_hovered_id)) {
-                try_move_take(m_user_selected_index, m_user_take_action_index, m_pieces[PIECE(m_hovered_id)].node_id);
+                if (is_piece_id(m_hovered_id)) {
+                    select(m_pieces[PIECE(m_hovered_id)].node_id);
+                }
             }
         } else {
-            if (is_node_id(m_hovered_id)) {
-                try_move(m_user_selected_index, m_nodes[m_hovered_id].get_id());
-            }
-
-            if (is_piece_id(m_hovered_id)) {
-                select(m_pieces[PIECE(m_hovered_id)].node_id);
-            }
-        }
-    } else {
-        if (m_user_take_action_index != -1) {
-            if (is_piece_id(m_hovered_id)) {
-                try_place_take(m_user_take_action_index, m_pieces[PIECE(m_hovered_id)].node_id);
-            }
-        } else {
-            if (is_node_id(m_hovered_id)) {
-                try_place(m_nodes[m_hovered_id].get_id());
+            if (m_take_action_index != -1) {
+                if (is_piece_id(m_hovered_id)) {
+                    try_place_take(m_take_action_index, m_pieces[PIECE(m_hovered_id)].node_id);
+                }
+            } else {
+                if (is_node_id(m_hovered_id)) {
+                    try_place(m_nodes[m_hovered_id].get_id());
+                }
             }
         }
-    }
+    });
 }
 
 void StandardGameBoard::place_piece(int place_index) {  // TODO test these
@@ -245,135 +244,34 @@ void StandardGameBoard::move_take_piece(int source_index, int destination_index,
 
 void StandardGameBoard::debug() {
     if (ImGui::Begin("Debug Board")) {
-        const char* turn {};
-        switch (m_turn) {
-            case Player::White:
-                turn = "White";
-                break;
-            case Player::Black:
-                turn = "Black";
-                break;
-        }
-
-        const char* game_over {};
-        switch (m_game_over) {
-            case GameOver::None:
-                game_over = "None";
-                break;
-            case GameOver::WinnerWhite:
-                game_over = "WinnerWhite";
-                break;
-            case GameOver::WinnerBlack:
-                game_over = "WinnerBlack";
-                break;
-            case GameOver::TieBetweenBothPlayers:
-                game_over = "TieBetweenBothPlayers";
-                break;
-        }
-
-        ImGui::Text("turn %s", turn);
-        ImGui::Text("game_over %s", game_over);
+        ImGui::Text("turn %s", turn_string(m_turn));
+        ImGui::Text("game_over %s", game_over_string(m_game_over));
         ImGui::Text("plies %u", m_plies);
         ImGui::Text("plies_without_advancement %u", m_plies_without_advancement);
         ImGui::Text("positions %lu", m_positions.size());
         ImGui::Text("legal_moves %lu", m_legal_moves.size());
         ImGui::Text("clicked_id %d", m_clicked_id);
         ImGui::Text("hovered_id %d", m_hovered_id);
-        ImGui::Text("user_selected_index %d", m_user_selected_index);
-        ImGui::Text("user_take_action_index %d", m_user_take_action_index);
+        ImGui::Text("selected_index %d", m_selected_index);
+        ImGui::Text("take_action_index %d", m_take_action_index);
     }
 
     ImGui::End();
 }
 
-#ifdef __GNUG__
-    #pragma GCC diagnostic push
-    #pragma GCC diagnostic ignored "-Wparentheses"
-#endif
-
-void StandardGameBoard::update_nodes() {
-    if (m_game_over != GameOver::None) {
-        std::for_each(m_nodes.begin(), m_nodes.end(), [](NodeObj& node) {
-            node.set_highlighted(false);
-        });
-
-        return;
-    }
-
-    /*
-        Highlight if:
-        first phase and not must take piece
-        second phase and piece selected and not must take piece
-    */
-    if (!(m_plies < 18 && m_user_take_action_index == -1 || m_plies >= 18 && m_user_selected_index != -1 && m_user_take_action_index == -1)) {
-        std::for_each(m_nodes.begin(), m_nodes.end(), [](NodeObj& node) {
-            node.set_highlighted(false);
-        });
-
-        return;
-    }
-
-    for (NodeObj& node : m_nodes) {
-        node.set_highlighted(node.get_id() == m_hovered_id);
-    }
-}
-
-void StandardGameBoard::update_pieces() {
-    if (m_game_over != GameOver::None) {
-        std::for_each(m_pieces.begin(), m_pieces.end(), [](PieceObj& piece) {
-            piece.get_renderable().get_material()->flags &= ~sm::Material::Outline;
-        });
-
-        return;
-    }
-
-    /*
-        Highlight if:
-        must take piece and piece is opponent's piece and piece is on the board
-        second phase and piece is ours and not must take piece
-    */
-    for (PieceObj& piece : m_pieces) {
-        const bool highlight {
-            m_user_take_action_index != -1 && static_cast<Player>(piece.get_type()) != m_turn && piece.node_id != -1 ||
-            m_plies >= 18 && static_cast<Player>(piece.get_type()) == m_turn && m_user_take_action_index == -1
-        };
-
-        if (piece.get_id() == m_hovered_id && highlight) {
-            piece.get_renderable().get_material()->flags |= sm::Material::Outline;
-            piece.get_renderable().outline.color = ORANGE;
-        } else {
-            piece.get_renderable().get_material()->flags &= ~sm::Material::Outline;
-        }
-    }
-
-    // Override, if the piece is actually selected
-    if (m_user_selected_index != -1) {
-        const int piece_id {m_nodes[m_user_selected_index].piece_id};
-
-        if (piece_id != -1) {
-            m_pieces[PIECE(piece_id)].get_renderable().get_material()->flags |= sm::Material::Outline;
-            m_pieces[PIECE(piece_id)].get_renderable().outline.color = RED;
-        }
-    }
-}
-
-#ifdef __GNUG__
-    #pragma GCC diagnostic pop
-#endif
-
 void StandardGameBoard::select(int index) {
-    if (m_user_selected_index == -1) {
+    if (m_selected_index == -1) {
         if (m_board[index] == static_cast<Piece>(m_turn)) {
-            m_user_selected_index = index;
+            m_selected_index = index;
         }
     } else {
-        if (index == m_user_selected_index) {
-            if (m_user_take_action_index == -1) {
-                m_user_selected_index = -1;
+        if (index == m_selected_index) {
+            if (m_take_action_index == -1) {
+                m_selected_index = -1;
             }
         } else if (m_board[index] == static_cast<Piece>(m_turn)) {
-            if (m_user_take_action_index == -1) {
-                m_user_selected_index = index;
+            if (m_take_action_index == -1) {
+                m_selected_index = index;
             }
         }
     }
@@ -466,7 +364,7 @@ void StandardGameBoard::user_place(int place_index) {
 }
 
 void StandardGameBoard::user_place_take_just_place(int place_index) {
-    m_user_take_action_index = place_index;
+    m_take_action_index = place_index;
 
     const int id {new_piece_to_place(static_cast<PieceType>(m_turn))};
 
@@ -510,7 +408,7 @@ void StandardGameBoard::user_move(int source_index, int destination_index) {
 }
 
 void StandardGameBoard::user_move_take_just_move(int source_index, int destination_index) {
-    m_user_take_action_index = destination_index;
+    m_take_action_index = destination_index;
 
     m_pieces[PIECE(m_nodes[source_index].piece_id)].node_id = destination_index;
     m_nodes[destination_index].piece_id = m_nodes[source_index].piece_id;
@@ -615,8 +513,8 @@ void StandardGameBoard::finish_turn(bool advancement) {
 
     m_positions.push_back({m_board, m_turn});
 
-    m_user_selected_index = -1;
-    m_user_take_action_index = -1;
+    m_selected_index = -1;
+    m_take_action_index = -1;
 }
 
 void StandardGameBoard::check_winner_material() {
@@ -851,54 +749,30 @@ bool StandardGameBoard::is_mill(const Board& board, Player player, int index) {
     assert(board[index] == piece);
 
     switch (index) {
-        case 0:
-            return IS_PC(1) && IS_PC(2) || IS_PC(9) && IS_PC(21);
-        case 1:
-            return IS_PC(0) && IS_PC(2) || IS_PC(4) && IS_PC(7);
-        case 2:
-            return IS_PC(0) && IS_PC(1) || IS_PC(14) && IS_PC(23);
-        case 3:
-            return IS_PC(4) && IS_PC(5) || IS_PC(10) && IS_PC(18);
-        case 4:
-            return IS_PC(3) && IS_PC(5) || IS_PC(1) && IS_PC(7);
-        case 5:
-            return IS_PC(3) && IS_PC(4) || IS_PC(13) && IS_PC(20);
-        case 6:
-            return IS_PC(7) && IS_PC(8) || IS_PC(11) && IS_PC(15);
-        case 7:
-            return IS_PC(6) && IS_PC(8) || IS_PC(1) && IS_PC(4);
-        case 8:
-            return IS_PC(6) && IS_PC(7) || IS_PC(12) && IS_PC(17);
-        case 9:
-            return IS_PC(0) && IS_PC(21) || IS_PC(10) && IS_PC(11);
-        case 10:
-            return IS_PC(9) && IS_PC(11) || IS_PC(3) && IS_PC(18);
-        case 11:
-            return IS_PC(9) && IS_PC(10) || IS_PC(6) && IS_PC(15);
-        case 12:
-            return IS_PC(13) && IS_PC(14) || IS_PC(8) && IS_PC(17);
-        case 13:
-            return IS_PC(12) && IS_PC(14) || IS_PC(5) && IS_PC(20);
-        case 14:
-            return IS_PC(12) && IS_PC(13) || IS_PC(2) && IS_PC(23);
-        case 15:
-            return IS_PC(16) && IS_PC(17) || IS_PC(6) && IS_PC(11);
-        case 16:
-            return IS_PC(15) && IS_PC(17) || IS_PC(19) && IS_PC(22);
-        case 17:
-            return IS_PC(15) && IS_PC(16) || IS_PC(8) && IS_PC(12);
-        case 18:
-            return IS_PC(19) && IS_PC(20) || IS_PC(3) && IS_PC(10);
-        case 19:
-            return IS_PC(18) && IS_PC(20) || IS_PC(16) && IS_PC(22);
-        case 20:
-            return IS_PC(18) && IS_PC(19) || IS_PC(5) && IS_PC(13);
-        case 21:
-            return IS_PC(22) && IS_PC(23) || IS_PC(0) && IS_PC(9);
-        case 22:
-            return IS_PC(21) && IS_PC(23) || IS_PC(16) && IS_PC(19);
-        case 23:
-            return IS_PC(21) && IS_PC(22) || IS_PC(2) && IS_PC(14);
+        case 0: return IS_PC(1) && IS_PC(2) || IS_PC(9) && IS_PC(21);
+        case 1: return IS_PC(0) && IS_PC(2) || IS_PC(4) && IS_PC(7);
+        case 2: return IS_PC(0) && IS_PC(1) || IS_PC(14) && IS_PC(23);
+        case 3: return IS_PC(4) && IS_PC(5) || IS_PC(10) && IS_PC(18);
+        case 4: return IS_PC(3) && IS_PC(5) || IS_PC(1) && IS_PC(7);
+        case 5: return IS_PC(3) && IS_PC(4) || IS_PC(13) && IS_PC(20);
+        case 6: return IS_PC(7) && IS_PC(8) || IS_PC(11) && IS_PC(15);
+        case 7: return IS_PC(6) && IS_PC(8) || IS_PC(1) && IS_PC(4);
+        case 8: return IS_PC(6) && IS_PC(7) || IS_PC(12) && IS_PC(17);
+        case 9: return IS_PC(0) && IS_PC(21) || IS_PC(10) && IS_PC(11);
+        case 10: return IS_PC(9) && IS_PC(11) || IS_PC(3) && IS_PC(18);
+        case 11: return IS_PC(9) && IS_PC(10) || IS_PC(6) && IS_PC(15);
+        case 12: return IS_PC(13) && IS_PC(14) || IS_PC(8) && IS_PC(17);
+        case 13: return IS_PC(12) && IS_PC(14) || IS_PC(5) && IS_PC(20);
+        case 14: return IS_PC(12) && IS_PC(13) || IS_PC(2) && IS_PC(23);
+        case 15: return IS_PC(16) && IS_PC(17) || IS_PC(6) && IS_PC(11);
+        case 16: return IS_PC(15) && IS_PC(17) || IS_PC(19) && IS_PC(22);
+        case 17: return IS_PC(15) && IS_PC(16) || IS_PC(8) && IS_PC(12);
+        case 18: return IS_PC(19) && IS_PC(20) || IS_PC(3) && IS_PC(10);
+        case 19: return IS_PC(18) && IS_PC(20) || IS_PC(16) && IS_PC(22);
+        case 20: return IS_PC(18) && IS_PC(19) || IS_PC(5) && IS_PC(13);
+        case 21: return IS_PC(22) && IS_PC(23) || IS_PC(0) && IS_PC(9);
+        case 22: return IS_PC(21) && IS_PC(23) || IS_PC(16) && IS_PC(19);
+        case 23: return IS_PC(21) && IS_PC(22) || IS_PC(2) && IS_PC(14);
     }
 
     return {};

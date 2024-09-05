@@ -61,7 +61,7 @@ JumpVariantBoard::JumpVariantBoard(
     m_legal_moves = generate_moves();
 }
 
-void JumpVariantBoard::update(sm::Ctx& ctx, glm::vec3 ray, glm::vec3 camera) {  // TODO dry
+void JumpVariantBoard::update(sm::Ctx& ctx, glm::vec3 ray, glm::vec3 camera) {
     update_hovered_id(ray, camera, [this]() {
         std::vector<std::pair<int, sm::Renderable>> renderables;
 
@@ -80,55 +80,39 @@ void JumpVariantBoard::update(sm::Ctx& ctx, glm::vec3 ray, glm::vec3 camera) {  
         return renderables;
     });
 
-    update_nodes();
-    update_pieces();
+    update_nodes_highlight(m_nodes, m_game_over, [this]() {
+        return m_selected_index != -1;
+    });
+
+    update_pieces_highlight<NODES>(m_pieces, m_nodes, m_game_over, m_selected_index, [this](const PieceObj& piece) {
+        return static_cast<Player>(piece.get_type()) == m_turn;
+    });
 
     ctx.add_renderable(m_renderable);
     ctx.add_renderable(m_paint_renderable);
 
-    for (NodeObj& node : m_nodes) {
-        node.update(ctx);
-    }
-
-    for (PieceObj& piece : m_pieces) {
-        piece.update(ctx);
-    }
+    update_nodes(ctx, m_nodes);
+    update_pieces(ctx, m_pieces);
 }
 
-void JumpVariantBoard::update_movement() {  // TODO dry
-    for (PieceObj& piece : m_pieces) {
-        piece.update_movement();
-    }
+void JumpVariantBoard::update_movement() {
+    BoardObj::update_movement(m_pieces);
 }
 
-void JumpVariantBoard::user_click_press() {  // TODO dry
-    if (m_game_over != GameOver::None) {
-        return;
-    }
-
-    m_clicked_id = m_hovered_id;
+void JumpVariantBoard::user_click_press() {
+    BoardObj::user_click_press(m_game_over);
 }
 
-void JumpVariantBoard::user_click_release() {  // TODO dry
-    if (m_game_over != GameOver::None) {
-        m_clicked_id = -1;
-        return;
-    }
+void JumpVariantBoard::user_click_release() {
+    BoardObj::user_click_release(m_game_over, [this]() {
+        if (is_node_id(m_hovered_id)) {
+            try_move(m_selected_index, m_nodes[m_hovered_id].get_id());
+        }
 
-    if (m_hovered_id == -1 || m_hovered_id != m_clicked_id) {
-        m_clicked_id = -1;
-        return;
-    }
-
-    m_clicked_id = -1;
-
-    if (is_node_id(m_hovered_id)) {
-        try_move(m_user_selected_index, m_nodes[m_hovered_id].get_id());
-    }
-
-    if (is_piece_id(m_hovered_id)) {
-        select(m_pieces[PIECE(m_hovered_id)].node_id);
-    }
+        if (is_piece_id(m_hovered_id)) {
+            select(m_pieces[PIECE(m_hovered_id)].node_id);
+        }
+    });
 }
 
 void JumpVariantBoard::move_piece(int source_index, int destination_index) {
@@ -155,112 +139,31 @@ void JumpVariantBoard::move_piece(int source_index, int destination_index) {
     );
 }
 
-void JumpVariantBoard::debug() {  // TODO dry
+void JumpVariantBoard::debug() {
     if (ImGui::Begin("Debug Board")) {
-        const char* turn {};
-        switch (m_turn) {
-            case Player::White:
-                turn = "White";
-                break;
-            case Player::Black:
-                turn = "Black";
-                break;
-        }
-
-        const char* game_over {};
-        switch (m_game_over) {
-            case GameOver::None:
-                game_over = "None";
-                break;
-            case GameOver::WinnerWhite:
-                game_over = "WinnerWhite";
-                break;
-            case GameOver::WinnerBlack:
-                game_over = "WinnerBlack";
-                break;
-            case GameOver::TieBetweenBothPlayers:
-                game_over = "TieBetweenBothPlayers";
-                break;
-        }
-
-        ImGui::Text("turn %s", turn);
-        ImGui::Text("game_over %s", game_over);
+        ImGui::Text("turn %s", turn_string(m_turn));
+        ImGui::Text("game_over %s", game_over_string(m_game_over));
         ImGui::Text("plies_without_advancement %u", m_plies_without_advancement);
         ImGui::Text("positions %lu", m_positions.size());
         ImGui::Text("legal_moves %lu", m_legal_moves.size());
         ImGui::Text("clicked_id %d", m_clicked_id);
         ImGui::Text("hovered_id %d", m_hovered_id);
-        ImGui::Text("user_selected_index %d", m_user_selected_index);
+        ImGui::Text("selected_index %d", m_selected_index);
     }
 
     ImGui::End();
 }
 
-void JumpVariantBoard::update_nodes() {  // TODO dry
-    if (m_game_over != GameOver::None) {
-        std::for_each(m_nodes.begin(), m_nodes.end(), [](NodeObj& node) {
-            node.set_highlighted(false);
-        });
-
-        return;
-    }
-
-    if (m_user_selected_index == -1) {
-        std::for_each(m_nodes.begin(), m_nodes.end(), [](NodeObj& node) {
-            node.set_highlighted(false);
-        });
-
-        return;
-    }
-
-    for (NodeObj& node : m_nodes) {
-        node.set_highlighted(node.get_id() == m_hovered_id);
-    }
-}
-
-void JumpVariantBoard::update_pieces() {  // TODO dry
-    if (m_game_over != GameOver::None) {
-        std::for_each(m_pieces.begin(), m_pieces.end(), [](PieceObj& piece) {
-            piece.get_renderable().get_material()->flags &= ~sm::Material::Outline;
-        });
-
-        return;
-    }
-
-    for (PieceObj& piece : m_pieces) {
-        const bool highlight {
-            static_cast<Player>(piece.get_type()) == m_turn
-        };
-
-        if (piece.get_id() == m_hovered_id && highlight) {
-            piece.get_renderable().get_material()->flags |= sm::Material::Outline;
-            piece.get_renderable().outline.color = ORANGE;
-        } else {
-            piece.get_renderable().get_material()->flags &= ~sm::Material::Outline;
-        }
-    }
-
-    // Override, if the piece is actually selected
-    if (m_user_selected_index != -1) {
-        const int piece_id {m_nodes[m_user_selected_index].piece_id};
-
-        if (piece_id != -1) {
-            m_pieces[PIECE(piece_id)].get_renderable().get_material()->flags |= sm::Material::Outline;
-            m_pieces[PIECE(piece_id)].get_renderable().outline.color = RED;
-        }
-    }
-}
-
 void JumpVariantBoard::select(int index) {
-    if (m_user_selected_index == -1) {
+    if (m_selected_index == -1) {
         if (m_board[index] == static_cast<Piece>(m_turn)) {
-            m_user_selected_index = index;
+            m_selected_index = index;
         }
     } else {
-        if (index == m_user_selected_index) {
-            m_user_selected_index = -1;
+        if (index == m_selected_index) {
+            m_selected_index = -1;
         } else if (m_board[index] == static_cast<Piece>(m_turn)) {
-            m_user_selected_index = index;
+            m_selected_index = index;
         }
     }
 }
@@ -324,7 +227,7 @@ void JumpVariantBoard::finish_turn() {
 
     m_positions.push_back({m_board, m_turn});
 
-    m_user_selected_index = -1;
+    m_selected_index = -1;
 }
 
 void JumpVariantBoard::check_winner() {
@@ -411,54 +314,30 @@ bool JumpVariantBoard::is_mill(const Board& board, Player player, int index) {
     assert(board[index] == piece);
 
     switch (index) {
-        case 0:
-            return IS_PC(1) && IS_PC(2) || IS_PC(9) && IS_PC(21);
-        case 1:
-            return IS_PC(0) && IS_PC(2) || IS_PC(4) && IS_PC(7);
-        case 2:
-            return IS_PC(0) && IS_PC(1) || IS_PC(14) && IS_PC(23);
-        case 3:
-            return IS_PC(4) && IS_PC(5) || IS_PC(10) && IS_PC(18);
-        case 4:
-            return IS_PC(3) && IS_PC(5) || IS_PC(1) && IS_PC(7);
-        case 5:
-            return IS_PC(3) && IS_PC(4) || IS_PC(13) && IS_PC(20);
-        case 6:
-            return IS_PC(7) && IS_PC(8) || IS_PC(11) && IS_PC(15);
-        case 7:
-            return IS_PC(6) && IS_PC(8) || IS_PC(1) && IS_PC(4);
-        case 8:
-            return IS_PC(6) && IS_PC(7) || IS_PC(12) && IS_PC(17);
-        case 9:
-            return IS_PC(0) && IS_PC(21) || IS_PC(10) && IS_PC(11);
-        case 10:
-            return IS_PC(9) && IS_PC(11) || IS_PC(3) && IS_PC(18);
-        case 11:
-            return IS_PC(9) && IS_PC(10) || IS_PC(6) && IS_PC(15);
-        case 12:
-            return IS_PC(13) && IS_PC(14) || IS_PC(8) && IS_PC(17);
-        case 13:
-            return IS_PC(12) && IS_PC(14) || IS_PC(5) && IS_PC(20);
-        case 14:
-            return IS_PC(12) && IS_PC(13) || IS_PC(2) && IS_PC(23);
-        case 15:
-            return IS_PC(16) && IS_PC(17) || IS_PC(6) && IS_PC(11);
-        case 16:
-            return IS_PC(15) && IS_PC(17) || IS_PC(19) && IS_PC(22);
-        case 17:
-            return IS_PC(15) && IS_PC(16) || IS_PC(8) && IS_PC(12);
-        case 18:
-            return IS_PC(19) && IS_PC(20) || IS_PC(3) && IS_PC(10);
-        case 19:
-            return IS_PC(18) && IS_PC(20) || IS_PC(16) && IS_PC(22);
-        case 20:
-            return IS_PC(18) && IS_PC(19) || IS_PC(5) && IS_PC(13);
-        case 21:
-            return IS_PC(22) && IS_PC(23) || IS_PC(0) && IS_PC(9);
-        case 22:
-            return IS_PC(21) && IS_PC(23) || IS_PC(16) && IS_PC(19);
-        case 23:
-            return IS_PC(21) && IS_PC(22) || IS_PC(2) && IS_PC(14);
+        case 0: return IS_PC(1) && IS_PC(2) || IS_PC(9) && IS_PC(21);
+        case 1: return IS_PC(0) && IS_PC(2) || IS_PC(4) && IS_PC(7);
+        case 2: return IS_PC(0) && IS_PC(1) || IS_PC(14) && IS_PC(23);
+        case 3: return IS_PC(4) && IS_PC(5) || IS_PC(10) && IS_PC(18);
+        case 4: return IS_PC(3) && IS_PC(5) || IS_PC(1) && IS_PC(7);
+        case 5: return IS_PC(3) && IS_PC(4) || IS_PC(13) && IS_PC(20);
+        case 6: return IS_PC(7) && IS_PC(8) || IS_PC(11) && IS_PC(15);
+        case 7: return IS_PC(6) && IS_PC(8) || IS_PC(1) && IS_PC(4);
+        case 8: return IS_PC(6) && IS_PC(7) || IS_PC(12) && IS_PC(17);
+        case 9: return IS_PC(0) && IS_PC(21) || IS_PC(10) && IS_PC(11);
+        case 10: return IS_PC(9) && IS_PC(11) || IS_PC(3) && IS_PC(18);
+        case 11: return IS_PC(9) && IS_PC(10) || IS_PC(6) && IS_PC(15);
+        case 12: return IS_PC(13) && IS_PC(14) || IS_PC(8) && IS_PC(17);
+        case 13: return IS_PC(12) && IS_PC(14) || IS_PC(5) && IS_PC(20);
+        case 14: return IS_PC(12) && IS_PC(13) || IS_PC(2) && IS_PC(23);
+        case 15: return IS_PC(16) && IS_PC(17) || IS_PC(6) && IS_PC(11);
+        case 16: return IS_PC(15) && IS_PC(17) || IS_PC(19) && IS_PC(22);
+        case 17: return IS_PC(15) && IS_PC(16) || IS_PC(8) && IS_PC(12);
+        case 18: return IS_PC(19) && IS_PC(20) || IS_PC(3) && IS_PC(10);
+        case 19: return IS_PC(18) && IS_PC(20) || IS_PC(16) && IS_PC(22);
+        case 20: return IS_PC(18) && IS_PC(19) || IS_PC(5) && IS_PC(13);
+        case 21: return IS_PC(22) && IS_PC(23) || IS_PC(0) && IS_PC(9);
+        case 22: return IS_PC(21) && IS_PC(23) || IS_PC(16) && IS_PC(19);
+        case 23: return IS_PC(21) && IS_PC(22) || IS_PC(2) && IS_PC(14);
     }
 
     return {};

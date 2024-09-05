@@ -71,19 +71,6 @@ struct Position {
     }
 };
 
-Player opponent(Player player);
-
-template<typename Board>
-unsigned int count_pieces(const Board& board, Player player) {
-    unsigned int result {0};
-
-    for (const Piece piece : board) {
-        result += static_cast<unsigned int>(piece == static_cast<Piece>(player));
-    }
-
-    return result;
-}
-
 class BoardObj {
 public:
     BoardObj() = default;
@@ -97,11 +84,102 @@ public:
 
     void set_board_paint_renderable(const sm::Renderable& board_paint);
 protected:
+    void user_click_press(GameOver game_over);
+    void user_click_release(GameOver game_over, std::function<void()>&& callback);
     void update_hovered_id(glm::vec3 ray, glm::vec3 camera, std::function<std::vector<std::pair<int, sm::Renderable>>()>&& get_renderables);
+
+    static const char* turn_string(Player turn);
+    static const char* game_over_string(GameOver game_over);
+    static Player opponent(Player player);
 
     static void do_place_animation(PieceObj& piece, const NodeObj& node, std::function<void()>&& on_finish);
     static void do_move_animation(PieceObj& piece, const NodeObj& node, std::function<void()>&& on_finish, bool direct);
     static void do_take_animation(PieceObj& piece, std::function<void()>&& on_finish);
+
+    template<typename Board>
+    static unsigned int count_pieces(const Board& board, Player player) {
+        unsigned int result {0};
+
+        for (const Piece piece : board) {
+            result += static_cast<unsigned int>(piece == static_cast<Piece>(player));
+        }
+
+        return result;
+    }
+
+    template<typename Pieces>
+    static void update_movement(Pieces& pieces) {
+        for (PieceObj& piece : pieces) {
+            piece.update_movement();
+        }
+    }
+
+    template<typename Nodes>
+    void update_nodes_highlight(Nodes& nodes, GameOver game_over, std::function<bool()>&& highlight) {
+        if (game_over != GameOver::None) {
+            std::for_each(nodes.begin(), nodes.end(), [](NodeObj& node) {
+                node.set_highlighted(false);
+            });
+
+            return;
+        }
+
+        if (!highlight()) {
+            std::for_each(nodes.begin(), nodes.end(), [](NodeObj& node) {
+                node.set_highlighted(false);
+            });
+
+            return;
+        }
+
+        for (NodeObj& node : nodes) {
+            node.set_highlighted(node.get_id() == m_hovered_id);
+        }
+    }
+
+    template<int PieceIdOffset, typename Pieces, typename Nodes>
+    void update_pieces_highlight(Pieces& pieces, const Nodes& nodes, GameOver game_over, int user_selected_index, std::function<bool(const PieceObj&)>&& highlight) {
+        if (game_over != GameOver::None) {
+            std::for_each(pieces.begin(), pieces.end(), [](PieceObj& piece) {
+                piece.get_renderable().get_material()->flags &= ~sm::Material::Outline;
+            });
+
+            return;
+        }
+
+        for (PieceObj& piece : pieces) {
+            if (piece.get_id() == m_hovered_id && highlight(piece)) {
+                piece.get_renderable().get_material()->flags |= sm::Material::Outline;
+                piece.get_renderable().outline.color = ORANGE;
+            } else {
+                piece.get_renderable().get_material()->flags &= ~sm::Material::Outline;
+            }
+        }
+
+        // Override, if the piece is actually selected
+        if (user_selected_index != -1) {
+            const int piece_id {nodes[user_selected_index].piece_id};
+
+            if (piece_id != -1) {
+                pieces[piece_id - PieceIdOffset].get_renderable().get_material()->flags |= sm::Material::Outline;
+                pieces[piece_id - PieceIdOffset].get_renderable().outline.color = RED;
+            }
+        }
+    }
+
+    template<typename Nodes>
+    static void update_nodes(sm::Ctx& ctx, Nodes& nodes) {
+        for (NodeObj& node : nodes) {
+            node.update(ctx);
+        }
+    }
+
+    template<typename Pieces>
+    static void update_pieces(sm::Ctx& ctx, Pieces& pieces) {
+        for (PieceObj& piece : pieces) {
+            piece.update(ctx);
+        }
+    }
 
     int m_clicked_id {-1};
     int m_hovered_id {-1};

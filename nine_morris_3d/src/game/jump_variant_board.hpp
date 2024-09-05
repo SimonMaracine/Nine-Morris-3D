@@ -45,9 +45,6 @@ public:
 
     void debug();
 private:
-    void update_nodes();
-    void update_pieces();
-
     void select(int index);
     void try_move(int source_index, int destination_index);
 
@@ -79,7 +76,7 @@ private:
     // Management data
     std::function<void(const Move&)> m_move_callback;
     std::vector<Move> m_legal_moves;
-    int m_user_selected_index {-1};
+    int m_selected_index {-1};
 
     // Scene data
     std::array<NodeObj, NODES> m_nodes {};
