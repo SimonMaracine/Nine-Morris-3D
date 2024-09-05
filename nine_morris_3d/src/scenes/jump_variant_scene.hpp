@@ -1,7 +1,5 @@
 #pragma once
 
-#include <vector>
-
 #include <nine_morris_3d_engine/nine_morris_3d.hpp>
 
 // #include "game/standard_board.hpp"
@@ -33,11 +31,6 @@ private:
     void setup_turn_indicator();
     void setup_timer();
     void setup_renderables();
-    sm::Renderable setup_board() const;
-    sm::Renderable setup_board_paint() const;
-    std::vector<sm::Renderable> setup_nodes() const;
-    std::vector<sm::Renderable> setup_white_pieces() const;
-    std::vector<sm::Renderable> setup_black_pieces() const;
 
     // StandardBoard m_board;
     TurnIndicator m_turn_indicator;

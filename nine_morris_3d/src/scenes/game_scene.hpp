@@ -1,5 +1,7 @@
 #pragma once
 
+#include <vector>
+
 #include <nine_morris_3d_engine/nine_morris_3d.hpp>
 
 #include "game/board.hpp"
@@ -30,6 +32,12 @@ protected:
     void setup_camera();
     void setup_skybox();
     void setup_lights();
+
+    sm::Renderable setup_board() const;
+    sm::Renderable setup_board_paint() const;
+    std::vector<sm::Renderable> setup_nodes() const;
+    std::vector<sm::Renderable> setup_white_pieces() const;
+    std::vector<sm::Renderable> setup_black_pieces() const;
 
     void load_skybox() const;
     void load_board_paint_texture() const;

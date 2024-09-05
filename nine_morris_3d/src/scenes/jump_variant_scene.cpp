@@ -4,8 +4,6 @@
 
 #include "game/ray.hpp"
 #include "global.hpp"
-#include "game.hpp"
-#include "constants.hpp"
 
 void JumpVariantScene::on_start() {
     GameScene::on_start();
@@ -82,25 +80,5 @@ void JumpVariantScene::setup_timer() {
 }
 
 void JumpVariantScene::setup_renderables() {
-
-}
-
-sm::Renderable JumpVariantScene::setup_board() const {
-
-}
-
-sm::Renderable JumpVariantScene::setup_board_paint() const {
-
-}
-
-std::vector<sm::Renderable> JumpVariantScene::setup_nodes() const {
-
-}
-
-std::vector<sm::Renderable> JumpVariantScene::setup_white_pieces() const {
-
-}
-
-std::vector<sm::Renderable> JumpVariantScene::setup_black_pieces() const {
 
 }
