@@ -137,9 +137,8 @@ private:
     // Management data
     std::function<void(const Move&)> m_move_callback;
     std::vector<Move> m_legal_moves;
-    int m_user_stored_index1 {-1};
-    int m_user_stored_index2 {-1};
-    bool m_user_must_take_piece {false};
+    int m_user_selected_index {-1};
+    int m_user_take_action_index {-1};
 
     // Scene data
     std::array<NodeObj, NODES> m_nodes {};

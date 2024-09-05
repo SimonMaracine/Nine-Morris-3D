@@ -106,13 +106,13 @@ void StandardGameBoard::user_click_release() {
     m_clicked_id = -1;
 
     if (m_plies >= 18) {
-        if (m_user_must_take_piece) {
+        if (m_user_take_action_index != -1) {
             if (is_piece_id(m_hovered_id)) {
-                try_move_take(m_user_stored_index1, m_user_stored_index2, m_pieces[PIECE(m_hovered_id)].node_id);
+                try_move_take(m_user_selected_index, m_user_take_action_index, m_pieces[PIECE(m_hovered_id)].node_id);
             }
         } else {
             if (is_node_id(m_hovered_id)) {
-                try_move(m_user_stored_index1, m_nodes[m_hovered_id].get_id());
+                try_move(m_user_selected_index, m_nodes[m_hovered_id].get_id());
             }
 
             if (is_piece_id(m_hovered_id)) {
@@ -120,9 +120,9 @@ void StandardGameBoard::user_click_release() {
             }
         }
     } else {
-        if (m_user_must_take_piece) {
+        if (m_user_take_action_index != -1) {
             if (is_piece_id(m_hovered_id)) {
-                try_place_take(m_user_stored_index2, m_pieces[PIECE(m_hovered_id)].node_id);
+                try_place_take(m_user_take_action_index, m_pieces[PIECE(m_hovered_id)].node_id);
             }
         } else {
             if (is_node_id(m_hovered_id)) {
@@ -279,9 +279,8 @@ void StandardGameBoard::debug() {
         ImGui::Text("legal_moves %lu", m_legal_moves.size());
         ImGui::Text("clicked_id %d", m_clicked_id);
         ImGui::Text("hovered_id %d", m_hovered_id);
-        ImGui::Text("user_stored_index1 %d", m_user_stored_index1);
-        ImGui::Text("user_stored_index2 %d", m_user_stored_index2);
-        ImGui::Text("user_must_take_piece %s", m_user_must_take_piece ? "true" : "false");
+        ImGui::Text("user_selected_index %d", m_user_selected_index);
+        ImGui::Text("user_take_action_index %d", m_user_take_action_index);
     }
 
     ImGui::End();
@@ -306,7 +305,7 @@ void StandardGameBoard::update_nodes() {
         first phase and not must take piece
         second phase and piece selected and not must take piece
     */
-    if (!(m_plies < 18 && m_user_stored_index2 == -1 || m_plies >= 18 && m_user_stored_index1 != -1 && m_user_stored_index2 == -1)) {
+    if (!(m_plies < 18 && m_user_take_action_index == -1 || m_plies >= 18 && m_user_selected_index != -1 && m_user_take_action_index == -1)) {
         std::for_each(m_nodes.begin(), m_nodes.end(), [](NodeObj& node) {
             node.set_highlighted(false);
         });
@@ -335,8 +334,8 @@ void StandardGameBoard::update_pieces() {
     */
     for (PieceObj& piece : m_pieces) {
         const bool highlight {
-            m_user_stored_index2 != -1 && static_cast<Player>(piece.get_type()) != m_turn && piece.node_id != -1 ||
-            m_plies >= 18 && static_cast<Player>(piece.get_type()) == m_turn && m_user_stored_index2 == -1
+            m_user_take_action_index != -1 && static_cast<Player>(piece.get_type()) != m_turn && piece.node_id != -1 ||
+            m_plies >= 18 && static_cast<Player>(piece.get_type()) == m_turn && m_user_take_action_index == -1
         };
 
         if (piece.get_id() == m_hovered_id && highlight) {
@@ -348,8 +347,8 @@ void StandardGameBoard::update_pieces() {
     }
 
     // Override, if the piece is actually selected
-    if (m_user_stored_index1 != -1) {
-        const int piece_id {m_nodes[m_user_stored_index1].piece_id};
+    if (m_user_selected_index != -1) {
+        const int piece_id {m_nodes[m_user_selected_index].piece_id};
 
         if (piece_id != -1) {
             m_pieces[PIECE(piece_id)].get_renderable().get_material()->flags |= sm::Material::Outline;
@@ -363,18 +362,18 @@ void StandardGameBoard::update_pieces() {
 #endif
 
 void StandardGameBoard::select(int index) {
-    if (m_user_stored_index1 == -1) {
+    if (m_user_selected_index == -1) {
         if (m_board[index] == static_cast<Piece>(m_turn)) {
-            m_user_stored_index1 = index;
+            m_user_selected_index = index;
         }
     } else {
-        if (index == m_user_stored_index1) {
-            if (m_user_stored_index2 == -1) {
-                m_user_stored_index1 = -1;
+        if (index == m_user_selected_index) {
+            if (m_user_take_action_index == -1) {
+                m_user_selected_index = -1;
             }
         } else if (m_board[index] == static_cast<Piece>(m_turn)) {
-            if (m_user_stored_index2 == -1) {
-                m_user_stored_index1 = index;
+            if (m_user_take_action_index == -1) {
+                m_user_selected_index = index;
             }
         }
     }
@@ -467,8 +466,7 @@ void StandardGameBoard::user_place(int place_index) {
 }
 
 void StandardGameBoard::user_place_take_just_place(int place_index) {
-    m_user_must_take_piece = true;
-    m_user_stored_index2 = place_index;
+    m_user_take_action_index = place_index;
 
     const int id {new_piece_to_place(static_cast<PieceType>(m_turn))};
 
@@ -512,8 +510,7 @@ void StandardGameBoard::user_move(int source_index, int destination_index) {
 }
 
 void StandardGameBoard::user_move_take_just_move(int source_index, int destination_index) {
-    m_user_must_take_piece = true;
-    m_user_stored_index2 = destination_index;
+    m_user_take_action_index = destination_index;
 
     m_pieces[PIECE(m_nodes[source_index].piece_id)].node_id = destination_index;
     m_nodes[destination_index].piece_id = m_nodes[source_index].piece_id;
@@ -618,9 +615,8 @@ void StandardGameBoard::finish_turn(bool advancement) {
 
     m_positions.push_back({m_board, m_turn});
 
-    m_user_stored_index1 = -1;
-    m_user_stored_index2 = -1;
-    m_user_must_take_piece = false;
+    m_user_selected_index = -1;
+    m_user_take_action_index = -1;
 }
 
 void StandardGameBoard::check_winner_material() {
@@ -856,104 +852,56 @@ bool StandardGameBoard::is_mill(const Board& board, Player player, int index) {
 
     switch (index) {
         case 0:
-            if (IS_PC(1) && IS_PC(2) || IS_PC(9) && IS_PC(21))
-                return true;
-            break;
+            return IS_PC(1) && IS_PC(2) || IS_PC(9) && IS_PC(21);
         case 1:
-            if (IS_PC(0) && IS_PC(2) || IS_PC(4) && IS_PC(7))
-                return true;
-            break;
+            return IS_PC(0) && IS_PC(2) || IS_PC(4) && IS_PC(7);
         case 2:
-            if (IS_PC(0) && IS_PC(1) || IS_PC(14) && IS_PC(23))
-                return true;
-            break;
+            return IS_PC(0) && IS_PC(1) || IS_PC(14) && IS_PC(23);
         case 3:
-            if (IS_PC(4) && IS_PC(5) || IS_PC(10) && IS_PC(18))
-                return true;
-            break;
+            return IS_PC(4) && IS_PC(5) || IS_PC(10) && IS_PC(18);
         case 4:
-            if (IS_PC(3) && IS_PC(5) || IS_PC(1) && IS_PC(7))
-                return true;
-            break;
+            return IS_PC(3) && IS_PC(5) || IS_PC(1) && IS_PC(7);
         case 5:
-            if (IS_PC(3) && IS_PC(4) || IS_PC(13) && IS_PC(20))
-                return true;
-            break;
+            return IS_PC(3) && IS_PC(4) || IS_PC(13) && IS_PC(20);
         case 6:
-            if (IS_PC(7) && IS_PC(8) || IS_PC(11) && IS_PC(15))
-                return true;
-            break;
+            return IS_PC(7) && IS_PC(8) || IS_PC(11) && IS_PC(15);
         case 7:
-            if (IS_PC(6) && IS_PC(8) || IS_PC(1) && IS_PC(4))
-                return true;
-            break;
+            return IS_PC(6) && IS_PC(8) || IS_PC(1) && IS_PC(4);
         case 8:
-            if (IS_PC(6) && IS_PC(7) || IS_PC(12) && IS_PC(17))
-                return true;
-            break;
+            return IS_PC(6) && IS_PC(7) || IS_PC(12) && IS_PC(17);
         case 9:
-            if (IS_PC(0) && IS_PC(21) || IS_PC(10) && IS_PC(11))
-                return true;
-            break;
+            return IS_PC(0) && IS_PC(21) || IS_PC(10) && IS_PC(11);
         case 10:
-            if (IS_PC(9) && IS_PC(11) || IS_PC(3) && IS_PC(18))
-                return true;
-            break;
+            return IS_PC(9) && IS_PC(11) || IS_PC(3) && IS_PC(18);
         case 11:
-            if (IS_PC(9) && IS_PC(10) || IS_PC(6) && IS_PC(15))
-                return true;
-            break;
+            return IS_PC(9) && IS_PC(10) || IS_PC(6) && IS_PC(15);
         case 12:
-            if (IS_PC(13) && IS_PC(14) || IS_PC(8) && IS_PC(17))
-                return true;
-            break;
+            return IS_PC(13) && IS_PC(14) || IS_PC(8) && IS_PC(17);
         case 13:
-            if (IS_PC(12) && IS_PC(14) || IS_PC(5) && IS_PC(20))
-                return true;
-            break;
+            return IS_PC(12) && IS_PC(14) || IS_PC(5) && IS_PC(20);
         case 14:
-            if (IS_PC(12) && IS_PC(13) || IS_PC(2) && IS_PC(23))
-                return true;
-            break;
+            return IS_PC(12) && IS_PC(13) || IS_PC(2) && IS_PC(23);
         case 15:
-            if (IS_PC(16) && IS_PC(17) || IS_PC(6) && IS_PC(11))
-                return true;
-            break;
+            return IS_PC(16) && IS_PC(17) || IS_PC(6) && IS_PC(11);
         case 16:
-            if (IS_PC(15) && IS_PC(17) || IS_PC(19) && IS_PC(22))
-                return true;
-            break;
+            return IS_PC(15) && IS_PC(17) || IS_PC(19) && IS_PC(22);
         case 17:
-            if (IS_PC(15) && IS_PC(16) || IS_PC(8) && IS_PC(12))
-                return true;
-            break;
+            return IS_PC(15) && IS_PC(16) || IS_PC(8) && IS_PC(12);
         case 18:
-            if (IS_PC(19) && IS_PC(20) || IS_PC(3) && IS_PC(10))
-                return true;
-            break;
+            return IS_PC(19) && IS_PC(20) || IS_PC(3) && IS_PC(10);
         case 19:
-            if (IS_PC(18) && IS_PC(20) || IS_PC(16) && IS_PC(22))
-                return true;
-            break;
+            return IS_PC(18) && IS_PC(20) || IS_PC(16) && IS_PC(22);
         case 20:
-            if (IS_PC(18) && IS_PC(19) || IS_PC(5) && IS_PC(13))
-                return true;
-            break;
+            return IS_PC(18) && IS_PC(19) || IS_PC(5) && IS_PC(13);
         case 21:
-            if (IS_PC(22) && IS_PC(23) || IS_PC(0) && IS_PC(9))
-                return true;
-            break;
+            return IS_PC(22) && IS_PC(23) || IS_PC(0) && IS_PC(9);
         case 22:
-            if (IS_PC(21) && IS_PC(23) || IS_PC(16) && IS_PC(19))
-                return true;
-            break;
+            return IS_PC(21) && IS_PC(23) || IS_PC(16) && IS_PC(19);
         case 23:
-            if (IS_PC(21) && IS_PC(22) || IS_PC(2) && IS_PC(14))
-                return true;
-            break;
+            return IS_PC(21) && IS_PC(22) || IS_PC(2) && IS_PC(14);
     }
 
-    return false;
+    return {};
 }
 
 #ifdef __GNUG__

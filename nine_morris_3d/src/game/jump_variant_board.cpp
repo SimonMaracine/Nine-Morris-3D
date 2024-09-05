@@ -1,5 +1,7 @@
 #include "jump_variant_board.hpp"
 
+#include <algorithm>
+#include <utility>
 #include <cassert>
 
 #include <nine_morris_3d_engine/external/imgui.h++>
@@ -59,7 +61,7 @@ JumpVariantBoard::JumpVariantBoard(
     m_legal_moves = generate_moves();
 }
 
-void JumpVariantBoard::update(sm::Ctx& ctx, glm::vec3 ray, glm::vec3 camera) {
+void JumpVariantBoard::update(sm::Ctx& ctx, glm::vec3 ray, glm::vec3 camera) {  // TODO dry
     update_hovered_id(ray, camera, [this]() {
         std::vector<std::pair<int, sm::Renderable>> renderables;
 
@@ -93,13 +95,13 @@ void JumpVariantBoard::update(sm::Ctx& ctx, glm::vec3 ray, glm::vec3 camera) {
     }
 }
 
-void JumpVariantBoard::update_movement() {
+void JumpVariantBoard::update_movement() {  // TODO dry
     for (PieceObj& piece : m_pieces) {
         piece.update_movement();
     }
 }
 
-void JumpVariantBoard::user_click_press() {
+void JumpVariantBoard::user_click_press() {  // TODO dry
     if (m_game_over != GameOver::None) {
         return;
     }
@@ -107,7 +109,7 @@ void JumpVariantBoard::user_click_press() {
     m_clicked_id = m_hovered_id;
 }
 
-void JumpVariantBoard::user_click_release() {
+void JumpVariantBoard::user_click_release() {  // TODO dry
     if (m_game_over != GameOver::None) {
         m_clicked_id = -1;
         return;
@@ -121,7 +123,7 @@ void JumpVariantBoard::user_click_release() {
     m_clicked_id = -1;
 
     if (is_node_id(m_hovered_id)) {
-        try_move(m_user_stored_index1, m_nodes[m_hovered_id].get_id());
+        try_move(m_user_selected_index, m_nodes[m_hovered_id].get_id());
     }
 
     if (is_piece_id(m_hovered_id)) {
@@ -153,7 +155,7 @@ void JumpVariantBoard::move_piece(int source_index, int destination_index) {
     );
 }
 
-void JumpVariantBoard::debug() {
+void JumpVariantBoard::debug() {  // TODO dry
     if (ImGui::Begin("Debug Board")) {
         const char* turn {};
         switch (m_turn) {
@@ -188,13 +190,13 @@ void JumpVariantBoard::debug() {
         ImGui::Text("legal_moves %lu", m_legal_moves.size());
         ImGui::Text("clicked_id %d", m_clicked_id);
         ImGui::Text("hovered_id %d", m_hovered_id);
-        ImGui::Text("user_stored_index1 %d", m_user_stored_index1);
+        ImGui::Text("user_selected_index %d", m_user_selected_index);
     }
 
     ImGui::End();
 }
 
-void JumpVariantBoard::update_nodes() {
+void JumpVariantBoard::update_nodes() {  // TODO dry
     if (m_game_over != GameOver::None) {
         std::for_each(m_nodes.begin(), m_nodes.end(), [](NodeObj& node) {
             node.set_highlighted(false);
@@ -203,7 +205,7 @@ void JumpVariantBoard::update_nodes() {
         return;
     }
 
-    if (m_user_stored_index1 == -1) {
+    if (m_user_selected_index == -1) {
         std::for_each(m_nodes.begin(), m_nodes.end(), [](NodeObj& node) {
             node.set_highlighted(false);
         });
@@ -216,7 +218,7 @@ void JumpVariantBoard::update_nodes() {
     }
 }
 
-void JumpVariantBoard::update_pieces() {
+void JumpVariantBoard::update_pieces() {  // TODO dry
     if (m_game_over != GameOver::None) {
         std::for_each(m_pieces.begin(), m_pieces.end(), [](PieceObj& piece) {
             piece.get_renderable().get_material()->flags &= ~sm::Material::Outline;
@@ -239,8 +241,8 @@ void JumpVariantBoard::update_pieces() {
     }
 
     // Override, if the piece is actually selected
-    if (m_user_stored_index1 != -1) {
-        const int piece_id {m_nodes[m_user_stored_index1].piece_id};
+    if (m_user_selected_index != -1) {
+        const int piece_id {m_nodes[m_user_selected_index].piece_id};
 
         if (piece_id != -1) {
             m_pieces[PIECE(piece_id)].get_renderable().get_material()->flags |= sm::Material::Outline;
@@ -250,15 +252,15 @@ void JumpVariantBoard::update_pieces() {
 }
 
 void JumpVariantBoard::select(int index) {
-    if (m_user_stored_index1 == -1) {
+    if (m_user_selected_index == -1) {
         if (m_board[index] == static_cast<Piece>(m_turn)) {
-            m_user_stored_index1 = index;
+            m_user_selected_index = index;
         }
     } else {
-        if (index == m_user_stored_index1) {
-            m_user_stored_index1 = -1;
+        if (index == m_user_selected_index) {
+            m_user_selected_index = -1;
         } else if (m_board[index] == static_cast<Piece>(m_turn)) {
-            m_user_stored_index1 = index;
+            m_user_selected_index = index;
         }
     }
 }
@@ -322,7 +324,7 @@ void JumpVariantBoard::finish_turn() {
 
     m_positions.push_back({m_board, m_turn});
 
-    m_user_stored_index1 = -1;
+    m_user_selected_index = -1;
 }
 
 void JumpVariantBoard::check_winner() {
@@ -410,104 +412,56 @@ bool JumpVariantBoard::is_mill(const Board& board, Player player, int index) {
 
     switch (index) {
         case 0:
-            if (IS_PC(1) && IS_PC(2) || IS_PC(9) && IS_PC(21))  // TODO can be simplified
-                return true;
-            break;
+            return IS_PC(1) && IS_PC(2) || IS_PC(9) && IS_PC(21);
         case 1:
-            if (IS_PC(0) && IS_PC(2) || IS_PC(4) && IS_PC(7))
-                return true;
-            break;
+            return IS_PC(0) && IS_PC(2) || IS_PC(4) && IS_PC(7);
         case 2:
-            if (IS_PC(0) && IS_PC(1) || IS_PC(14) && IS_PC(23))
-                return true;
-            break;
+            return IS_PC(0) && IS_PC(1) || IS_PC(14) && IS_PC(23);
         case 3:
-            if (IS_PC(4) && IS_PC(5) || IS_PC(10) && IS_PC(18))
-                return true;
-            break;
+            return IS_PC(4) && IS_PC(5) || IS_PC(10) && IS_PC(18);
         case 4:
-            if (IS_PC(3) && IS_PC(5) || IS_PC(1) && IS_PC(7))
-                return true;
-            break;
+            return IS_PC(3) && IS_PC(5) || IS_PC(1) && IS_PC(7);
         case 5:
-            if (IS_PC(3) && IS_PC(4) || IS_PC(13) && IS_PC(20))
-                return true;
-            break;
+            return IS_PC(3) && IS_PC(4) || IS_PC(13) && IS_PC(20);
         case 6:
-            if (IS_PC(7) && IS_PC(8) || IS_PC(11) && IS_PC(15))
-                return true;
-            break;
+            return IS_PC(7) && IS_PC(8) || IS_PC(11) && IS_PC(15);
         case 7:
-            if (IS_PC(6) && IS_PC(8) || IS_PC(1) && IS_PC(4))
-                return true;
-            break;
+            return IS_PC(6) && IS_PC(8) || IS_PC(1) && IS_PC(4);
         case 8:
-            if (IS_PC(6) && IS_PC(7) || IS_PC(12) && IS_PC(17))
-                return true;
-            break;
+            return IS_PC(6) && IS_PC(7) || IS_PC(12) && IS_PC(17);
         case 9:
-            if (IS_PC(0) && IS_PC(21) || IS_PC(10) && IS_PC(11))
-                return true;
-            break;
+            return IS_PC(0) && IS_PC(21) || IS_PC(10) && IS_PC(11);
         case 10:
-            if (IS_PC(9) && IS_PC(11) || IS_PC(3) && IS_PC(18))
-                return true;
-            break;
+            return IS_PC(9) && IS_PC(11) || IS_PC(3) && IS_PC(18);
         case 11:
-            if (IS_PC(9) && IS_PC(10) || IS_PC(6) && IS_PC(15))
-                return true;
-            break;
+            return IS_PC(9) && IS_PC(10) || IS_PC(6) && IS_PC(15);
         case 12:
-            if (IS_PC(13) && IS_PC(14) || IS_PC(8) && IS_PC(17))
-                return true;
-            break;
+            return IS_PC(13) && IS_PC(14) || IS_PC(8) && IS_PC(17);
         case 13:
-            if (IS_PC(12) && IS_PC(14) || IS_PC(5) && IS_PC(20))
-                return true;
-            break;
+            return IS_PC(12) && IS_PC(14) || IS_PC(5) && IS_PC(20);
         case 14:
-            if (IS_PC(12) && IS_PC(13) || IS_PC(2) && IS_PC(23))
-                return true;
-            break;
+            return IS_PC(12) && IS_PC(13) || IS_PC(2) && IS_PC(23);
         case 15:
-            if (IS_PC(16) && IS_PC(17) || IS_PC(6) && IS_PC(11))
-                return true;
-            break;
+            return IS_PC(16) && IS_PC(17) || IS_PC(6) && IS_PC(11);
         case 16:
-            if (IS_PC(15) && IS_PC(17) || IS_PC(19) && IS_PC(22))
-                return true;
-            break;
+            return IS_PC(15) && IS_PC(17) || IS_PC(19) && IS_PC(22);
         case 17:
-            if (IS_PC(15) && IS_PC(16) || IS_PC(8) && IS_PC(12))
-                return true;
-            break;
+            return IS_PC(15) && IS_PC(16) || IS_PC(8) && IS_PC(12);
         case 18:
-            if (IS_PC(19) && IS_PC(20) || IS_PC(3) && IS_PC(10))
-                return true;
-            break;
+            return IS_PC(19) && IS_PC(20) || IS_PC(3) && IS_PC(10);
         case 19:
-            if (IS_PC(18) && IS_PC(20) || IS_PC(16) && IS_PC(22))
-                return true;
-            break;
+            return IS_PC(18) && IS_PC(20) || IS_PC(16) && IS_PC(22);
         case 20:
-            if (IS_PC(18) && IS_PC(19) || IS_PC(5) && IS_PC(13))
-                return true;
-            break;
+            return IS_PC(18) && IS_PC(19) || IS_PC(5) && IS_PC(13);
         case 21:
-            if (IS_PC(22) && IS_PC(23) || IS_PC(0) && IS_PC(9))
-                return true;
-            break;
+            return IS_PC(22) && IS_PC(23) || IS_PC(0) && IS_PC(9);
         case 22:
-            if (IS_PC(21) && IS_PC(23) || IS_PC(16) && IS_PC(19))
-                return true;
-            break;
+            return IS_PC(21) && IS_PC(23) || IS_PC(16) && IS_PC(19);
         case 23:
-            if (IS_PC(21) && IS_PC(22) || IS_PC(2) && IS_PC(14))
-                return true;
-            break;
+            return IS_PC(21) && IS_PC(22) || IS_PC(2) && IS_PC(14);
     }
 
-    return false;
+    return {};
 }
 
 #ifdef __GNUG__

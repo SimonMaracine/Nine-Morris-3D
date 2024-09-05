@@ -79,7 +79,7 @@ private:
     // Management data
     std::function<void(const Move&)> m_move_callback;
     std::vector<Move> m_legal_moves;
-    int m_user_stored_index1 {-1};
+    int m_user_selected_index {-1};
 
     // Scene data
     std::array<NodeObj, NODES> m_nodes {};
