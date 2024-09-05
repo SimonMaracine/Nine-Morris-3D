@@ -25,7 +25,7 @@ public:
     void load_and_set_skybox();
     void load_and_set_board_paint_texture();
 
-    virtual Board& get_board() = 0;
+    virtual BoardObj& get_board() = 0;
 protected:
     void on_window_resized(const sm::WindowResizedEvent& event);
 

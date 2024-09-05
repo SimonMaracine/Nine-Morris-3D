@@ -20,7 +20,7 @@ public:
     void on_fixed_update() override;
     void on_imgui_update() override;
 
-    Board& get_board() override;
+    BoardObj& get_board() override;
 private:
     void on_key_released(const sm::KeyReleasedEvent& event);
     void on_mouse_button_pressed(const sm::MouseButtonPressedEvent& event);

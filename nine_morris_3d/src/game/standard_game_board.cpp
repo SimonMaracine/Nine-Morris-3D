@@ -4,59 +4,9 @@
 #include <utility>
 #include <cassert>
 
-#include <nine_morris_3d_engine/external/glm.h++>
 #include <nine_morris_3d_engine/external/imgui.h++>
 
-#include "game/ray.hpp"
-
-#define PIECE(index) (index - 24)
-
-static constexpr float NODE_Y_POSITION {0.063f};
-static const glm::vec3 NODE_POSITIONS[24] {
-    glm::vec3(2.046f, NODE_Y_POSITION, 2.062f),    // 0
-    glm::vec3(-0.008f, NODE_Y_POSITION, 2.089f),   // 1
-    glm::vec3(-2.101f, NODE_Y_POSITION, 2.076f),   // 2
-    glm::vec3(1.480f, NODE_Y_POSITION, 1.512f),    // 3
-    glm::vec3(0.001f, NODE_Y_POSITION, 1.513f),    // 4
-    glm::vec3(-1.509f, NODE_Y_POSITION, 1.502f),   // 5
-    glm::vec3(0.889f, NODE_Y_POSITION, 0.898f),    // 6
-    glm::vec3(0.001f, NODE_Y_POSITION, 0.906f),    // 7
-    glm::vec3(-0.930f, NODE_Y_POSITION, 0.892f),   // 8
-    glm::vec3(2.058f, NODE_Y_POSITION, 0.031f),    // 9
-    glm::vec3(1.481f, NODE_Y_POSITION, 0.025f),    // 10
-    glm::vec3(0.894f, NODE_Y_POSITION, 0.026f),    // 11
-    glm::vec3(-0.934f, NODE_Y_POSITION, 0.050f),   // 12
-    glm::vec3(-1.508f, NODE_Y_POSITION, 0.050f),   // 13
-    glm::vec3(-2.083f, NODE_Y_POSITION, 0.047f),   // 14
-    glm::vec3(0.882f, NODE_Y_POSITION, -0.894f),   // 15
-    glm::vec3(0.011f, NODE_Y_POSITION, -0.900f),   // 16
-    glm::vec3(-0.930f, NODE_Y_POSITION, -0.890f),  // 17
-    glm::vec3(1.477f, NODE_Y_POSITION, -1.455f),   // 18
-    glm::vec3(0.006f, NODE_Y_POSITION, -1.463f),   // 19
-    glm::vec3(-1.493f, NODE_Y_POSITION, -1.458f),  // 20
-    glm::vec3(2.063f, NODE_Y_POSITION, -2.046f),   // 21
-    glm::vec3(0.001f, NODE_Y_POSITION, -2.061f),   // 22
-    glm::vec3(-2.081f, NODE_Y_POSITION, -2.045f)   // 23
-};
-
-static const glm::vec3 RED {0.8f, 0.16f, 0.3f};
-static const glm::vec3 ORANGE {0.96f, 0.58f, 0.15f};
-
-static constexpr float PIECE_Y_POSITION_BOARD {0.135f};
-static constexpr float PIECE_Y_POSITION_AIR {0.5f};
-static constexpr float PIECE_Y_POSITION_AIR2 {0.75f};
-static constexpr float PIECE_Y_POSITION_AIR3 {2.0f};
-
-static glm::mat4 transformation_matrix(glm::vec3 position, glm::vec3 rotation, float scale) {
-    glm::mat4 matrix {1.0f};
-    matrix = glm::translate(matrix, position);
-    matrix = glm::rotate(matrix, rotation.x, glm::vec3(1.0f, 0.0f, 0.0f));
-    matrix = glm::rotate(matrix, rotation.y, glm::vec3(0.0f, 1.0f, 0.0f));
-    matrix = glm::rotate(matrix, rotation.z, glm::vec3(0.0f, 0.0f, 1.0f));
-    matrix = glm::scale(matrix, glm::vec3(scale));
-
-    return matrix;
-}
+#define PIECE(index) (index - StandardGameBoard::NODES)
 
 StandardGameBoard::StandardGameBoard(
     const sm::Renderable& board,
@@ -66,48 +16,64 @@ StandardGameBoard::StandardGameBoard(
     const std::vector<sm::Renderable>& black_pieces,
     std::function<void(const Move&)>&& move_callback
 )
-    : m_move_callback(std::move(move_callback)) {
-    m_renderable = board;
-    m_renderable.transform.scale = 20.0f;
-
-    set_board_paint_renderable(board_paint);
-
-    for (int i {0}; i < 24; i++) {
+    : BoardObj(board, board_paint), m_move_callback(std::move(move_callback)) {
+    for (int i {0}; i < NODES; i++) {
         m_nodes[i] = NodeObj(i, NODE_POSITIONS[i], nodes[i]);
     }
 
     // Offset pieces' IDs, so that they are different from nodes' IDs
 
-    for (int i {0}; i < 9; i++) {
-        m_pieces[i] = PieceObj(i + 24, glm::vec3(-3.0f, PIECE_Y_POSITION_AIR, static_cast<float>(i) * 0.5f - 2.0f), white_pieces[i], PieceType::White);
+    for (int i {0}; i < PIECES / 2; i++) {
+        m_pieces[i] = PieceObj(
+            i + NODES,
+            glm::vec3(-3.0f, PIECE_Y_POSITION_AIR_INITIAL, static_cast<float>(i) * 0.5f - 2.0f),
+            white_pieces[i],
+            PieceType::White
+        );
     }
 
-    for (int i {9}; i < 18; i++) {
-        m_pieces[i] = PieceObj(i + 24, glm::vec3(3.0f, PIECE_Y_POSITION_AIR, static_cast<float>(i - 9) * -0.5f + 2.0f), black_pieces[i - 9], PieceType::Black);
+    for (int i {PIECES / 2}; i < PIECES; i++) {
+        m_pieces[i] = PieceObj(
+            i + NODES,
+            glm::vec3(3.0f, PIECE_Y_POSITION_AIR_INITIAL, static_cast<float>(i - PIECES / 2) * -0.5f + 2.0f),
+            black_pieces[i - PIECES / 2],
+            PieceType::Black
+        );
     }
 
     m_legal_moves = generate_moves();
 }
 
-void StandardGameBoard::set_board_paint_renderable(const sm::Renderable& board_paint) {
-    m_paint_renderable = board_paint;
-    m_paint_renderable.transform.scale = 20.0f;
-    m_paint_renderable.transform.position.y = 0.062f;
-}
-
 void StandardGameBoard::update(sm::Ctx& ctx, glm::vec3 ray, glm::vec3 camera) {
-    update_hovered_id(ray, camera);
+    update_hovered_id(ray, camera, [this]() {
+        std::vector<std::pair<int, sm::Renderable>> renderables;
+
+        for (const NodeObj& node : m_nodes) {
+            renderables.push_back(std::make_pair(node.get_id(), node.get_renderable()));
+        }
+
+        for (const PieceObj& piece : m_pieces) {
+            if (!(piece.active && !piece.to_remove)) {
+                continue;
+            }
+
+            renderables.push_back(std::make_pair(piece.get_id(), piece.get_renderable()));
+        }
+
+        return renderables;
+    });
+
     update_nodes();
     update_pieces();
 
     ctx.add_renderable(m_renderable);
     ctx.add_renderable(m_paint_renderable);
 
-    for (auto& node : m_nodes) {
+    for (NodeObj& node : m_nodes) {
         node.update(ctx);
     }
 
-    for (auto& piece : m_pieces) {
+    for (PieceObj& piece : m_pieces) {
         piece.update(ctx);
     }
 }
@@ -236,7 +202,7 @@ void StandardGameBoard::move_piece(int source_index, int destination_index) {
         m_pieces[PIECE(m_nodes[source_index].piece_id)],
         m_nodes[destination_index],
         []() {},
-        has_three_pieces(m_board, m_pieces[PIECE(m_nodes[source_index].piece_id)])
+        !has_three_pieces(m_board, m_pieces[PIECE(m_nodes[source_index].piece_id)])
     );
 }
 
@@ -263,13 +229,18 @@ void StandardGameBoard::move_take_piece(int source_index, int destination_index,
 
     m_nodes[take_index].piece_id = -1;
 
-    do_move_animation(m_pieces[PIECE(m_nodes[source_index].piece_id)], m_nodes[destination_index], [=, this]() {
-        m_pieces[PIECE(take_piece_id)].to_remove = true;
+    do_move_animation(
+        m_pieces[PIECE(m_nodes[source_index].piece_id)],
+        m_nodes[destination_index],
+        [=, this]() {
+            m_pieces[PIECE(take_piece_id)].to_remove = true;
 
-        do_take_animation(m_pieces[PIECE(take_piece_id)], [=, this]() {
-            m_pieces[PIECE(take_piece_id)].active = false;
-        });
-    }, has_three_pieces(m_board, m_pieces[PIECE(m_nodes[source_index].piece_id)]));
+            do_take_animation(m_pieces[PIECE(take_piece_id)], [=, this]() {
+                m_pieces[PIECE(take_piece_id)].active = false;
+            });
+        },
+        !has_three_pieces(m_board, m_pieces[PIECE(m_nodes[source_index].piece_id)])
+    );
 }
 
 void StandardGameBoard::debug() {
@@ -314,54 +285,6 @@ void StandardGameBoard::debug() {
     }
 
     ImGui::End();
-}
-
-void StandardGameBoard::update_hovered_id(glm::vec3 ray, glm::vec3 camera) {
-    if (camera.y < 0.0f) {
-        m_hovered_id = -1;
-        return;
-    }
-
-    std::vector<std::pair<int, sm::Renderable>> renderables;
-
-    for (const NodeObj& node : m_nodes) {
-        renderables.push_back(std::make_pair(node.get_id(), node.get_renderable()));
-    }
-
-    for (const PieceObj& piece : m_pieces) {
-        if (!(piece.active && !piece.to_remove)) {
-            continue;
-        }
-
-        renderables.push_back(std::make_pair(piece.get_id(), piece.get_renderable()));
-    }
-
-    std::sort(renderables.begin(), renderables.end(), [camera](const auto& lhs, const auto& rhs) {
-        const auto left {glm::distance(lhs.second.transform.position, camera)};
-        const auto right {glm::distance(rhs.second.transform.position, camera)};
-
-        return left > right;
-    });
-
-    bool hover {false};
-
-    for (const auto& [id, renderable] : renderables) {
-        const auto& transform {renderable.transform};
-        const glm::mat4 to_world_space {transformation_matrix(transform.position, transform.rotation, transform.scale)};
-
-        sm::utils::AABB aabb;
-        aabb.min = to_world_space * glm::vec4(renderable.get_aabb().min, 1.0f);
-        aabb.max = to_world_space * glm::vec4(renderable.get_aabb().max, 1.0f);
-
-        if (ray_aabb_collision(ray, camera, aabb)) {
-            m_hovered_id = id;
-            hover = true;
-        }
-    }
-
-    if (!hover) {
-        m_hovered_id = -1;
-    }
 }
 
 #ifdef __GNUG__
@@ -584,7 +507,7 @@ void StandardGameBoard::user_move(int source_index, int destination_index) {
         m_pieces[PIECE(move_piece_id)],
         m_nodes[destination_index],
         []() {},
-        has_three_pieces(m_board, m_pieces[PIECE(move_piece_id)])
+        !has_three_pieces(m_board, m_pieces[PIECE(move_piece_id)])
     );
 }
 
@@ -603,7 +526,7 @@ void StandardGameBoard::user_move_take_just_move(int source_index, int destinati
         m_pieces[PIECE(move_piece_id)],
         m_nodes[destination_index],
         []() {},
-        has_three_pieces(m_board, m_pieces[PIECE(move_piece_id)])
+        !has_three_pieces(m_board, m_pieces[PIECE(move_piece_id)])
     );
 }
 
@@ -627,14 +550,10 @@ void StandardGameBoard::place(int place_index) {
 
     m_board[place_index] = static_cast<Piece>(m_turn);
 
-    Move move;
-    move.type = MoveType::Place;
-    move.place.place_index = place_index;
-
     finish_turn();
     check_winner_blocking();
 
-    m_move_callback(move);
+    m_move_callback(create_place(place_index));
 }
 
 void StandardGameBoard::place_take(int place_index, int take_index) {
@@ -644,16 +563,11 @@ void StandardGameBoard::place_take(int place_index, int take_index) {
     m_board[place_index] = static_cast<Piece>(m_turn);
     m_board[take_index] = Piece::None;
 
-    Move move;
-    move.type = MoveType::PlaceTake;
-    move.place_take.place_index = place_index;
-    move.place_take.take_index = take_index;
-
     finish_turn();
     check_winner_material();
     check_winner_blocking();
 
-    m_move_callback(move);
+    m_move_callback(create_place_take(place_index, take_index));
 }
 
 void StandardGameBoard::move(int source_index, int destination_index) {
@@ -662,17 +576,12 @@ void StandardGameBoard::move(int source_index, int destination_index) {
 
     std::swap(m_board[source_index], m_board[destination_index]);
 
-    Move move;
-    move.type = MoveType::Move;
-    move.move.source_index = source_index;
-    move.move.destination_index = destination_index;
-
     finish_turn(false);
     check_winner_blocking();
     check_fifty_move_rule();
     check_threefold_repetition({m_board, m_turn});
 
-    m_move_callback(move);
+    m_move_callback(create_move(source_index, destination_index));
 }
 
 void StandardGameBoard::move_take(int source_index, int destination_index, int take_index) {
@@ -683,17 +592,11 @@ void StandardGameBoard::move_take(int source_index, int destination_index, int t
     std::swap(m_board[source_index], m_board[destination_index]);
     m_board[take_index] = Piece::None;
 
-    Move move;
-    move.type = MoveType::MoveTake;
-    move.move_take.source_index = source_index;
-    move.move_take.destination_index = destination_index;
-    move.move_take.take_index = take_index;
-
     finish_turn();
     check_winner_material();
     check_winner_blocking();
 
-    m_move_callback(move);
+    m_move_callback(create_move_take(source_index, destination_index, take_index));
 }
 
 void StandardGameBoard::finish_turn(bool advancement) {
@@ -771,38 +674,6 @@ void StandardGameBoard::check_threefold_repetition(const Position& position) {
     }
 }
 
-void StandardGameBoard::do_place_animation(PieceObj& piece, const NodeObj& node, std::function<void()>&& on_finish) {
-    const glm::vec3 origin {piece.get_renderable().transform.position};
-    const glm::vec3 target0 {piece.get_renderable().transform.position.x, PIECE_Y_POSITION_AIR2, piece.get_renderable().transform.position.z};
-    const glm::vec3 target1 {node.get_renderable().transform.position.x, PIECE_Y_POSITION_AIR2, node.get_renderable().transform.position.z};
-    const glm::vec3 target {node.get_renderable().transform.position.x, PIECE_Y_POSITION_BOARD, node.get_renderable().transform.position.z};
-
-    piece.move_three_step(origin, target0, target1, target, std::move(on_finish));
-}
-
-void StandardGameBoard::do_move_animation(PieceObj& piece, const NodeObj& node, std::function<void()>&& on_finish, bool three_pieces) {
-    if (!three_pieces) {
-        const glm::vec3 origin {piece.get_renderable().transform.position};
-        const glm::vec3 target {node.get_renderable().transform.position.x, PIECE_Y_POSITION_BOARD, node.get_renderable().transform.position.z};
-
-        piece.move_direct(origin, target, std::move(on_finish));
-    } else {
-        const glm::vec3 origin {piece.get_renderable().transform.position};
-        const glm::vec3 target0 {piece.get_renderable().transform.position.x, PIECE_Y_POSITION_AIR2, piece.get_renderable().transform.position.z};
-        const glm::vec3 target1 {node.get_renderable().transform.position.x, PIECE_Y_POSITION_AIR2, node.get_renderable().transform.position.z};
-        const glm::vec3 target {node.get_renderable().transform.position.x, PIECE_Y_POSITION_BOARD, node.get_renderable().transform.position.z};
-
-        piece.move_three_step(origin, target0, target1, target, std::move(on_finish));
-    }
-}
-
-void StandardGameBoard::do_take_animation(PieceObj& piece, std::function<void()>&& on_finish) {
-    const glm::vec3 origin {piece.get_renderable().transform.position};
-    const glm::vec3 target {piece.get_renderable().transform.position.x, PIECE_Y_POSITION_AIR3, piece.get_renderable().transform.position.z};
-
-    piece.move_direct(origin, target, std::move(on_finish));
-}
-
 int StandardGameBoard::new_piece_to_place(PieceType type) {
     for (const PieceObj& piece : m_pieces) {
         if (piece.get_type() == type && piece.active && !piece.to_remove && piece.node_id == -1) {
@@ -814,11 +685,11 @@ int StandardGameBoard::new_piece_to_place(PieceType type) {
 }
 
 bool StandardGameBoard::is_node_id(int id) {
-    return id >= 0 && id <= 23;
+    return id >= 0 && id <= NODES - 1;
 }
 
 bool StandardGameBoard::is_piece_id(int id) {
-    return id >= 24 && id <= 24 + 17;
+    return id >= NODES && id <= NODES + PIECES - 1;
 }
 
 bool StandardGameBoard::has_three_pieces(const Board& board, const PieceObj& piece) {
@@ -843,7 +714,7 @@ std::vector<StandardGameBoard::Move> StandardGameBoard::generate_moves() const {
 }
 
 void StandardGameBoard::generate_moves_phase1(Board& board, std::vector<Move>& moves, Player player) {
-    for (int i {0}; i < 24; i++) {
+    for (int i {0}; i < NODES; i++) {
         if (board[i] != Piece::None) {
             continue;
         }
@@ -854,7 +725,7 @@ void StandardGameBoard::generate_moves_phase1(Board& board, std::vector<Move>& m
             const Player opponent_player {opponent(player)};
             const bool all_in_mills {all_pieces_in_mills(board, opponent_player)};
 
-            for (int j {0}; j < 24; j++) {
+            for (int j {0}; j < NODES; j++) {
                 if (board[j] != static_cast<Piece>(opponent_player)) {
                     continue;
                 }
@@ -874,7 +745,7 @@ void StandardGameBoard::generate_moves_phase1(Board& board, std::vector<Move>& m
 }
 
 void StandardGameBoard::generate_moves_phase2(Board& board, std::vector<Move>& moves, Player player) {
-    for (int i {0}; i < 24; i++) {
+    for (int i {0}; i < NODES; i++) {
         if (board[i] != static_cast<Piece>(player)) {
             continue;
         }
@@ -888,7 +759,7 @@ void StandardGameBoard::generate_moves_phase2(Board& board, std::vector<Move>& m
                 const Player opponent_player {opponent(player)};
                 const bool all_in_mills {all_pieces_in_mills(board, opponent_player)};
 
-                for (int k {0}; k < 24; k++) {
+                for (int k {0}; k < NODES; k++) {
                     if (board[k] != static_cast<Piece>(opponent_player)) {
                         continue;
                     }
@@ -909,12 +780,12 @@ void StandardGameBoard::generate_moves_phase2(Board& board, std::vector<Move>& m
 }
 
 void StandardGameBoard::generate_moves_phase3(Board& board, std::vector<Move>& moves, Player player) {
-    for (int i {0}; i < 24; i++) {
+    for (int i {0}; i < NODES; i++) {
         if (board[i] != static_cast<Piece>(player)) {
             continue;
         }
 
-        for (int j {0}; j < 24; j++) {
+        for (int j {0}; j < NODES; j++) {
             if (board[j] != Piece::None) {
                 continue;
             }
@@ -925,7 +796,7 @@ void StandardGameBoard::generate_moves_phase3(Board& board, std::vector<Move>& m
                 const Player opponent_player {opponent(player)};
                 const bool all_in_mills {all_pieces_in_mills(board, opponent_player)};
 
-                for (int k {0}; k < 24; k++) {
+                for (int k {0}; k < NODES; k++) {
                     if (board[k] != static_cast<Piece>(opponent_player)) {
                         continue;
                     }
@@ -980,6 +851,8 @@ void StandardGameBoard::unmake_move_move(Board& board, int source_index, int des
 
 bool StandardGameBoard::is_mill(const Board& board, Player player, int index) {
     const Piece piece {static_cast<Piece>(player)};
+
+    assert(board[index] == piece);
 
     switch (index) {
         case 0:
@@ -1088,7 +961,7 @@ bool StandardGameBoard::is_mill(const Board& board, Player player, int index) {
 #endif
 
 bool StandardGameBoard::all_pieces_in_mills(const Board& board, Player player) {
-    for (int i {0}; i < 24; i++) {
+    for (int i {0}; i < NODES; i++) {
         if (board[i] != static_cast<Piece>(player)) {
             continue;
         }

@@ -17,7 +17,19 @@ void LoadingScene::on_stop() {
 
 void LoadingScene::on_update() {
     if (m_done) {
-        ctx.change_scene("standard_game"_H);
+        const auto& g {ctx.global<Global>()};
+
+        switch (g.options.game_mode) {
+            case static_cast<int>(GameMode::Standard):
+                ctx.change_scene("standard_game"_H);
+                break;
+            case static_cast<int>(GameMode::Jump):
+                ctx.change_scene("jump_variant"_H);
+                break;
+            case static_cast<int>(GameMode::JumpPlus):
+                // TODO
+                break;
+        }
     }
 }
 

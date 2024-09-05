@@ -6,13 +6,15 @@
 
 #include <nine_morris_3d_engine/nine_morris_3d.hpp>
 
-#include "game/common.hpp"
 #include "game/board.hpp"
 #include "game/node.hpp"
 #include "game/piece.hpp"
 
-class StandardGameBoard : public Board {
+class StandardGameBoard : public BoardObj {
 public:
+    static constexpr int NODES {24};
+    static constexpr int PIECES {18};
+
     enum class MoveType {
         Place,
         PlaceTake,
@@ -46,7 +48,7 @@ public:
         MoveType type {};
     };
 
-    using Board = std::array<Piece, 24>;
+    using Board = std::array<Piece, NODES>;
     using Position = ::Position<Board>;
 
     StandardGameBoard() = default;
@@ -62,8 +64,6 @@ public:
     Player get_turn() const { return m_turn; }
     GameOver get_game_over() const { return m_game_over; }
 
-    void set_board_paint_renderable(const sm::Renderable& board_paint) override;
-
     void update(sm::Ctx& ctx, glm::vec3 ray, glm::vec3 camera);
     void update_movement();
     void user_click_press();
@@ -76,7 +76,6 @@ public:
 
     void debug();
 private:
-    void update_hovered_id(glm::vec3 ray, glm::vec3 camera);
     void update_nodes();
     void update_pieces();
 
@@ -105,9 +104,6 @@ private:
     void check_fifty_move_rule();
     void check_threefold_repetition(const Position& position);
 
-    static void do_place_animation(PieceObj& piece, const NodeObj& node, std::function<void()>&& on_finish);
-    static void do_move_animation(PieceObj& piece, const NodeObj& node, std::function<void()>&& on_finish, bool three_pieces);
-    static void do_take_animation(PieceObj& piece, std::function<void()>&& on_finish);
     int new_piece_to_place(PieceType type);
     static bool is_node_id(int id);
     static bool is_piece_id(int id);
@@ -141,16 +137,11 @@ private:
     // Management data
     std::function<void(const Move&)> m_move_callback;
     std::vector<Move> m_legal_moves;
-    int m_clicked_id {-1};
-    int m_hovered_id {-1};
     int m_user_stored_index1 {-1};
     int m_user_stored_index2 {-1};
     bool m_user_must_take_piece {false};
 
     // Scene data
-    std::array<NodeObj, 24> m_nodes {};
-    std::array<PieceObj, 18> m_pieces {};
-
-    sm::Renderable m_renderable;
-    sm::Renderable m_paint_renderable;
+    std::array<NodeObj, NODES> m_nodes {};
+    std::array<PieceObj, PIECES> m_pieces {};
 };

@@ -4,6 +4,7 @@
 
 #include <nine_morris_3d_engine/external/imgui.h++>
 #include <nine_morris_3d_engine/external/glm.h++>
+#include <nine_morris_3d_engine/external/resmanager.h++>
 
 #include "scenes/game_scene.hpp"
 #include "global.hpp"
@@ -76,36 +77,18 @@ void Ui::main_menu_bar(sm::Ctx& ctx, GameScene& game_scene) {
             if (ImGui::BeginMenu("Game Mode", enabled)) {
                 if (ImGui::RadioButton("Standard Game", &m_options.game_mode, static_cast<int>(GameMode::Standard))) {
                     if (std::exchange(g.options.game_mode, m_options.game_mode) != static_cast<int>(GameMode::Standard)) {
-
+                        ctx.change_scene("standard_game"_H);
                     }
-                    // if (data.imgui_option.scene != data.options.scene) {
-                    //     data.options.scene = data.imgui_option.scene;
-                    //     ctx->change_scene("standard_game"_H);
-
-                    //     LOG_INFO("Changed scene to standard game");
-                    // }
                 }
                 if (ImGui::RadioButton("Jump Variant", &m_options.game_mode, static_cast<int>(GameMode::Jump))) {
                     if (std::exchange(g.options.game_mode, m_options.game_mode) != static_cast<int>(GameMode::Jump)) {
-
+                        ctx.change_scene("jump_variant"_H);
                     }
-                    // if (data.imgui_option.scene != data.options.scene) {
-                    //     data.options.scene = data.imgui_option.scene;
-                    //     ctx->change_scene("jump_variant"_H);
-
-                    //     LOG_INFO("Changed scene to jump variant");
-                    // }
                 }
                 if (ImGui::RadioButton("Jump Plus Variant", &m_options.game_mode, static_cast<int>(GameMode::JumpPlus))) {
                     if (std::exchange(g.options.game_mode, m_options.game_mode) != static_cast<int>(GameMode::JumpPlus)) {
-
+                        // TODO
                     }
-                    // if (data.imgui_option.scene != data.options.scene) {
-                    //     data.options.scene = data.imgui_option.scene;
-                    //     ctx->change_scene("jump_plus_variant"_H);
-
-                    //     LOG_INFO("Changed scene to jump plus variant");
-                    // }
                 }
 
                 ImGui::EndMenu();

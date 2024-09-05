@@ -55,7 +55,7 @@ void StandardGameScene::on_imgui_update() {
     m_board.debug();
 }
 
-Board& StandardGameScene::get_board() {
+BoardObj& StandardGameScene::get_board() {
     return m_board;
 }
 
