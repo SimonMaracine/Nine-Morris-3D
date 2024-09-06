@@ -109,9 +109,9 @@ void JumpVariantScene::setup_timer() {
 void JumpVariantScene::setup_renderables() {
     const auto renderable_board {setup_board()};
     const auto renderable_board_paint {setup_board_paint()};
-    const auto renderable_nodes {setup_nodes()};
-    const auto renderable_white_pieces {setup_white_pieces()};
-    const auto renderable_black_pieces {setup_black_pieces()};
+    const auto renderable_nodes {setup_nodes(JumpVariantBoard::NODES)};
+    const auto renderable_white_pieces {setup_white_pieces(JumpVariantBoard::PIECES / 2)};
+    const auto renderable_black_pieces {setup_black_pieces(JumpVariantBoard::PIECES / 2)};
 
     m_board = JumpVariantBoard(
         renderable_board,

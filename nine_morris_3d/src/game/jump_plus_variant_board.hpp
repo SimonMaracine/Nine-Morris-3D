@@ -10,10 +10,10 @@
 #include "game/node.hpp"
 #include "game/piece.hpp"
 
-class JumpVariantBoard : public BoardObj {
+class JumpPlusVariantBoard : public BoardObj {
 public:
     static constexpr int NODES {24};
-    static constexpr int PIECES {6};
+    static constexpr int PIECES {12};
 
     struct Move {
         int source_index;
@@ -23,8 +23,8 @@ public:
     using Board = std::array<Piece, NODES>;
     using Position = ::Position<Board>;
 
-    JumpVariantBoard() = default;
-    JumpVariantBoard(
+    JumpPlusVariantBoard() = default;
+    JumpPlusVariantBoard(
         const sm::Renderable& board,
         const sm::Renderable& board_paint,
         const std::vector<sm::Renderable>& nodes,

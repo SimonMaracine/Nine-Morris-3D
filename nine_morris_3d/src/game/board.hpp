@@ -181,6 +181,51 @@ protected:
         }
     }
 
+#ifdef __GNUG__
+    #pragma GCC diagnostic push
+    #pragma GCC diagnostic ignored "-Wparentheses"
+#endif
+
+    template<typename Board>
+    static bool is_mill(const Board& board, Player player, int index) {
+        const Piece piece {static_cast<Piece>(player)};
+
+        assert(board[index] == piece);
+
+        switch (index) {
+            case 0: return board[1] == piece && board[2] == piece || board[9] == piece && board[21] == piece;
+            case 1: return board[0] == piece && board[2] == piece || board[4] == piece && board[7] == piece;
+            case 2: return board[0] == piece && board[1] == piece || board[14] == piece && board[23] == piece;
+            case 3: return board[4] == piece && board[5] == piece || board[10] == piece && board[18] == piece;
+            case 4: return board[3] == piece && board[5] == piece || board[1] == piece && board[7] == piece;
+            case 5: return board[3] == piece && board[4] == piece || board[13] == piece && board[20] == piece;
+            case 6: return board[7] == piece && board[8] == piece || board[11] == piece && board[15] == piece;
+            case 7: return board[6] == piece && board[8] == piece || board[1] == piece && board[4] == piece;
+            case 8: return board[6] == piece && board[7] == piece || board[12] == piece && board[17] == piece;
+            case 9: return board[0] == piece && board[21] == piece || board[10] == piece && board[11] == piece;
+            case 10: return board[9] == piece && board[11] == piece || board[3] == piece && board[18] == piece;
+            case 11: return board[9] == piece && board[10] == piece || board[6] == piece && board[15] == piece;
+            case 12: return board[13] == piece && board[14] == piece || board[8] == piece && board[17] == piece;
+            case 13: return board[12] == piece && board[14] == piece || board[5] == piece && board[20] == piece;
+            case 14: return board[12] == piece && board[13] == piece || board[2] == piece && board[23] == piece;
+            case 15: return board[16] == piece && board[17] == piece || board[6] == piece && board[11] == piece;
+            case 16: return board[15] == piece && board[17] == piece || board[19] == piece && board[22] == piece;
+            case 17: return board[15] == piece && board[16] == piece || board[8] == piece && board[12] == piece;
+            case 18: return board[19] == piece && board[20] == piece || board[3] == piece && board[10] == piece;
+            case 19: return board[18] == piece && board[20] == piece || board[16] == piece && board[22] == piece;
+            case 20: return board[18] == piece && board[19] == piece || board[5] == piece && board[13] == piece;
+            case 21: return board[22] == piece && board[23] == piece || board[0] == piece && board[9] == piece;
+            case 22: return board[21] == piece && board[23] == piece || board[16] == piece && board[19] == piece;
+            case 23: return board[21] == piece && board[22] == piece || board[2] == piece && board[14] == piece;
+        }
+
+        return {};
+    }
+
+#ifdef __GNUG__
+    #pragma GCC diagnostic pop
+#endif
+
     int m_clicked_id {-1};
     int m_hovered_id {-1};
 

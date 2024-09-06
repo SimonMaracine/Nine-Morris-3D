@@ -1,4 +1,4 @@
-#include "jump_variant_board.hpp"
+#include "jump_plus_variant_board.hpp"
 
 #include <algorithm>
 #include <utility>
@@ -6,9 +6,9 @@
 
 #include <nine_morris_3d_engine/external/imgui.h++>
 
-#define PIECE(index) (index - JumpVariantBoard::NODES)
+#define PIECE(index) (index - JumpPlusVariantBoard::NODES)
 
-JumpVariantBoard::JumpVariantBoard(
+JumpPlusVariantBoard::JumpPlusVariantBoard(
     const sm::Renderable& board,
     const sm::Renderable& board_paint,
     const std::vector<sm::Renderable>& nodes,
@@ -24,44 +24,75 @@ JumpVariantBoard::JumpVariantBoard(
 
     // Offset pieces' IDs, so that they are different from nodes' IDs
 
-    m_pieces[0] = PieceObj(0 + NODES, glm::vec3(NODE_POSITIONS[4].x, PIECE_Y_POSITION_BOARD, NODE_POSITIONS[4].z), white_pieces[0], PieceType::White);
-    m_pieces[1] = PieceObj(1 + NODES, glm::vec3(NODE_POSITIONS[13].x, PIECE_Y_POSITION_BOARD, NODE_POSITIONS[13].z), white_pieces[1], PieceType::White);
-    m_pieces[2] = PieceObj(2 + NODES, glm::vec3(NODE_POSITIONS[15].x, PIECE_Y_POSITION_BOARD, NODE_POSITIONS[15].z), white_pieces[2], PieceType::White);
+    m_pieces[0] = PieceObj(0 + NODES, glm::vec3(NODE_POSITIONS[0].x, PIECE_Y_POSITION_BOARD, NODE_POSITIONS[0].z), white_pieces[0], PieceType::White);
+    m_pieces[1] = PieceObj(1 + NODES, glm::vec3(NODE_POSITIONS[3].x, PIECE_Y_POSITION_BOARD, NODE_POSITIONS[3].z), white_pieces[1], PieceType::White);
+    m_pieces[2] = PieceObj(2 + NODES, glm::vec3(NODE_POSITIONS[6].x, PIECE_Y_POSITION_BOARD, NODE_POSITIONS[6].z), white_pieces[2], PieceType::White);
+    m_pieces[3] = PieceObj(3 + NODES, glm::vec3(NODE_POSITIONS[17].x, PIECE_Y_POSITION_BOARD, NODE_POSITIONS[17].z), white_pieces[3], PieceType::White);
+    m_pieces[4] = PieceObj(4 + NODES, glm::vec3(NODE_POSITIONS[20].x, PIECE_Y_POSITION_BOARD, NODE_POSITIONS[20].z), white_pieces[4], PieceType::White);
+    m_pieces[5] = PieceObj(5 + NODES, glm::vec3(NODE_POSITIONS[23].x, PIECE_Y_POSITION_BOARD, NODE_POSITIONS[23].z), white_pieces[5], PieceType::White);
 
-    m_pieces[3] = PieceObj(3 + NODES, glm::vec3(NODE_POSITIONS[5].x, PIECE_Y_POSITION_BOARD, NODE_POSITIONS[5].z), black_pieces[3 - PIECES / 2], PieceType::Black);
-    m_pieces[4] = PieceObj(4 + NODES, glm::vec3(NODE_POSITIONS[11].x, PIECE_Y_POSITION_BOARD, NODE_POSITIONS[11].z), black_pieces[4 - PIECES / 2], PieceType::Black);
-    m_pieces[5] = PieceObj(5 + NODES, glm::vec3(NODE_POSITIONS[16].x, PIECE_Y_POSITION_BOARD, NODE_POSITIONS[16].z), black_pieces[5 - PIECES / 2], PieceType::Black);
+    m_pieces[6] = PieceObj(6 + NODES, glm::vec3(NODE_POSITIONS[2].x, PIECE_Y_POSITION_BOARD, NODE_POSITIONS[2].z), black_pieces[6 - PIECES / 2], PieceType::Black);
+    m_pieces[7] = PieceObj(7 + NODES, glm::vec3(NODE_POSITIONS[5].x, PIECE_Y_POSITION_BOARD, NODE_POSITIONS[5].z), black_pieces[7 - PIECES / 2], PieceType::Black);
+    m_pieces[8] = PieceObj(8 + NODES, glm::vec3(NODE_POSITIONS[8].x, PIECE_Y_POSITION_BOARD, NODE_POSITIONS[8].z), black_pieces[8 - PIECES / 2], PieceType::Black);
+    m_pieces[9] = PieceObj(9 + NODES, glm::vec3(NODE_POSITIONS[15].x, PIECE_Y_POSITION_BOARD, NODE_POSITIONS[15].z), black_pieces[9 - PIECES / 2], PieceType::Black);
+    m_pieces[10] = PieceObj(10 + NODES, glm::vec3(NODE_POSITIONS[18].x, PIECE_Y_POSITION_BOARD, NODE_POSITIONS[18].z), black_pieces[10 - PIECES / 2], PieceType::Black);
+    m_pieces[11] = PieceObj(11 + NODES, glm::vec3(NODE_POSITIONS[21].x, PIECE_Y_POSITION_BOARD, NODE_POSITIONS[21].z), black_pieces[11 - PIECES / 2], PieceType::Black);
 
-    m_pieces[0].node_id = 4;
-    m_nodes[4].piece_id = m_pieces[0].get_id();
+    m_pieces[0].node_id = 0;
+    m_nodes[0].piece_id = m_pieces[0].get_id();
 
-    m_pieces[1].node_id = 13;
-    m_nodes[13].piece_id = m_pieces[1].get_id();
+    m_pieces[1].node_id = 3;
+    m_nodes[3].piece_id = m_pieces[1].get_id();
 
-    m_pieces[2].node_id = 15;
-    m_nodes[15].piece_id = m_pieces[2].get_id();
+    m_pieces[2].node_id = 6;
+    m_nodes[6].piece_id = m_pieces[2].get_id();
 
-    m_pieces[3].node_id = 5;
-    m_nodes[5].piece_id = m_pieces[3].get_id();
+    m_pieces[3].node_id = 17;
+    m_nodes[17].piece_id = m_pieces[3].get_id();
 
-    m_pieces[4].node_id = 11;
-    m_nodes[11].piece_id = m_pieces[4].get_id();
+    m_pieces[4].node_id = 20;
+    m_nodes[20].piece_id = m_pieces[4].get_id();
 
-    m_pieces[5].node_id = 16;
-    m_nodes[16].piece_id = m_pieces[5].get_id();
+    m_pieces[5].node_id = 23;
+    m_nodes[23].piece_id = m_pieces[5].get_id();
 
-    m_board[4] = Piece::White;
-    m_board[13] = Piece::White;
-    m_board[15] = Piece::White;
 
+    m_pieces[6].node_id = 2;
+    m_nodes[2].piece_id = m_pieces[6].get_id();
+
+    m_pieces[7].node_id = 5;
+    m_nodes[5].piece_id = m_pieces[7].get_id();
+
+    m_pieces[8].node_id = 8;
+    m_nodes[8].piece_id = m_pieces[8].get_id();
+
+    m_pieces[9].node_id = 15;
+    m_nodes[15].piece_id = m_pieces[9].get_id();
+
+    m_pieces[10].node_id = 18;
+    m_nodes[18].piece_id = m_pieces[10].get_id();
+
+    m_pieces[11].node_id = 21;
+    m_nodes[21].piece_id = m_pieces[11].get_id();
+
+    m_board[0] = Piece::White;
+    m_board[3] = Piece::White;
+    m_board[6] = Piece::White;
+    m_board[17] = Piece::White;
+    m_board[20] = Piece::White;
+    m_board[23] = Piece::White;
+
+    m_board[2] = Piece::Black;
     m_board[5] = Piece::Black;
-    m_board[11] = Piece::Black;
-    m_board[16] = Piece::Black;
+    m_board[8] = Piece::Black;
+    m_board[15] = Piece::Black;
+    m_board[18] = Piece::Black;
+    m_board[21] = Piece::Black;
 
     m_legal_moves = generate_moves();
 }
 
-void JumpVariantBoard::update(sm::Ctx& ctx, glm::vec3 ray, glm::vec3 camera) {
+void JumpPlusVariantBoard::update(sm::Ctx& ctx, glm::vec3 ray, glm::vec3 camera) {
     update_hovered_id(ray, camera, [this]() {
         std::vector<std::pair<int, sm::Renderable>> renderables;
 
@@ -95,15 +126,15 @@ void JumpVariantBoard::update(sm::Ctx& ctx, glm::vec3 ray, glm::vec3 camera) {
     update_pieces(ctx, m_pieces);
 }
 
-void JumpVariantBoard::update_movement() {
+void JumpPlusVariantBoard::update_movement() {
     BoardObj::update_movement(m_pieces);
 }
 
-void JumpVariantBoard::user_click_press() {
+void JumpPlusVariantBoard::user_click_press() {
     BoardObj::user_click_press(m_game_over);
 }
 
-void JumpVariantBoard::user_click_release() {
+void JumpPlusVariantBoard::user_click_release() {
     BoardObj::user_click_release(m_game_over, [this]() {
         if (is_node_id(m_hovered_id)) {
             try_move(m_selected_index, m_nodes[m_hovered_id].get_id());
@@ -115,7 +146,7 @@ void JumpVariantBoard::user_click_release() {
     });
 }
 
-void JumpVariantBoard::move_piece(int source_index, int destination_index) {
+void JumpPlusVariantBoard::move_piece(int source_index, int destination_index) {
     const auto iter {std::find_if(m_legal_moves.begin(), m_legal_moves.end(), [=](const Move& move) {
         return (
             move.source_index == source_index &&
@@ -139,7 +170,7 @@ void JumpVariantBoard::move_piece(int source_index, int destination_index) {
     );
 }
 
-void JumpVariantBoard::debug() {
+void JumpPlusVariantBoard::debug() {
     if (ImGui::Begin("Debug Board")) {
         ImGui::Text("turn %s", turn_string(m_turn));
         ImGui::Text("game_over %s", game_over_string(m_game_over));
@@ -154,7 +185,7 @@ void JumpVariantBoard::debug() {
     ImGui::End();
 }
 
-void JumpVariantBoard::select(int index) {
+void JumpPlusVariantBoard::select(int index) {
     if (m_selected_index == -1) {
         if (m_board[index] == static_cast<Piece>(m_turn)) {
             m_selected_index = index;
@@ -168,7 +199,7 @@ void JumpVariantBoard::select(int index) {
     }
 }
 
-void JumpVariantBoard::try_move(int source_index, int destination_index) {
+void JumpPlusVariantBoard::try_move(int source_index, int destination_index) {
     const auto iter {std::find_if(m_legal_moves.begin(), m_legal_moves.end(), [=](const Move& move) {
         return (
             move.source_index == source_index &&
@@ -182,7 +213,7 @@ void JumpVariantBoard::try_move(int source_index, int destination_index) {
     }
 }
 
-void JumpVariantBoard::user_move(int source_index, int destination_index) {
+void JumpPlusVariantBoard::user_move(int source_index, int destination_index) {
     move(source_index, destination_index);
 
     m_pieces[PIECE(m_nodes[source_index].piece_id)].node_id = destination_index;
@@ -200,7 +231,7 @@ void JumpVariantBoard::user_move(int source_index, int destination_index) {
     );
 }
 
-void JumpVariantBoard::move(int source_index, int destination_index) {
+void JumpPlusVariantBoard::move(int source_index, int destination_index) {
     assert(m_board[source_index] != Piece::None);
     assert(m_board[destination_index] == Piece::None);
 
@@ -214,7 +245,7 @@ void JumpVariantBoard::move(int source_index, int destination_index) {
     m_move_callback(create_move(source_index, destination_index));
 }
 
-void JumpVariantBoard::finish_turn() {
+void JumpPlusVariantBoard::finish_turn() {
     if (m_turn == Player::White) {
         m_turn = Player::Black;
     } else {
@@ -230,7 +261,7 @@ void JumpVariantBoard::finish_turn() {
     m_selected_index = -1;
 }
 
-void JumpVariantBoard::check_winner() {
+void JumpPlusVariantBoard::check_winner() {
     if (m_game_over != GameOver::None) {
         return;
     }
@@ -246,7 +277,7 @@ void JumpVariantBoard::check_winner() {
     }
 }
 
-void JumpVariantBoard::check_fifty_move_rule() {
+void JumpPlusVariantBoard::check_fifty_move_rule() {
     if (m_game_over != GameOver::None) {
         return;
     }
@@ -256,7 +287,7 @@ void JumpVariantBoard::check_fifty_move_rule() {
     }
 }
 
-void JumpVariantBoard::check_threefold_repetition(const Position& position) {
+void JumpPlusVariantBoard::check_threefold_repetition(const Position& position) {
     if (m_game_over != GameOver::None) {
         return;
     }
@@ -273,15 +304,15 @@ void JumpVariantBoard::check_threefold_repetition(const Position& position) {
     }
 }
 
-bool JumpVariantBoard::is_node_id(int id) {
+bool JumpPlusVariantBoard::is_node_id(int id) {
     return id >= 0 && id <= NODES - 1;
 }
 
-bool JumpVariantBoard::is_piece_id(int id) {
+bool JumpPlusVariantBoard::is_piece_id(int id) {
     return id >= NODES && id <= NODES + PIECES - 1;
 }
 
-std::vector<JumpVariantBoard::Move> JumpVariantBoard::generate_moves() const {
+std::vector<JumpPlusVariantBoard::Move> JumpPlusVariantBoard::generate_moves() const {
     std::vector<Move> moves;
 
     for (int i {0}; i < NODES; i++) {
@@ -301,7 +332,7 @@ std::vector<JumpVariantBoard::Move> JumpVariantBoard::generate_moves() const {
     return moves;
 }
 
-JumpVariantBoard::Move JumpVariantBoard::create_move(int source_index, int destination_index) {
+JumpPlusVariantBoard::Move JumpPlusVariantBoard::create_move(int source_index, int destination_index) {
     Move move;
     move.source_index = source_index;
     move.destination_index = destination_index;

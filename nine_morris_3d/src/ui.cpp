@@ -87,7 +87,7 @@ void Ui::main_menu_bar(sm::Ctx& ctx, GameScene& game_scene) {
                 }
                 if (ImGui::RadioButton("Jump Plus Variant", &m_options.game_mode, static_cast<int>(GameMode::JumpPlus))) {
                     if (std::exchange(g.options.game_mode, m_options.game_mode) != static_cast<int>(GameMode::JumpPlus)) {
-                        // TODO
+                        ctx.change_scene("jump_plus_variant"_H);
                     }
                 }
 

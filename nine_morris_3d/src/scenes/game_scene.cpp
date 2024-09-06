@@ -209,7 +209,7 @@ sm::Renderable GameScene::setup_board_paint() const {
     return sm::Renderable(mesh, vertex_array, material_instance);
 }
 
-std::vector<sm::Renderable> GameScene::setup_nodes() const {
+std::vector<sm::Renderable> GameScene::setup_nodes(unsigned int count) const {
     const auto mesh {ctx.get_mesh("node.obj"_H)};
 
     const auto vertex_array {ctx.load_vertex_array("node"_H, mesh)};
@@ -218,7 +218,7 @@ std::vector<sm::Renderable> GameScene::setup_nodes() const {
 
     std::vector<sm::Renderable> renderables;
 
-    for (unsigned int i {0}; i < 24; i++) {
+    for (unsigned int i {0}; i < count; i++) {
         const auto material_instance {ctx.load_material_instance(sm::Id("node" + std::to_string(i)), material)};
         material_instance->set_vec3("u_material.ambient_diffuse"_H, glm::vec3(0.075f));
         material_instance->set_vec3("u_material.specular"_H, glm::vec3(0.3f));
@@ -230,7 +230,7 @@ std::vector<sm::Renderable> GameScene::setup_nodes() const {
     return renderables;
 }
 
-std::vector<sm::Renderable> GameScene::setup_white_pieces() const {
+std::vector<sm::Renderable> GameScene::setup_white_pieces(unsigned int count) const {
     const auto mesh {ctx.get_mesh("piece_white.obj"_H)};
 
     const auto vertex_array {ctx.load_vertex_array("piece_white"_H, mesh)};
@@ -257,7 +257,7 @@ std::vector<sm::Renderable> GameScene::setup_white_pieces() const {
 
     std::vector<sm::Renderable> renderables;
 
-    for (unsigned int i {0}; i < 9; i++) {
+    for (unsigned int i {0}; i < count; i++) {
         const auto material_instance {ctx.load_material_instance(sm::Id("piece_white" + std::to_string(i)), material)};
         material_instance->set_texture("u_material.ambient_diffuse"_H, diffuse, 0);
         material_instance->set_vec3("u_material.specular"_H, glm::vec3(0.2f));
@@ -270,7 +270,7 @@ std::vector<sm::Renderable> GameScene::setup_white_pieces() const {
     return renderables;
 }
 
-std::vector<sm::Renderable> GameScene::setup_black_pieces() const {
+std::vector<sm::Renderable> GameScene::setup_black_pieces(unsigned int count) const {
     const auto mesh {ctx.get_mesh("piece_black.obj"_H)};
 
     const auto vertex_array {ctx.load_vertex_array("piece_black"_H, mesh)};
@@ -297,7 +297,7 @@ std::vector<sm::Renderable> GameScene::setup_black_pieces() const {
 
     std::vector<sm::Renderable> renderables;
 
-    for (unsigned int i {0}; i < 9; i++) {
+    for (unsigned int i {0}; i < count; i++) {
         const auto material_instance {ctx.load_material_instance(sm::Id("piece_black" + std::to_string(i)), material)};
         material_instance->set_texture("u_material.ambient_diffuse"_H, diffuse, 0);
         material_instance->set_vec3("u_material.specular"_H, glm::vec3(0.2f));

@@ -115,7 +115,6 @@ private:
     static void unmake_place_move(Board& board, int place_index);
     static void make_move_move(Board& board, int source_index, int destination_index);
     static void unmake_move_move(Board& board, int source_index, int destination_index);
-    static bool is_mill(const Board& board, Player player, int index);
     static bool all_pieces_in_mills(const Board& board, Player player);
     static std::vector<int> neighbor_free_positions(const Board& board, int index);
     static Move create_place(int place_index);

@@ -12,6 +12,7 @@
 #include "scenes/loading_scene.hpp"
 #include "scenes/standard_game_scene.hpp"
 #include "scenes/jump_variant_scene.hpp"
+#include "scenes/jump_plus_variant_scene.hpp"
 #include "game.hpp"
 #include "global.hpp"
 #include "constants.hpp"
@@ -97,6 +98,7 @@ int application_main() {
             game.add_scene<LoadingScene>();
             game.add_scene<StandardGameScene>();
             game.add_scene<JumpVariantScene>();
+            game.add_scene<JumpPlusVariantScene>();
             game.set_global_data<Global>();
             exit_code = game.run("loading"_H, functions);
         } catch (const sm::RuntimeError& e) {  // FIXME once an exception from a thread managed to not be caught; don't know how; seems to be working now

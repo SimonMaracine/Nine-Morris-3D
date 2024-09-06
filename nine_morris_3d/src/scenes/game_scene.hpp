@@ -35,9 +35,9 @@ protected:
 
     sm::Renderable setup_board() const;
     sm::Renderable setup_board_paint() const;
-    std::vector<sm::Renderable> setup_nodes() const;
-    std::vector<sm::Renderable> setup_white_pieces() const;
-    std::vector<sm::Renderable> setup_black_pieces() const;
+    std::vector<sm::Renderable> setup_nodes(unsigned int count) const;
+    std::vector<sm::Renderable> setup_white_pieces(unsigned int count) const;
+    std::vector<sm::Renderable> setup_black_pieces(unsigned int count) const;
 
     void load_skybox() const;
     void load_board_paint_texture() const;

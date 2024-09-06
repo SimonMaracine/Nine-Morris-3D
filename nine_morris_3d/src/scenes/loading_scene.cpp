@@ -27,7 +27,7 @@ void LoadingScene::on_update() {
                 ctx.change_scene("jump_variant"_H);
                 break;
             case static_cast<int>(GameMode::JumpPlus):
-                // TODO
+                ctx.change_scene("jump_plus_variant"_H);
                 break;
         }
     }

@@ -736,52 +736,6 @@ void StandardGameBoard::unmake_move_move(Board& board, int source_index, int des
     std::swap(board[source_index], board[destination_index]);
 }
 
-#ifdef __GNUG__
-    #pragma GCC diagnostic push
-    #pragma GCC diagnostic ignored "-Wparentheses"
-#endif
-
-#define IS_PC(const_index) (board[const_index] == piece)
-
-bool StandardGameBoard::is_mill(const Board& board, Player player, int index) {
-    const Piece piece {static_cast<Piece>(player)};
-
-    assert(board[index] == piece);
-
-    switch (index) {
-        case 0: return IS_PC(1) && IS_PC(2) || IS_PC(9) && IS_PC(21);
-        case 1: return IS_PC(0) && IS_PC(2) || IS_PC(4) && IS_PC(7);
-        case 2: return IS_PC(0) && IS_PC(1) || IS_PC(14) && IS_PC(23);
-        case 3: return IS_PC(4) && IS_PC(5) || IS_PC(10) && IS_PC(18);
-        case 4: return IS_PC(3) && IS_PC(5) || IS_PC(1) && IS_PC(7);
-        case 5: return IS_PC(3) && IS_PC(4) || IS_PC(13) && IS_PC(20);
-        case 6: return IS_PC(7) && IS_PC(8) || IS_PC(11) && IS_PC(15);
-        case 7: return IS_PC(6) && IS_PC(8) || IS_PC(1) && IS_PC(4);
-        case 8: return IS_PC(6) && IS_PC(7) || IS_PC(12) && IS_PC(17);
-        case 9: return IS_PC(0) && IS_PC(21) || IS_PC(10) && IS_PC(11);
-        case 10: return IS_PC(9) && IS_PC(11) || IS_PC(3) && IS_PC(18);
-        case 11: return IS_PC(9) && IS_PC(10) || IS_PC(6) && IS_PC(15);
-        case 12: return IS_PC(13) && IS_PC(14) || IS_PC(8) && IS_PC(17);
-        case 13: return IS_PC(12) && IS_PC(14) || IS_PC(5) && IS_PC(20);
-        case 14: return IS_PC(12) && IS_PC(13) || IS_PC(2) && IS_PC(23);
-        case 15: return IS_PC(16) && IS_PC(17) || IS_PC(6) && IS_PC(11);
-        case 16: return IS_PC(15) && IS_PC(17) || IS_PC(19) && IS_PC(22);
-        case 17: return IS_PC(15) && IS_PC(16) || IS_PC(8) && IS_PC(12);
-        case 18: return IS_PC(19) && IS_PC(20) || IS_PC(3) && IS_PC(10);
-        case 19: return IS_PC(18) && IS_PC(20) || IS_PC(16) && IS_PC(22);
-        case 20: return IS_PC(18) && IS_PC(19) || IS_PC(5) && IS_PC(13);
-        case 21: return IS_PC(22) && IS_PC(23) || IS_PC(0) && IS_PC(9);
-        case 22: return IS_PC(21) && IS_PC(23) || IS_PC(16) && IS_PC(19);
-        case 23: return IS_PC(21) && IS_PC(22) || IS_PC(2) && IS_PC(14);
-    }
-
-    return {};
-}
-
-#ifdef __GNUG__
-    #pragma GCC diagnostic pop
-#endif
-
 bool StandardGameBoard::all_pieces_in_mills(const Board& board, Player player) {
     for (int i {0}; i < NODES; i++) {
         if (board[i] != static_cast<Piece>(player)) {
