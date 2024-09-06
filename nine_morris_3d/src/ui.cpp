@@ -32,6 +32,9 @@ void Ui::update(sm::Ctx& ctx, GameScene& game_scene) {
         case PopupWindow::About:
             about_window();
             break;
+        case PopupWindow::GameOver:
+            game_over_window(game_scene);
+            break;
         case PopupWindow::RulesStandardGame:
             rules_standard_game_window();
             break;
@@ -417,6 +420,25 @@ void Ui::about_window() {
     });
 }
 
+void Ui::game_over_window(GameScene& game_scene) {
+    generic_window("Game Over", [&]() {
+        switch (game_scene.get_board().get_game_over()) {
+            case GameOver::None:
+                assert(false);
+                break;
+            case GameOver::WinnerWhite:
+                ImGui::Text("White player wins!");  // TODO game over reason
+                break;
+            case GameOver::WinnerBlack:
+                ImGui::Text("Black player wins!");
+                break;
+            case GameOver::TieBetweenBothPlayers:
+                ImGui::Text("Tie between both players!");
+                break;
+        }
+    });
+}
+
 void Ui::rules_standard_game_window() {
     const char* text {
 R"(Each player has nine pieces, either black or white.
@@ -479,7 +501,7 @@ void Ui::generic_window(const char* title, std::function<void()>&& contents, std
     if (ImGui::BeginPopupModal(title, nullptr, flags)) {
         contents();
 
-        ImGui::Dummy(ImVec2(0.0f, rem(0.5f)));
+        ImGui::Dummy(ImVec2(rem(10.0f), rem(0.5f)));  // FIXME
 
         const float ok_button_width {rem(7.0f)};
         ImGui::SetCursorPosX((ImGui::GetContentRegionAvail().x - ok_button_width) * 0.5f);

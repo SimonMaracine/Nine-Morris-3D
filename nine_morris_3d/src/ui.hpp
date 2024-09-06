@@ -12,6 +12,7 @@ class GameScene;
 enum class PopupWindow {
     None,
     About,
+    GameOver,
     RulesStandardGame,
     RulesJumpVariant,
     RulesJumpPlusVariant,
@@ -29,6 +30,7 @@ public:
 private:
     void main_menu_bar(sm::Ctx& ctx, GameScene& game_scene);
     void about_window();
+    void game_over_window(GameScene& game_scene);
     void rules_standard_game_window();
     void rules_jump_variant_window();
     void rules_jump_plus_variant_window();

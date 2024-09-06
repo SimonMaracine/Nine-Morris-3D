@@ -33,8 +33,9 @@ public:
         std::function<void(const Move&)>&& move_callback
     );
 
+    GameOver get_game_over() const override { return m_game_over; }
+
     Player get_turn() const { return m_turn; }
-    GameOver get_game_over() const { return m_game_over; }
 
     void update(sm::Ctx& ctx, glm::vec3 ray, glm::vec3 camera);
     void update_movement();

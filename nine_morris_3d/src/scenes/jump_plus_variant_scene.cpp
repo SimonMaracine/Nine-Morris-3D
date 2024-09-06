@@ -128,6 +128,7 @@ void JumpPlusVariantScene::setup_renderables() {
 
             if (m_board.get_game_over() != GameOver::None) {
                 m_timer.stop();
+                m_ui.set_popup_window(PopupWindow::GameOver);
             }
         }
     );

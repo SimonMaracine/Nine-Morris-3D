@@ -5,11 +5,11 @@
  | |\  | | | | |  __/ | |  | | (_) | |  | |  | \__ \  ___) | |__| |
  |_| \_|_|_| |_|\___| |_|  |_|\___/|_|  |_|  |_|___/ |____/|_____/ 
 
- VERSION 0.4.0
+VERSION 0.4.0
 
- Thank you for downloading Nine Morris 3D! A lot of effort was put in the making of this game. I hope
- that you find it useful and enjoyable. :)
- If you find any bugs or have any suggestion, please contact me at simonmara.dev@gmail.com.
+Thank you for downloading Nine Morris 3D! A lot of effort was put in the making of this game. I hope
+that you find it useful and enjoyable. :)
+If you find any bugs or have any suggestion, please contact me at simonmara.dev@gmail.com.
 
 ----------------------------------------------------------------------------------------------------
 
@@ -26,7 +26,7 @@ Normal texture:
 
 Fonts:
     https://www.1001fonts.com/code-new-roman-font.html
-    See the data/fonts/ directory.
+    See the assets/fonts directory.
 
 Cube maps:
     https://polyhaven.com/hdris
@@ -41,4 +41,4 @@ TOOLS I USED:
 Code editing: Visual Studio Code, Visual Studio
 Graphics: GIMP, Blender, https://matheowis.github.io/HDRI-to-CubeMap
 Audio: Audacity
-Other: Trello, RenderDoc
+Other: RenderDoc, Trello

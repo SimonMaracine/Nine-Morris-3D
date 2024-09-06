@@ -82,6 +82,8 @@ public:
     BoardObj(BoardObj&&) = default;
     BoardObj& operator=(BoardObj&&) = default;
 
+    virtual GameOver get_game_over() const = 0;
+
     void set_board_paint_renderable(const sm::Renderable& board_paint);
 protected:
     void user_click_press(GameOver game_over);

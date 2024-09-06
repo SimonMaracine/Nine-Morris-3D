@@ -87,7 +87,7 @@ void StandardGameScene::setup_turn_indicator() {
     m_turn_indicator = TurnIndicator(white_texture, black_texture);
 }
 
-void StandardGameScene::setup_timer() {
+void StandardGameScene::setup_timer() {  // TODO dry
     sm::FontSpecification specification;
     specification.size_height = 90.0f;
     specification.bitmap_size = 512;
@@ -128,6 +128,7 @@ void StandardGameScene::setup_renderables() {
 
             if (m_board.get_game_over() != GameOver::None) {
                 m_timer.stop();
+                m_ui.set_popup_window(PopupWindow::GameOver);
             }
         }
     );
