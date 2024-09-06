@@ -17,77 +17,20 @@ JumpPlusVariantBoard::JumpPlusVariantBoard(
     std::function<void(const Move&)>&& move_callback
 )
     : BoardObj(board, board_paint), m_move_callback(std::move(move_callback)) {
+    initialize_nodes(m_nodes, nodes);
 
-    for (int i {0}; i < NODES; i++) {
-        m_nodes[i] = NodeObj(i, NODE_POSITIONS[i], nodes[i]);
-    }
-
-    // Offset pieces' IDs, so that they are different from nodes' IDs
-
-    m_pieces[0] = PieceObj(0 + NODES, glm::vec3(NODE_POSITIONS[0].x, PIECE_Y_POSITION_BOARD, NODE_POSITIONS[0].z), white_pieces[0], PieceType::White);
-    m_pieces[1] = PieceObj(1 + NODES, glm::vec3(NODE_POSITIONS[3].x, PIECE_Y_POSITION_BOARD, NODE_POSITIONS[3].z), white_pieces[1], PieceType::White);
-    m_pieces[2] = PieceObj(2 + NODES, glm::vec3(NODE_POSITIONS[6].x, PIECE_Y_POSITION_BOARD, NODE_POSITIONS[6].z), white_pieces[2], PieceType::White);
-    m_pieces[3] = PieceObj(3 + NODES, glm::vec3(NODE_POSITIONS[17].x, PIECE_Y_POSITION_BOARD, NODE_POSITIONS[17].z), white_pieces[3], PieceType::White);
-    m_pieces[4] = PieceObj(4 + NODES, glm::vec3(NODE_POSITIONS[20].x, PIECE_Y_POSITION_BOARD, NODE_POSITIONS[20].z), white_pieces[4], PieceType::White);
-    m_pieces[5] = PieceObj(5 + NODES, glm::vec3(NODE_POSITIONS[23].x, PIECE_Y_POSITION_BOARD, NODE_POSITIONS[23].z), white_pieces[5], PieceType::White);
-
-    m_pieces[6] = PieceObj(6 + NODES, glm::vec3(NODE_POSITIONS[2].x, PIECE_Y_POSITION_BOARD, NODE_POSITIONS[2].z), black_pieces[6 - PIECES / 2], PieceType::Black);
-    m_pieces[7] = PieceObj(7 + NODES, glm::vec3(NODE_POSITIONS[5].x, PIECE_Y_POSITION_BOARD, NODE_POSITIONS[5].z), black_pieces[7 - PIECES / 2], PieceType::Black);
-    m_pieces[8] = PieceObj(8 + NODES, glm::vec3(NODE_POSITIONS[8].x, PIECE_Y_POSITION_BOARD, NODE_POSITIONS[8].z), black_pieces[8 - PIECES / 2], PieceType::Black);
-    m_pieces[9] = PieceObj(9 + NODES, glm::vec3(NODE_POSITIONS[15].x, PIECE_Y_POSITION_BOARD, NODE_POSITIONS[15].z), black_pieces[9 - PIECES / 2], PieceType::Black);
-    m_pieces[10] = PieceObj(10 + NODES, glm::vec3(NODE_POSITIONS[18].x, PIECE_Y_POSITION_BOARD, NODE_POSITIONS[18].z), black_pieces[10 - PIECES / 2], PieceType::Black);
-    m_pieces[11] = PieceObj(11 + NODES, glm::vec3(NODE_POSITIONS[21].x, PIECE_Y_POSITION_BOARD, NODE_POSITIONS[21].z), black_pieces[11 - PIECES / 2], PieceType::Black);
-
-    m_pieces[0].node_id = 0;
-    m_nodes[0].piece_id = m_pieces[0].get_id();
-
-    m_pieces[1].node_id = 3;
-    m_nodes[3].piece_id = m_pieces[1].get_id();
-
-    m_pieces[2].node_id = 6;
-    m_nodes[6].piece_id = m_pieces[2].get_id();
-
-    m_pieces[3].node_id = 17;
-    m_nodes[17].piece_id = m_pieces[3].get_id();
-
-    m_pieces[4].node_id = 20;
-    m_nodes[20].piece_id = m_pieces[4].get_id();
-
-    m_pieces[5].node_id = 23;
-    m_nodes[23].piece_id = m_pieces[5].get_id();
-
-
-    m_pieces[6].node_id = 2;
-    m_nodes[2].piece_id = m_pieces[6].get_id();
-
-    m_pieces[7].node_id = 5;
-    m_nodes[5].piece_id = m_pieces[7].get_id();
-
-    m_pieces[8].node_id = 8;
-    m_nodes[8].piece_id = m_pieces[8].get_id();
-
-    m_pieces[9].node_id = 15;
-    m_nodes[15].piece_id = m_pieces[9].get_id();
-
-    m_pieces[10].node_id = 18;
-    m_nodes[18].piece_id = m_pieces[10].get_id();
-
-    m_pieces[11].node_id = 21;
-    m_nodes[21].piece_id = m_pieces[11].get_id();
-
-    m_board[0] = Piece::White;
-    m_board[3] = Piece::White;
-    m_board[6] = Piece::White;
-    m_board[17] = Piece::White;
-    m_board[20] = Piece::White;
-    m_board[23] = Piece::White;
-
-    m_board[2] = Piece::Black;
-    m_board[5] = Piece::Black;
-    m_board[8] = Piece::Black;
-    m_board[15] = Piece::Black;
-    m_board[18] = Piece::Black;
-    m_board[21] = Piece::Black;
+    initialize_piece_on_board(m_pieces, m_nodes, m_board, white_pieces, 0, 0, 0, PieceType::White);
+    initialize_piece_on_board(m_pieces, m_nodes, m_board, white_pieces, 1, 3, 1, PieceType::White);
+    initialize_piece_on_board(m_pieces, m_nodes, m_board, white_pieces, 2, 6, 2, PieceType::White);
+    initialize_piece_on_board(m_pieces, m_nodes, m_board, white_pieces, 3, 17, 3, PieceType::White);
+    initialize_piece_on_board(m_pieces, m_nodes, m_board, white_pieces, 4, 20, 4, PieceType::White);
+    initialize_piece_on_board(m_pieces, m_nodes, m_board, white_pieces, 5, 23, 5, PieceType::White);
+    initialize_piece_on_board(m_pieces, m_nodes, m_board, black_pieces, 6, 2, 0, PieceType::Black);
+    initialize_piece_on_board(m_pieces, m_nodes, m_board, black_pieces, 7, 5, 1, PieceType::Black);
+    initialize_piece_on_board(m_pieces, m_nodes, m_board, black_pieces, 8, 8, 2, PieceType::Black);
+    initialize_piece_on_board(m_pieces, m_nodes, m_board, black_pieces, 9, 15, 3, PieceType::Black);
+    initialize_piece_on_board(m_pieces, m_nodes, m_board, black_pieces, 10, 18, 4, PieceType::Black);
+    initialize_piece_on_board(m_pieces, m_nodes, m_board, black_pieces, 11, 21, 5, PieceType::Black);
 
     m_legal_moves = generate_moves();
 }
@@ -115,7 +58,7 @@ void JumpPlusVariantBoard::update(sm::Ctx& ctx, glm::vec3 ray, glm::vec3 camera)
         return m_selected_index != -1;
     });
 
-    update_pieces_highlight<NODES>(m_pieces, m_nodes, m_game_over, m_selected_index, [this](const PieceObj& piece) {
+    update_pieces_highlight(m_pieces, m_nodes, m_game_over, m_selected_index, [this](const PieceObj& piece) {
         return static_cast<Player>(piece.get_type()) == m_turn;
     });
 

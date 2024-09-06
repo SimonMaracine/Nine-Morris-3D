@@ -17,28 +17,14 @@ StandardGameBoard::StandardGameBoard(
     std::function<void(const Move&)>&& move_callback
 )
     : BoardObj(board, board_paint), m_move_callback(std::move(move_callback)) {
-    for (int i {0}; i < NODES; i++) {
-        m_nodes[i] = NodeObj(i, NODE_POSITIONS[i], nodes[i]);
-    }
-
-    // Offset pieces' IDs, so that they are different from nodes' IDs
+    initialize_nodes(m_nodes, nodes);
 
     for (int i {0}; i < PIECES / 2; i++) {
-        m_pieces[i] = PieceObj(
-            i + NODES,
-            glm::vec3(-3.0f, PIECE_Y_POSITION_AIR_INITIAL, static_cast<float>(i) * 0.5f - 2.0f),
-            white_pieces[i],
-            PieceType::White
-        );
+        initialize_piece_in_air(m_pieces, m_nodes, white_pieces, i, i, -3.0f, static_cast<float>(i) * 0.5f - 2.0f, PieceType::White);
     }
 
     for (int i {PIECES / 2}; i < PIECES; i++) {
-        m_pieces[i] = PieceObj(
-            i + NODES,
-            glm::vec3(3.0f, PIECE_Y_POSITION_AIR_INITIAL, static_cast<float>(i - PIECES / 2) * -0.5f + 2.0f),
-            black_pieces[i - PIECES / 2],
-            PieceType::Black
-        );
+        initialize_piece_in_air(m_pieces, m_nodes, black_pieces, i, i - PIECES / 2, 3.0f, static_cast<float>(i - PIECES / 2) * -0.5f + 2.0f, PieceType::Black);
     }
 
     m_legal_moves = generate_moves();
@@ -75,7 +61,7 @@ void StandardGameBoard::update(sm::Ctx& ctx, glm::vec3 ray, glm::vec3 camera) {
         );
     });
 
-    update_pieces_highlight<NODES>(m_pieces, m_nodes, m_game_over, m_selected_index, [this](const PieceObj& piece) {
+    update_pieces_highlight(m_pieces, m_nodes, m_game_over, m_selected_index, [this](const PieceObj& piece) {
         return (
             m_take_action_index != -1 && static_cast<Player>(piece.get_type()) != m_turn && piece.node_id != -1 ||
             m_plies >= 18 && static_cast<Player>(piece.get_type()) == m_turn && m_take_action_index == -1

@@ -96,6 +96,60 @@ protected:
     static void do_move_animation(PieceObj& piece, const NodeObj& node, std::function<void()>&& on_finish, bool direct);
     static void do_take_animation(PieceObj& piece, std::function<void()>&& on_finish);
 
+    template<typename Nodes>
+    static void initialize_nodes(Nodes& nodes, const std::vector<sm::Renderable>& renderables) {
+        for (int i {0}; i < static_cast<int>(nodes.size()); i++) {
+            nodes[i] = NodeObj(i, NODE_POSITIONS[i], renderables[i]);
+        }
+    }
+
+    template<typename Pieces, typename Nodes, typename Board>
+    static void initialize_piece_on_board(
+        Pieces& pieces,
+        Nodes& nodes,
+        Board& board,
+        const std::vector<sm::Renderable>& renderables,
+        int index,
+        int node_index,
+        int renderable_index,
+        PieceType piece
+    ) {
+        // Offset pieces' IDs, so that they are different from nodes' IDs
+
+        pieces[index] = PieceObj(
+            index + static_cast<int>(nodes.size()),
+            glm::vec3(NODE_POSITIONS[node_index].x, PIECE_Y_POSITION_BOARD, NODE_POSITIONS[node_index].z),
+            renderables[renderable_index],
+            piece
+        );
+
+        pieces[index].node_id = node_index;
+        nodes[node_index].piece_id = pieces[index].get_id();
+
+        board[node_index] = static_cast<Piece>(piece);
+    }
+
+    template<typename Pieces, typename Nodes>
+    static void initialize_piece_in_air(
+        Pieces& pieces,
+        const Nodes& nodes,
+        const std::vector<sm::Renderable>& renderables,
+        int index,
+        int renderable_index,
+        float x,
+        float y,
+        PieceType piece
+    ) {
+        // Offset pieces' IDs, so that they are different from nodes' IDs
+
+        pieces[index] = PieceObj(
+            index + static_cast<int>(nodes.size()),
+            glm::vec3(x, PIECE_Y_POSITION_AIR_INITIAL, y),
+            renderables[renderable_index],
+            piece
+        );
+    }
+
     template<typename Board>
     static unsigned int count_pieces(const Board& board, Player player) {
         unsigned int result {0};
@@ -137,8 +191,14 @@ protected:
         }
     }
 
-    template<int PieceIdOffset, typename Pieces, typename Nodes>
-    void update_pieces_highlight(Pieces& pieces, const Nodes& nodes, GameOver game_over, int user_selected_index, std::function<bool(const PieceObj&)>&& highlight) {
+    template<typename Pieces, typename Nodes>
+    void update_pieces_highlight(
+        Pieces& pieces,
+        const Nodes& nodes,
+        GameOver game_over,
+        int user_selected_index,
+        std::function<bool(const PieceObj&)>&& highlight
+    ) {
         if (game_over != GameOver::None) {
             std::for_each(pieces.begin(), pieces.end(), [](PieceObj& piece) {
                 piece.get_renderable().get_material()->flags &= ~sm::Material::Outline;
@@ -161,8 +221,8 @@ protected:
             const int piece_id {nodes[user_selected_index].piece_id};
 
             if (piece_id != -1) {
-                pieces[piece_id - PieceIdOffset].get_renderable().get_material()->flags |= sm::Material::Outline;
-                pieces[piece_id - PieceIdOffset].get_renderable().outline.color = RED;
+                pieces[piece_id - nodes.size()].get_renderable().get_material()->flags |= sm::Material::Outline;
+                pieces[piece_id - nodes.size()].get_renderable().outline.color = RED;
             }
         }
     }
