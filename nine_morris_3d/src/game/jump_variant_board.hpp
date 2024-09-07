@@ -33,7 +33,7 @@ public:
         std::function<void(const Move&)>&& move_callback
     );
 
-    GameOver get_game_over() const override { return m_game_over; }
+    const GameOver& get_game_over() const override { return m_game_over; }
 
     Player get_turn() const { return m_turn; }
 
@@ -69,8 +69,8 @@ private:
     // Game data
     Board m_board {};
     Player m_turn {Player::White};
-    GameOver m_game_over {GameOver::None};
     unsigned int m_plies_without_advancement {};
+    GameOver m_game_over;
     std::vector<Position> m_positions;
 
     // Management data

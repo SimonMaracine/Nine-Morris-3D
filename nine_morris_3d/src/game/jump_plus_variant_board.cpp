@@ -215,7 +215,10 @@ void JumpPlusVariantBoard::check_winner() {
         }
 
         if (is_mill(m_board, opponent(m_turn), i)) {
-            m_game_over = static_cast<GameOver>(opponent(m_turn));
+            m_game_over = GameOver(
+                opponent(m_turn),
+                format("%s player has made a mill.", if_player_white(m_turn, "Black", "White"))
+            );
         }
     }
 }
@@ -226,7 +229,10 @@ void JumpPlusVariantBoard::check_fifty_move_rule() {
     }
 
     if (m_plies_without_advancement == 100) {
-        m_game_over = GameOver::TieBetweenBothPlayers;
+        m_game_over = GameOver(
+            GameOver::TieBetweenBothPlayers,
+            "Fifty moves have been made without a mill."
+        );
     }
 }
 
@@ -240,7 +246,10 @@ void JumpPlusVariantBoard::check_threefold_repetition(const Position& position) 
     for (auto iter {m_positions.begin()}; iter != std::prev(m_positions.end()); iter++) {
         if (*iter == position) {
             if (++repetitions == 3) {
-                m_game_over = GameOver::TieBetweenBothPlayers;
+                m_game_over = GameOver(
+                    GameOver::TieBetweenBothPlayers,
+                    "The same position has appeared for the third time."
+                );
                 return;
             }
         }

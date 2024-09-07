@@ -422,20 +422,30 @@ void Ui::about_window() {
 
 void Ui::game_over_window(GameScene& game_scene) {
     generic_window("Game Over", [&]() {
+        const char* message {};
+
         switch (game_scene.get_board().get_game_over()) {
             case GameOver::None:
                 assert(false);
                 break;
             case GameOver::WinnerWhite:
-                ImGui::Text("White player wins!");  // TODO game over reason
+                message = "White player wins!";
                 break;
             case GameOver::WinnerBlack:
-                ImGui::Text("Black player wins!");
+                message = "Black player wins!";
                 break;
             case GameOver::TieBetweenBothPlayers:
-                ImGui::Text("Tie between both players!");
+                message = "Tie between both players!";
                 break;
         }
+
+        ImGui::SetCursorPosX((ImGui::GetWindowWidth() - ImGui::CalcTextSize(message).x) * 0.5f);
+        ImGui::Text("%s", message);
+
+        const auto reason {static_cast<std::string>(game_scene.get_board().get_game_over())};
+
+        ImGui::SetCursorPosX((ImGui::GetWindowWidth() - ImGui::CalcTextSize(reason.c_str()).x) * 0.5f);
+        ImGui::Text("%s", reason.c_str());
     });
 }
 
@@ -501,10 +511,10 @@ void Ui::generic_window(const char* title, std::function<void()>&& contents, std
     if (ImGui::BeginPopupModal(title, nullptr, flags)) {
         contents();
 
-        ImGui::Dummy(ImVec2(rem(10.0f), rem(0.5f)));  // FIXME
+        ImGui::Dummy(ImVec2(rem(8.0f), rem(0.5f)));
 
         const float ok_button_width {rem(7.0f)};
-        ImGui::SetCursorPosX((ImGui::GetContentRegionAvail().x - ok_button_width) * 0.5f);
+        ImGui::SetCursorPosX((ImGui::GetWindowWidth() - ok_button_width) * 0.5f);
 
         if (ImGui::Button("Ok", ImVec2(ok_button_width, 0.0f))) {
             ImGui::CloseCurrentPopup();

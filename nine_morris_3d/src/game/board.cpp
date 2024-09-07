@@ -1,6 +1,8 @@
 #include "game/board.hpp"
 
 #include <algorithm>
+#include <cstdarg>
+#include <cstdio>
 
 #include <nine_morris_3d_engine/external/glm.h++>
 
@@ -125,6 +127,20 @@ Player BoardObj::opponent(Player player) {
     } else {
         return Player::White;
     }
+}
+
+std::string BoardObj::format(const char* format, ...) {
+    std::string buffer;
+    buffer.resize(128);
+
+    va_list args;
+    va_start(args, format);
+
+    std::vsnprintf(buffer.data(), 128, format, args);
+
+    va_end(args);
+
+    return buffer;
 }
 
 void BoardObj::do_place_animation(PieceObj& piece, const NodeObj& node, std::function<void()>&& on_finish) {

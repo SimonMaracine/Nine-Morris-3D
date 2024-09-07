@@ -3,6 +3,7 @@
 #include <functional>
 #include <vector>
 #include <utility>
+#include <string>
 
 #include <nine_morris_3d_engine/nine_morris_3d.hpp>
 
@@ -54,11 +55,26 @@ enum class Piece {
     Black
 };
 
-enum class GameOver {
-    None,
-    WinnerWhite,
-    WinnerBlack,
-    TieBetweenBothPlayers
+class GameOver {
+public:
+    enum Type {
+        None,
+        WinnerWhite,
+        WinnerBlack,
+        TieBetweenBothPlayers
+    };
+
+    GameOver() = default;
+    GameOver(Type type, const std::string& reason)
+        : m_type(type), m_reason(reason) {}
+    GameOver(Player player, const std::string& reason)
+        : m_type(static_cast<Type>(player)), m_reason(reason) {}
+
+    operator int() const { return m_type; }
+    operator std::string() const { return m_reason; }
+private:
+    Type m_type {None};
+    std::string m_reason;
 };
 
 template<typename Board>
@@ -82,7 +98,7 @@ public:
     BoardObj(BoardObj&&) = default;
     BoardObj& operator=(BoardObj&&) = default;
 
-    virtual GameOver get_game_over() const = 0;
+    virtual const GameOver& get_game_over() const = 0;
 
     void set_board_paint_renderable(const sm::Renderable& board_paint);
 protected:
@@ -93,10 +109,16 @@ protected:
     static const char* turn_string(Player turn);
     static const char* game_over_string(GameOver game_over);
     static Player opponent(Player player);
+    static std::string format(const char* format, ...);
 
     static void do_place_animation(PieceObj& piece, const NodeObj& node, std::function<void()>&& on_finish);
     static void do_move_animation(PieceObj& piece, const NodeObj& node, std::function<void()>&& on_finish, bool direct);
     static void do_take_animation(PieceObj& piece, std::function<void()>&& on_finish);
+
+    template<typename T>
+    T if_player_white(Player player, T&& value_if_white, T&& value_if_black) {
+        return player == Player::White ? value_if_white : value_if_black;
+    }
 
     template<typename Nodes>
     static void initialize_nodes(Nodes& nodes, const std::vector<sm::Renderable>& renderables) {

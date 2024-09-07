@@ -513,7 +513,10 @@ void StandardGameBoard::check_winner_material() {
     }
 
     if (count_pieces(m_board, m_turn) < 3) {
-        m_game_over = static_cast<GameOver>(opponent(m_turn));
+        m_game_over = GameOver(
+            opponent(m_turn),
+            format("%s player cannot make any more mills.", if_player_white(m_turn, "White", "Black"))
+        );
     }
 }
 
@@ -523,7 +526,10 @@ void StandardGameBoard::check_winner_blocking() {
     }
 
     if (m_legal_moves.empty()) {
-        m_game_over = static_cast<GameOver>(opponent(m_turn));
+        m_game_over = GameOver(
+            opponent(m_turn),
+            format("%s player has no more legal moves to make.", if_player_white(m_turn, "White", "Black"))
+        );
     }
 }
 
@@ -533,7 +539,10 @@ void StandardGameBoard::check_fifty_move_rule() {
     }
 
     if (m_plies_without_advancement == 100) {
-        m_game_over = GameOver::TieBetweenBothPlayers;
+        m_game_over = GameOver(
+            GameOver::TieBetweenBothPlayers,
+            "Fifty moves have been made without a mill."
+        );
     }
 }
 
@@ -547,7 +556,10 @@ void StandardGameBoard::check_threefold_repetition(const Position& position) {
     for (auto iter {m_positions.begin()}; iter != std::prev(m_positions.end()); iter++) {
         if (*iter == position) {
             if (++repetitions == 3) {
-                m_game_over = GameOver::TieBetweenBothPlayers;
+                m_game_over = GameOver(
+                    GameOver::TieBetweenBothPlayers,
+                    "The same position has appeared for the third time."
+                );
                 return;
             }
         }
