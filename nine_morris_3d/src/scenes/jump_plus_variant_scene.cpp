@@ -1,7 +1,5 @@
 #include "scenes/jump_plus_variant_scene.hpp"
 
-#include <nine_morris_3d_engine/external/resmanager.h++>
-
 #include "game/ray.hpp"
 #include "global.hpp"
 
@@ -12,9 +10,9 @@ void JumpPlusVariantScene::on_start() {
     ctx.connect_event<sm::MouseButtonPressedEvent, &JumpPlusVariantScene::on_mouse_button_pressed>(this);
     ctx.connect_event<sm::MouseButtonReleasedEvent, &JumpPlusVariantScene::on_mouse_button_released>(this);
 
-    setup_turn_indicator();
-    setup_timer();
-    setup_renderables();
+    m_turn_indicator = setup_turn_indicator();
+    m_timer = setup_timer();
+    m_board = setup_renderables();
 }
 
 void JumpPlusVariantScene::on_stop() {
@@ -77,43 +75,14 @@ void JumpPlusVariantScene::on_mouse_button_released(const sm::MouseButtonRelease
     }
 }
 
-void JumpPlusVariantScene::setup_turn_indicator() {
-    sm::TextureSpecification specification;
-    specification.format = sm::TextureFormat::Rgba8;
-
-    const auto white_texture {ctx.load_texture("white_indicator"_H, ctx.get_texture_data("white_indicator.png"_H), specification)};
-    const auto black_texture {ctx.load_texture("black_indicator"_H, ctx.get_texture_data("black_indicator.png"_H), specification)};
-
-    m_turn_indicator = TurnIndicator(white_texture, black_texture);
-}
-
-void JumpPlusVariantScene::setup_timer() {
-    sm::FontSpecification specification;
-    specification.size_height = 90.0f;
-    specification.bitmap_size = 512;
-
-    const auto font {ctx.load_font(
-        "open_sans"_H,
-        ctx.path_assets("fonts/OpenSans/OpenSans-Regular.ttf"),
-        specification,
-        [](sm::Font* font) {
-            font->begin_baking();
-            font->bake_ascii();
-            font->end_baking();
-        }
-    )};
-
-    m_timer = Timer(font);
-}
-
-void JumpPlusVariantScene::setup_renderables() {
+JumpPlusVariantBoard JumpPlusVariantScene::setup_renderables() {
     const auto renderable_board {setup_board()};
     const auto renderable_board_paint {setup_board_paint()};
     const auto renderable_nodes {setup_nodes(JumpPlusVariantBoard::NODES)};
     const auto renderable_white_pieces {setup_white_pieces(JumpPlusVariantBoard::PIECES / 2)};
     const auto renderable_black_pieces {setup_black_pieces(JumpPlusVariantBoard::PIECES / 2)};
 
-    m_board = JumpPlusVariantBoard(
+    return JumpPlusVariantBoard(
         renderable_board,
         renderable_board_paint,
         renderable_nodes,

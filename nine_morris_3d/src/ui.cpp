@@ -321,9 +321,6 @@ void Ui::main_menu_bar(sm::Ctx& ctx, GameScene& game_scene) {
             if (ImGui::MenuItem("Computer AI")) {
                 m_current_popup_window = PopupWindow::ComputerAi;
             }
-            if (ImGui::MenuItem("Save On Exit", nullptr, &m_options.save_on_exit)) {
-                g.options.save_on_exit = m_options.save_on_exit;
-            }
             if (ImGui::BeginMenu("Skybox")) {
                 if (m_loading_skybox) {
                     ImGui::RadioButton("None", false);
@@ -332,16 +329,19 @@ void Ui::main_menu_bar(sm::Ctx& ctx, GameScene& game_scene) {
                 } else {
                     if (ImGui::RadioButton("None", &m_options.skybox, static_cast<int>(Skybox::None))) {
                         if (std::exchange(g.options.skybox, m_options.skybox) != static_cast<int>(Skybox::None)) {
+                            m_loading_skybox = true;
                             game_scene.load_and_set_skybox();
                         }
                     }
                     if (ImGui::RadioButton("Field", &m_options.skybox, static_cast<int>(Skybox::Field))) {
                         if (std::exchange(g.options.skybox, m_options.skybox) != static_cast<int>(Skybox::Field)) {
+                            m_loading_skybox = true;
                             game_scene.load_and_set_skybox();
                         }
                     }
                     if (ImGui::RadioButton("Autumn", &m_options.skybox, static_cast<int>(Skybox::Autumn))) {
                         if (std::exchange(g.options.skybox, m_options.skybox) != static_cast<int>(Skybox::Autumn)) {
+                            m_loading_skybox = true;
                             game_scene.load_and_set_skybox();
                         }
                     }
@@ -374,6 +374,9 @@ void Ui::main_menu_bar(sm::Ctx& ctx, GameScene& game_scene) {
                 g.options.labeled_board = m_options.labeled_board;
 
                 game_scene.load_and_set_board_paint_texture();
+            }
+            if (ImGui::MenuItem("Save On Exit", nullptr, &m_options.save_on_exit)) {
+                g.options.save_on_exit = m_options.save_on_exit;
             }
             ImGui::MenuItem("Show Information", nullptr, &m_show_information);
 

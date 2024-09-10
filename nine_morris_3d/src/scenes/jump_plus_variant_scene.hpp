@@ -4,8 +4,6 @@
 
 #include "game/jump_plus_variant_board.hpp"
 #include "scenes/game_scene.hpp"
-#include "turn_indicator.hpp"
-#include "timer.hpp"
 
 class JumpPlusVariantScene : public GameScene {
 public:
@@ -26,9 +24,7 @@ private:
     void on_mouse_button_pressed(const sm::MouseButtonPressedEvent& event);
     void on_mouse_button_released(const sm::MouseButtonReleasedEvent& event);
 
-    void setup_turn_indicator();
-    void setup_timer();
-    void setup_renderables();
+    JumpPlusVariantBoard setup_renderables();
 
     JumpPlusVariantBoard m_board;
     TurnIndicator m_turn_indicator;

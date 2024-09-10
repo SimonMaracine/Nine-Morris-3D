@@ -24,6 +24,7 @@ public:
     bool get_show_information() const { return m_show_information; }
 
     void set_popup_window(PopupWindow window) { m_current_popup_window = window; }
+    void set_loading_skybox_done() { m_loading_skybox = false; }
 
     void initialize(sm::Ctx& ctx);
     void update(sm::Ctx& ctx, GameScene& game_scene);
@@ -52,7 +53,7 @@ private:
 
     std::string m_last_saved_game_date {"No Date"};
     PopupWindow m_current_popup_window {PopupWindow::None};
-    bool m_loading_skybox {false};
+    bool m_loading_skybox {false};  // This is needed, because selecting a skybox doesn't close the interface
     bool m_show_information {false};
     bool m_can_undo {false};
     bool m_can_redo {false};

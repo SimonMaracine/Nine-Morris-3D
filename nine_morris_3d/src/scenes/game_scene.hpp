@@ -7,6 +7,8 @@
 #include "game/board.hpp"
 #include "point_camera_controller.hpp"
 #include "ui.hpp"
+#include "turn_indicator.hpp"
+#include "timer.hpp"
 
 class GameScene : public sm::ApplicationScene {
 public:
@@ -38,6 +40,8 @@ protected:
     std::vector<sm::Renderable> setup_nodes(unsigned int count) const;
     std::vector<sm::Renderable> setup_white_pieces(unsigned int count) const;
     std::vector<sm::Renderable> setup_black_pieces(unsigned int count) const;
+    TurnIndicator setup_turn_indicator() const;
+    Timer setup_timer() const;
 
     void load_skybox() const;
     void load_board_paint_texture() const;

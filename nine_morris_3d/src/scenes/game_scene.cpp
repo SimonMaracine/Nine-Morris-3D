@@ -62,6 +62,7 @@ void GameScene::load_and_set_skybox() {
         ctx.add_task([this](const sm::Task&, void*) {
             setup_skybox();
             setup_lights();
+            m_ui.set_loading_skybox_done();
 
             return sm::Task::Result::Done;
         });
@@ -308,6 +309,35 @@ std::vector<sm::Renderable> GameScene::setup_black_pieces(unsigned int count) co
     }
 
     return renderables;
+}
+
+TurnIndicator GameScene::setup_turn_indicator() const {
+    sm::TextureSpecification specification;
+    specification.format = sm::TextureFormat::Rgba8;
+
+    const auto white_texture {ctx.load_texture("white_indicator"_H, ctx.get_texture_data("white_indicator.png"_H), specification)};
+    const auto black_texture {ctx.load_texture("black_indicator"_H, ctx.get_texture_data("black_indicator.png"_H), specification)};
+
+    return TurnIndicator(white_texture, black_texture);
+}
+
+Timer GameScene::setup_timer() const {
+    sm::FontSpecification specification;
+    specification.size_height = 90.0f;
+    specification.bitmap_size = 512;
+
+    const auto font {ctx.load_font(
+        "open_sans"_H,
+        ctx.path_assets("fonts/OpenSans/OpenSans-Regular.ttf"),
+        specification,
+        [](sm::Font* font) {
+            font->begin_baking();
+            font->bake_ascii();
+            font->end_baking();
+        }
+    )};
+
+    return Timer(font);
 }
 
 void GameScene::load_skybox() const {
