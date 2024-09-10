@@ -53,19 +53,11 @@ namespace sm {
     };
 }
 
-#define SM_EVENT_FORMATTER(EVENT, ...) \
+#define SM_EVENT_FORMATTER(EventType, ...) \
     template<> \
-    struct fmt::formatter<EVENT> { \
-        constexpr auto parse(format_parse_context& ctx) -> decltype(ctx.begin()) { \
-            if (ctx.begin() != ctx.end()) { \
-                throw format_error("Invalid format"); \
-            } \
-        \
-            return ctx.begin(); \
-        } \
-        \
+    struct fmt::formatter<EventType> : formatter<std::string_view> { \
         template <typename FormatContext> \
-        auto format(const EVENT& event, FormatContext& ctx) const -> decltype(ctx.out()) { \
+        auto format(const EventType& event, FormatContext& ctx) const -> decltype(ctx.out()) { \
             return fmt::format_to(ctx.out(), __VA_ARGS__); \
         } \
     };

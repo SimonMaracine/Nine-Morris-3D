@@ -134,13 +134,9 @@ namespace sm {
 
         unsigned int updates {0};
 
-        while (true) {
-            if (m_fixed_update.total_time > FIXED_DT) {
-                m_fixed_update.total_time -= FIXED_DT;
-                updates++;
-            } else {
-                break;
-            }
+        while (m_fixed_update.total_time > FIXED_DT) {
+            m_fixed_update.total_time -= FIXED_DT;
+            updates++;
         }
 
         return updates;
