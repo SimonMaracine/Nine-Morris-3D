@@ -36,11 +36,11 @@ protected:
     void setup_skybox();
     void setup_lights();
 
-    sm::Renderable setup_board(bool reload_textures = false) const;
-    sm::Renderable setup_board_paint(bool reload_textures = false) const;
+    sm::Renderable setup_board() const;
+    sm::Renderable setup_board_paint() const;
     std::vector<sm::Renderable> setup_nodes(unsigned int count) const;
-    std::vector<sm::Renderable> setup_white_pieces(unsigned int count, bool reload_textures = false) const;
-    std::vector<sm::Renderable> setup_black_pieces(unsigned int count, bool reload_textures = false) const;
+    std::vector<sm::Renderable> setup_white_pieces(unsigned int count) const;
+    std::vector<sm::Renderable> setup_black_pieces(unsigned int count) const;
     TurnIndicator setup_turn_indicator() const;
     Timer setup_timer() const;
 
@@ -48,8 +48,15 @@ protected:
     void load_board_paint_texture() const;
     void load_textures() const;
 
+    std::shared_ptr<sm::GlTexture> load_board_diffuse_texture(bool reload = false) const;
+    std::shared_ptr<sm::GlTexture> load_board_paint_diffuse_texture(bool reload = false) const;
+    std::shared_ptr<sm::GlTexture> load_board_normal_texture(bool reload = false) const;
+    std::shared_ptr<sm::GlTexture> load_white_piece_diffuse_texture(bool reload = false) const;
+    std::shared_ptr<sm::GlTexture> load_black_piece_diffuse_texture(bool reload = false) const;
+    std::shared_ptr<sm::GlTexture> load_piece_normal_texture(bool reload = false) const;
+
     std::shared_ptr<sm::GlTextureCubemap> get_skybox_texture_cubemap() const;
-    std::shared_ptr<sm::GlTexture> get_board_paint_texture(const sm::TextureSpecification& specification, bool reload_textures = false) const;
+    std::shared_ptr<sm::GlTexture> get_board_paint_texture(const sm::TextureSpecification& specification, bool reload = false) const;
 
     bool m_game_started {false};
     glm::vec3 m_default_camera_position {};

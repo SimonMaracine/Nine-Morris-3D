@@ -214,12 +214,12 @@ namespace sm {
     }
 
     void MaterialInstance::set_texture(Id name, unsigned int texture, int unit) {
-        Texture result_texure {};
-        result_texure.unit = unit;
-        result_texure.texture = texture;
+        Texture result_texture {};
+        result_texture.unit = unit;
+        result_texture.texture = texture;
 
         const Element& element {m_offsets.at(name)};
-        std::memcpy(m_data.get() + element.offset, &result_texure, sizeof(result_texure));
+        std::memcpy(m_data.get() + element.offset, &result_texture, sizeof(result_texture));
     }
 
     const GlShader* MaterialInstance::get_shader() const noexcept {
