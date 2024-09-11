@@ -17,20 +17,23 @@ JumpPlusVariantBoard::JumpPlusVariantBoard(
     std::function<void(const Move&)>&& move_callback
 )
     : BoardObj(board, board_paint), m_move_callback(std::move(move_callback)) {
-    initialize_nodes(m_nodes, nodes);
+    m_nodes.resize(NODES);
+    m_pieces.resize(PIECES);
 
-    initialize_piece_on_board(m_pieces, m_nodes, m_board, white_pieces, 0, 0, 0, PieceType::White);
-    initialize_piece_on_board(m_pieces, m_nodes, m_board, white_pieces, 1, 3, 1, PieceType::White);
-    initialize_piece_on_board(m_pieces, m_nodes, m_board, white_pieces, 2, 6, 2, PieceType::White);
-    initialize_piece_on_board(m_pieces, m_nodes, m_board, white_pieces, 3, 17, 3, PieceType::White);
-    initialize_piece_on_board(m_pieces, m_nodes, m_board, white_pieces, 4, 20, 4, PieceType::White);
-    initialize_piece_on_board(m_pieces, m_nodes, m_board, white_pieces, 5, 23, 5, PieceType::White);
-    initialize_piece_on_board(m_pieces, m_nodes, m_board, black_pieces, 6, 2, 0, PieceType::Black);
-    initialize_piece_on_board(m_pieces, m_nodes, m_board, black_pieces, 7, 5, 1, PieceType::Black);
-    initialize_piece_on_board(m_pieces, m_nodes, m_board, black_pieces, 8, 8, 2, PieceType::Black);
-    initialize_piece_on_board(m_pieces, m_nodes, m_board, black_pieces, 9, 15, 3, PieceType::Black);
-    initialize_piece_on_board(m_pieces, m_nodes, m_board, black_pieces, 10, 18, 4, PieceType::Black);
-    initialize_piece_on_board(m_pieces, m_nodes, m_board, black_pieces, 11, 21, 5, PieceType::Black);
+    initialize_nodes(nodes);
+
+    initialize_piece_on_board(m_board, white_pieces, 0, 0, 0, PieceType::White);
+    initialize_piece_on_board(m_board, white_pieces, 1, 3, 1, PieceType::White);
+    initialize_piece_on_board(m_board, white_pieces, 2, 6, 2, PieceType::White);
+    initialize_piece_on_board(m_board, white_pieces, 3, 17, 3, PieceType::White);
+    initialize_piece_on_board(m_board, white_pieces, 4, 20, 4, PieceType::White);
+    initialize_piece_on_board(m_board, white_pieces, 5, 23, 5, PieceType::White);
+    initialize_piece_on_board(m_board, black_pieces, 6, 2, 0, PieceType::Black);
+    initialize_piece_on_board(m_board, black_pieces, 7, 5, 1, PieceType::Black);
+    initialize_piece_on_board(m_board, black_pieces, 8, 8, 2, PieceType::Black);
+    initialize_piece_on_board(m_board, black_pieces, 9, 15, 3, PieceType::Black);
+    initialize_piece_on_board(m_board, black_pieces, 10, 18, 4, PieceType::Black);
+    initialize_piece_on_board(m_board, black_pieces, 11, 21, 5, PieceType::Black);
 
     m_legal_moves = generate_moves();
 }
@@ -54,23 +57,23 @@ void JumpPlusVariantBoard::update(sm::Ctx& ctx, glm::vec3 ray, glm::vec3 camera)
         return renderables;
     });
 
-    update_nodes_highlight(m_nodes, m_game_over, [this]() {
+    update_nodes_highlight(m_game_over, [this]() {
         return m_selected_index != -1;
     });
 
-    update_pieces_highlight(m_pieces, m_nodes, m_game_over, m_selected_index, [this](const PieceObj& piece) {
+    update_pieces_highlight(m_game_over, m_selected_index, [this](const PieceObj& piece) {
         return static_cast<Player>(piece.get_type()) == m_turn;
     });
 
     ctx.add_renderable(m_renderable);
     ctx.add_renderable(m_paint_renderable);
 
-    update_nodes(ctx, m_nodes);
-    update_pieces(ctx, m_pieces);
+    update_nodes(ctx);
+    update_pieces(ctx);
 }
 
 void JumpPlusVariantBoard::update_movement() {
-    BoardObj::update_movement(m_pieces);
+    BoardObj::update_movement();
 }
 
 void JumpPlusVariantBoard::user_click_press() {

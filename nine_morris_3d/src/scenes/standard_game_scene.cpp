@@ -76,18 +76,12 @@ void StandardGameScene::on_mouse_button_released(const sm::MouseButtonReleasedEv
 }
 
 StandardGameBoard StandardGameScene::setup_renderables() {
-    const auto renderable_board {setup_board()};
-    const auto renderable_board_paint {setup_board_paint()};
-    const auto renderable_nodes {setup_nodes(StandardGameBoard::NODES)};
-    const auto renderable_white_pieces {setup_white_pieces(StandardGameBoard::PIECES / 2)};
-    const auto renderable_black_pieces {setup_black_pieces(StandardGameBoard::PIECES / 2)};
-
     return StandardGameBoard(
-        renderable_board,
-        renderable_board_paint,
-        renderable_nodes,
-        renderable_white_pieces,
-        renderable_black_pieces,
+        setup_board(),
+        setup_board_paint(),
+        setup_nodes(StandardGameBoard::NODES),
+        setup_white_pieces(StandardGameBoard::PIECES / 2),
+        setup_black_pieces(StandardGameBoard::PIECES / 2),
         [this](const StandardGameBoard::Move&) {
             if (!m_game_started) {
                 m_timer.start();

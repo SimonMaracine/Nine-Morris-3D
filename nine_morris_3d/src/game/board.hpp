@@ -99,12 +99,42 @@ public:
     BoardObj& operator=(BoardObj&&) = default;
 
     virtual const GameOver& get_game_over() const = 0;
+    virtual int node_count() = 0;
+    virtual int piece_count() = 0;
 
-    void set_board_paint_renderable(const sm::Renderable& board_paint);
+    sm::Renderable& get_renderable() { return m_renderable; }
+    sm::Renderable& get_paint_renderable() { return m_paint_renderable; }
+    std::vector<NodeObj>& get_nodes() { return m_nodes; }
+    std::vector<PieceObj>& get_pieces() { return m_pieces; }
+
+    void set_board_paint_renderable(const sm::Renderable& renderable);
+    void set_renderables(
+        const sm::Renderable& board,
+        const sm::Renderable& board_paint,
+        const std::vector<sm::Renderable>& nodes,
+        const std::vector<sm::Renderable>& white_pieces,
+        const std::vector<sm::Renderable>& black_pieces
+    );
 protected:
     void user_click_press(GameOver game_over);
     void user_click_release(GameOver game_over, std::function<void()>&& callback);
     void update_hovered_id(glm::vec3 ray, glm::vec3 camera, std::function<std::vector<std::pair<int, sm::Renderable>>()>&& get_renderables);
+
+    void initialize_nodes(const std::vector<sm::Renderable>& renderables);
+    void initialize_piece_in_air(
+        const std::vector<sm::Renderable>& renderables,
+        int index,
+        int renderable_index,
+        float x,
+        float y,
+        PieceType piece
+    );
+
+    void update_movement();
+    void update_nodes_highlight(GameOver game_over, std::function<bool()>&& highlight);
+    void update_pieces_highlight(GameOver game_over, int user_selected_index, std::function<bool(const PieceObj&)>&& highlight);
+    void update_nodes(sm::Ctx& ctx);
+    void update_pieces(sm::Ctx& ctx);
 
     static const char* turn_string(Player turn);
     static const char* game_over_string(GameOver game_over);
@@ -120,17 +150,8 @@ protected:
         return player == Player::White ? value_if_white : value_if_black;
     }
 
-    template<typename Nodes>
-    static void initialize_nodes(Nodes& nodes, const std::vector<sm::Renderable>& renderables) {
-        for (int i {0}; i < static_cast<int>(nodes.size()); i++) {
-            nodes[i] = NodeObj(i, NODE_POSITIONS[i], renderables[i]);
-        }
-    }
-
-    template<typename Pieces, typename Nodes, typename Board>
-    static void initialize_piece_on_board(
-        Pieces& pieces,
-        Nodes& nodes,
+    template<typename Board>
+    void initialize_piece_on_board(
         Board& board,
         const std::vector<sm::Renderable>& renderables,
         int index,
@@ -140,38 +161,17 @@ protected:
     ) {
         // Offset pieces' IDs, so that they are different from nodes' IDs
 
-        pieces[index] = PieceObj(
-            index + static_cast<int>(nodes.size()),
+        m_pieces[index] = PieceObj(
+            index + static_cast<int>(m_nodes.size()),
             glm::vec3(NODE_POSITIONS[node_index].x, PIECE_Y_POSITION_BOARD, NODE_POSITIONS[node_index].z),
             renderables[renderable_index],
             piece
         );
 
-        pieces[index].node_id = node_index;
-        nodes[node_index].piece_id = pieces[index].get_id();
+        m_pieces[index].node_id = node_index;
+        m_nodes[node_index].piece_id = m_pieces[index].get_id();
 
         board[node_index] = static_cast<Piece>(piece);
-    }
-
-    template<typename Pieces, typename Nodes>
-    static void initialize_piece_in_air(
-        Pieces& pieces,
-        const Nodes& nodes,
-        const std::vector<sm::Renderable>& renderables,
-        int index,
-        int renderable_index,
-        float x,
-        float y,
-        PieceType piece
-    ) {
-        // Offset pieces' IDs, so that they are different from nodes' IDs
-
-        pieces[index] = PieceObj(
-            index + static_cast<int>(nodes.size()),
-            glm::vec3(x, PIECE_Y_POSITION_AIR_INITIAL, y),
-            renderables[renderable_index],
-            piece
-        );
     }
 
     template<typename Board>
@@ -183,86 +183,6 @@ protected:
         }
 
         return result;
-    }
-
-    template<typename Pieces>
-    static void update_movement(Pieces& pieces) {
-        for (PieceObj& piece : pieces) {
-            piece.update_movement();
-        }
-    }
-
-    template<typename Nodes>
-    void update_nodes_highlight(Nodes& nodes, GameOver game_over, std::function<bool()>&& highlight) {
-        if (game_over != GameOver::None) {
-            std::for_each(nodes.begin(), nodes.end(), [](NodeObj& node) {
-                node.set_highlighted(false);
-            });
-
-            return;
-        }
-
-        if (!highlight()) {
-            std::for_each(nodes.begin(), nodes.end(), [](NodeObj& node) {
-                node.set_highlighted(false);
-            });
-
-            return;
-        }
-
-        for (NodeObj& node : nodes) {
-            node.set_highlighted(node.get_id() == m_hovered_id);
-        }
-    }
-
-    template<typename Pieces, typename Nodes>
-    void update_pieces_highlight(
-        Pieces& pieces,
-        const Nodes& nodes,
-        GameOver game_over,
-        int user_selected_index,
-        std::function<bool(const PieceObj&)>&& highlight
-    ) {
-        if (game_over != GameOver::None) {
-            std::for_each(pieces.begin(), pieces.end(), [](PieceObj& piece) {
-                piece.get_renderable().get_material()->flags &= ~sm::Material::Outline;
-            });
-
-            return;
-        }
-
-        for (PieceObj& piece : pieces) {
-            if (piece.get_id() == m_hovered_id && highlight(piece)) {
-                piece.get_renderable().get_material()->flags |= sm::Material::Outline;
-                piece.get_renderable().outline.color = ORANGE;
-            } else {
-                piece.get_renderable().get_material()->flags &= ~sm::Material::Outline;
-            }
-        }
-
-        // Override, if the piece is actually selected
-        if (user_selected_index != -1) {
-            const int piece_id {nodes[user_selected_index].piece_id};
-
-            if (piece_id != -1) {
-                pieces[piece_id - nodes.size()].get_renderable().get_material()->flags |= sm::Material::Outline;
-                pieces[piece_id - nodes.size()].get_renderable().outline.color = RED;
-            }
-        }
-    }
-
-    template<typename Nodes>
-    static void update_nodes(sm::Ctx& ctx, Nodes& nodes) {
-        for (NodeObj& node : nodes) {
-            node.update(ctx);
-        }
-    }
-
-    template<typename Pieces>
-    static void update_pieces(sm::Ctx& ctx, Pieces& pieces) {
-        for (PieceObj& piece : pieces) {
-            piece.update(ctx);
-        }
     }
 
 #ifdef __GNUG__
@@ -315,4 +235,7 @@ protected:
 
     sm::Renderable m_renderable;
     sm::Renderable m_paint_renderable;
+
+    std::vector<NodeObj> m_nodes;
+    std::vector<PieceObj> m_pieces;
 };

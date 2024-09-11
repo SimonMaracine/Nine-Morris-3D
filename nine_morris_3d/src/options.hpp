@@ -60,7 +60,7 @@ struct Options {
 
 CEREAL_CLASS_VERSION(Options, version_number())
 
-void load_options(Options& options, const std::filesystem::path& file_path);
+void load_options(Options& options, const std::filesystem::path& file_path);  // TODO validation
 void save_options(const Options& options, const std::filesystem::path& file_path);
 
 struct OptionsFileError : std::runtime_error {

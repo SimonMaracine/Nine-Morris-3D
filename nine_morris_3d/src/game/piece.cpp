@@ -49,6 +49,10 @@ void PieceObj::move_three_step(glm::vec3 origin, glm::vec3 target0, glm::vec3 ta
     m_on_finish = std::move(on_finish);
 }
 
+void PieceObj::set_renderable(const sm::Renderable& renderable) {
+    m_renderable.override_renderable_private(renderable);
+}
+
 void PieceObj::direct_movement(glm::vec3 origin, glm::vec3 target, auto on_arrive) {
     const float initial_distance {glm::distance(origin, target)};
     const float current_distance {glm::distance(m_renderable.transform.position, target)};

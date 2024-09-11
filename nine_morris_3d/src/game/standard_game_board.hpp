@@ -62,6 +62,8 @@ public:
     );
 
     const GameOver& get_game_over() const override { return m_game_over; }
+    int node_count() override { return NODES; }
+    int piece_count() override { return PIECES; }
 
     Player get_turn() const { return m_turn; }
 
@@ -136,8 +138,4 @@ private:
     std::vector<Move> m_legal_moves;
     int m_selected_index {-1};
     int m_take_action_index {-1};
-
-    // Scene data
-    std::array<NodeObj, NODES> m_nodes {};
-    std::array<PieceObj, PIECES> m_pieces {};
 };

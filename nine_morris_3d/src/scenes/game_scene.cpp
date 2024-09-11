@@ -85,6 +85,26 @@ void GameScene::load_and_set_board_paint_texture() {
     });
 }
 
+void GameScene::load_and_set_textures() {
+    ctx.add_task_async([this](sm::AsyncTask& task, void*) {
+        load_textures();
+
+        ctx.add_task([this](const sm::Task&, void*) {
+            get_board().set_renderables(
+                setup_board(true),
+                setup_board_paint(true),
+                setup_nodes(get_board().node_count()),
+                setup_white_pieces(get_board().piece_count() / 2, true),
+                setup_black_pieces(get_board().piece_count() / 2, true)
+            );
+
+            return sm::Task::Result::Done;
+        });
+
+        task.set_done();
+    });
+}
+
 void GameScene::on_window_resized(const sm::WindowResizedEvent& event) {
     m_cam.set_projection(event.width, event.height, LENS_FOV, LENS_NEAR, LENS_FAR);
     m_cam_2d.set_projection(0, event.width, 0, event.height);
@@ -141,7 +161,7 @@ void GameScene::setup_lights() {
     }
 }
 
-sm::Renderable GameScene::setup_board() const {
+sm::Renderable GameScene::setup_board(bool reload_textures) const {
     const auto mesh {ctx.get_mesh("board.obj"_H)};
 
     const auto vertex_array {ctx.load_vertex_array("board"_H, mesh)};
@@ -150,19 +170,23 @@ sm::Renderable GameScene::setup_board() const {
     specification.mipmapping.emplace();
     specification.mipmapping->bias = -0.8f;
 
-    const auto diffuse {ctx.load_texture(
-        "board_diffuse"_H,
-        ctx.get_texture_data("board_diffuse.png"_H),
-        specification
-    )};
+    const auto diffuse {
+        reload_textures
+        ?
+        ctx.reload_texture("board_diffuse"_H, ctx.get_texture_data("board_diffuse.png"_H), specification)
+        :
+        ctx.load_texture("board_diffuse"_H, ctx.get_texture_data("board_diffuse.png"_H), specification)
+    };
 
     specification.format = sm::TextureFormat::Rgba8;
 
-    const auto normal {ctx.load_texture(
-        "board_normal"_H,
-        ctx.get_texture_data("board_normal.png"_H),
-        specification
-    )};
+    const auto normal {
+        reload_textures
+        ?
+        ctx.reload_texture("board_normal"_H, ctx.get_texture_data("board_normal.png"_H), specification)
+        :
+        ctx.load_texture("board_normal"_H, ctx.get_texture_data("board_normal.png"_H), specification)
+    };
 
     const auto material {ctx.load_material(sm::MaterialType::PhongDiffuseNormalShadow, sm::Material::CastShadow)};
 
@@ -175,7 +199,7 @@ sm::Renderable GameScene::setup_board() const {
     return sm::Renderable(mesh, vertex_array, material_instance);
 }
 
-sm::Renderable GameScene::setup_board_paint() const {
+sm::Renderable GameScene::setup_board_paint(bool reload_textures) const {
     const auto mesh {ctx.get_mesh("board_paint.obj"_H)};
 
     const auto vertex_array {ctx.load_vertex_array("board_paint"_H, mesh)};
@@ -184,15 +208,25 @@ sm::Renderable GameScene::setup_board_paint() const {
     specification.mipmapping.emplace();
     specification.mipmapping->bias = -0.8f;
 
-    const auto diffuse {get_board_paint_texture(specification)};
+    const auto diffuse {get_board_paint_texture(specification, reload_textures)};
 
     specification.format = sm::TextureFormat::Rgba8;
 
-    const auto normal {ctx.load_texture(
-        "board_normal"_H,
-        ctx.get_texture_data("board_normal.png"_H),
-        specification
-    )};
+    const auto normal {
+        reload_textures
+        ?
+        ctx.reload_texture(
+            "board_normal"_H,
+            ctx.get_texture_data("board_normal.png"_H),
+            specification
+        )
+        :
+        ctx.load_texture(
+            "board_normal"_H,
+            ctx.get_texture_data("board_normal.png"_H),
+            specification
+        )
+    };
 
     const auto material {ctx.load_material(
         "board_paint"_H,
@@ -231,7 +265,7 @@ std::vector<sm::Renderable> GameScene::setup_nodes(unsigned int count) const {
     return renderables;
 }
 
-std::vector<sm::Renderable> GameScene::setup_white_pieces(unsigned int count) const {
+std::vector<sm::Renderable> GameScene::setup_white_pieces(unsigned int count, bool reload_textures) const {
     const auto mesh {ctx.get_mesh("piece_white.obj"_H)};
 
     const auto vertex_array {ctx.load_vertex_array("piece_white"_H, mesh)};
@@ -240,19 +274,39 @@ std::vector<sm::Renderable> GameScene::setup_white_pieces(unsigned int count) co
     specification.mipmapping.emplace();
     specification.mipmapping->bias = -0.8f;
 
-    const auto diffuse {ctx.load_texture(
-        "piece_white_diffuse.png"_H,
-        ctx.get_texture_data("piece_white_diffuse.png"_H),
-        specification
-    )};
+    const auto diffuse {  // FIXME
+        reload_textures
+        ?
+        ctx.reload_texture(
+            "piece_white_diffuse.png"_H,
+            ctx.get_texture_data("piece_white_diffuse.png"_H),
+            specification
+        )
+        :
+        ctx.load_texture(
+            "piece_white_diffuse.png"_H,
+            ctx.get_texture_data("piece_white_diffuse.png"_H),
+            specification
+        )
+    };
 
     specification.format = sm::TextureFormat::Rgba8;
 
-    const auto normal {ctx.load_texture(
-        "piece_normal"_H,
-        ctx.get_texture_data("piece_normal.png"_H),
-        specification
-    )};
+    const auto normal {
+        reload_textures
+        ?
+        ctx.reload_texture(
+            "piece_normal"_H,
+            ctx.get_texture_data("piece_normal.png"_H),
+            specification
+        )
+        :
+        ctx.load_texture(
+            "piece_normal"_H,
+            ctx.get_texture_data("piece_normal.png"_H),
+            specification
+        )
+    };
 
     const auto material {ctx.load_material(sm::MaterialType::PhongDiffuseNormalShadow, sm::Material::CastShadow)};
 
@@ -271,7 +325,7 @@ std::vector<sm::Renderable> GameScene::setup_white_pieces(unsigned int count) co
     return renderables;
 }
 
-std::vector<sm::Renderable> GameScene::setup_black_pieces(unsigned int count) const {
+std::vector<sm::Renderable> GameScene::setup_black_pieces(unsigned int count, bool reload_textures) const {
     const auto mesh {ctx.get_mesh("piece_black.obj"_H)};
 
     const auto vertex_array {ctx.load_vertex_array("piece_black"_H, mesh)};
@@ -280,19 +334,39 @@ std::vector<sm::Renderable> GameScene::setup_black_pieces(unsigned int count) co
     specification.mipmapping.emplace();
     specification.mipmapping->bias = -0.8f;
 
-    const auto diffuse {ctx.load_texture(
-        "piece_black_diffuse.png"_H,
-        ctx.get_texture_data("piece_black_diffuse.png"_H),
-        specification
-    )};
+    const auto diffuse {
+        reload_textures
+        ?
+        ctx.reload_texture(
+            "piece_black_diffuse.png"_H,
+            ctx.get_texture_data("piece_black_diffuse.png"_H),
+            specification
+        )
+        :
+        ctx.load_texture(
+            "piece_black_diffuse.png"_H,
+            ctx.get_texture_data("piece_black_diffuse.png"_H),
+            specification
+        )
+    };
 
     specification.format = sm::TextureFormat::Rgba8;
 
-    const auto normal {ctx.load_texture(
-        "piece_normal"_H,
-        ctx.get_texture_data("piece_normal.png"_H),
-        specification
-    )};
+    const auto normal {
+        reload_textures
+        ?
+        ctx.reload_texture(
+            "piece_normal"_H,
+            ctx.get_texture_data("piece_normal.png"_H),
+            specification
+        )
+        :
+        ctx.load_texture(
+            "piece_normal"_H,
+            ctx.get_texture_data("piece_normal.png"_H),
+            specification
+        )
+    };
 
     const auto material {ctx.load_material(sm::MaterialType::PhongDiffuseNormalShadow, sm::Material::CastShadow)};
 
@@ -382,6 +456,79 @@ void GameScene::load_board_paint_texture() const {
     }
 }
 
+void GameScene::load_textures() const {
+    // Global options must have been set to the desired textures
+
+    const auto& g {ctx.global<Global>()};
+
+    {
+        sm::TexturePostProcessing post_processing;
+        post_processing.flip = false;
+
+        if (g.options.texture_quality == static_cast<int>(TextureQuality::Half)) {
+            post_processing.size = sm::TextureSize::Half;
+        }
+
+        switch (g.options.skybox) {
+            case static_cast<int>(Skybox::None):
+                break;
+            case static_cast<int>(Skybox::Field):
+                ctx.reload_texture_data(ctx.path_assets("textures/skybox/field/px.png"), post_processing);
+                ctx.reload_texture_data(ctx.path_assets("textures/skybox/field/nx.png"), post_processing);
+                ctx.reload_texture_data(ctx.path_assets("textures/skybox/field/py.png"), post_processing);
+                ctx.reload_texture_data(ctx.path_assets("textures/skybox/field/ny.png"), post_processing);
+                ctx.reload_texture_data(ctx.path_assets("textures/skybox/field/pz.png"), post_processing);
+                ctx.reload_texture_data(ctx.path_assets("textures/skybox/field/nz.png"), post_processing);
+                break;
+            case static_cast<int>(Skybox::Autumn):
+                ctx.reload_texture_data(ctx.path_assets("textures/skybox/autumn/px.png"), post_processing);
+                ctx.reload_texture_data(ctx.path_assets("textures/skybox/autumn/nx.png"), post_processing);
+                ctx.reload_texture_data(ctx.path_assets("textures/skybox/autumn/py.png"), post_processing);
+                ctx.reload_texture_data(ctx.path_assets("textures/skybox/autumn/ny.png"), post_processing);
+                ctx.reload_texture_data(ctx.path_assets("textures/skybox/autumn/pz.png"), post_processing);
+                ctx.reload_texture_data(ctx.path_assets("textures/skybox/autumn/nz.png"), post_processing);
+                break;
+        }
+    }
+
+    {
+        sm::TexturePostProcessing post_processing;
+
+        if (g.options.texture_quality == static_cast<int>(TextureQuality::Half)) {
+            post_processing.size = sm::TextureSize::Half;
+        }
+
+        ctx.reload_texture_data(ctx.path_assets("textures/board/board_diffuse.png"), post_processing);
+        ctx.reload_texture_data(ctx.path_assets("textures/board/board_normal.png"), post_processing);
+    }
+
+    {
+        sm::TexturePostProcessing post_processing;
+
+        if (g.options.texture_quality == static_cast<int>(TextureQuality::Half)) {
+            post_processing.size = sm::TextureSize::Half;
+        }
+
+        if (g.options.labeled_board) {
+            ctx.reload_texture_data(ctx.path_assets("textures/board/board_paint_labeled_diffuse.png"), post_processing);
+        } else {
+            ctx.reload_texture_data(ctx.path_assets("textures/board/board_paint_diffuse.png"), post_processing);
+        }
+    }
+
+    {
+        sm::TexturePostProcessing post_processing;
+
+        if (g.options.texture_quality == static_cast<int>(TextureQuality::Half)) {
+            post_processing.size = sm::TextureSize::Half;
+        }
+
+        ctx.reload_texture_data(ctx.path_assets("textures/piece/piece_white_diffuse.png"), post_processing);
+        ctx.reload_texture_data(ctx.path_assets("textures/piece/piece_black_diffuse.png"), post_processing);
+        ctx.reload_texture_data(ctx.path_assets("textures/piece/piece_normal.png"), post_processing);
+    }
+}
+
 std::shared_ptr<sm::GlTextureCubemap> GameScene::get_skybox_texture_cubemap() const {
     const auto& g {ctx.global<Global>()};
 
@@ -419,20 +566,40 @@ std::shared_ptr<sm::GlTextureCubemap> GameScene::get_skybox_texture_cubemap() co
     return {};
 }
 
-std::shared_ptr<sm::GlTexture> GameScene::get_board_paint_texture(const sm::TextureSpecification& specification) const {
+std::shared_ptr<sm::GlTexture> GameScene::get_board_paint_texture(const sm::TextureSpecification& specification, bool reload_textures) const {
     const auto& g {ctx.global<Global>()};
 
     if (g.options.labeled_board) {
-        return ctx.load_texture(
-            "board_paint_labeled_diffuse"_H,
-            ctx.get_texture_data("board_paint_labeled_diffuse.png"_H),
-            specification
+        return (
+            reload_textures
+            ?
+            ctx.reload_texture(
+                "board_paint_labeled_diffuse"_H,
+                ctx.get_texture_data("board_paint_labeled_diffuse.png"_H),
+                specification
+            )
+            :
+            ctx.load_texture(
+                "board_paint_labeled_diffuse"_H,
+                ctx.get_texture_data("board_paint_labeled_diffuse.png"_H),
+                specification
+            )
         );
     } else {
-        return ctx.load_texture(
-            "board_paint_diffuse"_H,
-            ctx.get_texture_data("board_paint_diffuse.png"_H),
-            specification
+        return (
+            reload_textures
+            ?
+            ctx.reload_texture(
+                "board_paint_diffuse"_H,
+                ctx.get_texture_data("board_paint_diffuse.png"_H),
+                specification
+            )
+            :
+            ctx.load_texture(
+                "board_paint_diffuse"_H,
+                ctx.get_texture_data("board_paint_diffuse.png"_H),
+                specification
+            )
         );
     }
 }

@@ -17,14 +17,17 @@ JumpVariantBoard::JumpVariantBoard(
     std::function<void(const Move&)>&& move_callback
 )
     : BoardObj(board, board_paint), m_move_callback(std::move(move_callback)) {
-    initialize_nodes(m_nodes, nodes);
+    m_nodes.resize(NODES);
+    m_pieces.resize(PIECES);
 
-    initialize_piece_on_board(m_pieces, m_nodes, m_board, white_pieces, 0, 4, 0, PieceType::White);
-    initialize_piece_on_board(m_pieces, m_nodes, m_board, white_pieces, 1, 13, 1, PieceType::White);
-    initialize_piece_on_board(m_pieces, m_nodes, m_board, white_pieces, 2, 15, 2, PieceType::White);
-    initialize_piece_on_board(m_pieces, m_nodes, m_board, black_pieces, 3, 5, 0, PieceType::Black);
-    initialize_piece_on_board(m_pieces, m_nodes, m_board, black_pieces, 4, 11, 1, PieceType::Black);
-    initialize_piece_on_board(m_pieces, m_nodes, m_board, black_pieces, 5, 16, 2, PieceType::Black);
+    initialize_nodes(nodes);
+
+    initialize_piece_on_board(m_board, white_pieces, 0, 4, 0, PieceType::White);
+    initialize_piece_on_board(m_board, white_pieces, 1, 13, 1, PieceType::White);
+    initialize_piece_on_board(m_board, white_pieces, 2, 15, 2, PieceType::White);
+    initialize_piece_on_board(m_board, black_pieces, 3, 5, 0, PieceType::Black);
+    initialize_piece_on_board(m_board, black_pieces, 4, 11, 1, PieceType::Black);
+    initialize_piece_on_board(m_board, black_pieces, 5, 16, 2, PieceType::Black);
 
     m_legal_moves = generate_moves();
 }
@@ -48,23 +51,23 @@ void JumpVariantBoard::update(sm::Ctx& ctx, glm::vec3 ray, glm::vec3 camera) {
         return renderables;
     });
 
-    update_nodes_highlight(m_nodes, m_game_over, [this]() {
+    update_nodes_highlight(m_game_over, [this]() {
         return m_selected_index != -1;
     });
 
-    update_pieces_highlight(m_pieces, m_nodes, m_game_over, m_selected_index, [this](const PieceObj& piece) {
+    update_pieces_highlight(m_game_over, m_selected_index, [this](const PieceObj& piece) {
         return static_cast<Player>(piece.get_type()) == m_turn;
     });
 
     ctx.add_renderable(m_renderable);
     ctx.add_renderable(m_paint_renderable);
 
-    update_nodes(ctx, m_nodes);
-    update_pieces(ctx, m_pieces);
+    update_nodes(ctx);
+    update_pieces(ctx);
 }
 
 void JumpVariantBoard::update_movement() {
-    BoardObj::update_movement(m_pieces);
+    BoardObj::update_movement();
 }
 
 void JumpVariantBoard::user_click_press() {

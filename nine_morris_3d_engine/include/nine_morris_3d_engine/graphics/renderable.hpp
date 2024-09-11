@@ -30,13 +30,19 @@ namespace sm {
         MaterialInstance* get_material() const noexcept { return m_material.get(); }
         operator bool() const noexcept { return m_mesh && m_vertex_array && m_material; }
 
+        void override_renderable_private(const Renderable& other) {
+            m_mesh = other.m_mesh;
+            m_vertex_array = other.m_vertex_array;
+            m_material = other.m_material;
+        }
+
         struct Transform {
             glm::vec3 position {};
             glm::vec3 rotation {};
             float scale {1.0f};  // Only uniform scaling
         } transform;
 
-        struct {
+        struct Outline {
             glm::vec3 color {1.0f};
             float thickness {1.1f};
         } outline;

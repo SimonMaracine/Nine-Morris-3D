@@ -22,17 +22,39 @@ static glm::mat4 transformation_matrix(glm::vec3 position, glm::vec3 rotation, f
     return matrix;
 }
 
-BoardObj::BoardObj(const sm::Renderable& board, const sm::Renderable& board_paint) {
-    m_renderable = board;
+BoardObj::BoardObj(const sm::Renderable& board, const sm::Renderable& board_paint)
+    : m_renderable(board), m_paint_renderable(board_paint) {
     m_renderable.transform.scale = 20.0f;
 
-    set_board_paint_renderable(board_paint);
-}
-
-void BoardObj::set_board_paint_renderable(const sm::Renderable& board_paint) {
-    m_paint_renderable = board_paint;
     m_paint_renderable.transform.scale = 20.0f;
     m_paint_renderable.transform.position.y = 0.062f;
+}
+
+void BoardObj::set_board_paint_renderable(const sm::Renderable& renderable) {
+    m_paint_renderable.override_renderable_private(renderable);
+}
+
+void BoardObj::set_renderables(
+    const sm::Renderable& board,
+    const sm::Renderable& board_paint,
+    const std::vector<sm::Renderable>& nodes,
+    const std::vector<sm::Renderable>& white_pieces,
+    const std::vector<sm::Renderable>& black_pieces
+) {
+    m_renderable.override_renderable_private(board);
+    set_board_paint_renderable(board_paint);
+
+    for (int i {0}; i < node_count(); i++) {
+        m_nodes[i].set_renderable(nodes[i]);
+    }
+
+    for (int i {0}; i < piece_count() / 2; i++) {
+        m_pieces[i].set_renderable(white_pieces[i]);
+    }
+
+    for (int i {piece_count() / 2}; i < piece_count(); i++) {
+        m_pieces[i].set_renderable(black_pieces[i - piece_count() / 2]);
+    }
 }
 
 void BoardObj::user_click_press(GameOver game_over) {
@@ -173,4 +195,101 @@ void BoardObj::do_take_animation(PieceObj& piece, std::function<void()>&& on_fin
     const glm::vec3 target {piece.get_renderable().transform.position.x, PIECE_Y_POSITION_AIR_TAKE, piece.get_renderable().transform.position.z};
 
     piece.move_direct(origin, target, std::move(on_finish));
+}
+
+void BoardObj::initialize_nodes(const std::vector<sm::Renderable>& renderables) {
+    for (int i {0}; i < static_cast<int>(m_nodes.size()); i++) {
+        m_nodes[i] = NodeObj(i, NODE_POSITIONS[i], renderables[i]);
+    }
+}
+
+void BoardObj::initialize_piece_in_air(
+    const std::vector<sm::Renderable>& renderables,
+    int index,
+    int renderable_index,
+    float x,
+    float y,
+    PieceType piece
+) {
+    // Offset pieces' IDs, so that they are different from nodes' IDs
+
+    m_pieces[index] = PieceObj(
+        index + static_cast<int>(m_nodes.size()),
+        glm::vec3(x, PIECE_Y_POSITION_AIR_INITIAL, y),
+        renderables[renderable_index],
+        piece
+    );
+}
+
+void BoardObj::update_movement() {
+    for (PieceObj& piece : m_pieces) {
+        piece.update_movement();
+    }
+}
+
+void BoardObj::update_nodes_highlight(GameOver game_over, std::function<bool()>&& highlight) {
+    if (game_over != GameOver::None) {
+        std::for_each(m_nodes.begin(), m_nodes.end(), [](NodeObj& node) {
+            node.set_highlighted(false);
+        });
+
+        return;
+    }
+
+    if (!highlight()) {
+        std::for_each(m_nodes.begin(), m_nodes.end(), [](NodeObj& node) {
+            node.set_highlighted(false);
+        });
+
+        return;
+    }
+
+    for (NodeObj& node : m_nodes) {
+        node.set_highlighted(node.get_id() == m_hovered_id);
+    }
+}
+
+void BoardObj::update_pieces_highlight(
+    GameOver game_over,
+    int user_selected_index,
+    std::function<bool(const PieceObj&)>&& highlight
+) {
+    if (game_over != GameOver::None) {
+        std::for_each(m_pieces.begin(), m_pieces.end(), [](PieceObj& piece) {
+            piece.get_renderable().get_material()->flags &= ~sm::Material::Outline;
+        });
+
+        return;
+    }
+
+    for (PieceObj& piece : m_pieces) {
+        if (piece.get_id() == m_hovered_id && highlight(piece)) {
+            piece.get_renderable().get_material()->flags |= sm::Material::Outline;
+            piece.get_renderable().outline.color = ORANGE;
+        } else {
+            piece.get_renderable().get_material()->flags &= ~sm::Material::Outline;
+        }
+    }
+
+    // Override, if the piece is actually selected
+    if (user_selected_index != -1) {
+        const int piece_id {m_nodes[user_selected_index].piece_id};
+
+        if (piece_id != -1) {
+            m_pieces[piece_id - m_nodes.size()].get_renderable().get_material()->flags |= sm::Material::Outline;
+            m_pieces[piece_id - m_nodes.size()].get_renderable().outline.color = RED;
+        }
+    }
+}
+
+void BoardObj::update_nodes(sm::Ctx& ctx) {
+    for (NodeObj& node : m_nodes) {
+        node.update(ctx);
+    }
+}
+
+void BoardObj::update_pieces(sm::Ctx& ctx) {
+    for (PieceObj& piece : m_pieces) {
+        piece.update(ctx);
+    }
 }

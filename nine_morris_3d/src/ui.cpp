@@ -231,12 +231,12 @@ void Ui::main_menu_bar(sm::Ctx& ctx, GameScene& game_scene) {
                 if (ImGui::BeginMenu("Texture Quality")) {
                     if (ImGui::RadioButton("Half", &m_options.texture_quality, static_cast<int>(TextureQuality::Half))) {
                         if (std::exchange(g.options.texture_quality, m_options.texture_quality) != static_cast<int>(TextureQuality::Half)) {
-                            // TODO
+                            game_scene.load_and_set_textures();
                         }
                     }
                     if (ImGui::RadioButton("Full", &m_options.texture_quality, static_cast<int>(TextureQuality::Full))) {
                         if (std::exchange(g.options.texture_quality, m_options.texture_quality) != static_cast<int>(TextureQuality::Full)) {
-                            // TODO
+                            game_scene.load_and_set_textures();
                         }
                     }
 

@@ -22,12 +22,13 @@ public:
     void on_fixed_update() override;
     void on_imgui_update() override;
 
+    virtual BoardObj& get_board() = 0;
+
     PointCameraController& get_camera_controller() { return m_cam_controller; }
 
     void load_and_set_skybox();
     void load_and_set_board_paint_texture();
-
-    virtual BoardObj& get_board() = 0;
+    void load_and_set_textures();
 protected:
     void on_window_resized(const sm::WindowResizedEvent& event);
 
@@ -35,19 +36,20 @@ protected:
     void setup_skybox();
     void setup_lights();
 
-    sm::Renderable setup_board() const;
-    sm::Renderable setup_board_paint() const;
+    sm::Renderable setup_board(bool reload_textures = false) const;
+    sm::Renderable setup_board_paint(bool reload_textures = false) const;
     std::vector<sm::Renderable> setup_nodes(unsigned int count) const;
-    std::vector<sm::Renderable> setup_white_pieces(unsigned int count) const;
-    std::vector<sm::Renderable> setup_black_pieces(unsigned int count) const;
+    std::vector<sm::Renderable> setup_white_pieces(unsigned int count, bool reload_textures = false) const;
+    std::vector<sm::Renderable> setup_black_pieces(unsigned int count, bool reload_textures = false) const;
     TurnIndicator setup_turn_indicator() const;
     Timer setup_timer() const;
 
     void load_skybox() const;
     void load_board_paint_texture() const;
+    void load_textures() const;
 
     std::shared_ptr<sm::GlTextureCubemap> get_skybox_texture_cubemap() const;
-    std::shared_ptr<sm::GlTexture> get_board_paint_texture(const sm::TextureSpecification& specification) const;
+    std::shared_ptr<sm::GlTexture> get_board_paint_texture(const sm::TextureSpecification& specification, bool reload_textures = false) const;
 
     bool m_game_started {false};
     glm::vec3 m_default_camera_position {};

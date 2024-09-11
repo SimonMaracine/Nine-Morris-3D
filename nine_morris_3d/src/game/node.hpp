@@ -15,6 +15,8 @@ public:
 
     void update(sm::Ctx& ctx);
 
+    void set_renderable(const sm::Renderable& renderable);
+
     int piece_id {-1};
 private:
     int m_id {-1};

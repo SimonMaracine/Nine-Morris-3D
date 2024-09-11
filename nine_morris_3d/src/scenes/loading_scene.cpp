@@ -40,6 +40,10 @@ void LoadingScene::load_assets() {
         sm::TexturePostProcessing post_processing;
         post_processing.flip = false;
 
+        if (g.options.texture_quality == static_cast<int>(TextureQuality::Half)) {
+            post_processing.size = sm::TextureSize::Half;
+        }
+
         switch (g.options.skybox) {
             case static_cast<int>(Skybox::None):
                 break;
@@ -63,18 +67,30 @@ void LoadingScene::load_assets() {
     }
 
     {
+        sm::TexturePostProcessing post_processing;
+
+        if (g.options.texture_quality == static_cast<int>(TextureQuality::Half)) {
+            post_processing.size = sm::TextureSize::Half;
+        }
+
         ctx.load_mesh(ctx.path_assets("models/board/board.obj"), "Board_Cube", sm::Mesh::Type::PNTT);
-        ctx.load_texture_data(ctx.path_assets("textures/board/board_diffuse.png"), sm::TexturePostProcessing());
-        ctx.load_texture_data(ctx.path_assets("textures/board/board_normal.png"), sm::TexturePostProcessing());
+        ctx.load_texture_data(ctx.path_assets("textures/board/board_diffuse.png"), post_processing);
+        ctx.load_texture_data(ctx.path_assets("textures/board/board_normal.png"), post_processing);
     }
 
     {
+        sm::TexturePostProcessing post_processing;
+
+        if (g.options.texture_quality == static_cast<int>(TextureQuality::Half)) {
+            post_processing.size = sm::TextureSize::Half;
+        }
+
         ctx.load_mesh(ctx.path_assets("models/board/board_paint.obj"), "Plane", sm::Mesh::Type::PNTT);
 
         if (g.options.labeled_board) {
-            ctx.load_texture_data(ctx.path_assets("textures/board/board_paint_labeled_diffuse.png"), sm::TexturePostProcessing());
+            ctx.load_texture_data(ctx.path_assets("textures/board/board_paint_labeled_diffuse.png"), post_processing);
         } else {
-            ctx.load_texture_data(ctx.path_assets("textures/board/board_paint_diffuse.png"), sm::TexturePostProcessing());
+            ctx.load_texture_data(ctx.path_assets("textures/board/board_paint_diffuse.png"), post_processing);
         }
     }
 
@@ -83,11 +99,17 @@ void LoadingScene::load_assets() {
     }
 
     {
+        sm::TexturePostProcessing post_processing;
+
+        if (g.options.texture_quality == static_cast<int>(TextureQuality::Half)) {
+            post_processing.size = sm::TextureSize::Half;
+        }
+
         ctx.load_mesh(ctx.path_assets("models/piece/piece_white.obj"), "White_Piece_Cylinder", sm::Mesh::Type::PNTT);
         ctx.load_mesh(ctx.path_assets("models/piece/piece_black.obj"), "Black_Piece_Cylinder", sm::Mesh::Type::PNTT);
-        ctx.load_texture_data(ctx.path_assets("textures/piece/piece_white_diffuse.png"), sm::TexturePostProcessing());
-        ctx.load_texture_data(ctx.path_assets("textures/piece/piece_black_diffuse.png"), sm::TexturePostProcessing());
-        ctx.load_texture_data(ctx.path_assets("textures/piece/piece_normal.png"), sm::TexturePostProcessing());
+        ctx.load_texture_data(ctx.path_assets("textures/piece/piece_white_diffuse.png"), post_processing);
+        ctx.load_texture_data(ctx.path_assets("textures/piece/piece_black_diffuse.png"), post_processing);
+        ctx.load_texture_data(ctx.path_assets("textures/piece/piece_normal.png"), post_processing);
     }
 
     {

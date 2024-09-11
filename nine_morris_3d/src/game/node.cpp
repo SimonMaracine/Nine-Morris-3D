@@ -11,3 +11,7 @@ void NodeObj::update(sm::Ctx& ctx) {
         ctx.add_renderable(m_renderable);
     }
 }
+
+void NodeObj::set_renderable(const sm::Renderable& renderable) {
+    m_renderable.override_renderable_private(renderable);
+}
