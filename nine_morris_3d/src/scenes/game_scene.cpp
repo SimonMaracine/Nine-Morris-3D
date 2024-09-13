@@ -94,66 +94,71 @@ void GameScene::load_and_set_textures() {
         load_textures();
 
         ctx.add_task([this](const sm::Task&, void*) {
-            const auto board_normal {load_board_normal_texture(true)};
-
-            get_board().get_renderable().get_material()->set_texture(
-                "u_material.ambient_diffuse"_H,
-                load_board_diffuse_texture(true),
-                0
-            );
-
-            get_board().get_renderable().get_material()->set_texture(
-                "u_material.normal"_H,
-                board_normal,
-                1
-            );
-
-            get_board().get_paint_renderable().get_material()->set_texture(
-                "u_material.ambient_diffuse"_H,
-                load_board_paint_diffuse_texture(true),
-                0
-            );
-
-            get_board().get_paint_renderable().get_material()->set_texture(
-                "u_material.normal"_H,
-                board_normal,
-                1
-            );
-
-            const auto white_piece_diffuse {load_white_piece_diffuse_texture(true)};
-            const auto black_piece_diffuse {load_black_piece_diffuse_texture(true)};
-            const auto piece_normal {load_piece_normal_texture(true)};
-
-            for (PieceObj& piece : get_board().get_pieces()) {
-                switch (piece.get_type()) {
-                    case PieceType::White:
-                        piece.get_renderable().get_material()->set_texture(
-                            "u_material.ambient_diffuse"_H,
-                            white_piece_diffuse,
-                            0
-                        );
-                        break;
-                    case PieceType::Black:
-                        piece.get_renderable().get_material()->set_texture(
-                            "u_material.ambient_diffuse"_H,
-                            black_piece_diffuse,
-                            0
-                        );
-                        break;
-                }
-
-                piece.get_renderable().get_material()->set_texture(
-                    "u_material.normal"_H,
-                    piece_normal,
-                    1
-                );
-            }
+            m_skybox = get_skybox_texture_cubemap(true);
+            set_renderable_textures();
 
             return sm::Task::Result::Done;
         });
 
         task.set_done();
     });
+}
+
+void GameScene::set_renderable_textures() {
+    const auto board_normal {load_board_normal_texture(true)};
+
+    get_board().get_renderable().get_material()->set_texture(
+        "u_material.ambient_diffuse"_H,
+        load_board_diffuse_texture(true),
+        0
+    );
+
+    get_board().get_renderable().get_material()->set_texture(
+        "u_material.normal"_H,
+        board_normal,
+        1
+    );
+
+    get_board().get_paint_renderable().get_material()->set_texture(
+        "u_material.ambient_diffuse"_H,
+        load_board_paint_diffuse_texture(true),
+        0
+    );
+
+    get_board().get_paint_renderable().get_material()->set_texture(
+        "u_material.normal"_H,
+        board_normal,
+        1
+    );
+
+    const auto white_piece_diffuse {load_white_piece_diffuse_texture(true)};
+    const auto black_piece_diffuse {load_black_piece_diffuse_texture(true)};
+    const auto piece_normal {load_piece_normal_texture(true)};
+
+    for (PieceObj& piece : get_board().get_pieces()) {
+        switch (piece.get_type()) {
+            case PieceType::White:
+                piece.get_renderable().get_material()->set_texture(
+                    "u_material.ambient_diffuse"_H,
+                    white_piece_diffuse,
+                    0
+                );
+                break;
+            case PieceType::Black:
+                piece.get_renderable().get_material()->set_texture(
+                    "u_material.ambient_diffuse"_H,
+                    black_piece_diffuse,
+                    0
+                );
+                break;
+        }
+
+        piece.get_renderable().get_material()->set_texture(
+            "u_material.normal"_H,
+            piece_normal,
+            1
+        );
+    }
 }
 
 void GameScene::on_window_resized(const sm::WindowResizedEvent& event) {
@@ -471,9 +476,12 @@ void GameScene::load_textures() const {
 }
 
 std::shared_ptr<sm::GlTexture> GameScene::load_board_diffuse_texture(bool reload) const {
+    const auto& g {ctx.global<Global>()};
+
     sm::TextureSpecification specification;
     specification.mipmapping.emplace();
     specification.mipmapping->bias = -0.8f;
+    specification.mipmapping->anisotropic_filtering = g.options.anisotropic_filtering;
 
     return (
         reload
@@ -485,17 +493,23 @@ std::shared_ptr<sm::GlTexture> GameScene::load_board_diffuse_texture(bool reload
 }
 
 std::shared_ptr<sm::GlTexture> GameScene::load_board_paint_diffuse_texture(bool reload) const {
+    const auto& g {ctx.global<Global>()};
+
     sm::TextureSpecification specification;
     specification.mipmapping.emplace();
     specification.mipmapping->bias = -0.8f;
+    specification.mipmapping->anisotropic_filtering = g.options.anisotropic_filtering;
 
     return get_board_paint_texture(specification, reload);
 }
 
 std::shared_ptr<sm::GlTexture> GameScene::load_board_normal_texture(bool reload) const {
+    const auto& g {ctx.global<Global>()};
+
     sm::TextureSpecification specification;
     specification.mipmapping.emplace();
     specification.mipmapping->bias = -0.8f;
+    specification.mipmapping->anisotropic_filtering = g.options.anisotropic_filtering;
     specification.format = sm::TextureFormat::Rgba8;
 
     return (
@@ -508,9 +522,12 @@ std::shared_ptr<sm::GlTexture> GameScene::load_board_normal_texture(bool reload)
 }
 
 std::shared_ptr<sm::GlTexture> GameScene::load_white_piece_diffuse_texture(bool reload) const {
+    const auto& g {ctx.global<Global>()};
+
     sm::TextureSpecification specification;
     specification.mipmapping.emplace();
     specification.mipmapping->bias = -0.8f;
+    specification.mipmapping->anisotropic_filtering = g.options.anisotropic_filtering;
 
     return (
         reload
@@ -522,9 +539,12 @@ std::shared_ptr<sm::GlTexture> GameScene::load_white_piece_diffuse_texture(bool 
 }
 
 std::shared_ptr<sm::GlTexture> GameScene::load_black_piece_diffuse_texture(bool reload) const {
+    const auto& g {ctx.global<Global>()};
+
     sm::TextureSpecification specification;
     specification.mipmapping.emplace();
     specification.mipmapping->bias = -0.8f;
+    specification.mipmapping->anisotropic_filtering = g.options.anisotropic_filtering;
 
     return (
         reload
@@ -536,9 +556,12 @@ std::shared_ptr<sm::GlTexture> GameScene::load_black_piece_diffuse_texture(bool 
 }
 
 std::shared_ptr<sm::GlTexture> GameScene::load_piece_normal_texture(bool reload) const {
+    const auto& g {ctx.global<Global>()};
+
     sm::TextureSpecification specification;
     specification.mipmapping.emplace();
     specification.mipmapping->bias = -0.8f;
+    specification.mipmapping->anisotropic_filtering = g.options.anisotropic_filtering;
     specification.format = sm::TextureFormat::Rgba8;
 
     return (
@@ -550,37 +573,71 @@ std::shared_ptr<sm::GlTexture> GameScene::load_piece_normal_texture(bool reload)
     );
 }
 
-std::shared_ptr<sm::GlTextureCubemap> GameScene::get_skybox_texture_cubemap() const {
+std::shared_ptr<sm::GlTextureCubemap> GameScene::get_skybox_texture_cubemap(bool reload) const {
     const auto& g {ctx.global<Global>()};
 
     switch (g.options.skybox) {
         case static_cast<int>(Skybox::None):
             return nullptr;
         case static_cast<int>(Skybox::Field):
-            return ctx.load_texture_cubemap(
-                "field"_H,
-                {
-                    ctx.get_texture_data("px.png"_H),
-                    ctx.get_texture_data("nx.png"_H),
-                    ctx.get_texture_data("py.png"_H),
-                    ctx.get_texture_data("ny.png"_H),
-                    ctx.get_texture_data("pz.png"_H),
-                    ctx.get_texture_data("nz.png"_H)
-                },
-                sm::TextureFormat::Srgb8Alpha8
+            return (
+                reload
+                ?
+                ctx.reload_texture_cubemap(
+                    "field"_H,
+                    {
+                        ctx.get_texture_data("px.png"_H),  // FIXME make dry
+                        ctx.get_texture_data("nx.png"_H),
+                        ctx.get_texture_data("py.png"_H),
+                        ctx.get_texture_data("ny.png"_H),
+                        ctx.get_texture_data("pz.png"_H),
+                        ctx.get_texture_data("nz.png"_H)
+                    },
+                    sm::TextureFormat::Srgb8Alpha8
+                )
+                :
+                ctx.load_texture_cubemap(
+                    "field"_H,
+                    {
+                        ctx.get_texture_data("px.png"_H),
+                        ctx.get_texture_data("nx.png"_H),
+                        ctx.get_texture_data("py.png"_H),
+                        ctx.get_texture_data("ny.png"_H),
+                        ctx.get_texture_data("pz.png"_H),
+                        ctx.get_texture_data("nz.png"_H)
+                    },
+                    sm::TextureFormat::Srgb8Alpha8
+                )
             );
         case static_cast<int>(Skybox::Autumn):
-            return ctx.load_texture_cubemap(
-                "autumn"_H,
-                {
-                    ctx.get_texture_data("px.png"_H),
-                    ctx.get_texture_data("nx.png"_H),
-                    ctx.get_texture_data("py.png"_H),
-                    ctx.get_texture_data("ny.png"_H),
-                    ctx.get_texture_data("pz.png"_H),
-                    ctx.get_texture_data("nz.png"_H)
-                },
-                sm::TextureFormat::Srgb8Alpha8
+            return (
+                reload
+                ?
+                ctx.reload_texture_cubemap(
+                    "autumn"_H,
+                    {
+                        ctx.get_texture_data("px.png"_H),
+                        ctx.get_texture_data("nx.png"_H),
+                        ctx.get_texture_data("py.png"_H),
+                        ctx.get_texture_data("ny.png"_H),
+                        ctx.get_texture_data("pz.png"_H),
+                        ctx.get_texture_data("nz.png"_H)
+                    },
+                    sm::TextureFormat::Srgb8Alpha8
+                )
+                :
+                ctx.load_texture_cubemap(
+                    "autumn"_H,
+                    {
+                        ctx.get_texture_data("px.png"_H),
+                        ctx.get_texture_data("nx.png"_H),
+                        ctx.get_texture_data("py.png"_H),
+                        ctx.get_texture_data("ny.png"_H),
+                        ctx.get_texture_data("pz.png"_H),
+                        ctx.get_texture_data("nz.png"_H)
+                    },
+                    sm::TextureFormat::Srgb8Alpha8
+                )
             );
     }
 
@@ -624,4 +681,3 @@ std::shared_ptr<sm::GlTexture> GameScene::get_board_paint_texture(const sm::Text
         );
     }
 }
-

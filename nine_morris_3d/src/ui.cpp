@@ -212,17 +212,17 @@ void Ui::main_menu_bar(sm::Ctx& ctx, GameScene& game_scene) {
                 if (ImGui::BeginMenu("Anisotropic Filtering")) {
                     if (ImGui::RadioButton("Off", &m_options.anisotropic_filtering, static_cast<int>(AnisotropicFiltering::Off))) {
                         if (std::exchange(g.options.anisotropic_filtering, m_options.anisotropic_filtering) != static_cast<int>(AnisotropicFiltering::Off)) {
-                            // TODO
+                            set_anisotropic_filtering_task(ctx, game_scene);
                         }
                     }
                     if (ImGui::RadioButton("4X", &m_options.anisotropic_filtering, static_cast<int>(AnisotropicFiltering::_4x))) {
                         if (std::exchange(g.options.anisotropic_filtering, m_options.anisotropic_filtering) != static_cast<int>(AnisotropicFiltering::_4x)) {
-                            // TODO
+                            set_anisotropic_filtering_task(ctx, game_scene);
                         }
                     }
                     if (ImGui::RadioButton("8X", &m_options.anisotropic_filtering, static_cast<int>(AnisotropicFiltering::_8x))) {
                         if (std::exchange(g.options.anisotropic_filtering, m_options.anisotropic_filtering) != static_cast<int>(AnisotropicFiltering::_8x)) {
-                            // TODO
+                            set_anisotropic_filtering_task(ctx, game_scene);
                         }
                     }
 
@@ -559,6 +559,14 @@ void Ui::set_anti_aliasing_task(sm::Ctx& ctx, int samples) {
 void Ui::set_shadow_quality_task(sm::Ctx& ctx, int size) {
     ctx.add_task([this, &ctx, size](const sm::Task&, void*) {
         ctx.set_renderer_shadow_map_size(size);
+
+        return sm::Task::Result::Done;
+    });
+}
+
+void Ui::set_anisotropic_filtering_task(sm::Ctx& ctx, GameScene& game_scene) {
+    ctx.add_task([this, &ctx, &game_scene](const sm::Task&, void*) {
+        game_scene.set_renderable_textures();
 
         return sm::Task::Result::Done;
     });

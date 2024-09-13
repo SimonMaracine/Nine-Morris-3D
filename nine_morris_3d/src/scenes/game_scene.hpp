@@ -29,6 +29,8 @@ public:
     void load_and_set_skybox();
     void load_and_set_board_paint_texture();
     void load_and_set_textures();
+
+    void set_renderable_textures();
 protected:
     void on_window_resized(const sm::WindowResizedEvent& event);
 
@@ -55,7 +57,7 @@ protected:
     std::shared_ptr<sm::GlTexture> load_black_piece_diffuse_texture(bool reload = false) const;
     std::shared_ptr<sm::GlTexture> load_piece_normal_texture(bool reload = false) const;
 
-    std::shared_ptr<sm::GlTextureCubemap> get_skybox_texture_cubemap() const;
+    std::shared_ptr<sm::GlTextureCubemap> get_skybox_texture_cubemap(bool reload = false) const;
     std::shared_ptr<sm::GlTexture> get_board_paint_texture(const sm::TextureSpecification& specification, bool reload = false) const;
 
     bool m_game_started {false};

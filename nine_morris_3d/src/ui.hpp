@@ -43,6 +43,7 @@ private:
     void set_scale(sm::Ctx& ctx, int scale);
     void set_anti_aliasing_task(sm::Ctx& ctx, int samples);
     void set_shadow_quality_task(sm::Ctx& ctx, int size);
+    void set_anisotropic_filtering_task(sm::Ctx& ctx, GameScene& game_scene);
     void create_font(sm::Ctx& ctx, int scale);
     void set_style();
     static float rem(float size);
