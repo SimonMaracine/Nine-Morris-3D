@@ -57,7 +57,7 @@ void GameScene::on_imgui_update() {
 
 void GameScene::load_and_set_skybox() {
     ctx.add_task_async([this](sm::AsyncTask& task, void*) {
-        load_skybox();
+        load_skybox_texture_data();
 
         ctx.add_task([this](const sm::Task&, void*) {
             setup_skybox();
@@ -73,7 +73,7 @@ void GameScene::load_and_set_skybox() {
 
 void GameScene::load_and_set_board_paint_texture() {
     ctx.add_task_async([this](sm::AsyncTask& task, void*) {
-        load_board_paint_texture();
+        load_board_paint_texture_data();
 
         ctx.add_task([this](const sm::Task&, void*) {
             get_board().get_paint_renderable().get_material()->set_texture(
@@ -91,10 +91,10 @@ void GameScene::load_and_set_board_paint_texture() {
 
 void GameScene::load_and_set_textures() {
     ctx.add_task_async([this](sm::AsyncTask& task, void*) {
-        load_textures();
+        load_all_texture_data();
 
         ctx.add_task([this](const sm::Task&, void*) {
-            m_skybox = get_skybox_texture_cubemap(true);
+            setup_skybox();
             set_renderable_textures();
 
             return sm::Task::Result::Done;
@@ -189,7 +189,7 @@ void GameScene::setup_camera() {
 }
 
 void GameScene::setup_skybox() {
-    m_skybox = get_skybox_texture_cubemap();
+    m_skybox = load_skybox_texture_cubemap();
 }
 
 void GameScene::setup_lights() {
@@ -360,7 +360,7 @@ Timer GameScene::setup_timer() const {
     return Timer(font);
 }
 
-void GameScene::load_skybox() const {
+void GameScene::load_skybox_texture_data() const {
     // Global options must have been set to the desired skybox
 
     const auto& g {ctx.global<Global>()};
@@ -390,7 +390,7 @@ void GameScene::load_skybox() const {
     }
 }
 
-void GameScene::load_board_paint_texture() const {
+void GameScene::load_board_paint_texture_data() const {
     // Global options must have been set to the desired texture
 
     const auto& g {ctx.global<Global>()};
@@ -402,7 +402,7 @@ void GameScene::load_board_paint_texture() const {
     }
 }
 
-void GameScene::load_textures() const {
+void GameScene::load_all_texture_data() const {
     // Global options must have been set to the desired textures
 
     const auto& g {ctx.global<Global>()};
@@ -483,13 +483,11 @@ std::shared_ptr<sm::GlTexture> GameScene::load_board_diffuse_texture(bool reload
     specification.mipmapping->bias = -0.8f;
     specification.mipmapping->anisotropic_filtering = g.options.anisotropic_filtering;
 
-    return (
-        reload
-        ?
-        ctx.reload_texture("board_diffuse"_H, ctx.get_texture_data("board_diffuse.png"_H), specification)
-        :
-        ctx.load_texture("board_diffuse"_H, ctx.get_texture_data("board_diffuse.png"_H), specification)
-    );
+    if (reload) {
+        return ctx.reload_texture("board_diffuse"_H, ctx.get_texture_data("board_diffuse.png"_H), specification);
+    } else {
+        return ctx.load_texture("board_diffuse"_H, ctx.get_texture_data("board_diffuse.png"_H), specification);
+    }
 }
 
 std::shared_ptr<sm::GlTexture> GameScene::load_board_paint_diffuse_texture(bool reload) const {
@@ -500,7 +498,19 @@ std::shared_ptr<sm::GlTexture> GameScene::load_board_paint_diffuse_texture(bool 
     specification.mipmapping->bias = -0.8f;
     specification.mipmapping->anisotropic_filtering = g.options.anisotropic_filtering;
 
-    return get_board_paint_texture(specification, reload);
+    if (reload) {
+        return ctx.reload_texture(
+            g.options.labeled_board ? "board_paint_labeled_diffuse"_H : "board_paint_diffuse"_H,
+            ctx.get_texture_data(g.options.labeled_board ? "board_paint_labeled_diffuse.png"_H : "board_paint_diffuse.png"_H),
+            specification
+        );
+    } else {
+        return ctx.load_texture(
+            g.options.labeled_board ? "board_paint_labeled_diffuse"_H : "board_paint_diffuse"_H,
+            ctx.get_texture_data(g.options.labeled_board ? "board_paint_labeled_diffuse.png"_H : "board_paint_diffuse.png"_H),
+            specification
+        );
+    }
 }
 
 std::shared_ptr<sm::GlTexture> GameScene::load_board_normal_texture(bool reload) const {
@@ -512,13 +522,11 @@ std::shared_ptr<sm::GlTexture> GameScene::load_board_normal_texture(bool reload)
     specification.mipmapping->anisotropic_filtering = g.options.anisotropic_filtering;
     specification.format = sm::TextureFormat::Rgba8;
 
-    return (
-        reload
-        ?
-        ctx.reload_texture("board_normal"_H, ctx.get_texture_data("board_normal.png"_H), specification)
-        :
-        ctx.load_texture("board_normal"_H, ctx.get_texture_data("board_normal.png"_H), specification)
-    );
+    if (reload) {
+        return ctx.reload_texture("board_normal"_H, ctx.get_texture_data("board_normal.png"_H), specification);
+    } else {
+        return ctx.load_texture("board_normal"_H, ctx.get_texture_data("board_normal.png"_H), specification);
+    }
 }
 
 std::shared_ptr<sm::GlTexture> GameScene::load_white_piece_diffuse_texture(bool reload) const {
@@ -529,13 +537,11 @@ std::shared_ptr<sm::GlTexture> GameScene::load_white_piece_diffuse_texture(bool 
     specification.mipmapping->bias = -0.8f;
     specification.mipmapping->anisotropic_filtering = g.options.anisotropic_filtering;
 
-    return (
-        reload
-        ?
-        ctx.reload_texture("piece_white_diffuse.png"_H, ctx.get_texture_data("piece_white_diffuse.png"_H), specification)
-        :
-        ctx.load_texture("piece_white_diffuse.png"_H, ctx.get_texture_data("piece_white_diffuse.png"_H), specification)
-    );
+    if (reload) {
+        return ctx.reload_texture("piece_white_diffuse.png"_H, ctx.get_texture_data("piece_white_diffuse.png"_H), specification);
+    } else {
+        return ctx.load_texture("piece_white_diffuse.png"_H, ctx.get_texture_data("piece_white_diffuse.png"_H), specification);
+    }
 }
 
 std::shared_ptr<sm::GlTexture> GameScene::load_black_piece_diffuse_texture(bool reload) const {
@@ -546,13 +552,11 @@ std::shared_ptr<sm::GlTexture> GameScene::load_black_piece_diffuse_texture(bool 
     specification.mipmapping->bias = -0.8f;
     specification.mipmapping->anisotropic_filtering = g.options.anisotropic_filtering;
 
-    return (
-        reload
-        ?
-        ctx.reload_texture("piece_black_diffuse.png"_H, ctx.get_texture_data("piece_black_diffuse.png"_H), specification)
-        :
-        ctx.load_texture("piece_black_diffuse.png"_H, ctx.get_texture_data("piece_black_diffuse.png"_H), specification)
-    );
+    if (reload) {
+        return ctx.reload_texture("piece_black_diffuse.png"_H, ctx.get_texture_data("piece_black_diffuse.png"_H), specification);
+    } else {
+        return ctx.load_texture("piece_black_diffuse.png"_H, ctx.get_texture_data("piece_black_diffuse.png"_H), specification);
+    }
 }
 
 std::shared_ptr<sm::GlTexture> GameScene::load_piece_normal_texture(bool reload) const {
@@ -564,120 +568,56 @@ std::shared_ptr<sm::GlTexture> GameScene::load_piece_normal_texture(bool reload)
     specification.mipmapping->anisotropic_filtering = g.options.anisotropic_filtering;
     specification.format = sm::TextureFormat::Rgba8;
 
-    return (
-        reload
-        ?
-        ctx.reload_texture("piece_normal"_H, ctx.get_texture_data("piece_normal.png"_H), specification)
-        :
-        ctx.load_texture("piece_normal"_H, ctx.get_texture_data("piece_normal.png"_H), specification)
-    );
+    if (reload) {
+        return ctx.reload_texture("piece_normal"_H, ctx.get_texture_data("piece_normal.png"_H), specification);
+    } else {
+        return ctx.load_texture("piece_normal"_H, ctx.get_texture_data("piece_normal.png"_H), specification);
+    }
 }
 
-std::shared_ptr<sm::GlTextureCubemap> GameScene::get_skybox_texture_cubemap(bool reload) const {
+std::shared_ptr<sm::GlTextureCubemap> GameScene::load_skybox_texture_cubemap(bool reload) const {
     const auto& g {ctx.global<Global>()};
+
+    const auto load_or_reload {
+        [this, reload](sm::Id id) {
+            if (reload) {
+                return ctx.reload_texture_cubemap(
+                    id,
+                    {
+                        ctx.get_texture_data("px.png"_H),
+                        ctx.get_texture_data("nx.png"_H),
+                        ctx.get_texture_data("py.png"_H),
+                        ctx.get_texture_data("ny.png"_H),
+                        ctx.get_texture_data("pz.png"_H),
+                        ctx.get_texture_data("nz.png"_H)
+                    },
+                    sm::TextureFormat::Srgb8Alpha8
+                );
+            } else {
+                return ctx.load_texture_cubemap(
+                    id,
+                    {
+                        ctx.get_texture_data("px.png"_H),
+                        ctx.get_texture_data("nx.png"_H),
+                        ctx.get_texture_data("py.png"_H),
+                        ctx.get_texture_data("ny.png"_H),
+                        ctx.get_texture_data("pz.png"_H),
+                        ctx.get_texture_data("nz.png"_H)
+                    },
+                    sm::TextureFormat::Srgb8Alpha8
+                );
+            }
+        }
+    };
 
     switch (g.options.skybox) {
         case static_cast<int>(Skybox::None):
             return nullptr;
         case static_cast<int>(Skybox::Field):
-            return (
-                reload
-                ?
-                ctx.reload_texture_cubemap(
-                    "field"_H,
-                    {
-                        ctx.get_texture_data("px.png"_H),  // FIXME make dry
-                        ctx.get_texture_data("nx.png"_H),
-                        ctx.get_texture_data("py.png"_H),
-                        ctx.get_texture_data("ny.png"_H),
-                        ctx.get_texture_data("pz.png"_H),
-                        ctx.get_texture_data("nz.png"_H)
-                    },
-                    sm::TextureFormat::Srgb8Alpha8
-                )
-                :
-                ctx.load_texture_cubemap(
-                    "field"_H,
-                    {
-                        ctx.get_texture_data("px.png"_H),
-                        ctx.get_texture_data("nx.png"_H),
-                        ctx.get_texture_data("py.png"_H),
-                        ctx.get_texture_data("ny.png"_H),
-                        ctx.get_texture_data("pz.png"_H),
-                        ctx.get_texture_data("nz.png"_H)
-                    },
-                    sm::TextureFormat::Srgb8Alpha8
-                )
-            );
+            return load_or_reload("field"_H);
         case static_cast<int>(Skybox::Autumn):
-            return (
-                reload
-                ?
-                ctx.reload_texture_cubemap(
-                    "autumn"_H,
-                    {
-                        ctx.get_texture_data("px.png"_H),
-                        ctx.get_texture_data("nx.png"_H),
-                        ctx.get_texture_data("py.png"_H),
-                        ctx.get_texture_data("ny.png"_H),
-                        ctx.get_texture_data("pz.png"_H),
-                        ctx.get_texture_data("nz.png"_H)
-                    },
-                    sm::TextureFormat::Srgb8Alpha8
-                )
-                :
-                ctx.load_texture_cubemap(
-                    "autumn"_H,
-                    {
-                        ctx.get_texture_data("px.png"_H),
-                        ctx.get_texture_data("nx.png"_H),
-                        ctx.get_texture_data("py.png"_H),
-                        ctx.get_texture_data("ny.png"_H),
-                        ctx.get_texture_data("pz.png"_H),
-                        ctx.get_texture_data("nz.png"_H)
-                    },
-                    sm::TextureFormat::Srgb8Alpha8
-                )
-            );
+            return load_or_reload("autumn"_H);
     }
 
     return {};
-}
-
-std::shared_ptr<sm::GlTexture> GameScene::get_board_paint_texture(const sm::TextureSpecification& specification, bool reload) const {
-    const auto& g {ctx.global<Global>()};
-
-    if (g.options.labeled_board) {
-        return (
-            reload
-            ?
-            ctx.reload_texture(
-                "board_paint_labeled_diffuse"_H,
-                ctx.get_texture_data("board_paint_labeled_diffuse.png"_H),
-                specification
-            )
-            :
-            ctx.load_texture(
-                "board_paint_labeled_diffuse"_H,
-                ctx.get_texture_data("board_paint_labeled_diffuse.png"_H),
-                specification
-            )
-        );
-    } else {
-        return (
-            reload
-            ?
-            ctx.reload_texture(
-                "board_paint_diffuse"_H,
-                ctx.get_texture_data("board_paint_diffuse.png"_H),
-                specification
-            )
-            :
-            ctx.load_texture(
-                "board_paint_diffuse"_H,
-                ctx.get_texture_data("board_paint_diffuse.png"_H),
-                specification
-            )
-        );
-    }
 }

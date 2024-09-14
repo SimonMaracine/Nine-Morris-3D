@@ -46,9 +46,9 @@ protected:
     TurnIndicator setup_turn_indicator() const;
     Timer setup_timer() const;
 
-    void load_skybox() const;
-    void load_board_paint_texture() const;
-    void load_textures() const;
+    void load_skybox_texture_data() const;
+    void load_board_paint_texture_data() const;
+    void load_all_texture_data() const;
 
     std::shared_ptr<sm::GlTexture> load_board_diffuse_texture(bool reload = false) const;
     std::shared_ptr<sm::GlTexture> load_board_paint_diffuse_texture(bool reload = false) const;
@@ -56,9 +56,7 @@ protected:
     std::shared_ptr<sm::GlTexture> load_white_piece_diffuse_texture(bool reload = false) const;
     std::shared_ptr<sm::GlTexture> load_black_piece_diffuse_texture(bool reload = false) const;
     std::shared_ptr<sm::GlTexture> load_piece_normal_texture(bool reload = false) const;
-
-    std::shared_ptr<sm::GlTextureCubemap> get_skybox_texture_cubemap(bool reload = false) const;
-    std::shared_ptr<sm::GlTexture> get_board_paint_texture(const sm::TextureSpecification& specification, bool reload = false) const;
+    std::shared_ptr<sm::GlTextureCubemap> load_skybox_texture_cubemap(bool reload = false) const;
 
     bool m_game_started {false};
     glm::vec3 m_default_camera_position {};
