@@ -8,7 +8,7 @@ enum class GameMode {
     JumpPlus
 };
 
-enum class PlayerType {
+enum class GamePlayer {
     Human,
     Computer
 };

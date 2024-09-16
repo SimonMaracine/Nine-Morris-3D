@@ -13,8 +13,8 @@ inline constexpr const char* OPTIONS_FILE_NAME {"options.dat"};
 
 struct Options {
     int game_mode {static_cast<int>(GameMode::Standard)};
-    int white_player {static_cast<int>(PlayerType::Human)};
-    int black_player {static_cast<int>(PlayerType::Computer)};
+    int white_player {static_cast<int>(GamePlayer::Human)};
+    int black_player {static_cast<int>(GamePlayer::Human)};
     float master_volume {1.0f};
     float music_volume {0.7f};
     int skybox {static_cast<int>(Skybox::Field)};

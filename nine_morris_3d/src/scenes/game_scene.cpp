@@ -14,6 +14,11 @@ void GameScene::on_start() {
     setup_lights();
 
     m_ui.initialize(ctx);
+
+    const auto& g {ctx.global<Global>()};
+
+    m_player_white = static_cast<GamePlayer>(g.options.white_player);
+    m_player_black = static_cast<GamePlayer>(g.options.black_player);
 }
 
 void GameScene::on_stop() {
@@ -164,6 +169,44 @@ void GameScene::set_renderable_textures() {
 void GameScene::on_window_resized(const sm::WindowResizedEvent& event) {
     m_cam.set_projection(event.width, event.height, LENS_FOV, LENS_NEAR, LENS_FAR);
     m_cam_2d.set_projection(0, event.width, 0, event.height);
+}
+
+void GameScene::update_game_state() {
+    switch (m_game_state) {
+        case GameState::NextPlayer: {
+            const auto switch_player {
+                [this](GamePlayer game_player) {
+                    switch (game_player) {
+                        case GamePlayer::Human:
+                            m_game_state = GameState::HumanMakeMove;
+                            break;
+                        case GamePlayer::Computer:
+                            m_game_state = GameState::ComputerThink;
+                            break;
+                    }
+                }
+            };
+
+            switch (get_board().get_turn()) {
+                case Player::White:
+                    switch_player(m_player_white);
+                    break;
+                case Player::Black:
+                    switch_player(m_player_black);
+                    break;
+            }
+
+            break;
+        }
+        case GameState::HumanMakeMove:  // FIXME update board only in this state
+            break;
+        case GameState::ComputerThink:
+            break;
+        case GameState::ComputerMakeMove:
+            break;
+        case GameState::Over:
+            break;
+    }
 }
 
 void GameScene::setup_camera() {

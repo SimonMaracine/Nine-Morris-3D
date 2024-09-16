@@ -9,6 +9,15 @@
 #include "ui.hpp"
 #include "turn_indicator.hpp"
 #include "timer.hpp"
+#include "constants.hpp"
+
+enum class GameState {
+    NextPlayer,
+    HumanMakeMove,
+    ComputerThink,
+    ComputerMakeMove,
+    Over
+};
 
 class GameScene : public sm::ApplicationScene {
 public:
@@ -25,6 +34,9 @@ public:
     virtual BoardObj& get_board() = 0;
 
     PointCameraController& get_camera_controller() { return m_cam_controller; }
+    GamePlayer& get_player_white() { return m_player_white; }
+    GamePlayer& get_player_black() { return m_player_black; }
+    GameState& get_game_state() { return m_game_state; }
 
     void load_and_set_skybox();
     void load_and_set_board_paint_texture();
@@ -33,6 +45,8 @@ public:
     void set_renderable_textures();
 protected:
     void on_window_resized(const sm::WindowResizedEvent& event);
+
+    void update_game_state();
 
     void setup_camera();
     void setup_skybox();
@@ -59,6 +73,9 @@ protected:
     std::shared_ptr<sm::GlTextureCubemap> load_skybox_texture_cubemap(bool reload = false) const;
 
     bool m_game_started {false};
+    GameState m_game_state {GameState::NextPlayer};
+    GamePlayer m_player_white {};
+    GamePlayer m_player_black {};
     glm::vec3 m_default_camera_position {};
 
     PointCameraController m_cam_controller;

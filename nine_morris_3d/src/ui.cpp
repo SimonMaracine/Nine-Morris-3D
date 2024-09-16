@@ -54,7 +54,7 @@ void Ui::main_menu_bar(sm::Ctx& ctx, GameScene& game_scene) {
     auto& g {ctx.global<Global>()};
 
     if (ImGui::BeginMainMenuBar()) {
-        const bool enabled {true};
+        const bool enabled {game_scene.get_game_state() == GameState::HumanMakeMove || game_scene.get_game_state() == GameState::Over};
 
         if (ImGui::BeginMenu("Game")) {
             if (ImGui::MenuItem("New Game", nullptr, false, enabled)) {
@@ -98,57 +98,45 @@ void Ui::main_menu_bar(sm::Ctx& ctx, GameScene& game_scene) {
             }
             if (ImGui::BeginMenu("Players", enabled)) {
                 if (ImGui::BeginMenu("White")) {
-                    if (ImGui::RadioButton("Human", &m_options.white_player, static_cast<int>(PlayerType::Human))) {
-                        if (std::exchange(g.options.black_player, m_options.white_player) != static_cast<int>(PlayerType::Human)) {
+                    if (ImGui::RadioButton("Human", &m_options.white_player, static_cast<int>(GamePlayer::Human))) {
+                        if (std::exchange(g.options.white_player, m_options.white_player) != static_cast<int>(GamePlayer::Human)) {
+                            game_scene.get_player_white() = GamePlayer::Human;
 
+                            if (game_scene.get_game_state() != GameState::Over) {  // TODO dry
+                                game_scene.get_game_state() = GameState::NextPlayer;
+                            }
                         }
-                        // game.white_player = GamePlayer::Human;
-
-                        // if (game.state != GameState::Stop) {
-                        //     game.reset_players();
-                        // }
-
-                        // LOG_INFO("Set white player to human");
                     }
-                    if (ImGui::RadioButton("Computer", &m_options.white_player, static_cast<int>(PlayerType::Computer))) {
-                        if (std::exchange(g.options.black_player, m_options.white_player) != static_cast<int>(PlayerType::Computer)) {
+                    if (ImGui::RadioButton("Computer", &m_options.white_player, static_cast<int>(GamePlayer::Computer))) {
+                        if (std::exchange(g.options.white_player, m_options.white_player) != static_cast<int>(GamePlayer::Computer)) {
+                            game_scene.get_player_white() = GamePlayer::Computer;
 
+                            if (game_scene.get_game_state() != GameState::Over) {
+                                game_scene.get_game_state() = GameState::NextPlayer;
+                            }
                         }
-                        // game.white_player = GamePlayer::Computer;
-
-                        // if (game.state != GameState::Stop) {
-                        //     game.reset_players();
-                        // }
-
-                        // LOG_INFO("Set white player to computer");
                     }
 
                     ImGui::EndMenu();
                 }
                 if (ImGui::BeginMenu("Black")) {
-                    if (ImGui::RadioButton("Human", &m_options.black_player, static_cast<int>(PlayerType::Human))) {
-                        if (std::exchange(g.options.black_player, m_options.black_player) != static_cast<int>(PlayerType::Human)) {
+                    if (ImGui::RadioButton("Human", &m_options.black_player, static_cast<int>(GamePlayer::Human))) {
+                        if (std::exchange(g.options.black_player, m_options.black_player) != static_cast<int>(GamePlayer::Human)) {
+                            game_scene.get_player_black() = GamePlayer::Human;
 
+                            if (game_scene.get_game_state() != GameState::Over) {
+                                game_scene.get_game_state() = GameState::NextPlayer;
+                            }
                         }
-                        // game.black_player = GamePlayer::Human;
-
-                        // if (game.state != GameState::Stop) {
-                        //     game.reset_players();
-                        // }
-
-                        // LOG_INFO("Set black player to human");
                     }
-                    if (ImGui::RadioButton("Computer", &m_options.black_player, static_cast<int>(PlayerType::Computer))) {
-                        if (std::exchange(g.options.black_player, m_options.black_player) != static_cast<int>(PlayerType::Computer)) {
+                    if (ImGui::RadioButton("Computer", &m_options.black_player, static_cast<int>(GamePlayer::Computer))) {
+                        if (std::exchange(g.options.black_player, m_options.black_player) != static_cast<int>(GamePlayer::Computer)) {
+                            game_scene.get_player_black() = GamePlayer::Computer;
 
+                            if (game_scene.get_game_state() != GameState::Over) {
+                                game_scene.get_game_state() = GameState::NextPlayer;
+                            }
                         }
-                        // game.black_player = GamePlayer::Computer;
-
-                        // if (game.state != GameState::Stop) {
-                        //     game.reset_players();
-                        // }
-
-                        // LOG_INFO("Set black player to computer");
                     }
 
                     ImGui::EndMenu();

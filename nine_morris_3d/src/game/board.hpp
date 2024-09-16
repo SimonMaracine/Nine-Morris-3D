@@ -99,6 +99,7 @@ public:
     BoardObj& operator=(BoardObj&&) = default;
 
     virtual const GameOver& get_game_over() const = 0;
+    virtual Player get_turn() const = 0;
     virtual int node_count() = 0;
     virtual int piece_count() = 0;
 

@@ -25,6 +25,7 @@ void StandardGameScene::on_update() {
     // sm::listener::set_position(cam_controller.get_position());  // TODO
 
     m_board.update(ctx, cast_mouse_ray(ctx, m_cam), m_cam_controller.get_position());
+    update_game_state();
 
     const auto& g {ctx.global<Global>()};
 
@@ -65,13 +66,17 @@ void StandardGameScene::on_key_released(const sm::KeyReleasedEvent& event) {
 
 void StandardGameScene::on_mouse_button_pressed(const sm::MouseButtonPressedEvent& event) {
     if (event.button == sm::MouseButton::Left) {
-        m_board.user_click_press();
+        if (m_game_state == GameState::HumanMakeMove) {
+            m_board.user_click_press();
+        }
     }
 }
 
 void StandardGameScene::on_mouse_button_released(const sm::MouseButtonReleasedEvent& event) {
     if (event.button == sm::MouseButton::Left) {
-        m_board.user_click_release();
+        if (m_game_state == GameState::HumanMakeMove) {
+            m_board.user_click_release();
+        }
     }
 }
 
@@ -89,9 +94,13 @@ StandardGameBoard StandardGameScene::setup_renderables() {
                 m_game_started = true;
             }
 
+            m_game_state = GameState::NextPlayer;
+
             if (m_board.get_game_over() != GameOver::None) {
                 m_timer.stop();
                 m_ui.set_popup_window(PopupWindow::GameOver);
+
+                m_game_state = GameState::Over;
             }
         }
     );

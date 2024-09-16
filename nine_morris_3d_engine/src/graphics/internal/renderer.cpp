@@ -23,6 +23,7 @@
 
 // shader uniform limit https://www.khronos.org/opengl/wiki/Uniform_(GLSL)#Implementation_limits
 // gamma https://blog.johnnovak.net/2016/09/21/what-every-coder-should-know-about-gamma/
+// gamma https://www.cambridgeincolour.com/tutorials/gamma-correction.htm
 
 using namespace resmanager::literals;
 

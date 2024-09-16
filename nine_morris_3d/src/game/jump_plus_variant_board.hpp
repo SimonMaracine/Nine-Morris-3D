@@ -34,10 +34,9 @@ public:
     );
 
     const GameOver& get_game_over() const override { return m_game_over; }
+    Player get_turn() const override { return m_turn; }
     int node_count() override { return NODES; }
     int piece_count() override { return PIECES; }
-
-    Player get_turn() const { return m_turn; }
 
     void update(sm::Ctx& ctx, glm::vec3 ray, glm::vec3 camera);
     void update_movement();
