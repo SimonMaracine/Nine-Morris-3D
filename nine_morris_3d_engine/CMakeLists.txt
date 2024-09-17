@@ -3,46 +3,16 @@ cmake_minimum_required(VERSION 3.20)
 # Use static linking everywhere possible
 set(BUILD_SHARED_LIBS OFF)
 
-# Assimp
-set(ASSIMP_NO_EXPORT ON)
-set(ASSIMP_BUILD_ALL_EXPORTERS_BY_DEFAULT OFF)
-set(ASSIMP_BUILD_ALL_IMPORTERS_BY_DEFAULT OFF)
-set(ASSIMP_BUILD_TESTS OFF)
-set(ASSIMP_INSTALL OFF)
-set(ASSIMP_WARNINGS_AS_ERRORS OFF)
-set(ASSIMP_INSTALL_PDB OFF)
-set(ASSIMP_BUILD_ASSIMP_VIEW OFF)
-set(ASSIMP_BUILD_OBJ_IMPORTER ON)
-
-# GLFW
-set(GLFW_INSTALL OFF)
-set(GLFW_BUILD_EXAMPLES OFF)
-set(GLFW_BUILD_TESTS OFF)
-set(GLFW_BUILD_DOCS OFF)
-
-# OpenAL Soft
-set(ALSOFT_UTILS OFF)
-set(ALSOFT_NO_CONFIG_UTIL ON)
-set(ALSOFT_EXAMPLES OFF)
-set(ALSOFT_INSTALL OFF)
-set(ALSOFT_INSTALL_CONFIG OFF)
-set(ALSOFT_INSTALL_HRTF_DATA OFF)
-set(ALSOFT_INSTALL_AMBDEC_PRESETS OFF)
-set(ALSOFT_INSTALL_EXAMPLES OFF)
-set(ALSOFT_INSTALL_UTILS OFF)
-set(ALSOFT_UPDATE_BUILD_VERSION OFF)
-set(LIBTYPE "STATIC")
-
+include(cmake/assimp.cmake)
 include(cmake/cereal.cmake)
 include(cmake/dear_imgui.cmake)
 include(cmake/glad.cmake)
+include(cmake/glfw.cmake)
+include(cmake/openal_soft.cmake)
 include(cmake/stb.cmake)
 
-add_subdirectory(extern/assimp)
 add_subdirectory(extern/entt)
-add_subdirectory(extern/glfw)
 add_subdirectory(extern/glm)
-add_subdirectory(extern/openal_soft)  # TODO be sure that system packages are available when building
 add_subdirectory(extern/resmanager)
 add_subdirectory(extern/spdlog)
 add_subdirectory(extern/utfcpp)

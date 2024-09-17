@@ -1,6 +1,7 @@
 #include "scenes/game_scene.hpp"
 
 #include <nine_morris_3d_engine/external/resmanager.h++>
+#include <muhle_intelligence.h>
 
 #include "global.hpp"
 
@@ -19,9 +20,17 @@ void GameScene::on_start() {
 
     m_player_white = static_cast<GamePlayer>(g.options.white_player);
     m_player_black = static_cast<GamePlayer>(g.options.black_player);
+
+    if (muhle_intelligence_initialize() != MUHLE_INTELLIGENCE_SUCCESS) {
+        LOG_DIST_ERROR("Could not initialize engine");
+    }
 }
 
 void GameScene::on_stop() {
+    if (muhle_intelligence_uninitialize() != MUHLE_INTELLIGENCE_SUCCESS) {
+        LOG_DIST_ERROR("Could not uninitialize engine");
+    }
+
     m_cam_controller.disconnect_events(ctx);
     ctx.disconnect_events(this);
 }

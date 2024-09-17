@@ -23,3 +23,6 @@
 	path = nine_morris_3d_engine/extern/resmanager
 	url = https://github.com/SimonMaracine/resource-manager
 	branch = stable
+[submodule "nine_morris_3d/extern/muhle_intelligence"]
+	path = nine_morris_3d/extern/muhle_intelligence
+	url = https://github.com/SimonMaracine/Muhle-Intelligence

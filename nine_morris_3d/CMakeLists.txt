@@ -1,5 +1,7 @@
 cmake_minimum_required(VERSION 3.20)
 
+include(cmake/muhle_intelligence.cmake)
+
 file(GLOB_RECURSE NM3D_SOURCES CONFIGURE_DEPENDS "src/*.cpp")
 file(GLOB_RECURSE NM3D_HEADERS "src/*.hpp")
 
@@ -14,7 +16,7 @@ add_executable(NineMorris3D ${GUI_EXECUTABLE_WINDOWS} ${NM3D_SOURCES} ${NM3D_HEA
 
 target_include_directories(NineMorris3D PRIVATE "src")
 
-target_link_libraries(NineMorris3D PRIVATE nine_morris_3d_engine)
+target_link_libraries(NineMorris3D PRIVATE nine_morris_3d_engine muhle_intelligence_interface)
 
 if(UNIX)
     target_compile_options(NineMorris3D PRIVATE "-Wall" "-Wextra" "-Wpedantic" "-Wconversion")
