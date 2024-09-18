@@ -2,6 +2,7 @@
 
 #include "game/ray.hpp"
 #include "global.hpp"
+#include "muhle_engine.hpp"
 
 void StandardGameScene::on_start() {
     GameScene::on_start();
@@ -58,6 +59,25 @@ BoardObj& StandardGameScene::get_board() {
     return m_board;
 }
 
+void StandardGameScene::play_move_on_board(const std::string& string) {
+    const StandardGameBoard::Move move {StandardGameBoard::move_from_string(string)};
+
+    switch (move.type) {
+        case StandardGameBoard::MoveType::Place:
+            m_board.place_piece(move.place.place_index);
+            break;
+        case StandardGameBoard::MoveType::PlaceTake:
+            m_board.place_take_piece(move.place_take.place_index, move.place_take.take_index);
+            break;
+        case StandardGameBoard::MoveType::Move:
+            m_board.move_piece(move.move.source_index, move.move.destination_index);
+            break;
+        case StandardGameBoard::MoveType::MoveTake:
+            m_board.move_take_piece(move.move_take.source_index, move.move_take.destination_index, move.move_take.take_index);
+            break;
+    }
+}
+
 void StandardGameScene::on_key_released(const sm::KeyReleasedEvent& event) {
     if (event.key == sm::Key::Space) {
         m_cam_controller.go_towards_position(m_default_camera_position);
@@ -87,7 +107,7 @@ StandardGameBoard StandardGameScene::setup_renderables() {
         setup_nodes(StandardGameBoard::NODES),
         setup_white_pieces(StandardGameBoard::PIECES / 2),
         setup_black_pieces(StandardGameBoard::PIECES / 2),
-        [this](const StandardGameBoard::Move&) {
+        [this](const StandardGameBoard::Move& move) {
             if (!m_game_started) {
                 m_timer.start();
 
@@ -101,6 +121,19 @@ StandardGameBoard StandardGameScene::setup_renderables() {
                 m_ui.set_popup_window(PopupWindow::GameOver);
 
                 m_game_state = GameState::Over;
+            }
+
+            switch (m_board.get_turn()) {
+                case Player::White:
+                    if (m_player_black == GamePlayer::Human) {
+                        muhle_engine::send_message("move " + StandardGameBoard::string_from_move(move) + '\n');
+                    }
+                    break;
+                case Player::Black:
+                    if (m_player_white == GamePlayer::Human) {
+                        muhle_engine::send_message("move " + StandardGameBoard::string_from_move(move) + '\n');
+                    }
+                    break;
             }
         }
     );

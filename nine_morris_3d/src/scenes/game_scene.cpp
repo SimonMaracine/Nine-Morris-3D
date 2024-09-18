@@ -1,9 +1,9 @@
 #include "scenes/game_scene.hpp"
 
 #include <nine_morris_3d_engine/external/resmanager.h++>
-#include <muhle_intelligence.h>
 
 #include "global.hpp"
+#include "muhle_engine.hpp"
 
 void GameScene::on_start() {
     ctx.connect_event<sm::WindowResizedEvent, &GameScene::on_window_resized>(this);
@@ -21,21 +21,28 @@ void GameScene::on_start() {
     m_player_white = static_cast<GamePlayer>(g.options.white_player);
     m_player_black = static_cast<GamePlayer>(g.options.black_player);
 
-    if (muhle_intelligence_initialize() != MUHLE_INTELLIGENCE_SUCCESS) {
-        LOG_DIST_ERROR("Could not initialize engine");
-    }
+    muhle_engine::initialize();  // TODO don't create and destroy engine every time
 }
 
 void GameScene::on_stop() {
-    if (muhle_intelligence_uninitialize() != MUHLE_INTELLIGENCE_SUCCESS) {
-        LOG_DIST_ERROR("Could not uninitialize engine");
+    if (m_engine_started) {
+        muhle_engine::send_message("quit\n");
     }
+
+    muhle_engine::uninitialize();
 
     m_cam_controller.disconnect_events(ctx);
     ctx.disconnect_events(this);
 }
 
 void GameScene::on_update() {
+    if (!m_engine_started) {
+        if (muhle_engine::is_ready()) {
+            muhle_engine::send_message("init\n");
+            m_engine_started = true;
+        }
+    }
+
     m_cam_controller.update_controls(ctx.get_delta(), ctx);
     m_cam_controller.update_camera(ctx.get_delta());
 
@@ -210,9 +217,35 @@ void GameScene::update_game_state() {
         case GameState::HumanMakeMove:  // FIXME update board only in this state
             break;
         case GameState::ComputerThink:
+            if (!m_engine_started) {
+                break;
+            }
+
+            muhle_engine::send_message("go\n");
+            m_game_state = GameState::ComputerMakeMove;
+
             break;
-        case GameState::ComputerMakeMove:
+        case GameState::ComputerMakeMove: {
+            const auto message {muhle_engine::receive_message()};
+
+            if (!message) {
+                break;
+            }
+
+            const auto tokens {muhle_engine::tokenize_message(*message)};
+
+            if (tokens.at(0) == "bestmove") {
+                if (tokens.at(1) == "none") {
+                    break;
+                }
+
+                play_move_on_board(tokens.at(1));
+            } else if (tokens.at(0) == "info") {
+                LOG_INFO("{}", tokens.at(1));
+            }
+
             break;
+        }
         case GameState::Over:
             break;
     }

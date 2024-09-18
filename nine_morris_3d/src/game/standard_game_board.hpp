@@ -3,6 +3,7 @@
 #include <array>
 #include <vector>
 #include <functional>
+#include <string>
 
 #include <nine_morris_3d_engine/nine_morris_3d.hpp>
 
@@ -76,6 +77,9 @@ public:
     void move_piece(int source_index, int destination_index);
     void move_take_piece(int source_index, int destination_index, int take_index);
 
+    static Move move_from_string(const std::string& string);
+    static std::string string_from_move(const Move& move);
+
     void debug();
 private:
     void select(int index);
@@ -123,6 +127,9 @@ private:
     static Move create_place_take(int place_index, int take_index);
     static Move create_move(int source_index, int destination_index);
     static Move create_move_take(int source_index, int destination_index, int take_index);
+
+    static int index_from_string(const std::string& string);
+    static const char* string_from_index(int index);
 
     // Game data
     Board m_board {};

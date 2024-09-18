@@ -1,6 +1,7 @@
 #pragma once
 
 #include <vector>
+#include <string>
 
 #include <nine_morris_3d_engine/nine_morris_3d.hpp>
 
@@ -32,6 +33,7 @@ public:
     void on_imgui_update() override;
 
     virtual BoardObj& get_board() = 0;
+    virtual void play_move_on_board(const std::string& string) = 0;
 
     PointCameraController& get_camera_controller() { return m_cam_controller; }
     GamePlayer& get_player_white() { return m_player_white; }
@@ -72,6 +74,7 @@ protected:
     std::shared_ptr<sm::GlTexture> load_piece_normal_texture(bool reload = false) const;
     std::shared_ptr<sm::GlTextureCubemap> load_skybox_texture_cubemap(bool reload = false) const;
 
+    bool m_engine_started {false};
     bool m_game_started {false};
     GameState m_game_state {GameState::NextPlayer};
     GamePlayer m_player_white {};

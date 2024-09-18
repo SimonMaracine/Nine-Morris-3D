@@ -169,7 +169,7 @@ void StandardGameBoard::place_take_piece(int place_index, int take_index) {
     });
 }
 
-void StandardGameBoard::move_piece(int source_index, int destination_index) {
+void StandardGameBoard::move_piece(int source_index, int destination_index) {  // FIXME
     const auto iter {std::find_if(m_legal_moves.begin(), m_legal_moves.end(), [=](const Move& move) {
         return (
             move.type == MoveType::Move &&
@@ -229,6 +229,84 @@ void StandardGameBoard::move_take_piece(int source_index, int destination_index,
         },
         !has_three_pieces(m_board, m_pieces[PIECE(m_nodes[source_index].piece_id)])
     );
+}
+
+StandardGameBoard::Move StandardGameBoard::move_from_string(const std::string& string) {
+    Move result {};
+
+    switch (string[0]) {
+        case 'P': {
+            const int place_index {index_from_string(string.substr(1, 2))};
+
+            if (string.size() > 3) {
+                const int take_index {index_from_string(string.substr(4, 2))};
+
+                result.type = MoveType::PlaceTake;
+                result.place_take.place_index = place_index;
+                result.place_take.take_index = take_index;
+            } else {
+                result.type = MoveType::Place;
+                result.place.place_index = place_index;
+            }
+
+            return result;
+        }
+        case 'M': {
+            const int source_index {index_from_string(string.substr(1, 2))};
+            const int destination_index {index_from_string(string.substr(4, 2))};
+
+            if (string.size() > 6) {
+                const int take_index {index_from_string(string.substr(7, 2))};
+
+                result.type = MoveType::MoveTake;
+                result.move_take.source_index = source_index;
+                result.move_take.destination_index = destination_index;
+                result.move_take.take_index = take_index;
+            } else {
+                result.type = MoveType::Move;
+                result.move.source_index = source_index;
+                result.move.destination_index = destination_index;
+            }
+
+            return result;
+        }
+    }
+
+    assert(false);
+    return {};
+}
+
+std::string StandardGameBoard::string_from_move(const Move& move) {
+    std::string result;
+
+    switch (move.type) {
+        case MoveType::Place:
+            result += 'P';
+            result += string_from_index(move.place.place_index);
+            break;
+        case MoveType::PlaceTake:
+            result += 'P';
+            result += string_from_index(move.place_take.place_index);
+            result += 'T';
+            result += string_from_index(move.place_take.take_index);
+            break;
+        case MoveType::Move:
+            result += 'M';
+            result += string_from_index(move.move.source_index);
+            result += '-';
+            result += string_from_index(move.move.destination_index);
+            break;
+        case MoveType::MoveTake:
+            result += 'M';
+            result += string_from_index(move.move_take.source_index);
+            result += '-';
+            result += string_from_index(move.move_take.destination_index);
+            result += 'T';
+            result += string_from_index(move.move_take.take_index);
+            break;
+    }
+
+    return result;
 }
 
 void StandardGameBoard::debug() {
@@ -912,4 +990,66 @@ StandardGameBoard::Move StandardGameBoard::create_move_take(int source_index, in
     move.move_take.take_index = take_index;
 
     return move;
+}
+
+int StandardGameBoard::index_from_string(const std::string& string) {
+    if (string == "a7") return 0;
+    else if (string == "d7") return 1;
+    else if (string == "g7") return 2;
+    else if (string == "b6") return 3;
+    else if (string == "d6") return 4;
+    else if (string == "f6") return 5;
+    else if (string == "c5") return 6;
+    else if (string == "d5") return 7;
+    else if (string == "e5") return 8;
+    else if (string == "a4") return 9;
+    else if (string == "b4") return 10;
+    else if (string == "c4") return 11;
+    else if (string == "e4") return 12;
+    else if (string == "f4") return 13;
+    else if (string == "g4") return 14;
+    else if (string == "c3") return 15;
+    else if (string == "d3") return 16;
+    else if (string == "e3") return 17;
+    else if (string == "b2") return 18;
+    else if (string == "d2") return 19;
+    else if (string == "f2") return 20;
+    else if (string == "a1") return 21;
+    else if (string == "d1") return 22;
+    else if (string == "g1") return 23;
+
+    assert(false);
+    return {};
+}
+
+const char* StandardGameBoard::string_from_index(int index) {
+    switch (index) {
+        case 0: return "a7";
+        case 1: return "d7";
+        case 2: return "g7";
+        case 3: return "b6";
+        case 4: return "d6";
+        case 5: return "f6";
+        case 6: return "c5";
+        case 7: return "d5";
+        case 8: return "e5";
+        case 9: return "a4";
+        case 10: return "b4";
+        case 11: return "c4";
+        case 12: return "e4";
+        case 13: return "f4";
+        case 14: return "g4";
+        case 15: return "c3";
+        case 16: return "d3";
+        case 17: return "e3";
+        case 18: return "b2";
+        case 19: return "d2";
+        case 20: return "f2";
+        case 21: return "a1";
+        case 22: return "d1";
+        case 23: return "g1";
+    }
+
+    assert(false);
+    return {};
 }

@@ -19,6 +19,7 @@ public:
     void on_imgui_update() override;
 
     BoardObj& get_board() override;
+    void play_move_on_board(const std::string& string) override;
 private:
     void on_key_released(const sm::KeyReleasedEvent& event);
     void on_mouse_button_pressed(const sm::MouseButtonPressedEvent& event);

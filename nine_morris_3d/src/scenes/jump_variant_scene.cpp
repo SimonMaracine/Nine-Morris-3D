@@ -58,6 +58,10 @@ BoardObj& JumpVariantScene::get_board() {
     return m_board;
 }
 
+void JumpVariantScene::play_move_on_board(const std::string& string) {
+    // TODO
+}
+
 void JumpVariantScene::on_key_released(const sm::KeyReleasedEvent& event) {
     if (event.key == sm::Key::Space) {
         m_cam_controller.go_towards_position(m_default_camera_position);
