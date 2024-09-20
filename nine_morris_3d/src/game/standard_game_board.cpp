@@ -120,7 +120,7 @@ void StandardGameBoard::user_click_release() {
     });
 }
 
-void StandardGameBoard::place_piece(int place_index) {  // TODO test these
+void StandardGameBoard::place_piece(int place_index) {
     const auto iter {std::find_if(m_legal_moves.begin(), m_legal_moves.end(), [=](const Move& move) {
         return move.type == MoveType::Place && move.place.place_index == place_index;
     })};
@@ -156,9 +156,7 @@ void StandardGameBoard::place_take_piece(int place_index, int take_index) {
     m_pieces[PIECE(m_nodes[take_index].piece_id)].node_id = -1;
     m_nodes[place_index].piece_id = id;
 
-    const int take_piece_id {m_nodes[take_index].piece_id};
-
-    m_nodes[take_index].piece_id = -1;
+    const int take_piece_id {std::exchange(m_nodes[take_index].piece_id, -1)};
 
     do_place_animation(m_pieces[PIECE(id)], m_nodes[place_index], [=, this]() {
         m_pieces[PIECE(take_piece_id)].to_remove = true;
@@ -169,7 +167,7 @@ void StandardGameBoard::place_take_piece(int place_index, int take_index) {
     });
 }
 
-void StandardGameBoard::move_piece(int source_index, int destination_index) {  // FIXME
+void StandardGameBoard::move_piece(int source_index, int destination_index) {
     const auto iter {std::find_if(m_legal_moves.begin(), m_legal_moves.end(), [=](const Move& move) {
         return (
             move.type == MoveType::Move &&
@@ -187,7 +185,7 @@ void StandardGameBoard::move_piece(int source_index, int destination_index) {  /
     m_nodes[source_index].piece_id = -1;
 
     do_move_animation(
-        m_pieces[PIECE(m_nodes[source_index].piece_id)],
+        m_pieces[PIECE(m_nodes[destination_index].piece_id)],
         m_nodes[destination_index],
         []() {},
         !has_three_pieces(m_board, m_pieces[PIECE(m_nodes[source_index].piece_id)])
@@ -213,12 +211,10 @@ void StandardGameBoard::move_take_piece(int source_index, int destination_index,
     m_nodes[source_index].piece_id = -1;
     m_pieces[PIECE(m_nodes[take_index].piece_id)].node_id = -1;
 
-    const int take_piece_id {m_nodes[take_index].piece_id};
-
-    m_nodes[take_index].piece_id = -1;
+    const int take_piece_id {std::exchange(m_nodes[take_index].piece_id, -1)};
 
     do_move_animation(
-        m_pieces[PIECE(m_nodes[source_index].piece_id)],
+        m_pieces[PIECE(m_nodes[destination_index].piece_id)],
         m_nodes[destination_index],
         [=, this]() {
             m_pieces[PIECE(take_piece_id)].to_remove = true;
@@ -227,7 +223,7 @@ void StandardGameBoard::move_take_piece(int source_index, int destination_index,
                 m_pieces[PIECE(take_piece_id)].active = false;
             });
         },
-        !has_three_pieces(m_board, m_pieces[PIECE(m_nodes[source_index].piece_id)])
+        !has_three_pieces(m_board, m_pieces[PIECE(m_nodes[destination_index].piece_id)])
     );
 }
 
@@ -446,9 +442,8 @@ void StandardGameBoard::user_place_take(int place_index, int take_index) {
 
     m_pieces[PIECE(m_nodes[take_index].piece_id)].node_id = -1;
 
-    const int take_piece_id {m_nodes[take_index].piece_id};
+    const int take_piece_id {std::exchange(m_nodes[take_index].piece_id, -1)};
 
-    m_nodes[take_index].piece_id = -1;
     m_pieces[PIECE(take_piece_id)].to_remove = true;
 
     do_take_animation(m_pieces[PIECE(take_piece_id)], [this, take_piece_id]() {
@@ -462,9 +457,7 @@ void StandardGameBoard::user_move(int source_index, int destination_index) {
     m_pieces[PIECE(m_nodes[source_index].piece_id)].node_id = destination_index;
     m_nodes[destination_index].piece_id = m_nodes[source_index].piece_id;
 
-    const int move_piece_id {m_nodes[source_index].piece_id};
-
-    m_nodes[source_index].piece_id = -1;
+    const int move_piece_id {std::exchange(m_nodes[source_index].piece_id, -1)};
 
     do_move_animation(
         m_pieces[PIECE(move_piece_id)],
@@ -480,9 +473,7 @@ void StandardGameBoard::user_move_take_just_move(int source_index, int destinati
     m_pieces[PIECE(m_nodes[source_index].piece_id)].node_id = destination_index;
     m_nodes[destination_index].piece_id = m_nodes[source_index].piece_id;
 
-    const int move_piece_id {m_nodes[source_index].piece_id};
-
-    m_nodes[source_index].piece_id = -1;
+    const int move_piece_id {std::exchange(m_nodes[source_index].piece_id, -1)};
 
     do_move_animation(
         m_pieces[PIECE(move_piece_id)],
@@ -497,9 +488,8 @@ void StandardGameBoard::user_move_take(int source_index, int destination_index, 
 
     m_pieces[PIECE(m_nodes[take_index].piece_id)].node_id = -1;
 
-    const int take_piece_id {m_nodes[take_index].piece_id};
+    const int take_piece_id {std::exchange(m_nodes[take_index].piece_id, -1)};
 
-    m_nodes[take_index].piece_id = -1;
     m_pieces[PIECE(take_piece_id)].to_remove = true;
 
     do_take_animation(m_pieces[PIECE(take_piece_id)], [this, take_piece_id]() {

@@ -187,6 +187,25 @@ void GameScene::on_window_resized(const sm::WindowResizedEvent& event) {
     m_cam_2d.set_projection(0, event.width, 0, event.height);
 }
 
+/* FIXME
+    don't allow the computer to automatically start the game
+    make button for the computer to start the game
+    make button to stop the computer from thinking
+    board's nodes and pieces should update only when it's human's turn
+    when computer plays with itself, there is no pause and pieces end up in invalid places (probably a bug)
+    right now user can only change the player types when it's their turn, this is not good
+    the engine and protocol are not yet done and they have bugs (+ support the other game modes)
+*/
+
+/* TODO
+    saving and loading games
+    undo and redo moves
+    piece highlights (+ user feedback)
+    create the engine once at the beginning
+    loading screen
+
+    implement all other game modes + finish engine
+*/
 void GameScene::update_game_state() {
     switch (m_game_state) {
         case GameState::NextPlayer: {
@@ -241,7 +260,7 @@ void GameScene::update_game_state() {
 
                 play_move_on_board(tokens.at(1));
             } else if (tokens.at(0) == "info") {
-                LOG_INFO("{}", tokens.at(1));
+                LOG_INFO("{}", message->substr(0, message->size() - 1));
             }
 
             break;

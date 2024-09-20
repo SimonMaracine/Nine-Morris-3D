@@ -159,9 +159,7 @@ void JumpVariantBoard::user_move(int source_index, int destination_index) {
     m_pieces[PIECE(m_nodes[source_index].piece_id)].node_id = destination_index;
     m_nodes[destination_index].piece_id = m_nodes[source_index].piece_id;
 
-    const int move_piece_id {m_nodes[source_index].piece_id};
-
-    m_nodes[source_index].piece_id = -1;
+    const int move_piece_id {std::exchange(m_nodes[source_index].piece_id, -1)};
 
     do_move_animation(
         m_pieces[PIECE(move_piece_id)],

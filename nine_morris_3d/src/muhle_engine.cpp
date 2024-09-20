@@ -1,7 +1,6 @@
 #include "muhle_engine.hpp"
 
 #include <cstring>
-#include <cassert>
 
 #include <nine_morris_3d_engine/nine_morris_3d.hpp>
 #include <muhle_intelligence.h>
@@ -43,8 +42,6 @@ namespace muhle_engine {
                 return std::nullopt;
             }
 
-            assert(result == MUHLE_INTELLIGENCE_SUCCESS);
-
             return std::make_optional(buffer);
         }
     }
@@ -62,7 +59,7 @@ namespace muhle_engine {
             return false;
         }
 
-        if (*message == "ready") {
+        if (*message == "ready\n") {
             return true;
         }
 
