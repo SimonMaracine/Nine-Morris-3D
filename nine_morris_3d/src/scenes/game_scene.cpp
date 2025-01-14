@@ -21,7 +21,7 @@ void GameScene::on_start() {
     // m_player_white = static_cast<GamePlayer>(g.options.white_player);
     // m_player_black = static_cast<GamePlayer>(g.options.black_player);
 
-    muhle_engine::initialize();  // TODO don't create and destroy engine every time
+    // muhle_engine::initialize();  // TODO don't create and destroy engine every time
 }
 
 void GameScene::on_stop() {
@@ -29,7 +29,7 @@ void GameScene::on_stop() {
     //     muhle_engine::send_message("quit\n");
     // }
 
-    muhle_engine::uninitialize();
+    // muhle_engine::uninitialize();
 
     m_cam_controller.disconnect_events(ctx);
     ctx.disconnect_events(this);

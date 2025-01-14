@@ -126,12 +126,12 @@ StandardGameBoard StandardGameScene::setup_renderables() {
             switch (m_board.get_turn()) {
                 case Player::White:
                     if (m_player_black == GamePlayer::Human) {
-                        muhle_engine::send_message("move " + StandardGameBoard::string_from_move(move) + '\n');
+                        // muhle_engine::send_message("move " + StandardGameBoard::string_from_move(move) + '\n');
                     }
                     break;
                 case Player::Black:
                     if (m_player_white == GamePlayer::Human) {
-                        muhle_engine::send_message("move " + StandardGameBoard::string_from_move(move) + '\n');
+                        // muhle_engine::send_message("move " + StandardGameBoard::string_from_move(move) + '\n');
                     }
                     break;
             }
