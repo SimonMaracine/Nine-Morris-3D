@@ -1,4 +1,4 @@
-#include "game/standard_game_board.hpp"
+#include "game/nine_mens_morris_board.hpp"
 
 #include <algorithm>
 #include <utility>

@@ -18,16 +18,16 @@ void GameScene::on_start() {
 
     const auto& g {ctx.global<Global>()};
 
-    m_player_white = static_cast<GamePlayer>(g.options.white_player);
-    m_player_black = static_cast<GamePlayer>(g.options.black_player);
+    // m_player_white = static_cast<GamePlayer>(g.options.white_player);
+    // m_player_black = static_cast<GamePlayer>(g.options.black_player);
 
     muhle_engine::initialize();  // TODO don't create and destroy engine every time
 }
 
 void GameScene::on_stop() {
-    if (m_engine_started) {
-        muhle_engine::send_message("quit\n");
-    }
+    // if (m_engine_started) {
+    //     muhle_engine::send_message("quit\n");
+    // }
 
     muhle_engine::uninitialize();
 
@@ -36,12 +36,12 @@ void GameScene::on_stop() {
 }
 
 void GameScene::on_update() {
-    if (!m_engine_started) {
-        if (muhle_engine::is_ready()) {
-            muhle_engine::send_message("init\n");
-            m_engine_started = true;
-        }
-    }
+    // if (!m_engine_started) {
+    //     if (muhle_engine::is_ready()) {
+    //         muhle_engine::send_message("init\n");
+    //         m_engine_started = true;
+    //     }
+    // }
 
     m_cam_controller.update_controls(ctx.get_delta(), ctx);
     m_cam_controller.update_camera(ctx.get_delta());
@@ -207,67 +207,67 @@ void GameScene::on_window_resized(const sm::WindowResizedEvent& event) {
     implement all other game modes + finish engine
 */
 void GameScene::update_game_state() {
-    switch (m_game_state) {
-        case GameState::NextPlayer: {
-            const auto switch_player {
-                [this](GamePlayer game_player) {
-                    switch (game_player) {
-                        case GamePlayer::Human:
-                            m_game_state = GameState::HumanMakeMove;
-                            break;
-                        case GamePlayer::Computer:
-                            m_game_state = GameState::ComputerThink;
-                            break;
-                    }
-                }
-            };
+    // switch (m_game_state) {
+    //     case GameState::NextPlayer: {
+    //         const auto switch_player {
+    //             [this](GamePlayer game_player) {
+    //                 switch (game_player) {
+    //                     case GamePlayer::Human:
+    //                         m_game_state = GameState::HumanMakeMove;
+    //                         break;
+    //                     case GamePlayer::Computer:
+    //                         m_game_state = GameState::ComputerThink;
+    //                         break;
+    //                 }
+    //             }
+    //         };
 
-            switch (get_board().get_turn()) {
-                case Player::White:
-                    switch_player(m_player_white);
-                    break;
-                case Player::Black:
-                    switch_player(m_player_black);
-                    break;
-            }
+    //         switch (get_board().get_turn()) {
+    //             case Player::White:
+    //                 switch_player(m_player_white);
+    //                 break;
+    //             case Player::Black:
+    //                 switch_player(m_player_black);
+    //                 break;
+    //         }
 
-            break;
-        }
-        case GameState::HumanMakeMove:  // FIXME update board only in this state
-            break;
-        case GameState::ComputerThink:
-            if (!m_engine_started) {
-                break;
-            }
+    //         break;
+    //     }
+    //     case GameState::HumanMakeMove:  // FIXME update board only in this state
+    //         break;
+    //     case GameState::ComputerThink:
+    //         if (!m_engine_started) {
+    //             break;
+    //         }
 
-            muhle_engine::send_message("go\n");
-            m_game_state = GameState::ComputerMakeMove;
+    //         muhle_engine::send_message("go\n");
+    //         m_game_state = GameState::ComputerMakeMove;
 
-            break;
-        case GameState::ComputerMakeMove: {
-            const auto message {muhle_engine::receive_message()};
+    //         break;
+    //     case GameState::ComputerMakeMove: {
+    //         const auto message {muhle_engine::receive_message()};
 
-            if (!message) {
-                break;
-            }
+    //         if (!message) {
+    //             break;
+    //         }
 
-            const auto tokens {muhle_engine::tokenize_message(*message)};
+    //         const auto tokens {muhle_engine::tokenize_message(*message)};
 
-            if (tokens.at(0) == "bestmove") {
-                if (tokens.at(1) == "none") {
-                    break;
-                }
+    //         if (tokens.at(0) == "bestmove") {
+    //             if (tokens.at(1) == "none") {
+    //                 break;
+    //             }
 
-                play_move_on_board(tokens.at(1));
-            } else if (tokens.at(0) == "info") {
-                LOG_INFO("{}", message->substr(0, message->size() - 1));
-            }
+    //             play_move_on_board(tokens.at(1));
+    //         } else if (tokens.at(0) == "info") {
+    //             LOG_INFO("{}", message->substr(0, message->size() - 1));
+    //         }
 
-            break;
-        }
-        case GameState::Over:
-            break;
-    }
+    //         break;
+    //     }
+    //     case GameState::Over:
+    //         break;
+    // }
 }
 
 void GameScene::setup_camera() {
@@ -435,34 +435,34 @@ std::vector<sm::Renderable> GameScene::setup_black_pieces(unsigned int count) co
     return renderables;
 }
 
-TurnIndicator GameScene::setup_turn_indicator() const {
-    sm::TextureSpecification specification;
-    specification.format = sm::TextureFormat::Rgba8;
+// TurnIndicator GameScene::setup_turn_indicator() const {
+//     sm::TextureSpecification specification;
+//     specification.format = sm::TextureFormat::Rgba8;
 
-    const auto white_texture {ctx.load_texture("white_indicator"_H, ctx.get_texture_data("white_indicator.png"_H), specification)};
-    const auto black_texture {ctx.load_texture("black_indicator"_H, ctx.get_texture_data("black_indicator.png"_H), specification)};
+//     const auto white_texture {ctx.load_texture("white_indicator"_H, ctx.get_texture_data("white_indicator.png"_H), specification)};
+//     const auto black_texture {ctx.load_texture("black_indicator"_H, ctx.get_texture_data("black_indicator.png"_H), specification)};
 
-    return TurnIndicator(white_texture, black_texture);
-}
+//     return TurnIndicator(white_texture, black_texture);
+// }
 
-Timer GameScene::setup_timer() const {
-    sm::FontSpecification specification;
-    specification.size_height = 90.0f;
-    specification.bitmap_size = 512;
+// Timer GameScene::setup_timer() const {
+//     sm::FontSpecification specification;
+//     specification.size_height = 90.0f;
+//     specification.bitmap_size = 512;
 
-    const auto font {ctx.load_font(
-        "open_sans"_H,
-        ctx.path_assets("fonts/OpenSans/OpenSans-Regular.ttf"),
-        specification,
-        [](sm::Font* font) {
-            font->begin_baking();
-            font->bake_ascii();
-            font->end_baking();
-        }
-    )};
+//     const auto font {ctx.load_font(
+//         "open_sans"_H,
+//         ctx.path_assets("fonts/OpenSans/OpenSans-Regular.ttf"),
+//         specification,
+//         [](sm::Font* font) {
+//             font->begin_baking();
+//             font->bake_ascii();
+//             font->end_baking();
+//         }
+//     )};
 
-    return Timer(font);
-}
+//     return Timer(font);
+// }
 
 void GameScene::load_skybox_texture_data() const {
     // Global options must have been set to the desired skybox
@@ -499,11 +499,11 @@ void GameScene::load_board_paint_texture_data() const {
 
     const auto& g {ctx.global<Global>()};
 
-    if (g.options.labeled_board) {
+    // if (g.options.labeled_board) {
         ctx.load_texture_data(ctx.path_assets("textures/board/board_paint_labeled_diffuse.png"), sm::TexturePostProcessing());
-    } else {
-        ctx.load_texture_data(ctx.path_assets("textures/board/board_paint_diffuse.png"), sm::TexturePostProcessing());
-    }
+    // } else {
+    //     ctx.load_texture_data(ctx.path_assets("textures/board/board_paint_diffuse.png"), sm::TexturePostProcessing());
+    // }
 }
 
 void GameScene::load_all_texture_data() const {
@@ -559,11 +559,11 @@ void GameScene::load_all_texture_data() const {
             post_processing.size = sm::TextureSize::Half;
         }
 
-        if (g.options.labeled_board) {
+        // if (g.options.labeled_board) {
             ctx.reload_texture_data(ctx.path_assets("textures/board/board_paint_labeled_diffuse.png"), post_processing);
-        } else {
-            ctx.reload_texture_data(ctx.path_assets("textures/board/board_paint_diffuse.png"), post_processing);
-        }
+        // } else {
+        //     ctx.reload_texture_data(ctx.path_assets("textures/board/board_paint_diffuse.png"), post_processing);
+        // }
     }
 
     {
@@ -604,14 +604,14 @@ std::shared_ptr<sm::GlTexture> GameScene::load_board_paint_diffuse_texture(bool 
 
     if (reload) {
         return ctx.reload_texture(
-            g.options.labeled_board ? "board_paint_labeled_diffuse"_H : "board_paint_diffuse"_H,
-            ctx.get_texture_data(g.options.labeled_board ? "board_paint_labeled_diffuse.png"_H : "board_paint_diffuse.png"_H),
+            /*g.options.labeled_board ?*/ "board_paint_labeled_diffuse"_H /*: "board_paint_diffuse"_H*/,
+            ctx.get_texture_data(/*g.options.labeled_board ?*/ "board_paint_labeled_diffuse.png"_H /*: "board_paint_diffuse.png"_H*/),
             specification
         );
     } else {
         return ctx.load_texture(
-            g.options.labeled_board ? "board_paint_labeled_diffuse"_H : "board_paint_diffuse"_H,
-            ctx.get_texture_data(g.options.labeled_board ? "board_paint_labeled_diffuse.png"_H : "board_paint_diffuse.png"_H),
+            /*g.options.labeled_board ?*/ "board_paint_labeled_diffuse"_H /*: "board_paint_diffuse"_H*/,
+            ctx.get_texture_data(/*g.options.labeled_board ?*/ "board_paint_labeled_diffuse.png"_H /*: "board_paint_diffuse.png"_H*/),
             specification
         );
     }

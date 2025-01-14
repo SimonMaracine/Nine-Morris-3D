@@ -19,17 +19,17 @@ void LoadingScene::on_update() {
     if (m_done) {
         const auto& g {ctx.global<Global>()};
 
-        switch (g.options.game_mode) {
-            case static_cast<int>(GameMode::Standard):
-                ctx.change_scene("standard_game"_H);
-                break;
-            case static_cast<int>(GameMode::Jump):
-                ctx.change_scene("jump_variant"_H);
-                break;
-            case static_cast<int>(GameMode::JumpPlus):
-                ctx.change_scene("jump_plus_variant"_H);
-                break;
-        }
+        // switch (g.options.game_mode) {
+        //     case static_cast<int>(GameMode::Standard):
+        //         ctx.change_scene("standard_game"_H);
+        //         break;
+        //     case static_cast<int>(GameMode::Jump):
+        //         ctx.change_scene("jump_variant"_H);
+        //         break;
+        //     case static_cast<int>(GameMode::JumpPlus):
+        //         ctx.change_scene("jump_plus_variant"_H);
+        //         break;
+        // }
     }
 }
 
@@ -87,11 +87,11 @@ void LoadingScene::load_assets() {
 
         ctx.load_mesh(ctx.path_assets("models/board/board_paint.obj"), "Plane", sm::Mesh::Type::PNTT);
 
-        if (g.options.labeled_board) {
+        // if (g.options.labeled_board) {
             ctx.load_texture_data(ctx.path_assets("textures/board/board_paint_labeled_diffuse.png"), post_processing);
-        } else {
-            ctx.load_texture_data(ctx.path_assets("textures/board/board_paint_diffuse.png"), post_processing);
-        }
+        // } else {
+        //     ctx.load_texture_data(ctx.path_assets("textures/board/board_paint_diffuse.png"), post_processing);
+        // }
     }
 
     {

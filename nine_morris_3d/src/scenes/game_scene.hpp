@@ -8,16 +8,23 @@
 #include "game/board.hpp"
 #include "point_camera_controller.hpp"
 #include "ui.hpp"
-#include "turn_indicator.hpp"
-#include "timer.hpp"
+#include "clock.hpp"
 #include "constants.hpp"
 
 enum class GameState {
-    NextPlayer,
-    HumanMakeMove,
+    Ready,
+    Start,
+    NextTurn,
+    HumanPlayMove,
     ComputerThink,
-    ComputerMakeMove,
+    ComputerPlayMove,
+    Stop,
     Over
+    // NextPlayer,
+    // HumanMakeMove,
+    // ComputerThink,
+    // ComputerMakeMove,
+    // Over
 };
 
 class GameScene : public sm::ApplicationScene {
@@ -59,8 +66,8 @@ protected:
     std::vector<sm::Renderable> setup_nodes(unsigned int count) const;
     std::vector<sm::Renderable> setup_white_pieces(unsigned int count) const;
     std::vector<sm::Renderable> setup_black_pieces(unsigned int count) const;
-    TurnIndicator setup_turn_indicator() const;
-    Timer setup_timer() const;
+    // TurnIndicator setup_turn_indicator() const;
+    // Timer setup_timer() const;
 
     void load_skybox_texture_data() const;
     void load_board_paint_texture_data() const;
@@ -74,9 +81,9 @@ protected:
     std::shared_ptr<sm::GlTexture> load_piece_normal_texture(bool reload = false) const;
     std::shared_ptr<sm::GlTextureCubemap> load_skybox_texture_cubemap(bool reload = false) const;
 
-    bool m_engine_started {false};
-    bool m_game_started {false};
-    GameState m_game_state {GameState::NextPlayer};
+    // bool m_engine_started {false};
+    // bool m_game_started {false};
+    GameState m_game_state {GameState::Ready};
     GamePlayer m_player_white {};
     GamePlayer m_player_black {};
     glm::vec3 m_default_camera_position {};

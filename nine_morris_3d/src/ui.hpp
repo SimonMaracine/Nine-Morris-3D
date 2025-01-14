@@ -13,10 +13,7 @@ enum class PopupWindow {
     None,
     About,
     GameOver,
-    RulesStandardGame,
-    RulesJumpVariant,
-    RulesJumpPlusVariant,
-    ComputerAi
+    RulesNineMensMorris
 };
 
 class Ui {
@@ -32,10 +29,10 @@ private:
     void main_menu_bar(sm::Ctx& ctx, GameScene& game_scene);
     void about_window();
     void game_over_window(GameScene& game_scene);
-    void rules_standard_game_window();
-    void rules_jump_variant_window();
-    void rules_jump_plus_variant_window();
-    void computer_ai_window();
+    void rules_nine_mens_morris_window();
+    // void rules_jump_variant_window();
+    // void rules_jump_plus_variant_window();
+    // void computer_ai_window();
     void wrapped_text_window(const char* title, const char* text);
     void generic_window(const char* title, std::function<void()>&& contents, std::function<void()>&& on_ok = []() {});
 
@@ -52,10 +49,10 @@ private:
     // When changed, update the options from the global data
     Options m_options;
 
-    std::string m_last_saved_game_date {"No Date"};
+    // std::string m_last_saved_game_date {"No Date"};
     PopupWindow m_current_popup_window {PopupWindow::None};
     bool m_loading_skybox {false};  // This is needed, because selecting a skybox doesn't close the interface
     bool m_show_information {false};
-    bool m_can_undo {false};
-    bool m_can_redo {false};
+    // bool m_can_undo {false};
+    // bool m_can_redo {false};
 };

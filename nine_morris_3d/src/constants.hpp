@@ -3,9 +3,7 @@
 // Enums and constants that should not change very often!
 
 enum class GameMode {
-    Standard,
-    Jump,
-    JumpPlus
+    NineMensMorris
 };
 
 enum class GamePlayer {
@@ -43,7 +41,7 @@ enum class ShadowQuality {
 
 enum class Scale {
     _100 = 1,
-    _200 = 2,
+    _200 = 2
 };
 
 inline constexpr int MIN_WIDTH {512};

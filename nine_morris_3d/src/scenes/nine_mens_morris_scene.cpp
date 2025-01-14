@@ -1,4 +1,4 @@
-#include "scenes/standard_game_scene.hpp"
+#include "scenes/nine_mens_morris_scene.hpp"
 
 #include "game/ray.hpp"
 #include "global.hpp"
@@ -11,8 +11,8 @@ void StandardGameScene::on_start() {
     ctx.connect_event<sm::MouseButtonPressedEvent, &StandardGameScene::on_mouse_button_pressed>(this);
     ctx.connect_event<sm::MouseButtonReleasedEvent, &StandardGameScene::on_mouse_button_released>(this);
 
-    m_turn_indicator = setup_turn_indicator();
-    m_timer = setup_timer();
+    // m_turn_indicator = setup_turn_indicator();
+    // m_timer = setup_timer();
     m_board = setup_renderables();
 }
 
@@ -30,15 +30,15 @@ void StandardGameScene::on_update() {
 
     const auto& g {ctx.global<Global>()};
 
-    if (!g.options.hide_turn_indicator) {
-        m_turn_indicator.update(ctx, static_cast<TurnIndicatorType>(m_board.get_turn()));
-    }
+    // if (!g.options.hide_turn_indicator) {
+    //     m_turn_indicator.update(ctx, static_cast<TurnIndicatorType>(m_board.get_turn()));
+    // }
 
-    m_timer.update();
+    // m_timer.update();
 
-    if (!g.options.hide_timer) {
-        m_timer.render(ctx);
-    }
+    // if (!g.options.hide_timer) {
+    //     m_timer.render(ctx);
+    // }
 
     ctx.shadow(m_shadow_box);
 }
@@ -86,17 +86,17 @@ void StandardGameScene::on_key_released(const sm::KeyReleasedEvent& event) {
 
 void StandardGameScene::on_mouse_button_pressed(const sm::MouseButtonPressedEvent& event) {
     if (event.button == sm::MouseButton::Left) {
-        if (m_game_state == GameState::HumanMakeMove) {
-            m_board.user_click_press();
-        }
+        // if (m_game_state == GameState::HumanMakeMove) {
+        //     m_board.user_click_press();
+        // }
     }
 }
 
 void StandardGameScene::on_mouse_button_released(const sm::MouseButtonReleasedEvent& event) {
     if (event.button == sm::MouseButton::Left) {
-        if (m_game_state == GameState::HumanMakeMove) {
-            m_board.user_click_release();
-        }
+        // if (m_game_state == GameState::HumanMakeMove) {
+        //     m_board.user_click_release();
+        // }
     }
 }
 
@@ -108,16 +108,16 @@ StandardGameBoard StandardGameScene::setup_renderables() {
         setup_white_pieces(StandardGameBoard::PIECES / 2),
         setup_black_pieces(StandardGameBoard::PIECES / 2),
         [this](const StandardGameBoard::Move& move) {
-            if (!m_game_started) {
-                m_timer.start();
+            // if (!m_game_started) {
+            //     // m_timer.start();
 
-                m_game_started = true;
-            }
+            //     m_game_started = true;
+            // }
 
-            m_game_state = GameState::NextPlayer;
+            // m_game_state = GameState::NextPlayer;
 
             if (m_board.get_game_over() != GameOver::None) {
-                m_timer.stop();
+                // m_timer.stop();
                 m_ui.set_popup_window(PopupWindow::GameOver);
 
                 m_game_state = GameState::Over;

@@ -2,7 +2,7 @@
 
 #include <nine_morris_3d_engine/nine_morris_3d.hpp>
 
-#include "game/standard_game_board.hpp"
+#include "game/nine_mens_morris_board.hpp"
 #include "scenes/game_scene.hpp"
 
 class StandardGameScene : public GameScene {
@@ -10,7 +10,7 @@ public:
     explicit StandardGameScene(sm::Ctx& ctx)
         : GameScene(ctx) {}
 
-    SM_SCENE_NAME("standard_game")
+    SM_SCENE_NAME("nine_mens_morris")
 
     void on_start() override;
     void on_stop() override;
@@ -28,6 +28,7 @@ private:
     StandardGameBoard setup_renderables();
 
     StandardGameBoard m_board;
-    TurnIndicator m_turn_indicator;
-    Timer m_timer;
+    // TurnIndicatorm_turn_indicator;
+    // Timer m_timer;
+    Clock m_clock;
 };
