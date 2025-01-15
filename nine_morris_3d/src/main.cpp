@@ -11,8 +11,6 @@
 
 #include "scenes/loading_scene.hpp"
 #include "scenes/nine_mens_morris_scene.hpp"
-#include "scenes/jump_variant_scene.hpp"
-#include "scenes/jump_plus_variant_scene.hpp"
 #include "game.hpp"
 #include "global.hpp"
 #include "constants.hpp"
@@ -96,7 +94,7 @@ int application_main() {
         try {
             sm::Application game {properties};
             game.add_scene<LoadingScene>();
-            game.add_scene<StandardGameScene>();
+            game.add_scene<NineMensMorrisScene>();
             // game.add_scene<JumpVariantScene>();
             // game.add_scene<JumpPlusVariantScene>();
             game.set_global_data<Global>();

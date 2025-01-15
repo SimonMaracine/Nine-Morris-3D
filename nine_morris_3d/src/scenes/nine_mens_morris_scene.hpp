@@ -1,34 +1,12 @@
 #pragma once
 
-#include <nine_morris_3d_engine/nine_morris_3d.hpp>
+#include "nine_mens_morris_base_scene.hpp"
 
-#include "game/nine_mens_morris_board.hpp"
-#include "scenes/game_scene.hpp"
-
-class StandardGameScene : public GameScene {
-public:
-    explicit StandardGameScene(sm::Ctx& ctx)
-        : GameScene(ctx) {}
+struct NineMensMorrisScene : NineMensMorrisBaseScene {
+    explicit NineMensMorrisScene(sm::Ctx& ctx)
+        : NineMensMorrisBaseScene(ctx) {}
 
     SM_SCENE_NAME("nine_mens_morris")
 
-    void on_start() override;
-    void on_stop() override;
-    void on_update() override;
-    void on_fixed_update() override;
-    void on_imgui_update() override;
-
-    BoardObj& get_board() override;
-    void play_move_on_board(const std::string& string) override;
-private:
-    void on_key_released(const sm::KeyReleasedEvent& event);
-    void on_mouse_button_pressed(const sm::MouseButtonPressedEvent& event);
-    void on_mouse_button_released(const sm::MouseButtonReleasedEvent& event);
-
-    StandardGameBoard setup_renderables();
-
-    StandardGameBoard m_board;
-    // TurnIndicatorm_turn_indicator;
-    // Timer m_timer;
-    Clock m_clock;
+    bool twelve_mens_morris_mode() const override { return false; }
 };

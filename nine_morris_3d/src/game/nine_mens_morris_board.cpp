@@ -6,9 +6,9 @@
 
 #include <nine_morris_3d_engine/external/imgui.h++>
 
-#define PIECE(index) (index - StandardGameBoard::NODES)
+#define PIECE(index) (index - NineMensMorrisBoard::NODES)
 
-StandardGameBoard::StandardGameBoard(
+NineMensMorrisBoard::NineMensMorrisBoard(
     const sm::Renderable& board,
     const sm::Renderable& board_paint,
     const std::vector<sm::Renderable>& nodes,
@@ -33,7 +33,7 @@ StandardGameBoard::StandardGameBoard(
     m_legal_moves = generate_moves();
 }
 
-void StandardGameBoard::update(sm::Ctx& ctx, glm::vec3 ray, glm::vec3 camera) {
+void NineMensMorrisBoard::update(sm::Ctx& ctx, glm::vec3 ray, glm::vec3 camera) {
     update_hovered_id(ray, camera, [this]() {
         std::vector<std::pair<int, sm::Renderable>> renderables;
 
@@ -82,15 +82,15 @@ void StandardGameBoard::update(sm::Ctx& ctx, glm::vec3 ray, glm::vec3 camera) {
     update_pieces(ctx);
 }
 
-void StandardGameBoard::update_movement() {
+void NineMensMorrisBoard::update_movement() {
     BoardObj::update_movement();
 }
 
-void StandardGameBoard::user_click_press() {
+void NineMensMorrisBoard::user_click_press() {
     BoardObj::user_click_press(m_game_over);
 }
 
-void StandardGameBoard::user_click_release() {
+void NineMensMorrisBoard::user_click_release() {
     BoardObj::user_click_release(m_game_over, [this]() {
         if (m_plies >= 18) {
             if (m_take_action_index != -1) {
@@ -120,7 +120,7 @@ void StandardGameBoard::user_click_release() {
     });
 }
 
-void StandardGameBoard::place_piece(int place_index) {
+void NineMensMorrisBoard::place_piece(int place_index) {
     const auto iter {std::find_if(m_legal_moves.begin(), m_legal_moves.end(), [=](const Move& move) {
         return move.type == MoveType::Place && move.place.place_index == place_index;
     })};
@@ -137,7 +137,7 @@ void StandardGameBoard::place_piece(int place_index) {
     do_place_animation(m_pieces[PIECE(id)], m_nodes[place_index], []() {});
 }
 
-void StandardGameBoard::place_take_piece(int place_index, int take_index) {
+void NineMensMorrisBoard::place_take_piece(int place_index, int take_index) {
     const auto iter {std::find_if(m_legal_moves.begin(), m_legal_moves.end(), [=](const Move& move) {
         return (
             move.type == MoveType::PlaceTake &&
@@ -167,7 +167,7 @@ void StandardGameBoard::place_take_piece(int place_index, int take_index) {
     });
 }
 
-void StandardGameBoard::move_piece(int source_index, int destination_index) {
+void NineMensMorrisBoard::move_piece(int source_index, int destination_index) {
     const auto iter {std::find_if(m_legal_moves.begin(), m_legal_moves.end(), [=](const Move& move) {
         return (
             move.type == MoveType::Move &&
@@ -192,7 +192,7 @@ void StandardGameBoard::move_piece(int source_index, int destination_index) {
     );
 }
 
-void StandardGameBoard::move_take_piece(int source_index, int destination_index, int take_index) {
+void NineMensMorrisBoard::move_take_piece(int source_index, int destination_index, int take_index) {
     const auto iter {std::find_if(m_legal_moves.begin(), m_legal_moves.end(), [=](const Move& move) {
         return (
             move.type == MoveType::MoveTake &&
@@ -227,7 +227,7 @@ void StandardGameBoard::move_take_piece(int source_index, int destination_index,
     );
 }
 
-StandardGameBoard::Move StandardGameBoard::move_from_string(const std::string& string) {
+NineMensMorrisBoard::Move NineMensMorrisBoard::move_from_string(const std::string& string) {
     Move result {};
 
     switch (string[0]) {
@@ -272,7 +272,7 @@ StandardGameBoard::Move StandardGameBoard::move_from_string(const std::string& s
     return {};
 }
 
-std::string StandardGameBoard::string_from_move(const Move& move) {
+std::string NineMensMorrisBoard::string_from_move(const Move& move) {
     std::string result;
 
     switch (move.type) {
@@ -305,7 +305,7 @@ std::string StandardGameBoard::string_from_move(const Move& move) {
     return result;
 }
 
-void StandardGameBoard::debug() {
+void NineMensMorrisBoard::debug() {
     if (ImGui::Begin("Debug Board")) {
         ImGui::Text("turn %s", turn_string(m_turn));
         ImGui::Text("game_over %s", game_over_string(m_game_over));
@@ -322,7 +322,7 @@ void StandardGameBoard::debug() {
     ImGui::End();
 }
 
-void StandardGameBoard::select(int index) {
+void NineMensMorrisBoard::select(int index) {
     if (m_selected_index == -1) {
         if (m_board[index] == static_cast<Piece>(m_turn)) {
             m_selected_index = index;
@@ -340,7 +340,7 @@ void StandardGameBoard::select(int index) {
     }
 }
 
-void StandardGameBoard::try_place(int place_index) {
+void NineMensMorrisBoard::try_place(int place_index) {
     auto iter {std::find_if(m_legal_moves.begin(), m_legal_moves.end(), [=](const Move& move) {
         return move.type == MoveType::Place && move.place.place_index == place_index;
     })};
@@ -359,7 +359,7 @@ void StandardGameBoard::try_place(int place_index) {
     }
 }
 
-void StandardGameBoard::try_place_take(int place_index, int take_index) {
+void NineMensMorrisBoard::try_place_take(int place_index, int take_index) {
     const auto iter {std::find_if(m_legal_moves.begin(), m_legal_moves.end(), [=](const Move& move) {
         return (
             move.type == MoveType::PlaceTake &&
@@ -373,7 +373,7 @@ void StandardGameBoard::try_place_take(int place_index, int take_index) {
     }
 }
 
-void StandardGameBoard::try_move(int source_index, int destination_index) {
+void NineMensMorrisBoard::try_move(int source_index, int destination_index) {
     auto iter {std::find_if(m_legal_moves.begin(), m_legal_moves.end(), [=](const Move& move) {
         return (
             move.type == MoveType::Move &&
@@ -400,7 +400,7 @@ void StandardGameBoard::try_move(int source_index, int destination_index) {
     }
 }
 
-void StandardGameBoard::try_move_take(int source_index, int destination_index, int take_index) {
+void NineMensMorrisBoard::try_move_take(int source_index, int destination_index, int take_index) {
     const auto iter {std::find_if(m_legal_moves.begin(), m_legal_moves.end(), [=](const Move& move) {
         return (
             move.type == MoveType::MoveTake &&
@@ -415,7 +415,7 @@ void StandardGameBoard::try_move_take(int source_index, int destination_index, i
     }
 }
 
-void StandardGameBoard::user_place(int place_index) {
+void NineMensMorrisBoard::user_place(int place_index) {
     place(place_index);
 
     const int id {new_piece_to_place(static_cast<PieceType>(opponent(m_turn)))};
@@ -426,7 +426,7 @@ void StandardGameBoard::user_place(int place_index) {
     do_place_animation(m_pieces[PIECE(id)], m_nodes[place_index], []() {});
 }
 
-void StandardGameBoard::user_place_take_just_place(int place_index) {
+void NineMensMorrisBoard::user_place_take_just_place(int place_index) {
     m_take_action_index = place_index;
 
     const int id {new_piece_to_place(static_cast<PieceType>(m_turn))};
@@ -437,7 +437,7 @@ void StandardGameBoard::user_place_take_just_place(int place_index) {
     do_place_animation(m_pieces[PIECE(id)], m_nodes[place_index], []() {});
 }
 
-void StandardGameBoard::user_place_take(int place_index, int take_index) {
+void NineMensMorrisBoard::user_place_take(int place_index, int take_index) {
     place_take(place_index, take_index);
 
     m_pieces[PIECE(m_nodes[take_index].piece_id)].node_id = -1;
@@ -451,7 +451,7 @@ void StandardGameBoard::user_place_take(int place_index, int take_index) {
     });
 }
 
-void StandardGameBoard::user_move(int source_index, int destination_index) {
+void NineMensMorrisBoard::user_move(int source_index, int destination_index) {
     move(source_index, destination_index);
 
     m_pieces[PIECE(m_nodes[source_index].piece_id)].node_id = destination_index;
@@ -467,7 +467,7 @@ void StandardGameBoard::user_move(int source_index, int destination_index) {
     );
 }
 
-void StandardGameBoard::user_move_take_just_move(int source_index, int destination_index) {
+void NineMensMorrisBoard::user_move_take_just_move(int source_index, int destination_index) {
     m_take_action_index = destination_index;
 
     m_pieces[PIECE(m_nodes[source_index].piece_id)].node_id = destination_index;
@@ -483,7 +483,7 @@ void StandardGameBoard::user_move_take_just_move(int source_index, int destinati
     );
 }
 
-void StandardGameBoard::user_move_take(int source_index, int destination_index, int take_index) {
+void NineMensMorrisBoard::user_move_take(int source_index, int destination_index, int take_index) {
     move_take(source_index, destination_index, take_index);
 
     m_pieces[PIECE(m_nodes[take_index].piece_id)].node_id = -1;
@@ -497,7 +497,7 @@ void StandardGameBoard::user_move_take(int source_index, int destination_index, 
     });
 }
 
-void StandardGameBoard::place(int place_index) {
+void NineMensMorrisBoard::place(int place_index) {
     assert(m_board[place_index] == Piece::None);
 
     m_board[place_index] = static_cast<Piece>(m_turn);
@@ -508,7 +508,7 @@ void StandardGameBoard::place(int place_index) {
     m_move_callback(create_place(place_index));
 }
 
-void StandardGameBoard::place_take(int place_index, int take_index) {
+void NineMensMorrisBoard::place_take(int place_index, int take_index) {
     assert(m_board[place_index] == Piece::None);
     assert(m_board[take_index] != Piece::None);
 
@@ -522,7 +522,7 @@ void StandardGameBoard::place_take(int place_index, int take_index) {
     m_move_callback(create_place_take(place_index, take_index));
 }
 
-void StandardGameBoard::move(int source_index, int destination_index) {
+void NineMensMorrisBoard::move(int source_index, int destination_index) {
     assert(m_board[source_index] != Piece::None);
     assert(m_board[destination_index] == Piece::None);
 
@@ -536,7 +536,7 @@ void StandardGameBoard::move(int source_index, int destination_index) {
     m_move_callback(create_move(source_index, destination_index));
 }
 
-void StandardGameBoard::move_take(int source_index, int destination_index, int take_index) {
+void NineMensMorrisBoard::move_take(int source_index, int destination_index, int take_index) {
     assert(m_board[source_index] != Piece::None);
     assert(m_board[destination_index] == Piece::None);
     assert(m_board[take_index] != Piece::None);
@@ -551,7 +551,7 @@ void StandardGameBoard::move_take(int source_index, int destination_index, int t
     m_move_callback(create_move_take(source_index, destination_index, take_index));
 }
 
-void StandardGameBoard::finish_turn(bool advancement) {
+void NineMensMorrisBoard::finish_turn(bool advancement) {
     if (m_turn == Player::White) {
         m_turn = Player::Black;
     } else {
@@ -574,7 +574,7 @@ void StandardGameBoard::finish_turn(bool advancement) {
     m_take_action_index = -1;
 }
 
-void StandardGameBoard::check_winner_material() {
+void NineMensMorrisBoard::check_winner_material() {
     if (m_game_over != GameOver::None) {
         return;
     }
@@ -591,7 +591,7 @@ void StandardGameBoard::check_winner_material() {
     }
 }
 
-void StandardGameBoard::check_winner_blocking() {
+void NineMensMorrisBoard::check_winner_blocking() {
     if (m_game_over != GameOver::None) {
         return;
     }
@@ -604,7 +604,7 @@ void StandardGameBoard::check_winner_blocking() {
     }
 }
 
-void StandardGameBoard::check_fifty_move_rule() {
+void NineMensMorrisBoard::check_fifty_move_rule() {
     if (m_game_over != GameOver::None) {
         return;
     }
@@ -617,7 +617,7 @@ void StandardGameBoard::check_fifty_move_rule() {
     }
 }
 
-void StandardGameBoard::check_threefold_repetition(const Position& position) {
+void NineMensMorrisBoard::check_threefold_repetition(const Position& position) {
     if (m_game_over != GameOver::None) {
         return;
     }
@@ -637,7 +637,7 @@ void StandardGameBoard::check_threefold_repetition(const Position& position) {
     }
 }
 
-int StandardGameBoard::new_piece_to_place(PieceType type) {
+int NineMensMorrisBoard::new_piece_to_place(PieceType type) {
     for (const PieceObj& piece : m_pieces) {
         if (piece.get_type() == type && piece.active && !piece.to_remove && piece.node_id == -1) {
             return piece.get_id();
@@ -647,19 +647,19 @@ int StandardGameBoard::new_piece_to_place(PieceType type) {
     assert(false);
 }
 
-bool StandardGameBoard::is_node_id(int id) {
+bool NineMensMorrisBoard::is_node_id(int id) {
     return id >= 0 && id <= NODES - 1;
 }
 
-bool StandardGameBoard::is_piece_id(int id) {
+bool NineMensMorrisBoard::is_piece_id(int id) {
     return id >= NODES && id <= NODES + PIECES - 1;
 }
 
-bool StandardGameBoard::has_three_pieces(const Board& board, const PieceObj& piece) {
+bool NineMensMorrisBoard::has_three_pieces(const Board& board, const PieceObj& piece) {
     return count_pieces(board, static_cast<Player>(piece.get_type())) == 3;
 }
 
-std::vector<StandardGameBoard::Move> StandardGameBoard::generate_moves() const {
+std::vector<NineMensMorrisBoard::Move> NineMensMorrisBoard::generate_moves() const {
     std::vector<Move> moves;
     Board board {m_board};
 
@@ -676,7 +676,7 @@ std::vector<StandardGameBoard::Move> StandardGameBoard::generate_moves() const {
     return moves;
 }
 
-void StandardGameBoard::generate_moves_phase1(Board& board, std::vector<Move>& moves, Player player) {
+void NineMensMorrisBoard::generate_moves_phase1(Board& board, std::vector<Move>& moves, Player player) {
     for (int i {0}; i < NODES; i++) {
         if (board[i] != Piece::None) {
             continue;
@@ -707,7 +707,7 @@ void StandardGameBoard::generate_moves_phase1(Board& board, std::vector<Move>& m
     }
 }
 
-void StandardGameBoard::generate_moves_phase2(Board& board, std::vector<Move>& moves, Player player) {
+void NineMensMorrisBoard::generate_moves_phase2(Board& board, std::vector<Move>& moves, Player player) {
     for (int i {0}; i < NODES; i++) {
         if (board[i] != static_cast<Piece>(player)) {
             continue;
@@ -742,7 +742,7 @@ void StandardGameBoard::generate_moves_phase2(Board& board, std::vector<Move>& m
     }
 }
 
-void StandardGameBoard::generate_moves_phase3(Board& board, std::vector<Move>& moves, Player player) {
+void NineMensMorrisBoard::generate_moves_phase3(Board& board, std::vector<Move>& moves, Player player) {
     for (int i {0}; i < NODES; i++) {
         if (board[i] != static_cast<Piece>(player)) {
             continue;
@@ -779,33 +779,33 @@ void StandardGameBoard::generate_moves_phase3(Board& board, std::vector<Move>& m
     }
 }
 
-void StandardGameBoard::make_place_move(Board& board, Player player, int place_index) {
+void NineMensMorrisBoard::make_place_move(Board& board, Player player, int place_index) {
     assert(board[place_index] == Piece::None);
 
     board[place_index] = static_cast<Piece>(player);
 }
 
-void StandardGameBoard::unmake_place_move(Board& board, int place_index) {
+void NineMensMorrisBoard::unmake_place_move(Board& board, int place_index) {
     assert(board[place_index] != Piece::None);
 
     board[place_index] = Piece::None;
 }
 
-void StandardGameBoard::make_move_move(Board& board, int source_index, int destination_index) {
+void NineMensMorrisBoard::make_move_move(Board& board, int source_index, int destination_index) {
     assert(board[source_index] != Piece::None);
     assert(board[destination_index] == Piece::None);
 
     std::swap(board[source_index], board[destination_index]);
 }
 
-void StandardGameBoard::unmake_move_move(Board& board, int source_index, int destination_index) {
+void NineMensMorrisBoard::unmake_move_move(Board& board, int source_index, int destination_index) {
     assert(board[source_index] == Piece::None);
     assert(board[destination_index] != Piece::None);
 
     std::swap(board[source_index], board[destination_index]);
 }
 
-bool StandardGameBoard::all_pieces_in_mills(const Board& board, Player player) {
+bool NineMensMorrisBoard::all_pieces_in_mills(const Board& board, Player player) {
     for (int i {0}; i < NODES; i++) {
         if (board[i] != static_cast<Piece>(player)) {
             continue;
@@ -824,7 +824,7 @@ bool StandardGameBoard::all_pieces_in_mills(const Board& board, Player player) {
         result.push_back(const_index); \
     }
 
-std::vector<int> StandardGameBoard::neighbor_free_positions(const Board& board, int index) {
+std::vector<int> NineMensMorrisBoard::neighbor_free_positions(const Board& board, int index) {
     std::vector<int> result;
     result.reserve(4);
 
@@ -946,7 +946,7 @@ std::vector<int> StandardGameBoard::neighbor_free_positions(const Board& board, 
     return result;
 }
 
-StandardGameBoard::Move StandardGameBoard::create_place(int place_index) {
+NineMensMorrisBoard::Move NineMensMorrisBoard::create_place(int place_index) {
     Move move;
     move.type = MoveType::Place;
     move.place.place_index = place_index;
@@ -954,7 +954,7 @@ StandardGameBoard::Move StandardGameBoard::create_place(int place_index) {
     return move;
 }
 
-StandardGameBoard::Move StandardGameBoard::create_place_take(int place_index, int take_index) {
+NineMensMorrisBoard::Move NineMensMorrisBoard::create_place_take(int place_index, int take_index) {
     Move move;
     move.type = MoveType::PlaceTake;
     move.place_take.place_index = place_index;
@@ -963,7 +963,7 @@ StandardGameBoard::Move StandardGameBoard::create_place_take(int place_index, in
     return move;
 }
 
-StandardGameBoard::Move StandardGameBoard::create_move(int source_index, int destination_index) {
+NineMensMorrisBoard::Move NineMensMorrisBoard::create_move(int source_index, int destination_index) {
     Move move;
     move.type = MoveType::Move;
     move.move.source_index = source_index;
@@ -972,7 +972,7 @@ StandardGameBoard::Move StandardGameBoard::create_move(int source_index, int des
     return move;
 }
 
-StandardGameBoard::Move StandardGameBoard::create_move_take(int source_index, int destination_index, int take_index) {
+NineMensMorrisBoard::Move NineMensMorrisBoard::create_move_take(int source_index, int destination_index, int take_index) {
     Move move;
     move.type = MoveType::MoveTake;
     move.move_take.source_index = source_index;
@@ -982,7 +982,7 @@ StandardGameBoard::Move StandardGameBoard::create_move_take(int source_index, in
     return move;
 }
 
-int StandardGameBoard::index_from_string(const std::string& string) {
+int NineMensMorrisBoard::index_from_string(const std::string& string) {
     if (string == "a7") return 0;
     else if (string == "d7") return 1;
     else if (string == "g7") return 2;
@@ -1012,7 +1012,7 @@ int StandardGameBoard::index_from_string(const std::string& string) {
     return {};
 }
 
-const char* StandardGameBoard::string_from_index(int index) {
+const char* NineMensMorrisBoard::string_from_index(int index) {
     switch (index) {
         case 0: return "a7";
         case 1: return "d7";

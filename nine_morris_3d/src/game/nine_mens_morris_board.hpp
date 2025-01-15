@@ -11,7 +11,7 @@
 #include "game/node.hpp"
 #include "game/piece.hpp"
 
-class StandardGameBoard : public BoardObj {
+class NineMensMorrisBoard : public BoardObj {
 public:
     static constexpr int NODES {24};
     static constexpr int PIECES {18};
@@ -52,8 +52,8 @@ public:
     using Board = std::array<Piece, NODES>;
     using Position = ::Position<Board>;
 
-    StandardGameBoard() = default;
-    StandardGameBoard(
+    NineMensMorrisBoard() = default;
+    NineMensMorrisBoard(
         const sm::Renderable& board,
         const sm::Renderable& board_paint,
         const std::vector<sm::Renderable>& nodes,
