@@ -19,7 +19,7 @@ public:
 
     int piece_id {-1};
 private:
-    int m_id {-1};
+    int m_id {-1};  // FIXME layout
     bool m_highlighted {false};
 
     sm::Renderable m_renderable;

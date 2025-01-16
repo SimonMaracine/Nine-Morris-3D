@@ -17,7 +17,7 @@ void NineMensMorrisBaseScene::scene_setup() {
 }
 
 void NineMensMorrisBaseScene::scene_update() {
-    m_board.update(ctx, cast_mouse_ray(ctx, m_cam), m_cam_controller.get_position());
+    m_board.update(ctx, cast_mouse_ray(ctx, m_cam), m_cam_controller.get_position(), m_game_state == GameState::HumanThinking);
 }
 
 void NineMensMorrisBaseScene::scene_fixed_update() {
@@ -33,46 +33,42 @@ BoardObj& NineMensMorrisBaseScene::get_board() {
 }
 
 void NineMensMorrisBaseScene::play_move_on_board(const std::string& string) {
-    const NineMensMorrisBoard::Move move {NineMensMorrisBoard::move_from_string(string)};
+    m_board.play_move(NineMensMorrisBoard::move_from_string(string));
+}
 
-    switch (move.type) {
-        case NineMensMorrisBoard::MoveType::Place:
-            m_board.place_piece(move.place.place_index);
-            break;
-        case NineMensMorrisBoard::MoveType::PlaceTake:
-            m_board.place_take_piece(move.place_take.place_index, move.place_take.take_index);
-            break;
-        case NineMensMorrisBoard::MoveType::Move:
-            m_board.move_piece(move.move.source_index, move.move.destination_index);
-            break;
-        case NineMensMorrisBoard::MoveType::MoveTake:
-            m_board.move_take_piece(move.move_take.source_index, move.move_take.destination_index, move.move_take.take_index);
-            break;
+GamePlayer NineMensMorrisBaseScene::get_board_player_type() const {
+    switch (m_board.get_player()) {
+        case NineMensMorrisBoard::Player::White:
+            return m_player_white;
+        case NineMensMorrisBoard::Player::Black:
+            return m_player_black;
     }
+
+    return {};
 }
 
 void NineMensMorrisBaseScene::set_scene_textures() {
     const auto board_normal {load_board_normal_texture(true)};
 
-    get_board().get_renderable().get_material()->set_texture(
+    m_board.get_renderable().get_material()->set_texture(
         "u_material.ambient_diffuse"_H,
         load_board_diffuse_texture(true),
         0
     );
 
-    get_board().get_renderable().get_material()->set_texture(
+    m_board.get_renderable().get_material()->set_texture(
         "u_material.normal"_H,
         board_normal,
         1
     );
 
-    get_board().get_paint_renderable().get_material()->set_texture(
+    m_board.get_paint_renderable().get_material()->set_texture(
         "u_material.ambient_diffuse"_H,
         load_board_paint_diffuse_texture(true),
         0
     );
 
-    get_board().get_paint_renderable().get_material()->set_texture(
+    m_board.get_paint_renderable().get_material()->set_texture(
         "u_material.normal"_H,
         board_normal,
         1
@@ -82,7 +78,7 @@ void NineMensMorrisBaseScene::set_scene_textures() {
     const auto black_piece_diffuse {load_black_piece_diffuse_texture(true)};
     const auto piece_normal {load_piece_normal_texture(true)};
 
-    for (PieceObj& piece : get_board().get_pieces()) {
+    for (PieceObj& piece : m_board.get_pieces()) {
         switch (piece.get_type()) {
             case PieceType::White:
                 piece.get_renderable().get_material()->set_texture(
@@ -173,24 +169,6 @@ void NineMensMorrisBaseScene::on_mouse_button_released(const sm::MouseButtonRele
             m_board.user_click_release();
         }
     }
-}
-
-void NineMensMorrisBaseScene::load_and_set_board_paint_texture() {
-    ctx.add_task_async([this](sm::AsyncTask& task, void*) {
-        load_board_paint_texture_data();
-
-        ctx.add_task([this](const sm::Task&, void*) {
-            get_board().get_paint_renderable().get_material()->set_texture(
-                "u_material.ambient_diffuse"_H,
-                load_board_paint_diffuse_texture(true),
-                0
-            );
-
-            return sm::Task::Result::Done;
-        });
-
-        task.set_done();
-    });
 }
 
 sm::Renderable NineMensMorrisBaseScene::setup_board() const {
@@ -305,18 +283,6 @@ std::vector<sm::Renderable> NineMensMorrisBaseScene::setup_black_pieces(unsigned
     }
 
     return renderables;
-}
-
-void NineMensMorrisBaseScene::load_board_paint_texture_data() const {
-    // Global options must have been set to the desired texture
-
-    const auto& g {ctx.global<Global>()};
-
-    // if (g.options.labeled_board) {
-        ctx.load_texture_data(ctx.path_assets("textures/board/board_paint_labeled_diffuse.png"), sm::TexturePostProcessing());
-    // } else {
-    //     ctx.load_texture_data(ctx.path_assets("textures/board/board_paint_diffuse.png"), sm::TexturePostProcessing());
-    // }
 }
 
 std::shared_ptr<sm::GlTexture> NineMensMorrisBaseScene::load_board_diffuse_texture(bool reload) const {
@@ -442,13 +408,13 @@ NineMensMorrisBoard NineMensMorrisBaseScene::setup_renderables() {
                 m_game_state = GameState::Over;
             }
 
-            switch (m_board.get_turn()) {
-                case Player::White:
+            switch (m_board.get_player()) {
+                case NineMensMorrisBoard::Player::White:
                     if (m_player_black == GamePlayer::Human) {
                         // muhle_engine::send_message("move " + NineMensMorrisBoard::string_from_move(move) + '\n');
                     }
                     break;
-                case Player::Black:
+                case NineMensMorrisBoard::Player::Black:
                     if (m_player_white == GamePlayer::Human) {
                         // muhle_engine::send_message("move " + NineMensMorrisBoard::string_from_move(move) + '\n');
                     }

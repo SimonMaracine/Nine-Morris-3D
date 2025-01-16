@@ -1,4 +1,4 @@
-#include "game/node.hpp"
+#include "game/nine_mens_morris/node.hpp"
 
 NodeObj::NodeObj(int id, glm::vec3 position, const sm::Renderable& renderable)
     : m_id(id), m_renderable(renderable) {

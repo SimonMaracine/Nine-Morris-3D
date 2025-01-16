@@ -19,17 +19,11 @@ void LoadingScene::on_update() {
     if (m_done) {
         const auto& g {ctx.global<Global>()};
 
-        // switch (g.options.game_mode) {
-        //     case static_cast<int>(GameMode::Standard):
-        //         ctx.change_scene("standard_game"_H);
-        //         break;
-        //     case static_cast<int>(GameMode::Jump):
-        //         ctx.change_scene("jump_variant"_H);
-        //         break;
-        //     case static_cast<int>(GameMode::JumpPlus):
-        //         ctx.change_scene("jump_plus_variant"_H);
-        //         break;
-        // }
+        switch (g.options.game_mode) {
+            case static_cast<int>(GameMode::NineMensMorris):
+                ctx.change_scene("nine_mens_morris"_H);
+                break;
+        }
     }
 }
 

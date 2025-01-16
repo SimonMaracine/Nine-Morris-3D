@@ -1,4 +1,4 @@
-#include "game/piece.hpp"
+#include "game/nine_mens_morris/piece.hpp"
 
 #include <utility>
 

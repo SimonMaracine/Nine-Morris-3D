@@ -38,13 +38,15 @@ public:
     virtual void scene_update() = 0;
     virtual void scene_fixed_update() = 0;
     virtual void scene_imgui_update() = 0;
+
     virtual BoardObj& get_board() = 0;
     virtual void play_move_on_board(const std::string& string) = 0;
+    virtual GamePlayer get_board_player_type() const = 0;
 
     PointCameraController& get_camera_controller() { return m_cam_controller; }
-    GamePlayer& get_player_white() { return m_player_white; }
-    GamePlayer& get_player_black() { return m_player_black; }
-    GameState& get_game_state() { return m_game_state; }
+    // GamePlayer& get_player_white() { return m_player_white; }
+    // GamePlayer& get_player_black() { return m_player_black; }
+    // GameState& get_game_state() { return m_game_state; }
 
     void load_and_set_skybox();
     void load_and_set_textures();

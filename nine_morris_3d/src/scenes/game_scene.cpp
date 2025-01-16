@@ -17,6 +17,7 @@ void GameScene::on_start() {
 
     m_ui.initialize(ctx);
 
+    scene_setup();
 
     // const auto& g {ctx.global<Global>()};
 
@@ -205,6 +206,83 @@ void GameScene::update_game_state() {
     //     case GameState::Over:
     //         break;
     // }
+
+    switch (m_game_state) {
+        case GameState::Ready:
+            break;
+        case GameState::Start:
+            m_clock.start();
+            m_game_state = GameState::NextTurn;
+
+            break;
+        case GameState::NextTurn: {
+            switch (get_board_player_type()) {
+                case GamePlayer::Human:
+                    m_game_state = GameState::HumanThinking;
+                    break;
+                case GamePlayer::Computer:
+                    m_game_state = GameState::ComputerStartThinking;
+                    break;
+            }
+
+            break;
+        }
+        case GameState::HumanThinking:
+            break;
+        case GameState::ComputerStartThinking:
+            // try {
+            //     m_engine->start_thinking(
+            //         board::position_to_string(m_board.get_setup_position()),
+            //         m_moves,
+            //         m_clock.get_white_time(),
+            //         m_clock.get_black_time(),
+            //         std::nullopt,
+            //         std::nullopt
+            //     );
+            // } catch (const engine::EngineError& e) {
+            //     std::cerr << "Engine error: " << e.what() << '\n';
+            //     m_game_state = GameState::Stop;
+            //     break;
+            // }
+
+            m_game_state = GameState::ComputerThinking;
+
+            break;
+        case GameState::ComputerThinking: {
+            // std::optional<std::string> best_move;
+
+            // try {
+            //     best_move = m_engine->done_thinking();
+            // } catch (const engine::EngineError& e) {
+            //     std::cerr << "Engine error: " << e.what() << '\n';
+            //     m_game_state = GameState::Stop;
+            //     break;
+            // }
+
+            // if (best_move) {
+            //     if (*best_move == "none") {
+            //         if (m_board.get_game_over() == board::GameOver::None) {
+            //             throw std::runtime_error("The engine calls game over, but the GUI doesn't agree");
+            //         }
+
+            //         break;
+            //     }
+
+            //     std::cout << "Playing move on the board " << *best_move << '\n';
+
+            //     m_board.play_move(board::move_from_string(*best_move));
+            // }
+
+            break;
+        }
+        case GameState::Stop:
+            m_clock.stop();
+            m_game_state = GameState::Over;
+
+            break;
+        case GameState::Over:
+            break;
+    }
 }
 
 void GameScene::setup_camera() {
