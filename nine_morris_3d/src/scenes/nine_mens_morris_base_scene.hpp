@@ -4,6 +4,8 @@
 
 #include "game/nine_mens_morris/nine_mens_morris_board.hpp"
 #include "scenes/game_scene.hpp"
+#include "game_options.hpp"
+#include "constants.hpp"
 
 class NineMensMorrisBaseScene : public GameScene {
 public:
@@ -16,9 +18,12 @@ public:
     void scene_fixed_update() override;
     void scene_imgui_update() override;
 
+    GameOptions& get_game_options() override;
     BoardObj& get_board() override;
     void play_move_on_board(const std::string& string) override;
     GamePlayer get_board_player_type() const override;
+    void timeout(PlayerColor color) override;
+    void time_control_options_window() override;
 
     void set_scene_textures() override;
     void load_all_texture_data() const override;
@@ -45,4 +50,5 @@ private:
     NineMensMorrisBoard setup_renderables();
 
     NineMensMorrisBoard m_board;
+    GameOptions m_game_options {NineMensMorrisTime::_10min};
 };

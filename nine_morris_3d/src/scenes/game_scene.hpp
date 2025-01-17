@@ -9,6 +9,8 @@
 #include "point_camera_controller.hpp"
 #include "ui.hpp"
 #include "clock.hpp"
+#include "move_list.hpp"
+#include "game_options.hpp"
 #include "constants.hpp"
 
 enum class GameState {
@@ -39,14 +41,17 @@ public:
     virtual void scene_fixed_update() = 0;
     virtual void scene_imgui_update() = 0;
 
+    virtual GameOptions& get_game_options() = 0;
     virtual BoardObj& get_board() = 0;
     virtual void play_move_on_board(const std::string& string) = 0;
     virtual GamePlayer get_board_player_type() const = 0;
+    virtual void timeout(PlayerColor color) = 0;
+    virtual void time_control_options_window() = 0;
 
     PointCameraController& get_camera_controller() { return m_cam_controller; }
-    // GamePlayer& get_player_white() { return m_player_white; }
-    // GamePlayer& get_player_black() { return m_player_black; }
-    // GameState& get_game_state() { return m_game_state; }
+    GameState& get_game_state() { return m_game_state; }
+    const Clock& get_clock() const { return m_clock; }
+    const MoveList& get_move_list() const { return m_move_list; }
 
     void load_and_set_skybox();
     void load_and_set_textures();
@@ -65,10 +70,9 @@ protected:
     std::shared_ptr<sm::GlTextureCubemap> load_skybox_texture_cubemap(bool reload = false) const;
 
     GameState m_game_state {GameState::Ready};
-    GamePlayer m_player_white {};
-    GamePlayer m_player_black {};
     glm::vec3 m_default_camera_position {};
     Clock m_clock;
+    MoveList m_move_list;
 
     PointCameraController m_cam_controller;
     Ui m_ui;

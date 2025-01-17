@@ -1,6 +1,7 @@
 #include "scenes/nine_mens_morris_base_scene.hpp"
 
 #include <nine_morris_3d_engine/external/resmanager.h++>
+#include <nine_morris_3d_engine/external/imgui.h++>
 
 #include "game/ray.hpp"
 #include "global.hpp"
@@ -28,6 +29,10 @@ void NineMensMorrisBaseScene::scene_imgui_update() {
     m_board.debug();
 }
 
+GameOptions& NineMensMorrisBaseScene::get_game_options() {
+    return m_game_options;
+}
+
 BoardObj& NineMensMorrisBaseScene::get_board() {
     return m_board;
 }
@@ -39,12 +44,53 @@ void NineMensMorrisBaseScene::play_move_on_board(const std::string& string) {
 GamePlayer NineMensMorrisBaseScene::get_board_player_type() const {
     switch (m_board.get_player()) {
         case NineMensMorrisBoard::Player::White:
-            return m_player_white;
+            return static_cast<GamePlayer>(m_game_options.white_player);
         case NineMensMorrisBoard::Player::Black:
-            return m_player_black;
+            return static_cast<GamePlayer>(m_game_options.black_player);
     }
 
     return {};
+}
+
+void NineMensMorrisBaseScene::timeout(PlayerColor color) {
+    switch (color) {
+        case PlayerColor::White:
+            m_board.timeout(NineMensMorrisBoard::Player::White);
+            break;
+        case PlayerColor::Black:
+            m_board.timeout(NineMensMorrisBoard::Player::Black);
+            break;
+    }
+}
+
+void NineMensMorrisBaseScene::time_control_options_window() {
+    const auto as_centiseconds {[](unsigned int minutes) { return 1000 * 60 * minutes; }};
+
+    if (ImGui::RadioButton("1 min", &m_game_options.time, static_cast<int>(NineMensMorrisTime::_1min))) {
+        m_clock.reset(as_centiseconds(1));
+    }
+
+    ImGui::SameLine();
+
+    if (ImGui::RadioButton("3 min", &m_game_options.time, static_cast<int>(NineMensMorrisTime::_3min))) {
+        m_clock.reset(as_centiseconds(3));
+    }
+
+    if (ImGui::RadioButton("10 min", &m_game_options.time, static_cast<int>(NineMensMorrisTime::_10min))) {
+        m_clock.reset(as_centiseconds(10));
+    }
+
+    ImGui::SameLine();
+
+    if (ImGui::RadioButton("60 min", &m_game_options.time, static_cast<int>(NineMensMorrisTime::_60min))) {
+        m_clock.reset(as_centiseconds(60));
+    }
+
+    ImGui::RadioButton("Custom", &m_game_options.time, static_cast<int>(NineMensMorrisTime::Custom));
+
+    if (m_game_options.time == static_cast<int>(NineMensMorrisTime::Custom)) {
+        // TODO
+    }
 }
 
 void NineMensMorrisBaseScene::set_scene_textures() {
@@ -393,33 +439,17 @@ NineMensMorrisBoard NineMensMorrisBaseScene::setup_renderables() {
         setup_white_pieces(NineMensMorrisBoard::PIECES / 2),
         setup_black_pieces(NineMensMorrisBoard::PIECES / 2),
         [this](const NineMensMorrisBoard::Move& move) {
-            // if (!m_game_started) {
-            //     // m_timer.start();
+            m_move_list.push(NineMensMorrisBoard::move_to_string(move));
 
-            //     m_game_started = true;
-            // }
+            m_clock.switch_turn();
 
-            // m_game_state = GameState::NextPlayer;
-
-            if (m_board.get_game_over() != GameOver::None) {
-                // m_timer.stop();
+            if (m_board.get_game_over() != GameOver::None) {  // TODO assert game over
                 m_ui.set_popup_window(PopupWindow::GameOver);
-
-                m_game_state = GameState::Over;
+                m_game_state = GameState::Stop;
+                return;
             }
 
-            switch (m_board.get_player()) {
-                case NineMensMorrisBoard::Player::White:
-                    if (m_player_black == GamePlayer::Human) {
-                        // muhle_engine::send_message("move " + NineMensMorrisBoard::string_from_move(move) + '\n');
-                    }
-                    break;
-                case NineMensMorrisBoard::Player::Black:
-                    if (m_player_white == GamePlayer::Human) {
-                        // muhle_engine::send_message("move " + NineMensMorrisBoard::string_from_move(move) + '\n');
-                    }
-                    break;
-            }
+            m_game_state = GameState::NextTurn;
         }
     );
 }

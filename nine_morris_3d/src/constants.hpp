@@ -2,6 +2,19 @@
 
 // Enums and constants that should not change very often!
 
+enum class NineMensMorrisTime {
+    _1min,
+    _3min,
+    _10min,
+    _60min,
+    Custom
+};
+
+enum class GameType {
+    Local,
+    Online
+};
+
 enum class GameMode {
     NineMensMorris
 };
@@ -9,6 +22,12 @@ enum class GameMode {
 enum class GamePlayer {
     Human,
     Computer
+};
+
+// Generic type
+enum class PlayerColor {
+    White,
+    Black
 };
 
 enum class Skybox {

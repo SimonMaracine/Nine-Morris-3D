@@ -18,34 +18,14 @@ void GameScene::on_start() {
     m_ui.initialize(ctx);
 
     scene_setup();
-
-    // const auto& g {ctx.global<Global>()};
-
-    // m_player_white = static_cast<GamePlayer>(g.options.white_player);
-    // m_player_black = static_cast<GamePlayer>(g.options.black_player);
-
-    // muhle_engine::initialize();  // TODO don't create and destroy engine every time
 }
 
 void GameScene::on_stop() {
-    // if (m_engine_started) {
-    //     muhle_engine::send_message("quit\n");
-    // }
-
-    // muhle_engine::uninitialize();
-
     m_cam_controller.disconnect_events(ctx);
     ctx.disconnect_events(this);
 }
 
 void GameScene::on_update() {
-    // if (!m_engine_started) {
-    //     if (muhle_engine::is_ready()) {
-    //         muhle_engine::send_message("init\n");
-    //         m_engine_started = true;
-    //     }
-    // }
-
     m_cam_controller.update_controls(ctx.get_delta(), ctx);
     m_cam_controller.update_camera(ctx.get_delta());
 
@@ -69,6 +49,22 @@ void GameScene::on_update() {
 
     // Light
     ctx.debug_add_lamp(glm::normalize(-m_directional_light.direction) * 15.0f, glm::vec3(0.6f));
+
+    m_clock.update();
+
+    if (m_game_state != GameState::Ready && m_game_state != GameState::Over) {
+        if (m_clock.get_white_time() == 0) {
+            timeout(PlayerColor::White);
+            m_ui.set_popup_window(PopupWindow::GameOver);
+            m_game_state = GameState::Stop;
+        }
+
+        if (m_clock.get_black_time() == 0) {
+            timeout(PlayerColor::Black);
+            m_ui.set_popup_window(PopupWindow::GameOver);
+            m_game_state = GameState::Stop;
+        }
+    }
 
     scene_update();
     update_game_state();
@@ -145,68 +141,6 @@ void GameScene::on_window_resized(const sm::WindowResizedEvent& event) {
     implement all other game modes + finish engine
 */
 void GameScene::update_game_state() {
-    // switch (m_game_state) {
-    //     case GameState::NextPlayer: {
-    //         const auto switch_player {
-    //             [this](GamePlayer game_player) {
-    //                 switch (game_player) {
-    //                     case GamePlayer::Human:
-    //                         m_game_state = GameState::HumanMakeMove;
-    //                         break;
-    //                     case GamePlayer::Computer:
-    //                         m_game_state = GameState::ComputerThink;
-    //                         break;
-    //                 }
-    //             }
-    //         };
-
-    //         switch (get_board().get_turn()) {
-    //             case Player::White:
-    //                 switch_player(m_player_white);
-    //                 break;
-    //             case Player::Black:
-    //                 switch_player(m_player_black);
-    //                 break;
-    //         }
-
-    //         break;
-    //     }
-    //     case GameState::HumanMakeMove:  // FIXME update board only in this state
-    //         break;
-    //     case GameState::ComputerThink:
-    //         if (!m_engine_started) {
-    //             break;
-    //         }
-
-    //         muhle_engine::send_message("go\n");
-    //         m_game_state = GameState::ComputerMakeMove;
-
-    //         break;
-    //     case GameState::ComputerMakeMove: {
-    //         const auto message {muhle_engine::receive_message()};
-
-    //         if (!message) {
-    //             break;
-    //         }
-
-    //         const auto tokens {muhle_engine::tokenize_message(*message)};
-
-    //         if (tokens.at(0) == "bestmove") {
-    //             if (tokens.at(1) == "none") {
-    //                 break;
-    //             }
-
-    //             play_move_on_board(tokens.at(1));
-    //         } else if (tokens.at(0) == "info") {
-    //             LOG_INFO("{}", message->substr(0, message->size() - 1));
-    //         }
-
-    //         break;
-    //     }
-    //     case GameState::Over:
-    //         break;
-    // }
-
     switch (m_game_state) {
         case GameState::Ready:
             break;

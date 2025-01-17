@@ -1,6 +1,7 @@
 #include "ui.hpp"
 
 #include <utility>
+#include <cassert>
 
 #include <nine_morris_3d_engine/external/imgui.h++>
 #include <nine_morris_3d_engine/external/glm.h++>
@@ -8,6 +9,7 @@
 
 #include "scenes/game_scene.hpp"
 #include "global.hpp"
+#include "game_options.hpp"
 #include "constants.hpp"
 #include "ver.hpp"
 
@@ -25,6 +27,7 @@ void Ui::initialize(sm::Ctx& ctx) {
 
 void Ui::update(sm::Ctx& ctx, GameScene& game_scene) {
     main_menu_bar(ctx, game_scene);
+    game_window(game_scene);
 
     switch (m_current_popup_window) {
         case PopupWindow::None:
@@ -34,6 +37,9 @@ void Ui::update(sm::Ctx& ctx, GameScene& game_scene) {
             break;
         case PopupWindow::GameOver:
             game_over_window(game_scene);
+            break;
+        case PopupWindow::GameOptions:
+            game_options_window(game_scene);
             break;
         case PopupWindow::RulesNineMensMorris:
             rules_nine_mens_morris_window();
@@ -47,7 +53,11 @@ void Ui::main_menu_bar(sm::Ctx& ctx, GameScene& game_scene) {
     if (ImGui::BeginMainMenuBar()) {
         if (ImGui::BeginMenu("Game")) {
             if (ImGui::MenuItem("New Game")) {
-                ctx.change_scene(dynamic_cast<sm::ApplicationScene&>(game_scene).get_id());
+                // ctx.change_scene(dynamic_cast<sm::ApplicationScene&>(game_scene).get_id());
+                // TODO reset some objects only
+            }
+            if (ImGui::MenuItem("Game Options")) {
+                m_current_popup_window = PopupWindow::GameOptions;
             }
             if (ImGui::BeginMenu("Game Mode")) {
                 if (ImGui::RadioButton("Nine Men's Morris", &m_options.game_mode, static_cast<int>(GameMode::NineMensMorris))) {
@@ -291,6 +301,70 @@ void Ui::main_menu_bar(sm::Ctx& ctx, GameScene& game_scene) {
     }
 }
 
+void Ui::game_window(GameScene& game_scene) {
+    if (ImGui::Begin("Game")) {
+        if (game_scene.get_game_state() != GameState::Ready) {
+            game_window_during_game(game_scene);
+        } else {
+            game_window_before_game(game_scene);
+        }
+    }
+
+    ImGui::End();
+}
+
+void Ui::game_window_before_game(GameScene& game_scene) {
+    if (ImGui::Button("Start Game")) {  // FIXME check engine available, at most one computer player etc.
+        game_scene.get_game_state() = GameState::Start;
+    }
+
+    ImGui::Separator();
+
+    const auto game_player_str {[](int game_player) -> const char* {
+        switch (game_player) {
+            case static_cast<int>(GamePlayer::Human):
+                return "human";
+            case static_cast<int>(GamePlayer::Computer):
+                return "computer";
+        }
+
+        assert(false);
+        return {};
+    }};
+
+    ImGui::Text("W");
+    ImGui::SameLine();
+    ImGui::Text("%s", game_player_str(game_scene.get_game_options().white_player));
+
+    ImGui::Text("B");
+    ImGui::SameLine();
+    ImGui::Text("%s", game_player_str(game_scene.get_game_options().black_player));
+
+    ImGui::Text("Time");
+    ImGui::SameLine();
+    const auto minutes {std::get<0>(Clock::split_time(game_scene.get_clock().get_white_time()))};
+    ImGui::Text("%u minutes", minutes);
+}
+
+void Ui::game_window_during_game(GameScene& game_scene) {
+    {
+        ImGui::Text("B");
+        ImGui::SameLine();
+        const auto [minutes, seconds, centiseconds] {Clock::split_time(game_scene.get_clock().get_black_time())};
+        ImGui::Text("%u:%02u.%02u", minutes, seconds, centiseconds);
+    }
+    {
+        ImGui::Text("W");
+        ImGui::SameLine();
+        const auto [minutes, seconds, centiseconds] {Clock::split_time(game_scene.get_clock().get_white_time())};
+        ImGui::Text("%u:%02u.%02u", minutes, seconds, centiseconds);
+    }
+
+    ImGui::Separator();
+
+    game_scene.get_move_list().update_window();
+}
+
 void Ui::about_window() {
     generic_window("About Nine Morris 3D", []() {
         ImGui::Text("A 3D implementation of the board game nine men's morris");
@@ -327,6 +401,44 @@ void Ui::game_over_window(GameScene& game_scene) {
 
         ImGui::SetCursorPosX((ImGui::GetWindowWidth() - ImGui::CalcTextSize(reason.c_str()).x) * 0.5f);
         ImGui::Text("%s", reason.c_str());
+    });
+}
+
+void Ui::game_options_window(GameScene& game_scene) {
+    generic_window("Game Options", [&]() {
+        GameOptions& game_options {game_scene.get_game_options()};
+
+        ImGui::BeginDisabled(game_scene.get_game_state() != GameState::Ready);
+
+        ImGui::RadioButton("Local", &game_options.game_type, static_cast<int>(GameType::Local));
+        ImGui::SameLine();
+        ImGui::RadioButton("Online", &game_options.game_type, static_cast<int>(GameType::Online));
+
+        ImGui::Separator();
+
+        if (game_options.game_type == static_cast<int>(GameType::Local)) {
+            ImGui::Text("W");
+            ImGui::SameLine();
+
+            ImGui::RadioButton("Human##w", &game_options.white_player, static_cast<int>(GamePlayer::Human));
+            ImGui::SameLine();
+            ImGui::RadioButton("Computer##w", &game_options.white_player, static_cast<int>(GamePlayer::Computer));
+
+            ImGui::Text("B");
+            ImGui::SameLine();
+
+            ImGui::RadioButton("Human##b", &game_options.black_player, static_cast<int>(GamePlayer::Human));
+            ImGui::SameLine();
+            ImGui::RadioButton("Computer##b", &game_options.black_player, static_cast<int>(GamePlayer::Computer));
+        } else {
+            ImGui::Text("(PLACEHOLDER)");
+        }
+
+        ImGui::Separator();
+
+        game_scene.time_control_options_window();
+
+        ImGui::EndDisabled();
     });
 }
 
