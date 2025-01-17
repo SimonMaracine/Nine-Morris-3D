@@ -217,11 +217,7 @@ void NineMensMorrisBaseScene::load_all_texture_data() const {
             post_processing.size = sm::TextureSize::Half;
         }
 
-        // if (g.options.labeled_board) {
-            ctx.reload_texture_data(ctx.path_assets("textures/board/board_paint_labeled_diffuse.png"), post_processing);
-        // } else {
-        //     ctx.reload_texture_data(ctx.path_assets("textures/board/board_paint_diffuse.png"), post_processing);
-        // }
+        ctx.reload_texture_data(ctx.path_assets("textures/board/board_paint_diffuse.png"), post_processing);
     }
 
     {
@@ -398,14 +394,14 @@ std::shared_ptr<sm::GlTexture> NineMensMorrisBaseScene::load_board_paint_diffuse
 
     if (reload) {
         return ctx.reload_texture(
-            /*g.options.labeled_board ?*/ "board_paint_labeled_diffuse"_H /*: "board_paint_diffuse"_H*/,
-            ctx.get_texture_data(/*g.options.labeled_board ?*/ "board_paint_labeled_diffuse.png"_H /*: "board_paint_diffuse.png"_H*/),
+            "board_paint_diffuse"_H,
+            ctx.get_texture_data("board_paint_diffuse.png"_H),
             specification
         );
     } else {
         return ctx.load_texture(
-            /*g.options.labeled_board ?*/ "board_paint_labeled_diffuse"_H /*: "board_paint_diffuse"_H*/,
-            ctx.get_texture_data(/*g.options.labeled_board ?*/ "board_paint_labeled_diffuse.png"_H /*: "board_paint_diffuse.png"_H*/),
+            "board_paint_diffuse"_H,
+            ctx.get_texture_data("board_paint_diffuse.png"_H),
             specification
         );
     }

@@ -13,8 +13,6 @@ inline constexpr const char* OPTIONS_FILE_NAME {"options.dat"};
 
 struct Options {
     int game_mode {static_cast<int>(GameMode::NineMensMorris)};
-    // int white_player {static_cast<int>(GamePlayer::Human)};
-    // int black_player {static_cast<int>(GamePlayer::Human)};
     float master_volume {1.0f};
     float music_volume {0.7f};
     int skybox {static_cast<int>(Skybox::Field)};
@@ -27,17 +25,11 @@ struct Options {
     bool enable_music {false};
     bool vsync {true};
     bool custom_cursor {false};
-    // bool save_on_exit {false};
-    // bool hide_timer {false};
-    // bool hide_turn_indicator {false};
-    // bool labeled_board {true};
 
     template<typename Archive>
     void serialize(Archive& archive, const std::uint32_t) {
         archive(
             game_mode,
-            // white_player,
-            // black_player,
             master_volume,
             music_volume,
             skybox,
@@ -50,10 +42,6 @@ struct Options {
             enable_music,
             vsync,
             custom_cursor
-            // save_on_exit,
-            // hide_timer,
-            // hide_turn_indicator,
-            // labeled_board
         );
     }
 };
