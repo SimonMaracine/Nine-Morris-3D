@@ -53,8 +53,7 @@ void Ui::main_menu_bar(sm::Ctx& ctx, GameScene& game_scene) {
     if (ImGui::BeginMainMenuBar()) {
         if (ImGui::BeginMenu("Game")) {
             if (ImGui::MenuItem("New Game")) {
-                // ctx.change_scene(dynamic_cast<sm::ApplicationScene&>(game_scene).get_id());
-                // TODO reset some objects only
+                game_scene.reset();
             }
             if (ImGui::MenuItem("Game Options")) {
                 m_current_popup_window = PopupWindow::GameOptions;
@@ -65,21 +64,6 @@ void Ui::main_menu_bar(sm::Ctx& ctx, GameScene& game_scene) {
                         ctx.change_scene("nine_mens_morris"_H);
                     }
                 }
-                // if (ImGui::RadioButton("Standard Game", &m_options.game_mode, static_cast<int>(GameMode::Standard))) {
-                //     if (std::exchange(g.options.game_mode, m_options.game_mode) != static_cast<int>(GameMode::Standard)) {
-                //         ctx.change_scene("standard_game"_H);
-                //     }
-                // }
-                // if (ImGui::RadioButton("Jump Variant", &m_options.game_mode, static_cast<int>(GameMode::Jump))) {
-                //     if (std::exchange(g.options.game_mode, m_options.game_mode) != static_cast<int>(GameMode::Jump)) {
-                //         ctx.change_scene("jump_variant"_H);
-                //     }
-                // }
-                // if (ImGui::RadioButton("Jump Plus Variant", &m_options.game_mode, static_cast<int>(GameMode::JumpPlus))) {
-                //     if (std::exchange(g.options.game_mode, m_options.game_mode) != static_cast<int>(GameMode::JumpPlus)) {
-                //         ctx.change_scene("jump_plus_variant"_H);
-                //     }
-                // }
 
                 ImGui::EndMenu();
             }

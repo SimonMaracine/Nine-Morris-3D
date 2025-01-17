@@ -229,53 +229,37 @@ NineMensMorrisBoard::NineMensMorrisBoard(
     m_paint_renderable.transform.scale = 20.0f;
     m_paint_renderable.transform.position.y = 0.062f;
 
-    m_nodes.resize(NODES);
-    m_pieces.resize(PIECES);
-
-    initialize_nodes(nodes);
-
-    for (int i {0}; i < PIECES / 2; i++) {
-        initialize_piece_in_air(white_pieces, i, i, -3.0f, static_cast<float>(i) * 0.5f - 2.0f, PieceType::White);
-    }
-
-    for (int i {PIECES / 2}; i < PIECES; i++) {
-        initialize_piece_in_air(black_pieces, i, i - PIECES / 2, 3.0f, static_cast<float>(i - PIECES / 2) * -0.5f + 2.0f, PieceType::Black);
-    }
-
     m_legal_moves = generate_moves();
+
+    initialize_objects(nodes, white_pieces, black_pieces);
 }
 
 void NineMensMorrisBoard::update(sm::Ctx& ctx, glm::vec3 ray, glm::vec3 camera, bool user_input) {
-    update_hovered_id(ray, camera, [this]() {
-        std::vector<std::pair<int, sm::Renderable>> renderables;
+    if (user_input) {
+        update_hovered_id(ray, camera, [this]() {
+            std::vector<std::pair<int, sm::Renderable>> renderables;
 
-        for (const NodeObj& node : m_nodes) {
-            renderables.push_back(std::make_pair(node.get_id(), node.get_renderable()));
-        }
-
-        for (const PieceObj& piece : m_pieces) {
-            if (!(piece.active && !piece.to_remove)) {
-                continue;
+            for (const NodeObj& node : m_nodes) {
+                renderables.push_back(std::make_pair(node.get_id(), node.get_renderable()));
             }
 
-            renderables.push_back(std::make_pair(piece.get_id(), piece.get_renderable()));
-        }
+            for (const PieceObj& piece : m_pieces) {
+                if (!(piece.active && !piece.to_remove)) {
+                    continue;
+                }
 
-        return renderables;
-    });
+                renderables.push_back(std::make_pair(piece.get_id(), piece.get_renderable()));
+            }
+
+            return renderables;
+        });
 
 #ifdef __GNUG__
     #pragma GCC diagnostic push
     #pragma GCC diagnostic ignored "-Wparentheses"
 #endif
 
-    if (user_input) {
         update_nodes_highlight([this]() {
-            // return (
-            //     m_position.plies < 18 && m_take_action_index == -1 ||
-            //     m_position.plies >= 18 && m_selected_index != -1 && m_take_action_index == -1
-            // );
-
             return (
                 m_position.plies < 18 && !m_capture_piece ||
                 m_position.plies >= 18 && m_select_id != -1 && !m_capture_piece
@@ -283,11 +267,6 @@ void NineMensMorrisBoard::update(sm::Ctx& ctx, glm::vec3 ray, glm::vec3 camera, 
         });
 
         update_pieces_highlight([this](const PieceObj& piece) {
-            // return (
-            //     m_take_action_index != -1 && static_cast<Player>(piece.get_type()) != m_turn && piece.node_id != -1 ||
-            //     m_plies >= 18 && static_cast<Player>(piece.get_type()) == m_turn && m_take_action_index == -1
-            // );
-
             return (
                 m_capture_piece && static_cast<Player>(piece.get_type()) != m_position.player && piece.node_id != -1 ||
                 m_position.plies >= 18 && static_cast<Player>(piece.get_type()) == m_position.player && !m_capture_piece
@@ -343,144 +322,22 @@ void NineMensMorrisBoard::user_click_release() {
                 }
             }
         }
-
-        // if (m_position.plies >= 18) {
-        //     if (m_take_action_index != -1) {
-        //         if (is_piece_id(m_hovered_id)) {
-        //             try_move_take(m_selected_index, m_take_action_index, m_pieces[PIECE(m_hovered_id)].node_id);
-        //         }
-        //     } else {
-        //         if (is_node_id(m_hovered_id)) {
-        //             try_move(m_selected_index, m_nodes[m_hovered_id].get_id());
-        //         }
-
-        //         if (is_piece_id(m_hovered_id)) {
-        //             select(m_pieces[PIECE(m_hovered_id)].node_id);
-        //         }
-        //     }
-        // } else {
-        //     if (m_take_action_index != -1) {
-        //         if (is_piece_id(m_hovered_id)) {
-        //             try_place_take(m_take_action_index, m_pieces[PIECE(m_hovered_id)].node_id);
-        //         }
-        //     } else {
-        //         if (is_node_id(m_hovered_id)) {
-        //             try_place(m_nodes[m_hovered_id].get_id());
-        //         }
-        //     }
-        // }
     });
 }
 
-// void NineMensMorrisBoard::place_piece(int place_index) {
-//     const auto iter {std::find_if(m_legal_moves.begin(), m_legal_moves.end(), [=](const Move& move) {
-//         return move.type == MoveType::Place && move.place.place_index == place_index;
-//     })};
+void NineMensMorrisBoard::reset(const Position& position) {
+    m_position = position;
+    m_plies_no_advancement = 0;
+    m_positions.clear();
 
-//     assert(iter != m_legal_moves.end());
+    m_capture_piece = false;
+    m_select_id = -1;
+    m_game_over = GameOver();
+    m_setup_position = m_position;
 
-//     place(place_index);
+    m_legal_moves = generate_moves();
 
-//     const int id {new_piece_to_place(static_cast<PieceType>(opponent(m_turn)))};
-
-//     m_pieces[PIECE(id)].node_id = place_index;
-//     m_nodes[place_index].piece_id = id;
-
-//     do_place_animation(m_pieces[PIECE(id)], m_nodes[place_index], []() {});
-// }
-
-// void NineMensMorrisBoard::place_take_piece(int place_index, int take_index) {
-//     const auto iter {std::find_if(m_legal_moves.begin(), m_legal_moves.end(), [=](const Move& move) {
-//         return (
-//             move.type == MoveType::PlaceTake &&
-//             move.place_take.place_index == place_index &&
-//             move.place_take.take_index == take_index
-//         );
-//     })};
-
-//     assert(iter != m_legal_moves.end());
-
-//     place_take(place_index, take_index);
-
-//     const int id {new_piece_to_place(static_cast<PieceType>(opponent(m_turn)))};
-
-//     m_pieces[PIECE(id)].node_id = place_index;
-//     m_pieces[PIECE(m_nodes[take_index].piece_id)].node_id = -1;
-//     m_nodes[place_index].piece_id = id;
-
-//     const int take_piece_id {std::exchange(m_nodes[take_index].piece_id, -1)};
-
-//     do_place_animation(m_pieces[PIECE(id)], m_nodes[place_index], [=, this]() {
-//         m_pieces[PIECE(take_piece_id)].to_remove = true;
-
-//         do_take_animation(m_pieces[PIECE(take_piece_id)], [=, this]() {
-//             m_pieces[PIECE(take_piece_id)].active = false;
-//         });
-//     });
-// }
-
-// void NineMensMorrisBoard::move_piece(int source_index, int destination_index) {
-//     const auto iter {std::find_if(m_legal_moves.begin(), m_legal_moves.end(), [=](const Move& move) {
-//         return (
-//             move.type == MoveType::Move &&
-//             move.move.source_index == source_index &&
-//             move.move.destination_index == destination_index
-//         );
-//     })};
-
-//     assert(iter != m_legal_moves.end());
-
-//     move(source_index, destination_index);
-
-//     m_pieces[PIECE(m_nodes[source_index].piece_id)].node_id = destination_index;
-//     m_nodes[destination_index].piece_id = m_nodes[source_index].piece_id;
-//     m_nodes[source_index].piece_id = -1;
-
-//     do_move_animation(
-//         m_pieces[PIECE(m_nodes[destination_index].piece_id)],
-//         m_nodes[destination_index],
-//         []() {},
-//         !has_three_pieces(m_board, m_pieces[PIECE(m_nodes[source_index].piece_id)])
-//     );
-// }
-
-// void NineMensMorrisBoard::move_take_piece(int source_index, int destination_index, int take_index) {
-//     const auto iter {std::find_if(m_legal_moves.begin(), m_legal_moves.end(), [=](const Move& move) {
-//         return (
-//             move.type == MoveType::MoveTake &&
-//             move.move_take.source_index == source_index &&
-//             move.move_take.destination_index == destination_index &&
-//             move.move_take.take_index == take_index
-//         );
-//     })};
-
-//     assert(iter != m_legal_moves.end());
-
-//     move_take(source_index, destination_index, take_index);
-
-//     m_pieces[PIECE(m_nodes[source_index].piece_id)].node_id = destination_index;
-//     m_nodes[destination_index].piece_id = m_nodes[source_index].piece_id;
-//     m_nodes[source_index].piece_id = -1;
-//     m_pieces[PIECE(m_nodes[take_index].piece_id)].node_id = -1;
-
-//     const int take_piece_id {std::exchange(m_nodes[take_index].piece_id, -1)};
-
-//     do_move_animation(
-//         m_pieces[PIECE(m_nodes[destination_index].piece_id)],
-//         m_nodes[destination_index],
-//         [=, this]() {
-//             m_pieces[PIECE(take_piece_id)].to_remove = true;
-
-//             do_take_animation(m_pieces[PIECE(take_piece_id)], [=, this]() {
-//                 m_pieces[PIECE(take_piece_id)].active = false;
-//             });
-//         },
-//         !has_three_pieces(m_board, m_pieces[PIECE(m_nodes[destination_index].piece_id)])
-//     );
-// }
-
-const NineMensMorrisBoard::Position& NineMensMorrisBoard::get_setup_position() const {
-    return m_setup_position;
+    initialize_objects();
 }
 
 void NineMensMorrisBoard::play_move(const Move& move) {
@@ -795,51 +652,67 @@ void NineMensMorrisBoard::set_renderables(
     }
 }
 
-void NineMensMorrisBoard::initialize_nodes(const std::vector<sm::Renderable>& renderables) {
-    for (int i {0}; i < static_cast<int>(m_nodes.size()); i++) {
-        m_nodes[i] = NodeObj(i, NODE_POSITIONS[i], renderables[i]);
+void NineMensMorrisBoard::initialize_objects(
+    const std::vector<sm::Renderable>& nodes,
+    const std::vector<sm::Renderable>& white_pieces,
+    const std::vector<sm::Renderable>& black_pieces
+) {
+    for (std::size_t i {0}; i < m_nodes.size(); i++) {
+        m_nodes[i] = NodeObj(static_cast<int>(i), NODE_POSITIONS[i], nodes[i]);
+    }
+
+    m_pieces.resize(PIECES);
+
+    // Offset pieces' IDs, so that they are different from nodes' IDs
+
+    for (int i {0}; i < PIECES / 2; i++) {
+        m_pieces[i] = PieceObj(
+            i + static_cast<int>(m_nodes.size()),
+            glm::vec3(-3.0f, PIECE_Y_POSITION_AIR_INITIAL, static_cast<float>(i) * 0.5f - 2.0f),
+            white_pieces[i],
+            PieceType::White
+        );
+    }
+
+    for (int i {PIECES / 2}; i < PIECES; i++) {
+        m_pieces[i] = PieceObj(
+            i + static_cast<int>(m_nodes.size()),
+            glm::vec3(3.0f, PIECE_Y_POSITION_AIR_INITIAL, static_cast<float>(i - PIECES / 2) * -0.5f + 2.0f),
+            black_pieces[i - PIECES / 2],
+            PieceType::Black
+        );
     }
 }
 
-void NineMensMorrisBoard::initialize_piece_in_air(
-    const std::vector<sm::Renderable>& renderables,
-    int index,
-    int renderable_index,
-    float x,
-    float y,
-    PieceType piece
-) {
+void NineMensMorrisBoard::initialize_objects() {
+    for (std::size_t i {0}; i < m_nodes.size(); i++) {
+        const auto renderable {m_nodes[i].get_renderable()};
+        m_nodes[i] = NodeObj(static_cast<int>(i), NODE_POSITIONS[i], renderable);
+    }
+
+    m_pieces.resize(PIECES);
+
     // Offset pieces' IDs, so that they are different from nodes' IDs
 
-    m_pieces[index] = PieceObj(
-        index + static_cast<int>(m_nodes.size()),
-        glm::vec3(x, PIECE_Y_POSITION_AIR_INITIAL, y),
-        renderables[renderable_index],
-        piece
-    );
-}
+    for (int i {0}; i < PIECES / 2; i++) {
+        const auto renderable {m_pieces[i].get_renderable()};
+        m_pieces[i] = PieceObj(
+            i + static_cast<int>(m_nodes.size()),
+            glm::vec3(-3.0f, PIECE_Y_POSITION_AIR_INITIAL, static_cast<float>(i) * 0.5f - 2.0f),
+            renderable,
+            PieceType::White
+        );
+    }
 
-void NineMensMorrisBoard::initialize_piece_on_board(
-    Board& board,
-    const std::vector<sm::Renderable>& renderables,
-    int index,
-    int node_index,
-    int renderable_index,
-    PieceType piece
-) {
-    // Offset pieces' IDs, so that they are different from nodes' IDs
-
-    m_pieces[index] = PieceObj(
-        index + static_cast<int>(m_nodes.size()),
-        glm::vec3(NODE_POSITIONS[node_index].x, PIECE_Y_POSITION_BOARD, NODE_POSITIONS[node_index].z),
-        renderables[renderable_index],
-        piece
-    );
-
-    m_pieces[index].node_id = node_index;
-    m_nodes[node_index].piece_id = m_pieces[index].get_id();
-
-    board[node_index] = static_cast<Node>(piece);
+    for (int i {PIECES / 2}; i < PIECES; i++) {
+        const auto renderable {m_pieces[i].get_renderable()};
+        m_pieces[i] = PieceObj(
+            i + static_cast<int>(m_nodes.size()),
+            glm::vec3(3.0f, PIECE_Y_POSITION_AIR_INITIAL, static_cast<float>(i - PIECES / 2) * -0.5f + 2.0f),
+            renderable,
+            PieceType::Black
+        );
+    }
 }
 
 void NineMensMorrisBoard::update_nodes_highlight(std::function<bool()>&& highlight) {
@@ -1102,163 +975,6 @@ void NineMensMorrisBoard::try_capture(int capture_index) {
             break;
     }
 }
-
-// void NineMensMorrisBoard::try_place(int place_index) {
-//     auto iter {std::find_if(m_legal_moves.begin(), m_legal_moves.end(), [=](const Move& move) {
-//         return move.type == MoveType::Place && move.place.place_index == place_index;
-//     })};
-
-//     if (iter != m_legal_moves.end()) {
-//         user_place(place_index);
-//         return;
-//     }
-
-//     iter = std::find_if(m_legal_moves.begin(), m_legal_moves.end(), [=](const Move& move) {
-//         return move.type == MoveType::PlaceTake && move.place_take.place_index == place_index;
-//     });
-
-//     if (iter != m_legal_moves.end()) {
-//         user_place_take_just_place(place_index);
-//     }
-// }
-
-// void NineMensMorrisBoard::try_place_take(int place_index, int take_index) {
-//     const auto iter {std::find_if(m_legal_moves.begin(), m_legal_moves.end(), [=](const Move& move) {
-//         return (
-//             move.type == MoveType::PlaceTake &&
-//             move.place_take.place_index == place_index &&
-//             move.place_take.take_index == take_index
-//         );
-//     })};
-
-//     if (iter != m_legal_moves.end()) {
-//         user_place_take(place_index, take_index);
-//     }
-// }
-
-// void NineMensMorrisBoard::try_move(int source_index, int destination_index) {
-//     auto iter {std::find_if(m_legal_moves.begin(), m_legal_moves.end(), [=](const Move& move) {
-//         return (
-//             move.type == MoveType::Move &&
-//             move.move.source_index == source_index &&
-//             move.move.destination_index == destination_index
-//         );
-//     })};
-
-//     if (iter != m_legal_moves.end()) {
-//         user_move(source_index, destination_index);
-//         return;
-//     }
-
-//     iter = std::find_if(m_legal_moves.begin(), m_legal_moves.end(), [=](const Move& move) {
-//         return (
-//             move.type == MoveType::MoveTake &&
-//             move.move_take.source_index == source_index &&
-//             move.move_take.destination_index == destination_index
-//         );
-//     });
-
-//     if (iter != m_legal_moves.end()) {
-//         user_move_take_just_move(source_index, destination_index);
-//     }
-// }
-
-// void NineMensMorrisBoard::try_move_take(int source_index, int destination_index, int take_index) {
-//     const auto iter {std::find_if(m_legal_moves.begin(), m_legal_moves.end(), [=](const Move& move) {
-//         return (
-//             move.type == MoveType::MoveTake &&
-//             move.move_take.source_index == source_index &&
-//             move.move_take.destination_index == destination_index &&
-//             move.move_take.take_index == take_index
-//         );
-//     })};
-
-//     if (iter != m_legal_moves.end()) {
-//         user_move_take(source_index, destination_index, take_index);
-//     }
-// }
-
-// void NineMensMorrisBoard::user_place(int place_index) {
-//     place(place_index);
-
-//     const int id {new_piece_to_place(static_cast<PieceType>(opponent(m_turn)))};
-
-//     m_pieces[PIECE(id)].node_id = place_index;
-//     m_nodes[place_index].piece_id = id;
-
-//     do_place_animation(m_pieces[PIECE(id)], m_nodes[place_index], []() {});
-// }
-
-// void NineMensMorrisBoard::user_place_take_just_place(int place_index) {
-//     m_take_action_index = place_index;
-
-//     const int id {new_piece_to_place(static_cast<PieceType>(m_turn))};
-
-//     m_pieces[PIECE(id)].node_id = place_index;
-//     m_nodes[place_index].piece_id = id;
-
-//     do_place_animation(m_pieces[PIECE(id)], m_nodes[place_index], []() {});
-// }
-
-// void NineMensMorrisBoard::user_place_take(int place_index, int take_index) {
-//     place_take(place_index, take_index);
-
-//     m_pieces[PIECE(m_nodes[take_index].piece_id)].node_id = -1;
-
-//     const int take_piece_id {std::exchange(m_nodes[take_index].piece_id, -1)};
-
-//     m_pieces[PIECE(take_piece_id)].to_remove = true;
-
-//     do_take_animation(m_pieces[PIECE(take_piece_id)], [this, take_piece_id]() {
-//         m_pieces[PIECE(take_piece_id)].active = false;
-//     });
-// }
-
-// void NineMensMorrisBoard::user_move(int source_index, int destination_index) {
-//     move(source_index, destination_index);
-
-//     m_pieces[PIECE(m_nodes[source_index].piece_id)].node_id = destination_index;
-//     m_nodes[destination_index].piece_id = m_nodes[source_index].piece_id;
-
-//     const int move_piece_id {std::exchange(m_nodes[source_index].piece_id, -1)};
-
-//     do_move_animation(
-//         m_pieces[PIECE(move_piece_id)],
-//         m_nodes[destination_index],
-//         []() {},
-//         !has_three_pieces(m_board, m_pieces[PIECE(move_piece_id)])
-//     );
-// }
-
-// void NineMensMorrisBoard::user_move_take_just_move(int source_index, int destination_index) {
-//     m_take_action_index = destination_index;
-
-//     m_pieces[PIECE(m_nodes[source_index].piece_id)].node_id = destination_index;
-//     m_nodes[destination_index].piece_id = m_nodes[source_index].piece_id;
-
-//     const int move_piece_id {std::exchange(m_nodes[source_index].piece_id, -1)};
-
-//     do_move_animation(
-//         m_pieces[PIECE(move_piece_id)],
-//         m_nodes[destination_index],
-//         []() {},
-//         !has_three_pieces(m_board, m_pieces[PIECE(move_piece_id)])
-//     );
-// }
-
-// void NineMensMorrisBoard::user_move_take(int source_index, int destination_index, int take_index) {
-//     move_take(source_index, destination_index, take_index);
-
-//     m_pieces[PIECE(m_nodes[take_index].piece_id)].node_id = -1;
-
-//     const int take_piece_id {std::exchange(m_nodes[take_index].piece_id, -1)};
-
-//     m_pieces[PIECE(take_piece_id)].to_remove = true;
-
-//     do_take_animation(m_pieces[PIECE(take_piece_id)], [this, take_piece_id]() {
-//         m_pieces[PIECE(take_piece_id)].active = false;
-//     });
-// }
 
 void NineMensMorrisBoard::play_place_move(const Move& move) {
     assert(move.type == MoveType::Place);
@@ -1633,9 +1349,9 @@ bool NineMensMorrisBoard::all_pieces_in_mills(const Board& board, Player player)
 }
 
 #define IS_FREE_CHECK(const_index) \
-if (board[const_index] == Node::None) { \
-    result.push_back(const_index); \
-}
+    if (board[const_index] == Node::None) { \
+        result.push_back(const_index); \
+    }
 
 std::vector<int> NineMensMorrisBoard::neighbor_free_positions(const Board& board, int index) {
     std::vector<int> result;
@@ -1759,7 +1475,7 @@ std::vector<int> NineMensMorrisBoard::neighbor_free_positions(const Board& board
     return result;
 }
 
-unsigned int NineMensMorrisBoard::count_pieces(const Board& board, Player player) {
+int NineMensMorrisBoard::count_pieces(const Board& board, Player player) {
     int result {0};
 
     for (const Node node : board) {

@@ -43,8 +43,10 @@ public:
 
     virtual GameOptions& get_game_options() = 0;
     virtual BoardObj& get_board() = 0;
-    virtual void play_move_on_board(const std::string& string) = 0;
     virtual GamePlayer get_board_player_type() const = 0;
+    virtual void reset() = 0;
+    virtual void reset(const std::string& string) = 0;
+    virtual void play_move(const std::string& string) = 0;
     virtual void timeout(PlayerColor color) = 0;
     virtual void time_control_options_window() = 0;
 

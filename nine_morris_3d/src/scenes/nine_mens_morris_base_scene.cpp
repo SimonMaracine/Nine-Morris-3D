@@ -37,10 +37,6 @@ BoardObj& NineMensMorrisBaseScene::get_board() {
     return m_board;
 }
 
-void NineMensMorrisBaseScene::play_move_on_board(const std::string& string) {
-    m_board.play_move(NineMensMorrisBoard::move_from_string(string));
-}
-
 GamePlayer NineMensMorrisBaseScene::get_board_player_type() const {
     switch (m_board.get_player()) {
         case NineMensMorrisBoard::Player::White:
@@ -50,6 +46,54 @@ GamePlayer NineMensMorrisBaseScene::get_board_player_type() const {
     }
 
     return {};
+}
+
+void NineMensMorrisBaseScene::reset() {
+    reset("w:w:b:1");
+}
+
+void NineMensMorrisBaseScene::reset(const std::string& string) {
+    try {
+        m_board.reset(NineMensMorrisBoard::position_from_string(string));
+    } catch (const BoardError& e) {
+        SM_THROW_ERROR(sm::ApplicationError, "Invalid input: {}", e.what());  // TODO fail gracefully
+    }
+
+    const auto clock_time {[](int time) -> unsigned int {
+        switch (time) {
+            case static_cast<int>(NineMensMorrisTime::_1min):
+                return Clock::as_centiseconds(1);
+            case static_cast<int>(NineMensMorrisTime::_3min):
+                return Clock::as_centiseconds(3);
+            case static_cast<int>(NineMensMorrisTime::_10min):
+                return Clock::as_centiseconds(10);
+            case static_cast<int>(NineMensMorrisTime::_60min):
+                return Clock::as_centiseconds(60);
+            case static_cast<int>(NineMensMorrisTime::Custom):
+                // FIXME
+                break;
+        }
+
+        assert(false);
+        return {};
+    }};
+
+    m_game_state = GameState::Ready;
+    m_clock.reset(clock_time(m_game_options.time));
+    m_move_list.clear();
+
+    if (m_board.get_setup_position().player == NineMensMorrisBoard::Player::Black) {
+        m_clock.switch_turn();
+        m_move_list.skip_first(true);
+    }
+}
+
+void NineMensMorrisBaseScene::play_move(const std::string& string) {
+    try {
+        m_board.play_move(NineMensMorrisBoard::move_from_string(string));
+    } catch (const BoardError& e) {
+        SM_THROW_ERROR(sm::ApplicationError, "Invalid input: {}", e.what());
+    }
 }
 
 void NineMensMorrisBaseScene::timeout(PlayerColor color) {
@@ -64,26 +108,24 @@ void NineMensMorrisBaseScene::timeout(PlayerColor color) {
 }
 
 void NineMensMorrisBaseScene::time_control_options_window() {
-    const auto as_centiseconds {[](unsigned int minutes) { return 1000 * 60 * minutes; }};
-
     if (ImGui::RadioButton("1 min", &m_game_options.time, static_cast<int>(NineMensMorrisTime::_1min))) {
-        m_clock.reset(as_centiseconds(1));
+        m_clock.reset(Clock::as_centiseconds(1));
     }
 
     ImGui::SameLine();
 
     if (ImGui::RadioButton("3 min", &m_game_options.time, static_cast<int>(NineMensMorrisTime::_3min))) {
-        m_clock.reset(as_centiseconds(3));
+        m_clock.reset(Clock::as_centiseconds(3));
     }
 
     if (ImGui::RadioButton("10 min", &m_game_options.time, static_cast<int>(NineMensMorrisTime::_10min))) {
-        m_clock.reset(as_centiseconds(10));
+        m_clock.reset(Clock::as_centiseconds(10));
     }
 
     ImGui::SameLine();
 
     if (ImGui::RadioButton("60 min", &m_game_options.time, static_cast<int>(NineMensMorrisTime::_60min))) {
-        m_clock.reset(as_centiseconds(60));
+        m_clock.reset(Clock::as_centiseconds(60));
     }
 
     ImGui::RadioButton("Custom", &m_game_options.time, static_cast<int>(NineMensMorrisTime::Custom));

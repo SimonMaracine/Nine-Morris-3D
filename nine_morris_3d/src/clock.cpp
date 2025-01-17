@@ -56,6 +56,10 @@ std::tuple<unsigned int, unsigned int, unsigned int> Clock::split_time(unsigned 
     return std::make_tuple(minutes, seconds, centiseconds);
 }
 
+unsigned int Clock::as_centiseconds(unsigned int minutes) {
+    return 1000 * 60 * minutes;
+}
+
 void Clock::set_time(std::chrono::steady_clock::time_point& last_time) {
     last_time = std::chrono::steady_clock::now();
 }

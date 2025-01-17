@@ -38,4 +38,12 @@ namespace sm {
         explicit OtherError(const std::string& message)
             : RuntimeError(message) {}
     };
+
+    // Used only by the client code
+    struct ApplicationError : RuntimeError {
+        explicit ApplicationError(const char* message)
+            : RuntimeError(message) {}
+        explicit ApplicationError(const std::string& message)
+            : RuntimeError(message) {}
+    };
 }

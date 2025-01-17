@@ -8,6 +8,7 @@ void MoveList::push(const std::string& string) {
 
 void MoveList::clear() {
     m_moves.clear();
+    m_skip_first = false;
 }
 
 void MoveList::skip_first(bool skip) {

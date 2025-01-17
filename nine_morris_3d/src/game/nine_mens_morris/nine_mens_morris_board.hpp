@@ -68,7 +68,6 @@ public:
     };
 
     using Board = std::array<Node, NODES>;
-    // using Position = ::Position<Board>;
 
     struct Position {
         Board board {};
@@ -92,13 +91,11 @@ public:
 
     const GameOver& get_game_over() const override { return m_game_over; }
     Player get_player() const { return m_position.player; }
-    // Player get_turn() const override { return m_turn; }
-    // int node_count() override { return NODES; }
-    // int piece_count() override { return PIECES; }
+    const Position& get_setup_position() const { return m_setup_position; }
 
     sm::Renderable& get_renderable() { return m_renderable; }
     sm::Renderable& get_paint_renderable() { return m_paint_renderable; }
-    std::vector<NodeObj>& get_nodes() { return m_nodes; }
+    std::array<NodeObj, NODES>& get_nodes() { return m_nodes; }
     std::vector<PieceObj>& get_pieces() { return m_pieces; }
 
     void update(sm::Ctx& ctx, glm::vec3 ray, glm::vec3 camera, bool user_input);
@@ -106,16 +103,9 @@ public:
     void user_click_press();
     void user_click_release();
 
-    // void place_piece(int place_index);
-    // void place_take_piece(int place_index, int take_index);
-    // void move_piece(int source_index, int destination_index);
-    // void move_take_piece(int source_index, int destination_index, int take_index);
-    const Position& get_setup_position() const;
+    void reset(const Position& position);
     void play_move(const Move& move);
     void timeout(Player player);
-
-    // static Move move_from_string(const std::string& string);
-    // static std::string string_from_move(const Move& move);
 
     static Move move_from_string(const std::string& string);
     static std::string move_to_string(const Move& move);
@@ -132,23 +122,12 @@ public:
         const std::vector<sm::Renderable>& black_pieces
     );
 private:
-    void initialize_nodes(const std::vector<sm::Renderable>& renderables);
-    void initialize_piece_in_air(
-        const std::vector<sm::Renderable>& renderables,
-        int index,
-        int renderable_index,
-        float x,
-        float y,
-        PieceType piece
+    void initialize_objects(
+        const std::vector<sm::Renderable>& nodes,
+        const std::vector<sm::Renderable>& white_pieces,
+        const std::vector<sm::Renderable>& black_pieces
     );
-    void initialize_piece_on_board(
-        Board& board,
-        const std::vector<sm::Renderable>& renderables,
-        int index,
-        int node_index,
-        int renderable_index,
-        PieceType piece
-    );
+    void initialize_objects();
 
     void update_nodes_highlight(std::function<bool()>&& highlight);
     void update_pieces_highlight(std::function<bool(const PieceObj&)>&& highlight);
@@ -163,17 +142,6 @@ private:
     void try_place(int place_index);
     void try_move(int source_index, int destination_index);
     void try_capture(int capture_index);
-    // void try_place(int place_index);
-    // void try_place_take(int place_index, int take_index);
-    // void try_move(int source_index, int destination_index);
-    // void try_move_take(int source_index, int destination_index, int take_index);
-
-    // void user_place(int place_index);
-    // void user_place_take_just_place(int place_index);
-    // void user_place_take(int place_index, int take_index);
-    // void user_move(int source_index, int destination_index);
-    // void user_move_take_just_move(int source_index, int destination_index);
-    // void user_move_take(int source_index, int destination_index, int take_index);
 
     // These just change the state
     void play_place_move(const Move& move);
@@ -204,7 +172,7 @@ private:
     static bool is_mill(const Board& board, Player player, int index);
     static bool all_pieces_in_mills(const Board& board, Player player);
     static std::vector<int> neighbor_free_positions(const Board& board, int index);
-    static unsigned int count_pieces(const Board& board, Player player);
+    static int count_pieces(const Board& board, Player player);
     static Player opponent(Player player);
 
     template<typename T>
@@ -220,18 +188,14 @@ private:
     // Management data
     bool m_capture_piece {false};
     int m_select_id {-1};
-    // GameOver m_game_over;
     Position m_setup_position;
     std::vector<Move> m_legal_moves;
     std::vector<Move> m_candidate_moves;
     std::function<void(const Move&)> m_move_callback;
-    // int m_selected_index {-1};
-    // int m_take_action_index {-1};
 
     // Objects
     sm::Renderable m_renderable;
     sm::Renderable m_paint_renderable;
-
-    std::vector<NodeObj> m_nodes;
+    std::array<NodeObj, NODES> m_nodes;
     std::vector<PieceObj> m_pieces;
 };
