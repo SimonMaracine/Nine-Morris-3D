@@ -89,7 +89,8 @@ public:
         std::function<void(const Move&)>&& move_callback
     );
 
-    const GameOver& get_game_over() const override { return m_game_over; }
+    const GameOver& get_game_over() const override;
+    PlayerColor get_player_color() const override;
     Player get_player() const { return m_position.player; }
     const Position& get_setup_position() const { return m_setup_position; }
 
@@ -106,6 +107,8 @@ public:
     void reset(const Position& position);
     void play_move(const Move& move);
     void timeout(Player player);
+    void resign(Player player);
+    void offer_draw();
 
     static Move move_from_string(const std::string& string);
     static std::string move_to_string(const Move& move);

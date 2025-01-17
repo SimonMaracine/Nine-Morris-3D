@@ -8,6 +8,8 @@
 
 #include <nine_morris_3d_engine/nine_morris_3d.hpp>
 
+#include "constants.hpp"
+
 class GameOver {
 public:
     enum Type {
@@ -41,6 +43,9 @@ public:
     BoardObj& operator=(BoardObj&&) = default;
 
     virtual const GameOver& get_game_over() const = 0;
+    virtual PlayerColor get_player_color() const = 0;
+
+    static PlayerColor opponent(PlayerColor color);
 protected:
     void user_click_press();
     void user_click_release(std::function<void()>&& callback);

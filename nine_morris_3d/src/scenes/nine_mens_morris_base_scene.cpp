@@ -86,6 +86,8 @@ void NineMensMorrisBaseScene::reset(const std::string& string) {
         m_clock.switch_turn();
         m_move_list.skip_first(true);
     }
+
+    m_cam_controller.go_towards_position(m_default_camera_position);
 }
 
 void NineMensMorrisBaseScene::play_move(const std::string& string) {
@@ -105,6 +107,21 @@ void NineMensMorrisBaseScene::timeout(PlayerColor color) {
             m_board.timeout(NineMensMorrisBoard::Player::Black);
             break;
     }
+}
+
+void NineMensMorrisBaseScene::resign(PlayerColor color) {
+    switch (color) {
+        case PlayerColor::White:
+            m_board.resign(NineMensMorrisBoard::Player::White);
+            break;
+        case PlayerColor::Black:
+            m_board.resign(NineMensMorrisBoard::Player::Black);
+            break;
+    }
+}
+
+void NineMensMorrisBaseScene::offer_draw() {
+    m_board.offer_draw();
 }
 
 void NineMensMorrisBaseScene::time_control_options_window() {

@@ -13,6 +13,29 @@
 #include "constants.hpp"
 #include "ver.hpp"
 
+static PlayerColor resigning_player(GameScene& game_scene) {
+    const auto& options {game_scene.get_game_options()};
+
+    if (options.game_type == static_cast<int>(GameType::Online)) {
+        // FIXME
+        return {};
+    }
+
+    if (options.white_player == static_cast<int>(GamePlayer::Human) && options.black_player == static_cast<int>(GamePlayer::Human)) {
+        return game_scene.get_board().get_player_color();
+    }
+
+    if (game_scene.get_game_options().white_player == static_cast<int>(GamePlayer::Human)) {
+        return PlayerColor::White;
+    }
+
+    if (game_scene.get_game_options().black_player == static_cast<int>(GamePlayer::Human)) {
+        return PlayerColor::Black;
+    }
+
+    assert(false);
+}
+
 void Ui::initialize(sm::Ctx& ctx) {
     const auto& g {ctx.global<Global>()};
 
@@ -54,6 +77,12 @@ void Ui::main_menu_bar(sm::Ctx& ctx, GameScene& game_scene) {
         if (ImGui::BeginMenu("Game")) {
             if (ImGui::MenuItem("New Game")) {
                 game_scene.reset();
+            }
+            if (ImGui::MenuItem("Resign")) {
+                // game_scene.resign(resigning_player(game_scene));
+            }
+            if (ImGui::MenuItem("Offer Draw")) {
+                // game_scene.offer_draw();
             }
             if (ImGui::MenuItem("Game Options")) {
                 m_current_popup_window = PopupWindow::GameOptions;

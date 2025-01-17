@@ -25,6 +25,8 @@ public:
     void reset(const std::string& string) override;
     void play_move(const std::string& string) override;
     void timeout(PlayerColor color) override;
+    void resign(PlayerColor color) override;
+    void offer_draw() override;
     void time_control_options_window() override;
 
     void set_scene_textures() override;

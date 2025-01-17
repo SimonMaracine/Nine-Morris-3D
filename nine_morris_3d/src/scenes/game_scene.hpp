@@ -48,6 +48,8 @@ public:
     virtual void reset(const std::string& string) = 0;
     virtual void play_move(const std::string& string) = 0;
     virtual void timeout(PlayerColor color) = 0;
+    virtual void resign(PlayerColor color) = 0;
+    virtual void offer_draw() = 0;
     virtual void time_control_options_window() = 0;
 
     PointCameraController& get_camera_controller() { return m_cam_controller; }
@@ -85,4 +87,5 @@ protected:
     sm::ShadowBox m_shadow_box;
 
     std::shared_ptr<sm::GlTextureCubemap> m_skybox;
+    // sm::Quad m_wait_indicator;  // TODO
 };

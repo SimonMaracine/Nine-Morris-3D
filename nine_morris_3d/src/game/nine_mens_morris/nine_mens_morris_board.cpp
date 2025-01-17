@@ -234,6 +234,19 @@ NineMensMorrisBoard::NineMensMorrisBoard(
     initialize_objects(nodes, white_pieces, black_pieces);
 }
 
+const GameOver& NineMensMorrisBoard::get_game_over() const {
+    return m_game_over;
+}
+
+PlayerColor NineMensMorrisBoard::get_player_color() const {
+    switch (m_position.player) {
+        case Player::White:
+            return PlayerColor::White;
+        case Player::Black:
+            return PlayerColor::Black;
+    }
+}
+
 void NineMensMorrisBoard::update(sm::Ctx& ctx, glm::vec3 ray, glm::vec3 camera, bool user_input) {
     if (user_input) {
         update_hovered_id(ray, camera, [this]() {
@@ -450,6 +463,30 @@ void NineMensMorrisBoard::timeout(Player player) {
             );
             break;
     }
+}
+
+void NineMensMorrisBoard::resign(Player player) {
+    switch (player) {
+        case Player::White:
+            m_game_over = GameOver(
+                GameOver::WinnerBlack,
+                "White player has resigned."
+            );
+            break;
+        case Player::Black:
+            m_game_over = GameOver(
+                GameOver::WinnerWhite,
+                "Black player has resigned."
+            );
+            break;
+    }
+}
+
+void NineMensMorrisBoard::offer_draw() {
+    m_game_over = GameOver(
+        GameOver::TieBetweenBothPlayers,
+        "Draw has been offered and accepted."
+    );
 }
 
 NineMensMorrisBoard::Move NineMensMorrisBoard::move_from_string(const std::string& string) {

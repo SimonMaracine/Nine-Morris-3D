@@ -34,6 +34,14 @@ const char* GameOver::to_string() const {
     return {};
 }
 
+PlayerColor BoardObj::opponent(PlayerColor color) {
+    if (color == PlayerColor::White) {
+        return PlayerColor::Black;
+    } else {
+        return PlayerColor::White;
+    }
+}
+
 void BoardObj::user_click_press() {
     if (m_game_over != GameOver::None) {
         return;
