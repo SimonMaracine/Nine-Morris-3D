@@ -4,6 +4,8 @@
 
 #include <nine_morris_3d_engine/nine_morris_3d.hpp>
 
+#include "game/hoverable.hpp"
+
 enum class PieceType {
     White = 1,
     Black = 2
@@ -15,14 +17,11 @@ enum class PieceMovement {
     ThreeStep
 };
 
-class PieceObj {
+class PieceObj : public HoverableObj {
 public:
     PieceObj() = default;
-    PieceObj(int id, glm::vec3 position, const sm::Renderable& renderable, PieceType type);
+    PieceObj(int id, const sm::Renderable& renderable, glm::vec3 position, PieceType type);
 
-    const sm::Renderable& get_renderable() const { return m_renderable; }
-    sm::Renderable& get_renderable() { return m_renderable; }
-    int get_id() const { return m_id; }
     PieceType get_type() const { return m_type; }
 
     void update(sm::Ctx& ctx);
@@ -30,8 +29,6 @@ public:
 
     void move_direct(glm::vec3 origin, glm::vec3 target, std::function<void()>&& on_finish);
     void move_three_step(glm::vec3 origin, glm::vec3 target0, glm::vec3 target1, glm::vec3 target, std::function<void()>&& on_finish);
-
-    void set_renderable(const sm::Renderable& renderable);
 
     bool active {true};
     bool to_remove {false};
@@ -42,7 +39,6 @@ private:
     void threestep_movement();
     void finish_movement();
 
-    int m_id {-1};
     PieceType m_type {};
 
     PieceMovement m_movement {PieceMovement::None};
@@ -53,6 +49,4 @@ private:
     bool m_reached_target0 {false};
     bool m_reached_target1 {false};
     std::function<void()> m_on_finish;
-
-    sm::Renderable m_renderable;
 };

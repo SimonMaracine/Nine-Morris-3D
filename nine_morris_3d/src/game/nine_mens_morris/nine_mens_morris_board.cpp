@@ -252,11 +252,11 @@ PlayerColor NineMensMorrisBoard::get_player_color() const {
 
 void NineMensMorrisBoard::update(sm::Ctx& ctx, glm::vec3 ray, glm::vec3 camera, bool user_input) {
     if (user_input) {
-        update_hovered_id(ray, camera, [this]() {
-            std::vector<std::pair<int, sm::Renderable>> renderables;
+        update_hover_id(ray, camera, [this]() {
+            std::vector<HoverableObj> hoverables;
 
             for (const NodeObj& node : m_nodes) {
-                renderables.push_back(std::make_pair(node.get_id(), node.get_renderable()));
+                hoverables.push_back(node);
             }
 
             for (const PieceObj& piece : m_pieces) {
@@ -264,10 +264,10 @@ void NineMensMorrisBoard::update(sm::Ctx& ctx, glm::vec3 ray, glm::vec3 camera, 
                     continue;
                 }
 
-                renderables.push_back(std::make_pair(piece.get_id(), piece.get_renderable()));
+                hoverables.push_back(piece);
             }
 
-            return renderables;
+            return hoverables;
         });
     }
 
@@ -704,7 +704,7 @@ void NineMensMorrisBoard::initialize_objects(
     const std::vector<sm::Renderable>& black_pieces
 ) {
     for (std::size_t i {0}; i < m_nodes.size(); i++) {
-        m_nodes[i] = NodeObj(static_cast<int>(i), NODE_POSITIONS[i], nodes[i]);
+        m_nodes[i] = NodeObj(static_cast<int>(i), nodes[i], NODE_POSITIONS[i]);
     }
 
     m_pieces.resize(PIECES);
@@ -714,8 +714,8 @@ void NineMensMorrisBoard::initialize_objects(
     for (int i {0}; i < PIECES / 2; i++) {
         m_pieces[i] = PieceObj(
             i + static_cast<int>(m_nodes.size()),
-            glm::vec3(-3.0f, PIECE_Y_POSITION_AIR_INITIAL, static_cast<float>(i) * 0.5f - 2.0f),
             white_pieces[i],
+            glm::vec3(-3.0f, PIECE_Y_POSITION_AIR_INITIAL, static_cast<float>(i) * 0.5f - 2.0f),
             PieceType::White
         );
     }
@@ -723,8 +723,8 @@ void NineMensMorrisBoard::initialize_objects(
     for (int i {PIECES / 2}; i < PIECES; i++) {
         m_pieces[i] = PieceObj(
             i + static_cast<int>(m_nodes.size()),
-            glm::vec3(3.0f, PIECE_Y_POSITION_AIR_INITIAL, static_cast<float>(i - PIECES / 2) * -0.5f + 2.0f),
             black_pieces[i - PIECES / 2],
+            glm::vec3(3.0f, PIECE_Y_POSITION_AIR_INITIAL, static_cast<float>(i - PIECES / 2) * -0.5f + 2.0f),
             PieceType::Black
         );
     }
@@ -733,7 +733,7 @@ void NineMensMorrisBoard::initialize_objects(
 void NineMensMorrisBoard::initialize_objects() {
     for (std::size_t i {0}; i < m_nodes.size(); i++) {
         const auto renderable {m_nodes[i].get_renderable()};
-        m_nodes[i] = NodeObj(static_cast<int>(i), NODE_POSITIONS[i], renderable);
+        m_nodes[i] = NodeObj(static_cast<int>(i), renderable, NODE_POSITIONS[i]);
     }
 
     m_pieces.resize(PIECES);
@@ -744,8 +744,8 @@ void NineMensMorrisBoard::initialize_objects() {
         const auto renderable {m_pieces[i].get_renderable()};
         m_pieces[i] = PieceObj(
             i + static_cast<int>(m_nodes.size()),
-            glm::vec3(-3.0f, PIECE_Y_POSITION_AIR_INITIAL, static_cast<float>(i) * 0.5f - 2.0f),
             renderable,
+            glm::vec3(-3.0f, PIECE_Y_POSITION_AIR_INITIAL, static_cast<float>(i) * 0.5f - 2.0f),
             PieceType::White
         );
     }
@@ -754,8 +754,8 @@ void NineMensMorrisBoard::initialize_objects() {
         const auto renderable {m_pieces[i].get_renderable()};
         m_pieces[i] = PieceObj(
             i + static_cast<int>(m_nodes.size()),
-            glm::vec3(3.0f, PIECE_Y_POSITION_AIR_INITIAL, static_cast<float>(i - PIECES / 2) * -0.5f + 2.0f),
             renderable,
+            glm::vec3(3.0f, PIECE_Y_POSITION_AIR_INITIAL, static_cast<float>(i - PIECES / 2) * -0.5f + 2.0f),
             PieceType::Black
         );
     }

@@ -7,8 +7,8 @@ static constexpr float PIECE_MIN_VELOCITY_STRENGTH {0.01f};
 static constexpr float PIECE_MAX_VELOCITY_STRENGTH {1.0f};
 static constexpr float PIECE_DISTANCE_ERROR {0.001f};
 
-PieceObj::PieceObj(int id, glm::vec3 position, const sm::Renderable& renderable, PieceType type)
-    : m_id(id), m_type(type), m_renderable(renderable) {
+PieceObj::PieceObj(int id, const sm::Renderable& renderable, glm::vec3 position, PieceType type)
+    : HoverableObj(id, renderable), m_type(type) {
     m_renderable.transform.position = position;
     m_renderable.transform.scale = 20.0f;
     m_renderable.outline.thickness = 1.15f;
@@ -47,10 +47,6 @@ void PieceObj::move_three_step(glm::vec3 origin, glm::vec3 target0, glm::vec3 ta
     m_target1 = target1;
     m_target = target;
     m_on_finish = std::move(on_finish);
-}
-
-void PieceObj::set_renderable(const sm::Renderable& renderable) {
-    m_renderable.override_renderable_private(renderable);
 }
 
 void PieceObj::direct_movement(glm::vec3 origin, glm::vec3 target, auto on_arrive) {

@@ -8,8 +8,10 @@
 
 #include <nine_morris_3d_engine/nine_morris_3d.hpp>
 
+#include "hoverable.hpp"
 #include "constants.hpp"
 
+// Type that keeps track of the state and result of a game
 class GameOver {
 public:
     enum Type {
@@ -32,6 +34,7 @@ private:
     std::string m_reason;
 };
 
+// Generic board object representing a game with its data and rules
 class BoardObj {
 public:
     BoardObj() = default;
@@ -49,7 +52,7 @@ public:
 protected:
     void user_click_press();
     void user_click_release(std::function<void()>&& callback);
-    void update_hovered_id(glm::vec3 ray, glm::vec3 camera, std::function<std::vector<std::pair<int, sm::Renderable>>()>&& get_renderables);
+    void update_hover_id(glm::vec3 ray, glm::vec3 camera, std::function<std::vector<HoverableObj>()>&& get_hoverables);
 
     static std::string format(const char* format, ...);
 
@@ -58,6 +61,7 @@ protected:
     GameOver m_game_over;
 };
 
+// Generic error thrown inside board code
 struct BoardError : std::runtime_error {
     explicit BoardError(const char* message)
         : std::runtime_error(message) {}

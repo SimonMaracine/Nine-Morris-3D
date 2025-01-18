@@ -66,33 +66,33 @@ void BoardObj::user_click_release(std::function<void()>&& callback) {
     callback();
 }
 
-void BoardObj::update_hovered_id(glm::vec3 ray, glm::vec3 camera, std::function<std::vector<std::pair<int, sm::Renderable>>()>&& get_renderables) {
+void BoardObj::update_hover_id(glm::vec3 ray, glm::vec3 camera, std::function<std::vector<HoverableObj>()>&& get_hoverables) {
     if (camera.y < 0.0f) {
         m_hover_id = -1;
         return;
     }
 
-    auto renderables {get_renderables()};
+    auto hoverables {get_hoverables()};
 
-    std::sort(renderables.begin(), renderables.end(), [camera](const auto& lhs, const auto& rhs) {
-        const auto left {glm::distance(lhs.second.transform.position, camera)};
-        const auto right {glm::distance(rhs.second.transform.position, camera)};
+    std::sort(hoverables.begin(), hoverables.end(), [camera](const auto& lhs, const auto& rhs) {
+        const auto left {glm::distance(lhs.get_renderable().transform.position, camera)};
+        const auto right {glm::distance(rhs.get_renderable().transform.position, camera)};
 
         return left > right;
     });
 
     bool hover {false};
 
-    for (const auto& [id, renderable] : renderables) {
-        const auto& transform {renderable.transform};
+    for (const HoverableObj& hoverable : hoverables) {
+        const auto& transform {hoverable.get_renderable().transform};
         const glm::mat4 to_world_space {transformation_matrix(transform.position, transform.rotation, transform.scale)};
 
         sm::utils::AABB aabb;
-        aabb.min = to_world_space * glm::vec4(renderable.get_aabb().min, 1.0f);
-        aabb.max = to_world_space * glm::vec4(renderable.get_aabb().max, 1.0f);
+        aabb.min = to_world_space * glm::vec4(hoverable.get_renderable().get_aabb().min, 1.0f);
+        aabb.max = to_world_space * glm::vec4(hoverable.get_renderable().get_aabb().max, 1.0f);
 
         if (ray_aabb_collision(ray, camera, aabb)) {
-            m_hover_id = id;
+            m_hover_id = hoverable.get_id();
             hover = true;
         }
     }
