@@ -14,7 +14,11 @@
 #include "ver.hpp"
 
 static bool resign_available(GameScene& game_scene) {
-    return game_scene.get_game_options().game_type == static_cast<int>(GameType::Online);
+    return (
+        game_scene.get_game_state() != GameState::Ready &&
+        game_scene.get_game_state() != GameState::Over &&
+        game_scene.get_game_options().game_type == static_cast<int>(GameType::Online)
+    );
 }
 
 static PlayerColor resign_player(GameScene& game_scene) {
@@ -33,11 +37,20 @@ static PlayerColor resign_player(GameScene& game_scene) {
 }
 
 static bool offer_draw_available(GameScene& game_scene) {
-    return game_scene.get_game_options().game_type == static_cast<int>(GameType::Online);
+    return (
+        game_scene.get_game_state() != GameState::Ready &&
+        game_scene.get_game_state() != GameState::Over &&
+        game_scene.get_game_options().game_type == static_cast<int>(GameType::Online)
+    );
 }
 
 static bool accept_draw_offer_available(GameScene& game_scene) {
-    return game_scene.get_game_options().game_type == static_cast<int>(GameType::Online) && game_scene.get_draw_offered_by_remote();
+    return (
+        game_scene.get_game_state() != GameState::Ready &&
+        game_scene.get_game_state() != GameState::Over &&
+        game_scene.get_game_options().game_type == static_cast<int>(GameType::Online) &&
+        game_scene.get_draw_offered_by_remote()
+    );
 }
 
 void Ui::initialize(sm::Ctx& ctx) {

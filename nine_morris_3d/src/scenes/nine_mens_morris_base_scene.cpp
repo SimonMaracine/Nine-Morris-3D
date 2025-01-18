@@ -48,7 +48,7 @@ GamePlayer NineMensMorrisBaseScene::get_player_type() const {
             return GamePlayer::Human;
         case static_cast<int>(GameType::LocalHumanVsComputer):
             switch (m_board.get_player()) {
-                case NineMensMorrisBoard::Player::White:
+                case NineMensMorrisBoard::Player::White:  // TODO improve
                     return (
                         m_game_options.local_human_vs_computer.computer_color == static_cast<int>(PlayerColor::White)
                         ?
@@ -149,6 +149,9 @@ void NineMensMorrisBaseScene::timeout(PlayerColor color) {
             m_board.timeout(NineMensMorrisBoard::Player::Black);
             break;
     }
+
+    m_ui.set_popup_window(PopupWindow::GameOver);
+    m_game_state = GameState::Stop;
 }
 
 void NineMensMorrisBaseScene::resign(PlayerColor color) {
@@ -160,10 +163,16 @@ void NineMensMorrisBaseScene::resign(PlayerColor color) {
             m_board.resign(NineMensMorrisBoard::Player::Black);
             break;
     }
+
+    m_ui.set_popup_window(PopupWindow::GameOver);
+    m_game_state = GameState::Stop;
 }
 
 void NineMensMorrisBaseScene::accept_draw_offer() {
     m_board.accept_draw_offer();
+
+    m_ui.set_popup_window(PopupWindow::GameOver);
+    m_game_state = GameState::Stop;
 }
 
 void NineMensMorrisBaseScene::time_control_options_window() {

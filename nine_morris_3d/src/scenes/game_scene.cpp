@@ -55,14 +55,10 @@ void GameScene::on_update() {
     if (m_game_state != GameState::Ready && m_game_state != GameState::Over) {
         if (m_clock.get_white_time() == 0) {
             timeout(PlayerColor::White);
-            m_ui.set_popup_window(PopupWindow::GameOver);
-            m_game_state = GameState::Stop;
         }
 
         if (m_clock.get_black_time() == 0) {
             timeout(PlayerColor::Black);
-            m_ui.set_popup_window(PopupWindow::GameOver);
-            m_game_state = GameState::Stop;
         }
     }
 
