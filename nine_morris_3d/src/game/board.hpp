@@ -16,7 +16,7 @@ public:
         None,
         WinnerWhite,
         WinnerBlack,
-        TieBetweenBothPlayers
+        Draw
     };
 
     GameOver() = default;

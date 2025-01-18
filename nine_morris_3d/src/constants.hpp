@@ -11,7 +11,8 @@ enum class NineMensMorrisTime {
 };
 
 enum class GameType {
-    Local,
+    LocalHumanVsHuman,
+    LocalHumanVsComputer,
     Online
 };
 
@@ -21,7 +22,8 @@ enum class GameMode {
 
 enum class GamePlayer {
     Human,
-    Computer
+    Computer,
+    Remote
 };
 
 // Generic type
@@ -29,6 +31,17 @@ enum class PlayerColor {
     White,
     Black
 };
+
+constexpr const char* player_color_to_string(PlayerColor color) {
+    switch (color) {
+        case PlayerColor::White:
+            return "white";
+        case PlayerColor::Black:
+            return "black";
+    }
+
+    return {};
+}
 
 enum class Skybox {
     None,

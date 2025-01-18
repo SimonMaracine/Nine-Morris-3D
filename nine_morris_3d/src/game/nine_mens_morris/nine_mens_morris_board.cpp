@@ -245,6 +245,9 @@ PlayerColor NineMensMorrisBoard::get_player_color() const {
         case Player::Black:
             return PlayerColor::Black;
     }
+
+    assert(false);
+    return {};
 }
 
 void NineMensMorrisBoard::update(sm::Ctx& ctx, glm::vec3 ray, glm::vec3 camera, bool user_input) {
@@ -266,26 +269,32 @@ void NineMensMorrisBoard::update(sm::Ctx& ctx, glm::vec3 ray, glm::vec3 camera, 
 
             return renderables;
         });
+    }
 
 #ifdef __GNUG__
     #pragma GCC diagnostic push
     #pragma GCC diagnostic ignored "-Wparentheses"
 #endif
 
-        update_nodes_highlight([this]() {
+    update_nodes_highlight(
+        [this]() {
             return (
                 m_position.plies < 18 && !m_capture_piece ||
                 m_position.plies >= 18 && m_select_id != -1 && !m_capture_piece
             );
-        });
+        },
+        user_input
+    );
 
-        update_pieces_highlight([this](const PieceObj& piece) {
+    update_pieces_highlight(
+        [this](const PieceObj& piece) {
             return (
                 m_capture_piece && static_cast<Player>(piece.get_type()) != m_position.player && piece.node_id != -1 ||
                 m_position.plies >= 18 && static_cast<Player>(piece.get_type()) == m_position.player && !m_capture_piece
             );
-        });
-    }
+        },
+        user_input
+    );
 
 #ifdef __GNUG__
     #pragma GCC diagnostic pop
@@ -453,13 +462,13 @@ void NineMensMorrisBoard::timeout(Player player) {
         case Player::White:
             m_game_over = GameOver(
                 GameOver::WinnerBlack,
-                "White player ran out of time."
+                "White player has ran out of time."
             );
             break;
         case Player::Black:
             m_game_over = GameOver(
                 GameOver::WinnerWhite,
-                "Black player ran out of time."
+                "Black player has ran out of time."
             );
             break;
     }
@@ -482,9 +491,9 @@ void NineMensMorrisBoard::resign(Player player) {
     }
 }
 
-void NineMensMorrisBoard::offer_draw() {
+void NineMensMorrisBoard::accept_draw_offer() {
     m_game_over = GameOver(
-        GameOver::TieBetweenBothPlayers,
+        GameOver::Draw,
         "Draw has been offered and accepted."
     );
 }
@@ -752,8 +761,8 @@ void NineMensMorrisBoard::initialize_objects() {
     }
 }
 
-void NineMensMorrisBoard::update_nodes_highlight(std::function<bool()>&& highlight) {
-    if (m_game_over != GameOver::None) {
+void NineMensMorrisBoard::update_nodes_highlight(std::function<bool()>&& highlight, bool enabled) {
+    if (!enabled) {
         std::for_each(m_nodes.begin(), m_nodes.end(), [](NodeObj& node) {
             node.set_highlighted(false);
         });
@@ -774,8 +783,8 @@ void NineMensMorrisBoard::update_nodes_highlight(std::function<bool()>&& highlig
     }
 }
 
-void NineMensMorrisBoard::update_pieces_highlight(std::function<bool(const PieceObj&)>&& highlight) {
-    if (m_game_over != GameOver::None) {
+void NineMensMorrisBoard::update_pieces_highlight(std::function<bool(const PieceObj&)>&& highlight, bool enabled) {
+    if (!enabled) {
         std::for_each(m_pieces.begin(), m_pieces.end(), [](PieceObj& piece) {
             piece.get_renderable().get_material()->flags &= ~sm::Material::Outline;
         });
@@ -1115,7 +1124,7 @@ void NineMensMorrisBoard::check_legal_moves() {
     if (m_legal_moves.empty()) {
         m_game_over = GameOver(
             if_player_white(m_position.player, GameOver::WinnerBlack, GameOver::WinnerWhite),
-            format("%s player has no more legal moves to make.", if_player_white(m_position.player, "White", "Black"))
+            format("%s player has no more legal moves to play.", if_player_white(m_position.player, "White", "Black"))
         );
     }
 }
@@ -1127,8 +1136,8 @@ void NineMensMorrisBoard::check_fifty_move_rule() {
 
     if (m_plies_no_advancement == 100) {
         m_game_over = GameOver(
-            GameOver::TieBetweenBothPlayers,
-            "Fifty moves have been made without a mill."
+            GameOver::Draw,
+            "Fifty moves have been played without a mill."
         );
     }
 }
@@ -1144,7 +1153,7 @@ void NineMensMorrisBoard::check_threefold_repetition() {
 
     if (count == 3) {
         m_game_over = GameOver(
-            GameOver::TieBetweenBothPlayers,
+            GameOver::Draw,
             "The same position has appeared for the third time."
         );
     }

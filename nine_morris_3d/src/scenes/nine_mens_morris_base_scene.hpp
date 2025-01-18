@@ -20,13 +20,13 @@ public:
 
     GameOptions& get_game_options() override;
     BoardObj& get_board() override;
-    GamePlayer get_board_player_type() const override;
+    GamePlayer get_player_type() const override;
     void reset() override;
     void reset(const std::string& string) override;
     void play_move(const std::string& string) override;
     void timeout(PlayerColor color) override;
     void resign(PlayerColor color) override;
-    void offer_draw() override;
+    void accept_draw_offer() override;
     void time_control_options_window() override;
 
     void set_scene_textures() override;

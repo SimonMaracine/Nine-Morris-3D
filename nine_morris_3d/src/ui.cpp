@@ -13,27 +13,31 @@
 #include "constants.hpp"
 #include "ver.hpp"
 
-static PlayerColor resigning_player(GameScene& game_scene) {
-    const auto& options {game_scene.get_game_options()};
+static bool resign_available(GameScene& game_scene) {
+    return game_scene.get_game_options().game_type == static_cast<int>(GameType::Online);
+}
 
-    if (options.game_type == static_cast<int>(GameType::Online)) {
-        // FIXME
-        return {};
-    }
+static PlayerColor resign_player(GameScene& game_scene) {
+    const GameOptions& options {game_scene.get_game_options()};
 
-    if (options.white_player == static_cast<int>(GamePlayer::Human) && options.black_player == static_cast<int>(GamePlayer::Human)) {
-        return game_scene.get_board().get_player_color();
-    }
-
-    if (game_scene.get_game_options().white_player == static_cast<int>(GamePlayer::Human)) {
-        return PlayerColor::White;
-    }
-
-    if (game_scene.get_game_options().black_player == static_cast<int>(GamePlayer::Human)) {
-        return PlayerColor::Black;
+    switch (options.game_type) {
+        case static_cast<int>(GameType::Online):
+            return BoardObj::opponent(static_cast<PlayerColor>(options.online.remote_color));
+        default:
+            assert(false);
+            break;
     }
 
     assert(false);
+    return {};
+}
+
+static bool offer_draw_available(GameScene& game_scene) {
+    return game_scene.get_game_options().game_type == static_cast<int>(GameType::Online);
+}
+
+static bool accept_draw_offer_available(GameScene& game_scene) {
+    return game_scene.get_game_options().game_type == static_cast<int>(GameType::Online) && game_scene.get_draw_offered_by_remote();
 }
 
 void Ui::initialize(sm::Ctx& ctx) {
@@ -78,11 +82,14 @@ void Ui::main_menu_bar(sm::Ctx& ctx, GameScene& game_scene) {
             if (ImGui::MenuItem("New Game")) {
                 game_scene.reset();
             }
-            if (ImGui::MenuItem("Resign")) {
-                // game_scene.resign(resigning_player(game_scene));
+            if (ImGui::MenuItem("Resign", nullptr, nullptr, resign_available(game_scene))) {
+                game_scene.resign(resign_player(game_scene));
             }
-            if (ImGui::MenuItem("Offer Draw")) {
-                // game_scene.offer_draw();
+            if (ImGui::MenuItem("Accept Draw Offer", nullptr, nullptr, accept_draw_offer_available(game_scene))) {
+                game_scene.accept_draw_offer();
+            }
+            if (ImGui::MenuItem("Offer Draw", nullptr, nullptr, offer_draw_available(game_scene))) {
+                // TODO
             }
             if (ImGui::MenuItem("Game Options")) {
                 m_current_popup_window = PopupWindow::GameOptions;
@@ -333,30 +340,33 @@ void Ui::game_window_before_game(GameScene& game_scene) {
 
     ImGui::Separator();
 
-    const auto game_player_str {[](int game_player) -> const char* {
-        switch (game_player) {
-            case static_cast<int>(GamePlayer::Human):
-                return "human";
-            case static_cast<int>(GamePlayer::Computer):
-                return "computer";
-        }
+    switch (game_scene.get_game_options().game_type) {
+        case static_cast<int>(GameType::LocalHumanVsHuman):
+            ImGui::TextWrapped("Local game between two human players");
+            break;
+        case static_cast<int>(GameType::LocalHumanVsComputer):
+            ImGui::TextWrapped("Local game between human and computer players");
+            ImGui::TextWrapped(
+                "Computer plays as %s",
+                player_color_to_string(static_cast<PlayerColor>(game_scene.get_game_options().local_human_vs_computer.computer_color))
+            );
+            break;
+        case static_cast<int>(GameType::Online):
+            ImGui::TextWrapped("Online game between two human players");
+            ImGui::TextWrapped(
+                "Remote plays as %s",
+                player_color_to_string(static_cast<PlayerColor>(game_scene.get_game_options().online.remote_color))
+            );
+            break;
+    }
 
-        assert(false);
-        return {};
-    }};
-
-    ImGui::Text("W");
-    ImGui::SameLine();
-    ImGui::Text("%s", game_player_str(game_scene.get_game_options().white_player));
-
-    ImGui::Text("B");
-    ImGui::SameLine();
-    ImGui::Text("%s", game_player_str(game_scene.get_game_options().black_player));
-
-    ImGui::Text("Time");
-    ImGui::SameLine();
     const auto minutes {std::get<0>(Clock::split_time(game_scene.get_clock().get_white_time()))};
-    ImGui::Text("%u minutes", minutes);
+
+    if (minutes == 1) {
+        ImGui::TextWrapped("%u minute", minutes);
+    } else {
+        ImGui::TextWrapped("%u minutes", minutes);
+    }
 }
 
 void Ui::game_window_during_game(GameScene& game_scene) {
@@ -402,8 +412,8 @@ void Ui::game_over_window(GameScene& game_scene) {
             case GameOver::WinnerBlack:
                 message = "Black player wins!";
                 break;
-            case GameOver::TieBetweenBothPlayers:
-                message = "Tie between both players!";
+            case GameOver::Draw:
+                message = "Draw!";
                 break;
         }
 
@@ -419,32 +429,27 @@ void Ui::game_over_window(GameScene& game_scene) {
 
 void Ui::game_options_window(GameScene& game_scene) {
     generic_window("Game Options", [&]() {
-        GameOptions& game_options {game_scene.get_game_options()};
+        GameOptions& options {game_scene.get_game_options()};
 
         ImGui::BeginDisabled(game_scene.get_game_state() != GameState::Ready);
 
-        ImGui::RadioButton("Local", &game_options.game_type, static_cast<int>(GameType::Local));
-        ImGui::SameLine();
-        ImGui::RadioButton("Online", &game_options.game_type, static_cast<int>(GameType::Online));
+        ImGui::RadioButton("Local", &options.game_type, static_cast<int>(GameType::LocalHumanVsHuman));
+        ImGui::RadioButton("Local vs Computer", &options.game_type, static_cast<int>(GameType::LocalHumanVsComputer));
+        ImGui::RadioButton("Online", &options.game_type, static_cast<int>(GameType::Online));
 
         ImGui::Separator();
 
-        if (game_options.game_type == static_cast<int>(GameType::Local)) {
-            ImGui::Text("W");
-            ImGui::SameLine();
-
-            ImGui::RadioButton("Human##w", &game_options.white_player, static_cast<int>(GamePlayer::Human));
-            ImGui::SameLine();
-            ImGui::RadioButton("Computer##w", &game_options.white_player, static_cast<int>(GamePlayer::Computer));
-
-            ImGui::Text("B");
-            ImGui::SameLine();
-
-            ImGui::RadioButton("Human##b", &game_options.black_player, static_cast<int>(GamePlayer::Human));
-            ImGui::SameLine();
-            ImGui::RadioButton("Computer##b", &game_options.black_player, static_cast<int>(GamePlayer::Computer));
-        } else {
-            ImGui::Text("(PLACEHOLDER)");
+        switch (options.game_type) {
+            case static_cast<int>(GameType::LocalHumanVsHuman):
+                break;
+            case static_cast<int>(GameType::LocalHumanVsComputer):
+                ImGui::RadioButton("white", &options.local_human_vs_computer.computer_color, static_cast<int>(PlayerColor::White));
+                ImGui::RadioButton("black", &options.local_human_vs_computer.computer_color, static_cast<int>(PlayerColor::Black));
+                break;
+            case static_cast<int>(GameType::Online):
+                ImGui::RadioButton("white", &options.online.remote_color, static_cast<int>(PlayerColor::White));
+                ImGui::RadioButton("black", &options.online.remote_color, static_cast<int>(PlayerColor::Black));
+                break;
         }
 
         ImGui::Separator();
@@ -461,8 +466,8 @@ R"(Each player has nine pieces, either black or white.
 A player wins by reducing the opponent to two pieces, or by leaving them without a legal move.
 When a player remains with three pieces, they can jump on the board.
 A player may take a piece from a mill only if there are no other pieces available.
-The game ends with a tie when fifty turns take place without any mill.
-The game ends with a tie when the exact same position shows up for the third time.)"
+The game ends with a draw when fifty turns take place without any mill.
+The game ends with a draw when the same position happens three times.)"
     };
 
     wrapped_text_window("Nine Men's Morris Rules", text);

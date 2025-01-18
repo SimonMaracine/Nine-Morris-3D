@@ -18,7 +18,12 @@ void NineMensMorrisBaseScene::scene_setup() {
 }
 
 void NineMensMorrisBaseScene::scene_update() {
-    m_board.update(ctx, cast_mouse_ray(ctx, m_cam), m_cam_controller.get_position(), m_game_state == GameState::HumanThinking);
+    m_board.update(
+        ctx,
+        cast_mouse_ray(ctx, m_cam),
+        m_cam_controller.get_position(),
+        m_game_state == GameState::HumanThinking && m_board.get_game_over() == GameOver::None
+    );
 }
 
 void NineMensMorrisBaseScene::scene_fixed_update() {
@@ -37,14 +42,51 @@ BoardObj& NineMensMorrisBaseScene::get_board() {
     return m_board;
 }
 
-GamePlayer NineMensMorrisBaseScene::get_board_player_type() const {
-    switch (m_board.get_player()) {
-        case NineMensMorrisBoard::Player::White:
-            return static_cast<GamePlayer>(m_game_options.white_player);
-        case NineMensMorrisBoard::Player::Black:
-            return static_cast<GamePlayer>(m_game_options.black_player);
+GamePlayer NineMensMorrisBaseScene::get_player_type() const {
+    switch (m_game_options.game_type) {
+        case static_cast<int>(GameType::LocalHumanVsHuman):
+            return GamePlayer::Human;
+        case static_cast<int>(GameType::LocalHumanVsComputer):
+            switch (m_board.get_player()) {
+                case NineMensMorrisBoard::Player::White:
+                    return (
+                        m_game_options.local_human_vs_computer.computer_color == static_cast<int>(PlayerColor::White)
+                        ?
+                        GamePlayer::Computer
+                        :
+                        GamePlayer::Human
+                    );
+                case NineMensMorrisBoard::Player::Black:
+                    return (
+                        m_game_options.local_human_vs_computer.computer_color == static_cast<int>(PlayerColor::Black)
+                        ?
+                        GamePlayer::Computer
+                        :
+                        GamePlayer::Human
+                    );
+            }
+        case static_cast<int>(GameType::Online):
+            switch (m_board.get_player()) {
+                case NineMensMorrisBoard::Player::White:
+                    return (
+                        m_game_options.online.remote_color == static_cast<int>(PlayerColor::White)
+                        ?
+                        GamePlayer::Remote
+                        :
+                        GamePlayer::Human
+                    );
+                case NineMensMorrisBoard::Player::Black:
+                    return (
+                        m_game_options.online.remote_color == static_cast<int>(PlayerColor::Black)
+                        ?
+                        GamePlayer::Remote
+                        :
+                        GamePlayer::Human
+                    );
+            }
     }
 
+    assert(false);
     return {};
 }
 
@@ -120,8 +162,8 @@ void NineMensMorrisBaseScene::resign(PlayerColor color) {
     }
 }
 
-void NineMensMorrisBaseScene::offer_draw() {
-    m_board.offer_draw();
+void NineMensMorrisBaseScene::accept_draw_offer() {
+    m_board.accept_draw_offer();
 }
 
 void NineMensMorrisBaseScene::time_control_options_window() {

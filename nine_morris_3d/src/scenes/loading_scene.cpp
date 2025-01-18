@@ -6,7 +6,13 @@
 
 void LoadingScene::on_start() {
     ctx.add_task_async([this](sm::AsyncTask& task, void*) {
-        load_assets();
+        try {
+            load_assets();
+        } catch (const sm::RuntimeError&) {
+            task.set_done(std::current_exception());
+            return;
+        }
+
         task.set_done();
     });
 }
@@ -81,11 +87,7 @@ void LoadingScene::load_assets() {
 
         ctx.load_mesh(ctx.path_assets("models/board/board_paint.obj"), "Plane", sm::Mesh::Type::PNTT);
 
-        // if (g.options.labeled_board) {
-            ctx.load_texture_data(ctx.path_assets("textures/board/board_paint_labeled_diffuse.png"), post_processing);
-        // } else {
-        //     ctx.load_texture_data(ctx.path_assets("textures/board/board_paint_diffuse.png"), post_processing);
-        // }
+        ctx.load_texture_data(ctx.path_assets("textures/board/board_paint_diffuse.png"), post_processing);
     }
 
     {
@@ -104,11 +106,6 @@ void LoadingScene::load_assets() {
         ctx.load_texture_data(ctx.path_assets("textures/piece/piece_white_diffuse.png"), post_processing);
         ctx.load_texture_data(ctx.path_assets("textures/piece/piece_black_diffuse.png"), post_processing);
         ctx.load_texture_data(ctx.path_assets("textures/piece/piece_normal.png"), post_processing);
-    }
-
-    {
-        ctx.load_texture_data(ctx.path_assets("textures/indicator/white_indicator.png"), sm::TexturePostProcessing());
-        ctx.load_texture_data(ctx.path_assets("textures/indicator/black_indicator.png"), sm::TexturePostProcessing());
     }
 
     ctx.add_task([this](const sm::Task&, void*) {

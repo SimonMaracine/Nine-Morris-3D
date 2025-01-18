@@ -43,19 +43,20 @@ public:
 
     virtual GameOptions& get_game_options() = 0;
     virtual BoardObj& get_board() = 0;
-    virtual GamePlayer get_board_player_type() const = 0;
+    virtual GamePlayer get_player_type() const = 0;
     virtual void reset() = 0;
     virtual void reset(const std::string& string) = 0;
     virtual void play_move(const std::string& string) = 0;
     virtual void timeout(PlayerColor color) = 0;
     virtual void resign(PlayerColor color) = 0;
-    virtual void offer_draw() = 0;
+    virtual void accept_draw_offer() = 0;
     virtual void time_control_options_window() = 0;
 
     PointCameraController& get_camera_controller() { return m_cam_controller; }
     GameState& get_game_state() { return m_game_state; }
     const Clock& get_clock() const { return m_clock; }
     const MoveList& get_move_list() const { return m_move_list; }
+    bool& get_draw_offered_by_remote() { return m_draw_offered_by_remote; }
 
     void load_and_set_skybox();
     void load_and_set_textures();
@@ -77,6 +78,7 @@ protected:
     glm::vec3 m_default_camera_position {};
     Clock m_clock;
     MoveList m_move_list;
+    bool m_draw_offered_by_remote {false};
 
     PointCameraController m_cam_controller;
     Ui m_ui;

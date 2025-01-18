@@ -108,7 +108,7 @@ public:
     void play_move(const Move& move);
     void timeout(Player player);
     void resign(Player player);
-    void offer_draw();
+    void accept_draw_offer();
 
     static Move move_from_string(const std::string& string);
     static std::string move_to_string(const Move& move);
@@ -132,8 +132,8 @@ private:
     );
     void initialize_objects();
 
-    void update_nodes_highlight(std::function<bool()>&& highlight);
-    void update_pieces_highlight(std::function<bool(const PieceObj&)>&& highlight);
+    void update_nodes_highlight(std::function<bool()>&& highlight, bool enabled);
+    void update_pieces_highlight(std::function<bool(const PieceObj&)>&& highlight, bool enabled);
     void update_nodes(sm::Ctx& ctx);
     void update_pieces(sm::Ctx& ctx);
 

@@ -27,8 +27,8 @@ const char* GameOver::to_string() const {
             return "WinnerWhite";
         case GameOver::WinnerBlack:
             return "WinnerBlack";
-        case GameOver::TieBetweenBothPlayers:
-            return "TieBetweenBothPlayers";
+        case GameOver::Draw:
+            return "Draw";
     }
 
     return {};

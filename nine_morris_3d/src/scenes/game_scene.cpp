@@ -87,7 +87,12 @@ void GameScene::on_imgui_update() {
 
 void GameScene::load_and_set_skybox() {
     ctx.add_task_async([this](sm::AsyncTask& task, void*) {
-        load_skybox_texture_data();
+        try {
+            load_skybox_texture_data();
+        } catch (const sm::RuntimeError&) {
+            task.set_done(std::current_exception());
+            return;
+        }
 
         ctx.add_task([this](const sm::Task&, void*) {
             setup_skybox();
@@ -103,7 +108,12 @@ void GameScene::load_and_set_skybox() {
 
 void GameScene::load_and_set_textures() {
     ctx.add_task_async([this](sm::AsyncTask& task, void*) {
-        load_all_texture_data();
+        try {
+            load_all_texture_data();
+        } catch (const sm::RuntimeError&) {
+            task.set_done(std::current_exception());
+            return;
+        }
 
         ctx.add_task([this](const sm::Task&, void*) {
             setup_skybox();
@@ -150,7 +160,7 @@ void GameScene::update_game_state() {
 
             break;
         case GameState::NextTurn: {
-            switch (get_board_player_type()) {
+            switch (get_player_type()) {
                 case GamePlayer::Human:
                     m_game_state = GameState::HumanThinking;
                     break;
