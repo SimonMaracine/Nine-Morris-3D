@@ -7,10 +7,47 @@
 #include <nine_morris_3d_engine/external/cereal.h++>
 
 #include "ver.hpp"
-#include "constants.hpp"
 
 inline constexpr const char* OPTIONS_FILE_NAME {"options.dat"};
 
+enum class GameMode {
+    NineMensMorris
+};
+
+enum class Skybox {
+    None,
+    Field,
+    Autumn
+};
+
+enum class AntiAliasing {
+    Off = 1,
+    _2x = 2,
+    _4x = 4
+};
+
+enum class AnisotropicFiltering {
+    Off = 0,
+    _4x = 4,
+    _8x = 8
+};
+
+enum class TextureQuality {
+    Half,
+    Full
+};
+
+enum class ShadowQuality {
+    Half = 2048,
+    Full = 4096
+};
+
+enum class Scale {
+    _100 = 1,
+    _200 = 2
+};
+
+// Structure representing data saved and loaded from disk
 struct Options {
     int game_mode {static_cast<int>(GameMode::NineMensMorris)};
     float master_volume {1.0f};
@@ -51,6 +88,7 @@ CEREAL_CLASS_VERSION(Options, version_number())
 void load_options(Options& options, const std::filesystem::path& file_path);  // TODO validation
 void save_options(const Options& options, const std::filesystem::path& file_path);
 
+// Error thrown by load and save operations
 struct OptionsFileError : std::runtime_error {
     explicit OptionsFileError(const char* message)
         : std::runtime_error(message) {}

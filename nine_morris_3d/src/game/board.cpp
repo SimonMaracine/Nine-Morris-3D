@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <cstdarg>
 #include <cstdio>
+#include <cassert>
 
 #include <nine_morris_3d_engine/external/glm.h++>
 
@@ -31,6 +32,7 @@ const char* GameOver::to_string() const {
             return "Draw";
     }
 
+    assert(false);
     return {};
 }
 
@@ -39,6 +41,14 @@ PlayerColor BoardObj::opponent(PlayerColor color) {
         return PlayerColor::Black;
     } else {
         return PlayerColor::White;
+    }
+}
+
+const char* BoardObj::player_color_to_string(PlayerColor color) {
+    if (color == PlayerColor::White) {
+        return "white";
+    } else {
+        return "black";
     }
 }
 

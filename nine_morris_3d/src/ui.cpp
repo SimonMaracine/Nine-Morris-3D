@@ -10,7 +10,6 @@
 #include "scenes/game_scene.hpp"
 #include "global.hpp"
 #include "game_options.hpp"
-#include "constants.hpp"
 #include "ver.hpp"
 
 static bool resign_available(GameScene& game_scene) {
@@ -361,14 +360,14 @@ void Ui::game_window_before_game(GameScene& game_scene) {
             ImGui::TextWrapped("Local game between human and computer players");
             ImGui::TextWrapped(
                 "Computer plays as %s",
-                player_color_to_string(static_cast<PlayerColor>(game_scene.get_game_options().local_human_vs_computer.computer_color))
+                BoardObj::player_color_to_string(static_cast<PlayerColor>(game_scene.get_game_options().local_human_vs_computer.computer_color))
             );
             break;
         case static_cast<int>(GameType::Online):
             ImGui::TextWrapped("Online game between two human players");
             ImGui::TextWrapped(
                 "Remote plays as %s",
-                player_color_to_string(static_cast<PlayerColor>(game_scene.get_game_options().online.remote_color))
+                BoardObj::player_color_to_string(static_cast<PlayerColor>(game_scene.get_game_options().online.remote_color))
             );
             break;
     }

@@ -11,7 +11,6 @@
 #include "clock.hpp"
 #include "move_list.hpp"
 #include "game_options.hpp"
-#include "constants.hpp"
 
 enum class GameState {
     Ready,
@@ -22,6 +21,13 @@ enum class GameState {
     ComputerThinking,
     Stop,
     Over
+};
+
+// Type of player
+enum class GamePlayer {
+    Human,
+    Computer,
+    Remote
 };
 
 class GameScene : public sm::ApplicationScene {

@@ -96,8 +96,8 @@ namespace sm {
         m_win.show();
     }
 
-    void Ctx::set_window_vsync(int interval) const noexcept {
-        m_win.set_vsync(interval);
+    void Ctx::set_window_vsync(bool enable) const noexcept {
+        m_win.set_vsync(enable);
     }
 
     void Ctx::add_window_cursor(Id id, std::unique_ptr<TextureData>&& cursor, int x_hotspot, int y_hotspot) {

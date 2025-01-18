@@ -91,10 +91,8 @@ namespace sm::internal {
         glfwShowWindow(m_window);
     }
 
-    void Window::set_vsync(int interval) const noexcept {
-        assert(interval >= 0);
-
-        glfwSwapInterval(interval);
+    void Window::set_vsync(bool enable) const noexcept {
+        glfwSwapInterval(enable ? 1 : 0);
     }
 
     void Window::add_cursor(Id id, std::unique_ptr<TextureData>&& data, int x_hotspot, int y_hotspot) {

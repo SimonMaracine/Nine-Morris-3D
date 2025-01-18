@@ -1,10 +1,13 @@
 #pragma once
 
-#include "constants.hpp"
+enum class GameType {
+    LocalHumanVsHuman,
+    LocalHumanVsComputer,
+    Online
+};
 
 // Data set before any game
 // Represents what type of game it is and which are the players
-
 struct GameOptions {
     template<typename T>
     explicit GameOptions(T time)

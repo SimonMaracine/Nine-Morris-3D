@@ -5,7 +5,14 @@
 #include "game/nine_mens_morris/nine_mens_morris_board.hpp"
 #include "scenes/game_scene.hpp"
 #include "game_options.hpp"
-#include "constants.hpp"
+
+enum class NineMensMorrisTime {
+    _1min,
+    _3min,
+    _10min,
+    _60min,
+    Custom
+};
 
 class NineMensMorrisBaseScene : public GameScene {
 public:
