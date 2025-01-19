@@ -82,27 +82,27 @@ public:
     NineMensMorrisBoard() = default;
     NineMensMorrisBoard(
         const sm::Renderable& board,
-        const sm::Renderable& board_paint,
+        const sm::Renderable& paint,
         const std::vector<sm::Renderable>& nodes,
         const std::vector<sm::Renderable>& white_pieces,
         const std::vector<sm::Renderable>& black_pieces,
         std::function<void(const Move&)>&& move_callback
     );
 
+    void user_click_release_callback() override;
     const GameOver& get_game_over() const override;
     PlayerColor get_player_color() const override;
+
     Player get_player() const { return m_position.player; }
     const Position& get_setup_position() const { return m_setup_position; }
 
-    sm::Renderable& get_renderable() { return m_renderable; }
+    sm::Renderable& get_board_renderable() { return m_board_renderable; }
     sm::Renderable& get_paint_renderable() { return m_paint_renderable; }
     std::array<NodeObj, NODES>& get_nodes() { return m_nodes; }
-    std::vector<PieceObj>& get_pieces() { return m_pieces; }
+    std::array<PieceObj, PIECES>& get_pieces() { return m_pieces; }
 
     void update(sm::Ctx& ctx, glm::vec3 ray, glm::vec3 camera, bool user_input);
     void update_movement();
-    void user_click_press();
-    void user_click_release();
 
     void reset(const Position& position);
     void play_move(const Move& move);
@@ -116,14 +116,6 @@ public:
     static std::string position_to_string(const Position& position);
 
     void debug();
-
-    void set_renderables(
-        const sm::Renderable& board,
-        const sm::Renderable& board_paint,
-        const std::vector<sm::Renderable>& nodes,
-        const std::vector<sm::Renderable>& white_pieces,
-        const std::vector<sm::Renderable>& black_pieces
-    );
 
     template<typename T>
     T if_player_white(T value_if_white, T value_if_black) const {
@@ -197,8 +189,8 @@ private:
     std::function<void(const Move&)> m_move_callback;
 
     // Objects
-    sm::Renderable m_renderable;
+    sm::Renderable m_board_renderable;
     sm::Renderable m_paint_renderable;
     std::array<NodeObj, NODES> m_nodes;
-    std::vector<PieceObj> m_pieces;
+    std::array<PieceObj, PIECES> m_pieces;
 };

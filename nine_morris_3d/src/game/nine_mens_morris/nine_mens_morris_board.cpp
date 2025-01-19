@@ -215,23 +215,51 @@ NineMensMorrisBoard::Move NineMensMorrisBoard::Move::create_move_capture(int sou
 
 NineMensMorrisBoard::NineMensMorrisBoard(
     const sm::Renderable& board,
-    const sm::Renderable& board_paint,
+    const sm::Renderable& paint,
     const std::vector<sm::Renderable>& nodes,
     const std::vector<sm::Renderable>& white_pieces,
     const std::vector<sm::Renderable>& black_pieces,
     std::function<void(const Move&)>&& move_callback
 )
     : m_move_callback(std::move(move_callback)) {
-    m_renderable = board;
-    m_renderable.transform.scale = 20.0f;
+    m_board_renderable = board;
+    m_board_renderable.transform.scale = 20.0f;
 
-    m_paint_renderable = board_paint;
+    m_paint_renderable = paint;
     m_paint_renderable.transform.scale = 20.0f;
     m_paint_renderable.transform.position.y = 0.062f;
 
     m_legal_moves = generate_moves();
 
     initialize_objects(nodes, white_pieces, black_pieces);
+}
+
+void NineMensMorrisBoard::user_click_release_callback() {
+    if (m_position.plies >= 18) {
+        if (m_capture_piece) {
+            if (is_piece_id(m_hover_id)) {
+                try_capture(m_pieces[PIECE(m_hover_id)].node_id);
+            }
+        } else {
+            if (is_node_id(m_hover_id)) {
+                try_move(m_select_id, m_nodes[m_hover_id].get_id());
+            }
+
+            if (is_piece_id(m_hover_id)) {
+                select(m_pieces[PIECE(m_hover_id)].node_id);
+            }
+        }
+    } else {
+        if (m_capture_piece) {
+            if (is_piece_id(m_hover_id)) {
+                try_capture(m_pieces[PIECE(m_hover_id)].node_id);
+            }
+        } else {
+            if (is_node_id(m_hover_id)) {
+                try_place(m_nodes[m_hover_id].get_id());
+            }
+        }
+    }
 }
 
 const GameOver& NineMensMorrisBoard::get_game_over() const {
@@ -300,7 +328,7 @@ void NineMensMorrisBoard::update(sm::Ctx& ctx, glm::vec3 ray, glm::vec3 camera, 
     #pragma GCC diagnostic pop
 #endif
 
-    ctx.add_renderable(m_renderable);
+    ctx.add_renderable(m_board_renderable);
     ctx.add_renderable(m_paint_renderable);
 
     update_nodes(ctx);
@@ -311,40 +339,6 @@ void NineMensMorrisBoard::update_movement() {
     for (PieceObj& piece : m_pieces) {
         piece.update_movement();
     }
-}
-
-void NineMensMorrisBoard::user_click_press() {
-    BoardObj::user_click_press();
-}
-
-void NineMensMorrisBoard::user_click_release() {
-    BoardObj::user_click_release([this]() {
-        if (m_position.plies >= 18) {
-            if (m_capture_piece) {
-                if (is_piece_id(m_hover_id)) {
-                    try_capture(m_pieces[PIECE(m_hover_id)].node_id);
-                }
-            } else {
-                if (is_node_id(m_hover_id)) {
-                    try_move(m_select_id, m_nodes[m_hover_id].get_id());
-                }
-
-                if (is_piece_id(m_hover_id)) {
-                    select(m_pieces[PIECE(m_hover_id)].node_id);
-                }
-            }
-        } else {
-            if (m_capture_piece) {
-                if (is_piece_id(m_hover_id)) {
-                    try_capture(m_pieces[PIECE(m_hover_id)].node_id);
-                }
-            } else {
-                if (is_node_id(m_hover_id)) {
-                    try_place(m_nodes[m_hover_id].get_id());
-                }
-            }
-        }
-    });
 }
 
 void NineMensMorrisBoard::reset(const Position& position) {
@@ -675,29 +669,6 @@ void NineMensMorrisBoard::debug() {
     ImGui::End();
 }
 
-void NineMensMorrisBoard::set_renderables(
-    const sm::Renderable& board,
-    const sm::Renderable& board_paint,
-    const std::vector<sm::Renderable>& nodes,
-    const std::vector<sm::Renderable>& white_pieces,
-    const std::vector<sm::Renderable>& black_pieces
-) {
-    m_renderable.override_renderable_private(board);
-    m_paint_renderable.override_renderable_private(board_paint);
-
-    for (int i {0}; i < NODES; i++) {
-        m_nodes[i].set_renderable(nodes[i]);
-    }
-
-    for (int i {0}; i < PIECES / 2; i++) {
-        m_pieces[i].set_renderable(white_pieces[i]);
-    }
-
-    for (int i {PIECES / 2}; i < PIECES; i++) {
-        m_pieces[i].set_renderable(black_pieces[i - PIECES / 2]);
-    }
-}
-
 void NineMensMorrisBoard::initialize_objects(
     const std::vector<sm::Renderable>& nodes,
     const std::vector<sm::Renderable>& white_pieces,
@@ -706,8 +677,6 @@ void NineMensMorrisBoard::initialize_objects(
     for (std::size_t i {0}; i < m_nodes.size(); i++) {
         m_nodes[i] = NodeObj(static_cast<int>(i), nodes[i], NODE_POSITIONS[i]);
     }
-
-    m_pieces.resize(PIECES);
 
     // Offset pieces' IDs, so that they are different from nodes' IDs
 
@@ -735,8 +704,6 @@ void NineMensMorrisBoard::initialize_objects() {
         const auto renderable {m_nodes[i].get_renderable()};
         m_nodes[i] = NodeObj(static_cast<int>(i), renderable, NODE_POSITIONS[i]);
     }
-
-    m_pieces.resize(PIECES);
 
     // Offset pieces' IDs, so that they are different from nodes' IDs
 

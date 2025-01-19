@@ -40,18 +40,14 @@ public:
 
     virtual bool twelve_mens_morris_mode() const = 0;
 private:
-    void on_key_released(const sm::KeyReleasedEvent& event);
-    void on_mouse_button_pressed(const sm::MouseButtonPressedEvent& event);
-    void on_mouse_button_released(const sm::MouseButtonReleasedEvent& event);
-
     sm::Renderable setup_board() const;
-    sm::Renderable setup_board_paint() const;
-    std::vector<sm::Renderable> setup_nodes(unsigned int count) const;
-    std::vector<sm::Renderable> setup_white_pieces(unsigned int count) const;
-    std::vector<sm::Renderable> setup_black_pieces(unsigned int count) const;
+    sm::Renderable setup_paint() const;
+    std::vector<sm::Renderable> setup_nodes() const;
+    std::vector<sm::Renderable> setup_white_pieces() const;
+    std::vector<sm::Renderable> setup_black_pieces() const;
 
     std::shared_ptr<sm::GlTexture> load_board_diffuse_texture(bool reload = false) const;
-    std::shared_ptr<sm::GlTexture> load_board_paint_diffuse_texture(bool reload = false) const;
+    std::shared_ptr<sm::GlTexture> load_paint_diffuse_texture(bool reload = false) const;
     std::shared_ptr<sm::GlTexture> load_board_normal_texture(bool reload = false) const;
     std::shared_ptr<sm::GlTexture> load_white_piece_diffuse_texture(bool reload = false) const;
     std::shared_ptr<sm::GlTexture> load_black_piece_diffuse_texture(bool reload = false) const;

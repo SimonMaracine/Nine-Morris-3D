@@ -21,16 +21,16 @@ void GameScene::on_start() {
 }
 
 void GameScene::on_stop() {
-    m_cam_controller.disconnect_events(ctx);
+    m_camera_controller.disconnect_events(ctx);
     ctx.disconnect_events(this);
 }
 
 void GameScene::on_update() {
-    m_cam_controller.update_controls(ctx.get_delta(), ctx);
-    m_cam_controller.update_camera(ctx.get_delta());
+    m_camera_controller.update_controls(ctx.get_delta(), ctx);
+    m_camera_controller.update_camera(ctx.get_delta());
 
-    ctx.capture(m_cam, m_cam_controller.get_position());
-    ctx.capture(m_cam_2d);
+    ctx.capture(m_camera, m_camera_controller.get_position());
+    ctx.capture(m_camera_2d);
 
     ctx.add_light(m_directional_light);
     ctx.environment(m_skybox);
@@ -67,7 +67,7 @@ void GameScene::on_update() {
 }
 
 void GameScene::on_fixed_update() {
-    m_cam_controller.update_friction();
+    m_camera_controller.update_friction();
 
     scene_fixed_update();
 }
@@ -120,8 +120,30 @@ void GameScene::load_and_set_textures() {
 }
 
 void GameScene::on_window_resized(const sm::WindowResizedEvent& event) {
-    m_cam.set_projection(event.width, event.height, LENS_FOV, LENS_NEAR, LENS_FAR);
-    m_cam_2d.set_projection(0, event.width, 0, event.height);
+    m_camera.set_projection(event.width, event.height, LENS_FOV, LENS_NEAR, LENS_FAR);
+    m_camera_2d.set_projection(0, event.width, 0, event.height);
+}
+
+void GameScene::on_key_released(const sm::KeyReleasedEvent& event) {
+    if (event.key == sm::Key::Space) {
+        m_camera_controller.go_towards_position(m_default_camera_position);
+    }
+}
+
+void GameScene::on_mouse_button_pressed(const sm::MouseButtonPressedEvent& event) {
+    if (event.button == sm::MouseButton::Left) {
+        if (m_game_state == GameState::HumanThinking) {
+            get_board().user_click_press();
+        }
+    }
+}
+
+void GameScene::on_mouse_button_released(const sm::MouseButtonReleasedEvent& event) {
+    if (event.button == sm::MouseButton::Left) {
+        if (m_game_state == GameState::HumanThinking) {
+            get_board().user_click_release();
+        }
+    }
 }
 
 /* FIXME
@@ -225,8 +247,8 @@ void GameScene::update_game_state() {
 void GameScene::setup_camera() {
     const auto& g {ctx.global<Global>()};
 
-    m_cam_controller = PointCameraController(
-        m_cam,
+    m_camera_controller = PointCameraController(
+        m_camera,
         ctx.get_window_width(),
         ctx.get_window_height(),
         glm::vec3(0.0f),
@@ -235,13 +257,13 @@ void GameScene::setup_camera() {
         g.options.camera_sensitivity
     );
 
-    m_cam_controller.connect_events(ctx);
+    m_camera_controller.connect_events(ctx);
 
-    m_default_camera_position = m_cam_controller.get_position();
-    m_cam_controller.set_distance_to_point(m_cam_controller.get_distance_to_point() + 1.0f);
-    m_cam_controller.go_towards_position(m_default_camera_position);
+    m_default_camera_position = m_camera_controller.get_position();
+    m_camera_controller.set_distance_to_point(m_camera_controller.get_distance_to_point() + 1.0f);
+    m_camera_controller.go_towards_position(m_default_camera_position);
 
-    m_cam_2d.set_projection(0, ctx.get_window_width(), 0, ctx.get_window_height());
+    m_camera_2d.set_projection(0, ctx.get_window_width(), 0, ctx.get_window_height());
 }
 
 void GameScene::setup_skybox() {

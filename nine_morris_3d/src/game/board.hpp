@@ -50,14 +50,16 @@ public:
     BoardObj(BoardObj&&) = default;
     BoardObj& operator=(BoardObj&&) = default;
 
+    virtual void user_click_release_callback() = 0;
     virtual const GameOver& get_game_over() const = 0;
     virtual PlayerColor get_player_color() const = 0;
+
+    void user_click_press();
+    void user_click_release();
 
     static PlayerColor player_color_opponent(PlayerColor color);
     static const char* player_color_to_string(PlayerColor color);
 protected:
-    void user_click_press();
-    void user_click_release(std::function<void()>&& callback);
     void update_hover_id(glm::vec3 ray, glm::vec3 camera, std::function<std::vector<HoverableObj>()>&& get_hoverables);
 
     static std::string format(const char* format, ...);

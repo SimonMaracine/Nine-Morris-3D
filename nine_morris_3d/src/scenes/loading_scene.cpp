@@ -85,9 +85,9 @@ void LoadingScene::load_assets() {
             post_processing.size = sm::TextureSize::Half;
         }
 
-        ctx.load_mesh(ctx.path_assets("models/board/board_paint.obj"), "Plane", sm::Mesh::Type::PNTT);
+        ctx.load_mesh(ctx.path_assets("models/board/paint.obj"), "Plane", sm::Mesh::Type::PNTT);
 
-        ctx.load_texture_data(ctx.path_assets("textures/board/board_paint_diffuse.png"), post_processing);
+        ctx.load_texture_data(ctx.path_assets("textures/board/paint_diffuse.png"), post_processing);
     }
 
     {

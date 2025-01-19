@@ -1,6 +1,5 @@
 #pragma once
 
-#include <vector>
 #include <string>
 
 #include <nine_morris_3d_engine/nine_morris_3d.hpp>
@@ -58,7 +57,7 @@ public:
     virtual void accept_draw_offer() = 0;
     virtual void time_control_options_window() = 0;
 
-    PointCameraController& get_camera_controller() { return m_cam_controller; }
+    PointCameraController& get_camera_controller() { return m_camera_controller; }
     GameState& get_game_state() { return m_game_state; }
     GameOptions& get_game_options() { return m_game_options; }
     const Clock& get_clock() const { return m_clock; }
@@ -71,6 +70,9 @@ public:
     void load_and_set_textures();
 protected:
     void on_window_resized(const sm::WindowResizedEvent& event);
+    void on_key_released(const sm::KeyReleasedEvent& event);
+    void on_mouse_button_pressed(const sm::MouseButtonPressedEvent& event);
+    void on_mouse_button_released(const sm::MouseButtonReleasedEvent& event);
 
     void update_game_state();
 
@@ -81,13 +83,13 @@ protected:
     void load_skybox_texture_data() const;
     std::shared_ptr<sm::GlTextureCubemap> load_skybox_texture_cubemap(bool reload = false) const;
 
-    sm::Camera m_cam;
-    sm::Camera2D m_cam_2d;
+    sm::Camera m_camera;
+    sm::Camera2D m_camera_2d;
     sm::DirectionalLight m_directional_light;
     sm::ShadowBox m_shadow_box;
     sm::Skybox m_skybox;
     // sm::Quad m_wait_indicator;  // TODO
-    PointCameraController m_cam_controller;
+    PointCameraController m_camera_controller;
     Ui m_ui;
 
     GameState m_game_state {GameState::Ready};

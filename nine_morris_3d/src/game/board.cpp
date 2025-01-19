@@ -36,6 +36,30 @@ const char* GameOver::to_string() const {
     return {};
 }
 
+void BoardObj::user_click_press() {
+    if (m_game_over != GameOver::None) {
+        return;
+    }
+
+    m_click_id = m_hover_id;
+}
+
+void BoardObj::user_click_release() {
+    if (m_game_over != GameOver::None) {
+        m_click_id = -1;
+        return;
+    }
+
+    if (m_hover_id == -1 || m_hover_id != m_click_id) {
+        m_click_id = -1;
+        return;
+    }
+
+    m_click_id = -1;
+
+    user_click_release_callback();
+}
+
 PlayerColor BoardObj::player_color_opponent(PlayerColor color) {
     if (color == PlayerColorWhite) {
         return PlayerColorBlack;
@@ -50,30 +74,6 @@ const char* BoardObj::player_color_to_string(PlayerColor color) {
     } else {
         return "black";
     }
-}
-
-void BoardObj::user_click_press() {
-    if (m_game_over != GameOver::None) {
-        return;
-    }
-
-    m_click_id = m_hover_id;
-}
-
-void BoardObj::user_click_release(std::function<void()>&& callback) {
-    if (m_game_over != GameOver::None) {
-        m_click_id = -1;
-        return;
-    }
-
-    if (m_hover_id == -1 || m_hover_id != m_click_id) {
-        m_click_id = -1;
-        return;
-    }
-
-    m_click_id = -1;
-
-    callback();
 }
 
 void BoardObj::update_hover_id(glm::vec3 ray, glm::vec3 camera, std::function<std::vector<HoverableObj>()>&& get_hoverables) {

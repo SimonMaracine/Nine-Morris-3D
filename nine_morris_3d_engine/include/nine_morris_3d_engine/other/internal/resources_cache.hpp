@@ -23,25 +23,25 @@ namespace sm::internal {
     class LockedCache {
     public:
         resmanager::Cache<T>& operator*() {
-            std::lock_guard<std::mutex> lock {m_mutex};
+            std::lock_guard lock {m_mutex};
 
             return m_cache;
         }
 
         const resmanager::Cache<T>& operator*() const {
-            std::lock_guard<std::mutex> lock {m_mutex};
+            std::lock_guard lock {m_mutex};
 
             return m_cache;
         }
 
         resmanager::Cache<T>* operator->() {
-            std::lock_guard<std::mutex> lock {m_mutex};
+            std::lock_guard lock {m_mutex};
 
             return &m_cache;
         }
 
         const resmanager::Cache<T>* operator->() const {
-            std::lock_guard<std::mutex> lock {m_mutex};
+            std::lock_guard lock {m_mutex};
 
             return &m_cache;
         }

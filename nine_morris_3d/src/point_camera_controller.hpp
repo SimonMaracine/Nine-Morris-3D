@@ -1,7 +1,6 @@
 #pragma once
 
 #include <nine_morris_3d_engine/nine_morris_3d.hpp>
-#include <nine_morris_3d_engine/external/glm.h++>
 
 inline constexpr float LENS_FOV {45.0f};
 inline constexpr float LENS_NEAR {1.0f};

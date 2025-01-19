@@ -19,8 +19,6 @@ public:
     int get_id() const { return m_id; }
     const sm::Renderable& get_renderable() const { return m_renderable; }
     sm::Renderable& get_renderable() { return m_renderable; }
-
-    void set_renderable(const sm::Renderable& renderable) { m_renderable.override_renderable_private(renderable); }
 protected:
     int m_id {-1};
     sm::Renderable m_renderable;

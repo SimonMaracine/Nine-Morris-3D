@@ -9,33 +9,33 @@
 
 namespace sm::internal {
     void TaskManager::add(const Task::TaskFunction& function, void* user_data) {
-        std::lock_guard<std::mutex> lock {m_mutex};
+        std::lock_guard lock {m_mutex};
 
         m_tasks_active.emplace_back(function, user_data);
     }
 
     void TaskManager::add_async(const AsyncTask::TaskFunction& function, void* user_data) {
-        std::lock_guard<std::mutex> lock {m_async_mutex};
+        std::lock_guard lock {m_async_mutex};
 
         m_async_tasks.push_back(std::make_unique<AsyncTask>(function, user_data));
     }
 
     void TaskManager::update() {
         {
-            std::lock_guard<std::mutex> lock {m_mutex};
+            std::lock_guard lock {m_mutex};
 
             update_tasks();
         }
 
         {
-            std::lock_guard<std::mutex> lock {m_async_mutex};
+            std::lock_guard lock {m_async_mutex};
 
             update_async_tasks();
         }
     }
 
     void TaskManager::wait_async() {
-        std::lock_guard<std::mutex> lock {m_async_mutex};
+        std::lock_guard lock {m_async_mutex};
 
         for (const auto& async_task : m_async_tasks) {
             async_task->m_stop.store(true);
