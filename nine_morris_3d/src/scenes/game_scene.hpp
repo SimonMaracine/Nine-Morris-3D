@@ -30,6 +30,7 @@ enum class GamePlayer {
     Remote
 };
 
+// Base class for scenes representing games
 class GameScene : public sm::ApplicationScene {
 public:
     explicit GameScene(sm::Ctx& ctx)
@@ -93,7 +94,6 @@ protected:
     sm::Camera2D m_cam_2d;
     sm::DirectionalLight m_directional_light;
     sm::ShadowBox m_shadow_box;
-
-    std::shared_ptr<sm::GlTextureCubemap> m_skybox;
+    sm::Skybox m_skybox;
     // sm::Quad m_wait_indicator;  // TODO
 };

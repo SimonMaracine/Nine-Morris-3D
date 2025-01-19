@@ -18,8 +18,8 @@ namespace sm::internal {
         m_camera_2d = camera_2d;
     }
 
-    void Scene::skybox(std::shared_ptr<GlTextureCubemap> texture) noexcept {
-        m_skybox_texture = texture;
+    void Scene::environment(const Skybox& skybox) noexcept {
+        m_skybox = skybox;
     }
 
     void Scene::shadow(ShadowBox& box) noexcept {
@@ -205,7 +205,7 @@ namespace sm::internal {
         m_shadow_box = {};
         m_texts.clear();
         m_quads.clear();
-        m_skybox_texture = {};
+        m_skybox = {};
         m_post_processing_steps.clear();
         m_camera = {};
         m_camera_2d = {};

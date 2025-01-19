@@ -33,10 +33,7 @@ void GameScene::on_update() {
     ctx.capture(m_cam_2d);
 
     ctx.add_light(m_directional_light);
-
-    if (m_skybox) {
-        ctx.skybox(m_skybox);
-    }
+    ctx.environment(m_skybox);
 
     if (m_ui.get_show_information()) {
         ctx.show_information_text();
@@ -248,7 +245,7 @@ void GameScene::setup_camera() {
 }
 
 void GameScene::setup_skybox() {
-    m_skybox = load_skybox_texture_cubemap();
+    m_skybox.texture = load_skybox_texture_cubemap();
 }
 
 void GameScene::setup_lights() {
@@ -256,19 +253,19 @@ void GameScene::setup_lights() {
 
     switch (g.options.skybox) {
         case static_cast<int>(Skybox::None):
-            m_directional_light.direction = glm::normalize(glm::vec3(0.1f, -0.8f, 0.1f));
+            m_directional_light.direction = glm::normalize(glm::vec3(0.123f, -0.985f, 0.123f));
             m_directional_light.ambient_color = glm::vec3(0.07f);
             m_directional_light.diffuse_color = glm::vec3(0.6f);
             m_directional_light.specular_color = glm::vec3(0.75f);
             break;
         case static_cast<int>(Skybox::Field):
-            m_directional_light.direction = glm::normalize(glm::vec3(-0.198f, -0.192f, -0.282f));
+            m_directional_light.direction = glm::normalize(glm::vec3(-0.525f, -0.405f, -0.748f));
             m_directional_light.ambient_color = glm::vec3(0.08f);
             m_directional_light.diffuse_color = glm::vec3(0.95f);
             m_directional_light.specular_color = glm::vec3(1.0f);
             break;
         case static_cast<int>(Skybox::Autumn):
-            m_directional_light.direction = glm::normalize(glm::vec3(0.4f, -1.0f, -0.1f));
+            m_directional_light.direction = glm::normalize(glm::vec3(0.37f, -0.925f, -0.092f));
             m_directional_light.ambient_color = glm::vec3(0.15f);
             m_directional_light.diffuse_color = glm::vec3(0.75f);
             m_directional_light.specular_color = glm::vec3(0.65f);

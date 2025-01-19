@@ -76,7 +76,7 @@ namespace sm {
 
             if (!m_minimized) {
 #ifndef SM_BUILD_DISTRIBUTION
-                m_ctx.m_dbg.add_lines(m_ctx.m_scn);
+                m_ctx.m_dbg.render_lines(m_ctx.m_scn);
 #endif
                 m_ctx.m_rnd.render(m_ctx.m_scn, m_ctx.m_win.get_width(), m_ctx.m_win.get_height());
                 dear_imgui_render();
@@ -183,7 +183,7 @@ namespace sm {
 
         m_scene_current->scene->on_imgui_update();
 #ifndef SM_BUILD_DISTRIBUTION
-        m_ctx.m_dbg.render_dear_imgui(m_ctx.m_scn, m_ctx);
+        m_ctx.m_dbg.render(m_ctx.m_scn, m_ctx);
 #endif
 
         internal::imgui_context::end_frame();

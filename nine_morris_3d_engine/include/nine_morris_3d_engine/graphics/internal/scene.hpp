@@ -12,6 +12,7 @@
 #include "nine_morris_3d_engine/graphics/light.hpp"
 #include "nine_morris_3d_engine/graphics/camera.hpp"
 #include "nine_morris_3d_engine/graphics/post_processing_step.hpp"
+#include "nine_morris_3d_engine/graphics/skybox.hpp"
 
 namespace sm::internal {
     class Renderer;
@@ -23,7 +24,7 @@ namespace sm::internal {
         // Immediate
         void capture(const Camera& camera, glm::vec3 position) noexcept;
         void capture(const Camera2D& camera_2d) noexcept;
-        void skybox(std::shared_ptr<GlTextureCubemap> texture) noexcept;
+        void environment(const Skybox& skybox) noexcept;
         void shadow(ShadowBox& box) noexcept;
         void add_post_processing(std::shared_ptr<PostProcessingStep> step);
 
@@ -59,7 +60,7 @@ namespace sm::internal {
         std::vector<Text> m_texts;
         std::vector<Quad> m_quads;
         std::vector<std::shared_ptr<PostProcessingStep>> m_post_processing_steps;
-        std::shared_ptr<GlTextureCubemap> m_skybox_texture;
+        Skybox m_skybox;
         Camera m_camera;
         glm::vec3 m_camera_position {};
         Camera2D m_camera_2d;

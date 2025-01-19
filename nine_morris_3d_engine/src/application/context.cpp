@@ -1,7 +1,5 @@
 #include "nine_morris_3d_engine/application/context.hpp"
 
-#include <array>
-
 #include <resmanager/resmanager.hpp>
 
 #include "nine_morris_3d_engine/application/application.hpp"
@@ -204,8 +202,8 @@ namespace sm {
         m_scn.capture(camera_2d);
     }
 
-    void Ctx::skybox(std::shared_ptr<GlTextureCubemap> texture) noexcept {
-        m_scn.skybox(texture);
+    void Ctx::environment(const Skybox& skybox) noexcept {
+        m_scn.environment(skybox);
     }
 
     void Ctx::shadow(ShadowBox& box) noexcept {

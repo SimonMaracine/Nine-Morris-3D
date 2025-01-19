@@ -137,7 +137,7 @@ namespace sm {
         // Scene
         void capture(const Camera& camera, glm::vec3 position) noexcept;
         void capture(const Camera2D& camera_2d) noexcept;
-        void skybox(std::shared_ptr<GlTextureCubemap> texture) noexcept;
+        void environment(const Skybox& skybox) noexcept;
         void shadow(ShadowBox& box) noexcept;
         void add_post_processing(std::shared_ptr<PostProcessingStep> step);
         void add_renderable(Renderable& renderable);
