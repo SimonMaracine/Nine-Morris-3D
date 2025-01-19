@@ -1,29 +1,25 @@
 #pragma once
 
-enum class GameType {
-    LocalHumanVsHuman,
-    LocalHumanVsComputer,
-    Online
+enum GameType : int {
+    GameTypeLocalHumanVsHuman,
+    GameTypeLocalHumanVsComputer,
+    GameTypeOnline
 };
 
 // Data set before any game
 // Represents what type of game it is and which are the players
 struct GameOptions {
-    template<typename T>
-    explicit GameOptions(T time)
-        : time(static_cast<int>(time)) {}
-
-    int game_type {static_cast<int>(GameType::LocalHumanVsHuman)};
+    int game_type {GameTypeLocalHumanVsHuman};
 
     struct LocalHumanVsHuman {};
 
     struct LocalHumanVsComputer {
-        int computer_color {static_cast<int>(PlayerColor::Black)};
+        int computer_color {PlayerColorBlack};
     } local_human_vs_computer;
 
     struct Online {
-        int remote_color {static_cast<int>(PlayerColor::Black)};
+        int remote_color {PlayerColorBlack};
     } online;
 
-    int time {};
+    int time {};  // This needs to be initialized with the corresponding enum
 };

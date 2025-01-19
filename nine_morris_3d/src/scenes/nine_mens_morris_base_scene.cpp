@@ -15,6 +15,7 @@ void NineMensMorrisBaseScene::connect_events() {
 
 void NineMensMorrisBaseScene::scene_setup() {
     m_board = setup_renderables();
+    m_game_options.time = NineMensMorrisTime10min;
 }
 
 void NineMensMorrisBaseScene::scene_update() {
@@ -34,56 +35,30 @@ void NineMensMorrisBaseScene::scene_imgui_update() {
     m_board.debug();
 }
 
-GameOptions& NineMensMorrisBaseScene::get_game_options() {
-    return m_game_options;
-}
-
 BoardObj& NineMensMorrisBaseScene::get_board() {
     return m_board;
 }
 
 GamePlayer NineMensMorrisBaseScene::get_player_type() const {
     switch (m_game_options.game_type) {
-        case static_cast<int>(GameType::LocalHumanVsHuman):
+        case GameTypeLocalHumanVsHuman:
             return GamePlayer::Human;
-        case static_cast<int>(GameType::LocalHumanVsComputer):
-            switch (m_board.get_player()) {
-                case NineMensMorrisBoard::Player::White:  // TODO improve
-                    return (
-                        m_game_options.local_human_vs_computer.computer_color == static_cast<int>(PlayerColor::White)
-                        ?
-                        GamePlayer::Computer
-                        :
-                        GamePlayer::Human
-                    );
-                case NineMensMorrisBoard::Player::Black:
-                    return (
-                        m_game_options.local_human_vs_computer.computer_color == static_cast<int>(PlayerColor::Black)
-                        ?
-                        GamePlayer::Computer
-                        :
-                        GamePlayer::Human
-                    );
-            }
-        case static_cast<int>(GameType::Online):
-            switch (m_board.get_player()) {
-                case NineMensMorrisBoard::Player::White:
-                    return (
-                        m_game_options.online.remote_color == static_cast<int>(PlayerColor::White)
-                        ?
-                        GamePlayer::Remote
-                        :
-                        GamePlayer::Human
-                    );
-                case NineMensMorrisBoard::Player::Black:
-                    return (
-                        m_game_options.online.remote_color == static_cast<int>(PlayerColor::Black)
-                        ?
-                        GamePlayer::Remote
-                        :
-                        GamePlayer::Human
-                    );
-            }
+        case GameTypeLocalHumanVsComputer:
+            return (
+                m_game_options.local_human_vs_computer.computer_color == m_board.if_player_white(PlayerColorWhite, PlayerColorBlack)
+                ?
+                GamePlayer::Computer
+                :
+                GamePlayer::Human
+            );
+        case GameTypeOnline:
+            return (
+                m_game_options.online.remote_color == m_board.if_player_white(PlayerColorWhite, PlayerColorBlack)
+                ?
+                GamePlayer::Computer
+                :
+                GamePlayer::Human
+            );
     }
 
     assert(false);
@@ -103,15 +78,15 @@ void NineMensMorrisBaseScene::reset(const std::string& string) {
 
     const auto clock_time {[](int time) -> unsigned int {
         switch (time) {
-            case static_cast<int>(NineMensMorrisTime::_1min):
+            case NineMensMorrisTime1min:
                 return Clock::as_centiseconds(1);
-            case static_cast<int>(NineMensMorrisTime::_3min):
+            case NineMensMorrisTime3min:
                 return Clock::as_centiseconds(3);
-            case static_cast<int>(NineMensMorrisTime::_10min):
+            case NineMensMorrisTime10min:
                 return Clock::as_centiseconds(10);
-            case static_cast<int>(NineMensMorrisTime::_60min):
+            case NineMensMorrisTime60min:
                 return Clock::as_centiseconds(60);
-            case static_cast<int>(NineMensMorrisTime::Custom):
+            case NineMensMorrisTimeCustom:
                 // FIXME
                 break;
         }
@@ -142,10 +117,10 @@ void NineMensMorrisBaseScene::play_move(const std::string& string) {
 
 void NineMensMorrisBaseScene::timeout(PlayerColor color) {
     switch (color) {
-        case PlayerColor::White:
+        case PlayerColorWhite:
             m_board.timeout(NineMensMorrisBoard::Player::White);
             break;
-        case PlayerColor::Black:
+        case PlayerColorBlack:
             m_board.timeout(NineMensMorrisBoard::Player::Black);
             break;
     }
@@ -156,10 +131,10 @@ void NineMensMorrisBaseScene::timeout(PlayerColor color) {
 
 void NineMensMorrisBaseScene::resign(PlayerColor color) {
     switch (color) {
-        case PlayerColor::White:
+        case PlayerColorWhite:
             m_board.resign(NineMensMorrisBoard::Player::White);
             break;
-        case PlayerColor::Black:
+        case PlayerColorBlack:
             m_board.resign(NineMensMorrisBoard::Player::Black);
             break;
     }
@@ -176,29 +151,29 @@ void NineMensMorrisBaseScene::accept_draw_offer() {
 }
 
 void NineMensMorrisBaseScene::time_control_options_window() {
-    if (ImGui::RadioButton("1 min", &m_game_options.time, static_cast<int>(NineMensMorrisTime::_1min))) {
+    if (ImGui::RadioButton("1 min", &m_game_options.time, NineMensMorrisTime1min)) {
         m_clock.reset(Clock::as_centiseconds(1));
     }
 
     ImGui::SameLine();
 
-    if (ImGui::RadioButton("3 min", &m_game_options.time, static_cast<int>(NineMensMorrisTime::_3min))) {
+    if (ImGui::RadioButton("3 min", &m_game_options.time, NineMensMorrisTime3min)) {
         m_clock.reset(Clock::as_centiseconds(3));
     }
 
-    if (ImGui::RadioButton("10 min", &m_game_options.time, static_cast<int>(NineMensMorrisTime::_10min))) {
+    if (ImGui::RadioButton("10 min", &m_game_options.time, NineMensMorrisTime10min)) {
         m_clock.reset(Clock::as_centiseconds(10));
     }
 
     ImGui::SameLine();
 
-    if (ImGui::RadioButton("60 min", &m_game_options.time, static_cast<int>(NineMensMorrisTime::_60min))) {
+    if (ImGui::RadioButton("60 min", &m_game_options.time, NineMensMorrisTime60min)) {
         m_clock.reset(Clock::as_centiseconds(60));
     }
 
-    ImGui::RadioButton("Custom", &m_game_options.time, static_cast<int>(NineMensMorrisTime::Custom));
+    ImGui::RadioButton("Custom", &m_game_options.time, NineMensMorrisTimeCustom);
 
-    if (m_game_options.time == static_cast<int>(NineMensMorrisTime::Custom)) {
+    if (m_game_options.time == NineMensMorrisTimeCustom) {
         // TODO
     }
 }
@@ -270,7 +245,7 @@ void NineMensMorrisBaseScene::load_all_texture_data() const {
     {
         sm::TexturePostProcessing post_processing;
 
-        if (g.options.texture_quality == static_cast<int>(TextureQuality::Half)) {
+        if (g.options.texture_quality == TextureQualityHalf) {
             post_processing.size = sm::TextureSize::Half;
         }
 
@@ -281,7 +256,7 @@ void NineMensMorrisBaseScene::load_all_texture_data() const {
     {
         sm::TexturePostProcessing post_processing;
 
-        if (g.options.texture_quality == static_cast<int>(TextureQuality::Half)) {
+        if (g.options.texture_quality == TextureQualityHalf) {
             post_processing.size = sm::TextureSize::Half;
         }
 
@@ -291,7 +266,7 @@ void NineMensMorrisBaseScene::load_all_texture_data() const {
     {
         sm::TexturePostProcessing post_processing;
 
-        if (g.options.texture_quality == static_cast<int>(TextureQuality::Half)) {
+        if (g.options.texture_quality == TextureQualityHalf) {
             post_processing.size = sm::TextureSize::Half;
         }
 

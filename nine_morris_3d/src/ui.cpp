@@ -16,7 +16,7 @@ static bool resign_available(GameScene& game_scene) {
     return (
         game_scene.get_game_state() != GameState::Ready &&
         game_scene.get_game_state() != GameState::Over &&
-        game_scene.get_game_options().game_type == static_cast<int>(GameType::Online)
+        game_scene.get_game_options().game_type == GameTypeOnline
     );
 }
 
@@ -24,8 +24,8 @@ static PlayerColor resign_player(GameScene& game_scene) {
     const GameOptions& options {game_scene.get_game_options()};
 
     switch (options.game_type) {
-        case static_cast<int>(GameType::Online):
-            return BoardObj::opponent(static_cast<PlayerColor>(options.online.remote_color));
+        case GameTypeOnline:
+            return BoardObj::player_color_opponent(static_cast<PlayerColor>(options.online.remote_color));
         default:
             assert(false);
             break;
@@ -39,7 +39,7 @@ static bool offer_draw_available(GameScene& game_scene) {
     return (
         game_scene.get_game_state() != GameState::Ready &&
         game_scene.get_game_state() != GameState::Over &&
-        game_scene.get_game_options().game_type == static_cast<int>(GameType::Online)
+        game_scene.get_game_options().game_type == GameTypeOnline
     );
 }
 
@@ -47,7 +47,7 @@ static bool accept_draw_offer_available(GameScene& game_scene) {
     return (
         game_scene.get_game_state() != GameState::Ready &&
         game_scene.get_game_state() != GameState::Over &&
-        game_scene.get_game_options().game_type == static_cast<int>(GameType::Online) &&
+        game_scene.get_game_options().game_type == GameTypeOnline &&
         game_scene.get_draw_offered_by_remote()
     );
 }
@@ -107,8 +107,8 @@ void Ui::main_menu_bar(sm::Ctx& ctx, GameScene& game_scene) {
                 m_current_popup_window = PopupWindow::GameOptions;
             }
             if (ImGui::BeginMenu("Game Mode")) {
-                if (ImGui::RadioButton("Nine Men's Morris", &m_options.game_mode, static_cast<int>(GameMode::NineMensMorris))) {
-                    if (std::exchange(g.options.game_mode, m_options.game_mode) != static_cast<int>(GameMode::NineMensMorris)) {
+                if (ImGui::RadioButton("Nine Men's Morris", &m_options.game_mode, GameModeNineMensMorris)) {
+                    if (std::exchange(g.options.game_mode, m_options.game_mode) != GameModeNineMensMorris) {
                         ctx.change_scene("nine_mens_morris"_H);
                     }
                 }
@@ -124,13 +124,13 @@ void Ui::main_menu_bar(sm::Ctx& ctx, GameScene& game_scene) {
         if (ImGui::BeginMenu("Options")) {
             if (ImGui::BeginMenu("Graphics")) {
                 if (ImGui::BeginMenu("Scale")) {
-                    if (ImGui::RadioButton("100%", &m_options.scale, static_cast<int>(Scale::_100))) {
-                        if (std::exchange(g.options.scale, m_options.scale) != static_cast<int>(Scale::_100)) {
+                    if (ImGui::RadioButton("100%", &m_options.scale, Scale100)) {
+                        if (std::exchange(g.options.scale, m_options.scale) != Scale100) {
                             set_scale_task(ctx, g.options.scale);
                         }
                     }
-                    if (ImGui::RadioButton("200%", &m_options.scale, static_cast<int>(Scale::_200))) {
-                        if (std::exchange(g.options.scale, m_options.scale) != static_cast<int>(Scale::_200)) {
+                    if (ImGui::RadioButton("200%", &m_options.scale, Scale200)) {
+                        if (std::exchange(g.options.scale, m_options.scale) != Scale200) {
                             set_scale_task(ctx, g.options.scale);
                         }
                     }
@@ -138,18 +138,18 @@ void Ui::main_menu_bar(sm::Ctx& ctx, GameScene& game_scene) {
                     ImGui::EndMenu();
                 }
                 if (ImGui::BeginMenu("Anti-Aliasing")) {
-                    if (ImGui::RadioButton("Off", &m_options.anti_aliasing, static_cast<int>(AntiAliasing::Off))) {
-                        if (std::exchange(g.options.anti_aliasing, m_options.anti_aliasing) != static_cast<int>(AntiAliasing::Off)) {
+                    if (ImGui::RadioButton("Off", &m_options.anti_aliasing, AntiAliasingOff)) {
+                        if (std::exchange(g.options.anti_aliasing, m_options.anti_aliasing) != AntiAliasingOff) {
                             set_anti_aliasing_task(ctx, g.options.anti_aliasing);
                         }
                     }
-                    if (ImGui::RadioButton("2X", &m_options.anti_aliasing, static_cast<int>(AntiAliasing::_2x))) {
-                        if (std::exchange(g.options.anti_aliasing, m_options.anti_aliasing) != static_cast<int>(AntiAliasing::_2x)) {
+                    if (ImGui::RadioButton("2X", &m_options.anti_aliasing, AntiAliasing2x)) {
+                        if (std::exchange(g.options.anti_aliasing, m_options.anti_aliasing) != AntiAliasing2x) {
                             set_anti_aliasing_task(ctx, g.options.anti_aliasing);
                         }
                     }
-                    if (ImGui::RadioButton("4X", &m_options.anti_aliasing, static_cast<int>(AntiAliasing::_4x))) {
-                        if (std::exchange(g.options.anti_aliasing, m_options.anti_aliasing) != static_cast<int>(AntiAliasing::_4x)) {
+                    if (ImGui::RadioButton("4X", &m_options.anti_aliasing, AntiAliasing4x)) {
+                        if (std::exchange(g.options.anti_aliasing, m_options.anti_aliasing) != AntiAliasing4x) {
                             set_anti_aliasing_task(ctx, g.options.anti_aliasing);
                         }
                     }
@@ -157,18 +157,18 @@ void Ui::main_menu_bar(sm::Ctx& ctx, GameScene& game_scene) {
                     ImGui::EndMenu();
                 }
                 if (ImGui::BeginMenu("Anisotropic Filtering")) {
-                    if (ImGui::RadioButton("Off", &m_options.anisotropic_filtering, static_cast<int>(AnisotropicFiltering::Off))) {
-                        if (std::exchange(g.options.anisotropic_filtering, m_options.anisotropic_filtering) != static_cast<int>(AnisotropicFiltering::Off)) {
+                    if (ImGui::RadioButton("Off", &m_options.anisotropic_filtering, AnisotropicFilteringOff)) {
+                        if (std::exchange(g.options.anisotropic_filtering, m_options.anisotropic_filtering) != AnisotropicFilteringOff) {
                             set_anisotropic_filtering_task(ctx, game_scene);
                         }
                     }
-                    if (ImGui::RadioButton("4X", &m_options.anisotropic_filtering, static_cast<int>(AnisotropicFiltering::_4x))) {
-                        if (std::exchange(g.options.anisotropic_filtering, m_options.anisotropic_filtering) != static_cast<int>(AnisotropicFiltering::_4x)) {
+                    if (ImGui::RadioButton("4X", &m_options.anisotropic_filtering, AnisotropicFiltering4x)) {
+                        if (std::exchange(g.options.anisotropic_filtering, m_options.anisotropic_filtering) != AnisotropicFiltering4x) {
                             set_anisotropic_filtering_task(ctx, game_scene);
                         }
                     }
-                    if (ImGui::RadioButton("8X", &m_options.anisotropic_filtering, static_cast<int>(AnisotropicFiltering::_8x))) {
-                        if (std::exchange(g.options.anisotropic_filtering, m_options.anisotropic_filtering) != static_cast<int>(AnisotropicFiltering::_8x)) {
+                    if (ImGui::RadioButton("8X", &m_options.anisotropic_filtering, AnisotropicFiltering8x)) {
+                        if (std::exchange(g.options.anisotropic_filtering, m_options.anisotropic_filtering) != AnisotropicFiltering8x) {
                             set_anisotropic_filtering_task(ctx, game_scene);
                         }
                     }
@@ -176,13 +176,13 @@ void Ui::main_menu_bar(sm::Ctx& ctx, GameScene& game_scene) {
                     ImGui::EndMenu();
                 }
                 if (ImGui::BeginMenu("Texture Quality")) {
-                    if (ImGui::RadioButton("Half", &m_options.texture_quality, static_cast<int>(TextureQuality::Half))) {
-                        if (std::exchange(g.options.texture_quality, m_options.texture_quality) != static_cast<int>(TextureQuality::Half)) {
+                    if (ImGui::RadioButton("Half", &m_options.texture_quality, TextureQualityHalf)) {
+                        if (std::exchange(g.options.texture_quality, m_options.texture_quality) != TextureQualityHalf) {
                             game_scene.load_and_set_textures();
                         }
                     }
-                    if (ImGui::RadioButton("Full", &m_options.texture_quality, static_cast<int>(TextureQuality::Full))) {
-                        if (std::exchange(g.options.texture_quality, m_options.texture_quality) != static_cast<int>(TextureQuality::Full)) {
+                    if (ImGui::RadioButton("Full", &m_options.texture_quality, TextureQualityFull)) {
+                        if (std::exchange(g.options.texture_quality, m_options.texture_quality) != TextureQualityFull) {
                             game_scene.load_and_set_textures();
                         }
                     }
@@ -190,13 +190,13 @@ void Ui::main_menu_bar(sm::Ctx& ctx, GameScene& game_scene) {
                     ImGui::EndMenu();
                 }
                 if (ImGui::BeginMenu("Shadow Quality")) {
-                    if (ImGui::RadioButton("Half", &m_options.shadow_quality, static_cast<int>(ShadowQuality::Half))) {
-                        if (std::exchange(g.options.shadow_quality, m_options.shadow_quality) != static_cast<int>(ShadowQuality::Half)) {
+                    if (ImGui::RadioButton("Half", &m_options.shadow_quality, ShadowQualityHalf)) {
+                        if (std::exchange(g.options.shadow_quality, m_options.shadow_quality) != ShadowQualityHalf) {
                             set_shadow_quality_task(ctx, g.options.shadow_quality);
                         }
                     }
-                    if (ImGui::RadioButton("Full", &m_options.shadow_quality, static_cast<int>(ShadowQuality::Full))) {
-                        if (std::exchange(g.options.shadow_quality, m_options.shadow_quality) != static_cast<int>(ShadowQuality::Full)) {
+                    if (ImGui::RadioButton("Full", &m_options.shadow_quality, ShadowQualityFull)) {
+                        if (std::exchange(g.options.shadow_quality, m_options.shadow_quality) != ShadowQualityFull) {
                             set_shadow_quality_task(ctx, g.options.shadow_quality);
                         }
                     }
@@ -271,20 +271,20 @@ void Ui::main_menu_bar(sm::Ctx& ctx, GameScene& game_scene) {
                     ImGui::RadioButton("Field", false);
                     ImGui::RadioButton("Autumn", false);
                 } else {
-                    if (ImGui::RadioButton("None", &m_options.skybox, static_cast<int>(Skybox::None))) {
-                        if (std::exchange(g.options.skybox, m_options.skybox) != static_cast<int>(Skybox::None)) {
+                    if (ImGui::RadioButton("None", &m_options.skybox, SkyboxNone)) {
+                        if (std::exchange(g.options.skybox, m_options.skybox) != SkyboxNone) {
                             m_loading_skybox = true;
                             game_scene.load_and_set_skybox();
                         }
                     }
-                    if (ImGui::RadioButton("Field", &m_options.skybox, static_cast<int>(Skybox::Field))) {
-                        if (std::exchange(g.options.skybox, m_options.skybox) != static_cast<int>(Skybox::Field)) {
+                    if (ImGui::RadioButton("Field", &m_options.skybox, SkyboxField)) {
+                        if (std::exchange(g.options.skybox, m_options.skybox) != SkyboxField) {
                             m_loading_skybox = true;
                             game_scene.load_and_set_skybox();
                         }
                     }
-                    if (ImGui::RadioButton("Autumn", &m_options.skybox, static_cast<int>(Skybox::Autumn))) {
-                        if (std::exchange(g.options.skybox, m_options.skybox) != static_cast<int>(Skybox::Autumn)) {
+                    if (ImGui::RadioButton("Autumn", &m_options.skybox, SkyboxAutumn)) {
+                        if (std::exchange(g.options.skybox, m_options.skybox) != SkyboxAutumn) {
                             m_loading_skybox = true;
                             game_scene.load_and_set_skybox();
                         }
@@ -353,17 +353,17 @@ void Ui::game_window_before_game(GameScene& game_scene) {
     ImGui::Separator();
 
     switch (game_scene.get_game_options().game_type) {
-        case static_cast<int>(GameType::LocalHumanVsHuman):
+        case GameTypeLocalHumanVsHuman:
             ImGui::TextWrapped("Local game between two human players");
             break;
-        case static_cast<int>(GameType::LocalHumanVsComputer):
+        case GameTypeLocalHumanVsComputer:
             ImGui::TextWrapped("Local game between human and computer players");
             ImGui::TextWrapped(
                 "Computer plays as %s",
                 BoardObj::player_color_to_string(static_cast<PlayerColor>(game_scene.get_game_options().local_human_vs_computer.computer_color))
             );
             break;
-        case static_cast<int>(GameType::Online):
+        case GameTypeOnline:
             ImGui::TextWrapped("Online game between two human players");
             ImGui::TextWrapped(
                 "Remote plays as %s",
@@ -445,22 +445,22 @@ void Ui::game_options_window(GameScene& game_scene) {
 
         ImGui::BeginDisabled(game_scene.get_game_state() != GameState::Ready);
 
-        ImGui::RadioButton("Local", &options.game_type, static_cast<int>(GameType::LocalHumanVsHuman));
-        ImGui::RadioButton("Local vs Computer", &options.game_type, static_cast<int>(GameType::LocalHumanVsComputer));
-        ImGui::RadioButton("Online", &options.game_type, static_cast<int>(GameType::Online));
+        ImGui::RadioButton("Local", &options.game_type, GameTypeLocalHumanVsHuman);
+        ImGui::RadioButton("Local vs Computer", &options.game_type, GameTypeLocalHumanVsComputer);
+        ImGui::RadioButton("Online", &options.game_type, GameTypeOnline);
 
         ImGui::Separator();
 
         switch (options.game_type) {
-            case static_cast<int>(GameType::LocalHumanVsHuman):
+            case GameTypeLocalHumanVsHuman:
                 break;
-            case static_cast<int>(GameType::LocalHumanVsComputer):
-                ImGui::RadioButton("white", &options.local_human_vs_computer.computer_color, static_cast<int>(PlayerColor::White));
-                ImGui::RadioButton("black", &options.local_human_vs_computer.computer_color, static_cast<int>(PlayerColor::Black));
+            case GameTypeLocalHumanVsComputer:
+                ImGui::RadioButton("white", &options.local_human_vs_computer.computer_color, PlayerColorWhite);
+                ImGui::RadioButton("black", &options.local_human_vs_computer.computer_color, PlayerColorBlack);
                 break;
-            case static_cast<int>(GameType::Online):
-                ImGui::RadioButton("white", &options.online.remote_color, static_cast<int>(PlayerColor::White));
-                ImGui::RadioButton("black", &options.online.remote_color, static_cast<int>(PlayerColor::Black));
+            case GameTypeOnline:
+                ImGui::RadioButton("white", &options.online.remote_color, PlayerColorWhite);
+                ImGui::RadioButton("black", &options.online.remote_color, PlayerColorBlack);
                 break;
         }
 

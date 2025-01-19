@@ -241,9 +241,9 @@ const GameOver& NineMensMorrisBoard::get_game_over() const {
 PlayerColor NineMensMorrisBoard::get_player_color() const {
     switch (m_position.player) {
         case Player::White:
-            return PlayerColor::White;
+            return PlayerColorWhite;
         case Player::Black:
-            return PlayerColor::Black;
+            return PlayerColorBlack;
     }
 
     assert(false);
@@ -660,7 +660,7 @@ std::string NineMensMorrisBoard::position_to_string(const Position& position) {
 
 void NineMensMorrisBoard::debug() {
     if (ImGui::Begin("Debug Board")) {
-        ImGui::Text("player: %s", if_player_white(m_position.player, "white", "black"));
+        ImGui::Text("player: %s", if_player_white("white", "black"));
         ImGui::Text("game_over: %s", m_game_over.to_string());
         ImGui::Text("plies: %u", m_position.plies);
         ImGui::Text("plies_no_advancement: %u", m_plies_no_advancement);
@@ -1110,8 +1110,8 @@ void NineMensMorrisBoard::check_material() {
 
     if (count_pieces(m_position.board, m_position.player) < 3) {
         m_game_over = GameOver(
-            if_player_white(m_position.player, GameOver::WinnerBlack, GameOver::WinnerWhite),
-            format("%s player cannot make any more mills.", if_player_white(m_position.player, "White", "Black"))
+            if_player_white(GameOver::WinnerBlack, GameOver::WinnerWhite),
+            format("%s player cannot make any more mills.", if_player_white("White", "Black"))
         );
     }
 }
@@ -1123,8 +1123,8 @@ void NineMensMorrisBoard::check_legal_moves() {
 
     if (m_legal_moves.empty()) {
         m_game_over = GameOver(
-            if_player_white(m_position.player, GameOver::WinnerBlack, GameOver::WinnerWhite),
-            format("%s player has no more legal moves to play.", if_player_white(m_position.player, "White", "Black"))
+            if_player_white(GameOver::WinnerBlack, GameOver::WinnerWhite),
+            format("%s player has no more legal moves to play.", if_player_white("White", "Black"))
         );
     }
 }

@@ -36,16 +36,16 @@ const char* GameOver::to_string() const {
     return {};
 }
 
-PlayerColor BoardObj::opponent(PlayerColor color) {
-    if (color == PlayerColor::White) {
-        return PlayerColor::Black;
+PlayerColor BoardObj::player_color_opponent(PlayerColor color) {
+    if (color == PlayerColorWhite) {
+        return PlayerColorBlack;
     } else {
-        return PlayerColor::White;
+        return PlayerColorWhite;
     }
 }
 
 const char* BoardObj::player_color_to_string(PlayerColor color) {
-    if (color == PlayerColor::White) {
+    if (color == PlayerColorWhite) {
         return "white";
     } else {
         return "black";

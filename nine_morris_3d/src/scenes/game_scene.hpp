@@ -48,7 +48,6 @@ public:
     virtual void scene_fixed_update() = 0;
     virtual void scene_imgui_update() = 0;
 
-    virtual GameOptions& get_game_options() = 0;
     virtual BoardObj& get_board() = 0;
     virtual GamePlayer get_player_type() const = 0;
     virtual void reset() = 0;
@@ -61,14 +60,15 @@ public:
 
     PointCameraController& get_camera_controller() { return m_cam_controller; }
     GameState& get_game_state() { return m_game_state; }
+    GameOptions& get_game_options() { return m_game_options; }
     const Clock& get_clock() const { return m_clock; }
     const MoveList& get_move_list() const { return m_move_list; }
     bool& get_draw_offered_by_remote() { return m_draw_offered_by_remote; }
 
-    void load_and_set_skybox();
-    void load_and_set_textures();
     virtual void set_scene_textures() = 0;
     virtual void load_all_texture_data() const = 0;
+    void load_and_set_skybox();
+    void load_and_set_textures();
 protected:
     void on_window_resized(const sm::WindowResizedEvent& event);
 
@@ -81,19 +81,19 @@ protected:
     void load_skybox_texture_data() const;
     std::shared_ptr<sm::GlTextureCubemap> load_skybox_texture_cubemap(bool reload = false) const;
 
-    GameState m_game_state {GameState::Ready};
-    glm::vec3 m_default_camera_position {};
-    Clock m_clock;
-    MoveList m_move_list;
-    bool m_draw_offered_by_remote {false};
-
-    PointCameraController m_cam_controller;
-    Ui m_ui;
-
     sm::Camera m_cam;
     sm::Camera2D m_cam_2d;
     sm::DirectionalLight m_directional_light;
     sm::ShadowBox m_shadow_box;
     sm::Skybox m_skybox;
     // sm::Quad m_wait_indicator;  // TODO
+    PointCameraController m_cam_controller;
+    Ui m_ui;
+
+    GameState m_game_state {GameState::Ready};
+    glm::vec3 m_default_camera_position {};
+    GameOptions m_game_options;
+    Clock m_clock;
+    MoveList m_move_list;
+    bool m_draw_offered_by_remote {false};
 };

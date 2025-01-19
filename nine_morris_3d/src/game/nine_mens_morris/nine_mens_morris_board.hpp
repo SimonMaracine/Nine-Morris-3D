@@ -124,6 +124,11 @@ public:
         const std::vector<sm::Renderable>& white_pieces,
         const std::vector<sm::Renderable>& black_pieces
     );
+
+    template<typename T>
+    T if_player_white(T value_if_white, T value_if_black) const {
+        return m_position.player == Player::White ? value_if_white : value_if_black;
+    }
 private:
     void initialize_objects(
         const std::vector<sm::Renderable>& nodes,
@@ -177,11 +182,6 @@ private:
     static std::vector<int> neighbor_free_positions(const Board& board, int index);
     static int count_pieces(const Board& board, Player player);
     static Player opponent(Player player);
-
-    template<typename T>
-    static T if_player_white(Player player, T&& value_if_white, T&& value_if_black) {
-        return player == Player::White ? value_if_white : value_if_black;
-    }
 
     // Game data
     Position m_position;

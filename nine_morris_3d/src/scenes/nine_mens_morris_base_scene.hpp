@@ -6,12 +6,12 @@
 #include "scenes/game_scene.hpp"
 #include "game_options.hpp"
 
-enum class NineMensMorrisTime {
-    _1min,
-    _3min,
-    _10min,
-    _60min,
-    Custom
+enum NineMensMorrisTime : int {
+    NineMensMorrisTime1min,
+    NineMensMorrisTime3min,
+    NineMensMorrisTime10min,
+    NineMensMorrisTime60min,
+    NineMensMorrisTimeCustom
 };
 
 class NineMensMorrisBaseScene : public GameScene {
@@ -25,7 +25,6 @@ public:
     void scene_fixed_update() override;
     void scene_imgui_update() override;
 
-    GameOptions& get_game_options() override;
     BoardObj& get_board() override;
     GamePlayer get_player_type() const override;
     void reset() override;
@@ -61,5 +60,4 @@ private:
     NineMensMorrisBoard setup_renderables();
 
     NineMensMorrisBoard m_board;
-    GameOptions m_game_options {NineMensMorrisTime::_10min};
 };

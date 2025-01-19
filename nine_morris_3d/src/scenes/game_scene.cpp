@@ -51,11 +51,11 @@ void GameScene::on_update() {
 
     if (m_game_state != GameState::Ready && m_game_state != GameState::Over) {
         if (m_clock.get_white_time() == 0) {
-            timeout(PlayerColor::White);
+            timeout(PlayerColorWhite);
         }
 
         if (m_clock.get_black_time() == 0) {
-            timeout(PlayerColor::Black);
+            timeout(PlayerColorBlack);
         }
     }
 
@@ -252,19 +252,19 @@ void GameScene::setup_lights() {
     const auto& g {ctx.global<Global>()};
 
     switch (g.options.skybox) {
-        case static_cast<int>(Skybox::None):
+        case SkyboxNone:
             m_directional_light.direction = glm::normalize(glm::vec3(0.123f, -0.985f, 0.123f));
             m_directional_light.ambient_color = glm::vec3(0.07f);
             m_directional_light.diffuse_color = glm::vec3(0.6f);
             m_directional_light.specular_color = glm::vec3(0.75f);
             break;
-        case static_cast<int>(Skybox::Field):
+        case SkyboxField:
             m_directional_light.direction = glm::normalize(glm::vec3(-0.525f, -0.405f, -0.748f));
             m_directional_light.ambient_color = glm::vec3(0.08f);
             m_directional_light.diffuse_color = glm::vec3(0.95f);
             m_directional_light.specular_color = glm::vec3(1.0f);
             break;
-        case static_cast<int>(Skybox::Autumn):
+        case SkyboxAutumn:
             m_directional_light.direction = glm::normalize(glm::vec3(0.37f, -0.925f, -0.092f));
             m_directional_light.ambient_color = glm::vec3(0.15f);
             m_directional_light.diffuse_color = glm::vec3(0.75f);
@@ -282,9 +282,9 @@ void GameScene::load_skybox_texture_data() const {
     post_processing.flip = false;
 
     switch (g.options.skybox) {
-        case static_cast<int>(Skybox::None):
+        case SkyboxNone:
             break;
-        case static_cast<int>(Skybox::Field):
+        case SkyboxField:
             ctx.reload_texture_data(ctx.path_assets("textures/skybox/field/px.png"), post_processing);
             ctx.reload_texture_data(ctx.path_assets("textures/skybox/field/nx.png"), post_processing);
             ctx.reload_texture_data(ctx.path_assets("textures/skybox/field/py.png"), post_processing);
@@ -292,7 +292,7 @@ void GameScene::load_skybox_texture_data() const {
             ctx.reload_texture_data(ctx.path_assets("textures/skybox/field/pz.png"), post_processing);
             ctx.reload_texture_data(ctx.path_assets("textures/skybox/field/nz.png"), post_processing);
             break;
-        case static_cast<int>(Skybox::Autumn):
+        case SkyboxAutumn:
             ctx.reload_texture_data(ctx.path_assets("textures/skybox/autumn/px.png"), post_processing);
             ctx.reload_texture_data(ctx.path_assets("textures/skybox/autumn/nx.png"), post_processing);
             ctx.reload_texture_data(ctx.path_assets("textures/skybox/autumn/py.png"), post_processing);
@@ -339,11 +339,11 @@ std::shared_ptr<sm::GlTextureCubemap> GameScene::load_skybox_texture_cubemap(boo
     };
 
     switch (g.options.skybox) {
-        case static_cast<int>(Skybox::None):
+        case SkyboxNone:
             return nullptr;
-        case static_cast<int>(Skybox::Field):
+        case SkyboxField:
             return load_or_reload("field"_H);
-        case static_cast<int>(Skybox::Autumn):
+        case SkyboxAutumn:
             return load_or_reload("autumn"_H);
     }
 

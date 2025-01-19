@@ -34,9 +34,9 @@ private:
 };
 
 // Generic player type
-enum class PlayerColor {
-    White,
-    Black
+enum PlayerColor : int {
+    PlayerColorWhite,
+    PlayerColorBlack
 };
 
 // Generic board object representing a game with its data and rules
@@ -53,7 +53,7 @@ public:
     virtual const GameOver& get_game_over() const = 0;
     virtual PlayerColor get_player_color() const = 0;
 
-    static PlayerColor opponent(PlayerColor color);
+    static PlayerColor player_color_opponent(PlayerColor color);
     static const char* player_color_to_string(PlayerColor color);
 protected:
     void user_click_press();

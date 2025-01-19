@@ -26,7 +26,7 @@ void LoadingScene::on_update() {
         const auto& g {ctx.global<Global>()};
 
         switch (g.options.game_mode) {
-            case static_cast<int>(GameMode::NineMensMorris):
+            case GameModeNineMensMorris:
                 ctx.change_scene("nine_mens_morris"_H);
                 break;
         }
@@ -40,14 +40,14 @@ void LoadingScene::load_assets() {
         sm::TexturePostProcessing post_processing;
         post_processing.flip = false;
 
-        if (g.options.texture_quality == static_cast<int>(TextureQuality::Half)) {
+        if (g.options.texture_quality == TextureQualityHalf) {
             post_processing.size = sm::TextureSize::Half;
         }
 
         switch (g.options.skybox) {
-            case static_cast<int>(Skybox::None):
+            case SkyboxNone:
                 break;
-            case static_cast<int>(Skybox::Field):
+            case SkyboxField:
                 ctx.load_texture_data(ctx.path_assets("textures/skybox/field/px.png"), post_processing);
                 ctx.load_texture_data(ctx.path_assets("textures/skybox/field/nx.png"), post_processing);
                 ctx.load_texture_data(ctx.path_assets("textures/skybox/field/py.png"), post_processing);
@@ -55,7 +55,7 @@ void LoadingScene::load_assets() {
                 ctx.load_texture_data(ctx.path_assets("textures/skybox/field/pz.png"), post_processing);
                 ctx.load_texture_data(ctx.path_assets("textures/skybox/field/nz.png"), post_processing);
                 break;
-            case static_cast<int>(Skybox::Autumn):
+            case SkyboxAutumn:
                 ctx.load_texture_data(ctx.path_assets("textures/skybox/autumn/px.png"), post_processing);
                 ctx.load_texture_data(ctx.path_assets("textures/skybox/autumn/nx.png"), post_processing);
                 ctx.load_texture_data(ctx.path_assets("textures/skybox/autumn/py.png"), post_processing);
@@ -69,7 +69,7 @@ void LoadingScene::load_assets() {
     {
         sm::TexturePostProcessing post_processing;
 
-        if (g.options.texture_quality == static_cast<int>(TextureQuality::Half)) {
+        if (g.options.texture_quality == TextureQualityHalf) {
             post_processing.size = sm::TextureSize::Half;
         }
 
@@ -81,7 +81,7 @@ void LoadingScene::load_assets() {
     {
         sm::TexturePostProcessing post_processing;
 
-        if (g.options.texture_quality == static_cast<int>(TextureQuality::Half)) {
+        if (g.options.texture_quality == TextureQualityHalf) {
             post_processing.size = sm::TextureSize::Half;
         }
 
@@ -97,7 +97,7 @@ void LoadingScene::load_assets() {
     {
         sm::TexturePostProcessing post_processing;
 
-        if (g.options.texture_quality == static_cast<int>(TextureQuality::Half)) {
+        if (g.options.texture_quality == TextureQualityHalf) {
             post_processing.size = sm::TextureSize::Half;
         }
 

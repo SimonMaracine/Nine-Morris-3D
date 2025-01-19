@@ -10,54 +10,54 @@
 
 inline constexpr const char* OPTIONS_FILE_NAME {"options.dat"};
 
-enum class GameMode {
-    NineMensMorris
+enum GameMode : int {
+    GameModeNineMensMorris
 };
 
-enum class Skybox {
-    None,
-    Field,
-    Autumn
+enum Skybox : int {
+    SkyboxNone,
+    SkyboxField,
+    SkyboxAutumn
 };
 
-enum class AntiAliasing {
-    Off = 1,
-    _2x = 2,
-    _4x = 4
+enum AntiAliasing : int {
+    AntiAliasingOff = 1,
+    AntiAliasing2x = 2,
+    AntiAliasing4x = 4
 };
 
-enum class AnisotropicFiltering {
-    Off = 0,
-    _4x = 4,
-    _8x = 8
+enum AnisotropicFiltering : int {
+    AnisotropicFilteringOff = 0,
+    AnisotropicFiltering4x = 4,
+    AnisotropicFiltering8x = 8
 };
 
-enum class TextureQuality {
-    Half,
-    Full
+enum TextureQuality : int {
+    TextureQualityHalf,
+    TextureQualityFull
 };
 
-enum class ShadowQuality {
-    Half = 2048,
-    Full = 4096
+enum ShadowQuality : int {
+    ShadowQualityHalf = 2048,
+    ShadowQualityFull = 4096
 };
 
-enum class Scale {
-    _100 = 1,
-    _200 = 2
+enum Scale : int {
+    Scale100 = 1,
+    Scale200 = 2
 };
 
 // Structure representing data saved and loaded from disk
 struct Options {
-    int game_mode {static_cast<int>(GameMode::NineMensMorris)};
+    int game_mode {GameModeNineMensMorris};
     float master_volume {1.0f};
     float music_volume {0.7f};
-    int skybox {static_cast<int>(Skybox::Field)};
-    int anti_aliasing {static_cast<int>(AntiAliasing::_2x)};
-    int anisotropic_filtering {static_cast<int>(AnisotropicFiltering::_4x)};
-    int texture_quality {static_cast<int>(TextureQuality::Full)};
-    int shadow_quality {static_cast<int>(ShadowQuality::Full)};
-    int scale {static_cast<int>(Scale::_100)};
+    int skybox {SkyboxField};
+    int anti_aliasing {AntiAliasing2x};
+    int anisotropic_filtering {AnisotropicFiltering4x};
+    int texture_quality {TextureQualityFull};
+    int shadow_quality {ShadowQualityFull};
+    int scale {Scale100};
     float camera_sensitivity {1.0f};
     bool enable_music {false};
     bool vsync {true};
