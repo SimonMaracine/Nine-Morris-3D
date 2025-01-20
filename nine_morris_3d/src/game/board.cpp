@@ -21,19 +21,24 @@ static glm::mat4 transformation_matrix(glm::vec3 position, glm::vec3 rotation, f
 }
 
 const char* GameOver::to_string() const {
+    const char* string {};
+
     switch (m_type) {
         case GameOver::None:
-            return "None";
+            string = "None";
+            break;
         case GameOver::WinnerWhite:
-            return "WinnerWhite";
+            string = "WinnerWhite";
+            break;
         case GameOver::WinnerBlack:
-            return "WinnerBlack";
+            string = "WinnerBlack";
+            break;
         case GameOver::Draw:
-            return "Draw";
+            string = "Draw";
+            break;
     }
 
-    assert(false);
-    return {};
+    return string;
 }
 
 void BoardObj::user_click_press() {

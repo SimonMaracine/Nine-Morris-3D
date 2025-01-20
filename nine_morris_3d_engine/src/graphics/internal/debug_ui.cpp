@@ -1,6 +1,7 @@
 #include "nine_morris_3d_engine/graphics/internal/debug_ui.hpp"
 
 #include <cstring>
+#include <cstdio>
 
 #include <imgui.h>
 #include <glm/gtc/type_ptr.hpp>
@@ -17,6 +18,7 @@ namespace sm::internal {
             ImGui::Checkbox("Texts", &m_texts);
             ImGui::Checkbox("Quads", &m_quads);
             ImGui::Checkbox("Tasks", &m_tasks);
+            ImGui::Checkbox("Frame Time", &m_frame_time);
 
             if (ImGui::Checkbox("VSync", &m_vsync)) {
                 ctx.m_win.set_vsync(m_vsync);
@@ -47,6 +49,10 @@ namespace sm::internal {
 
         if (m_tasks) {
             tasks(ctx);
+        }
+
+        if (m_frame_time) {
+            frame_time(ctx);
         }
     }
 
@@ -133,7 +139,7 @@ namespace sm::internal {
         ImGui::End();
     }
 
-    void DebugUi::texts(Scene& scene) noexcept {
+    void DebugUi::texts(Scene& scene) {
         if (ImGui::Begin("Debug Texts")) {
             for (int index {0}; Text* text : scene.m_debug.texts) {
                 char buffer[512] {};
@@ -178,6 +184,28 @@ namespace sm::internal {
         if (ImGui::Begin("Debug Tasks")) {
             ImGui::Text("Tasks count: %lu", ctx.m_tsk.m_tasks_active.size());
             ImGui::Text("Async tasks count: %lu", ctx.m_tsk.m_async_tasks.size());
+        }
+
+        ImGui::End();
+    }
+
+    void DebugUi::frame_time(Ctx& ctx) {
+        const float time {ctx.get_delta() * 1000.0f};
+        frames[index] = time;
+
+        if (index < FRAMES_SIZE) {
+            index++;
+            frames.push_back(time);
+        } else {
+            frames.push_back(time);
+            frames.erase(frames.cbegin());
+        }
+
+        char text[32] {};
+        std::snprintf(text, sizeof(text), "%.3f", time);
+
+        if (ImGui::Begin("Frame Time")) {
+            ImGui::PlotLines("time (ms)", frames.data(), FRAMES_SIZE, 0, text, 0.0f, 50.0f, ImVec2(200, 60));
         }
 
         ImGui::End();

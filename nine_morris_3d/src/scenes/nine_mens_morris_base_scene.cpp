@@ -36,29 +36,33 @@ BoardObj& NineMensMorrisBaseScene::get_board() {
 }
 
 GamePlayer NineMensMorrisBaseScene::get_player_type() const {
+    GamePlayer player {};
+
     switch (m_game_options.game_type) {
         case GameTypeLocalHumanVsHuman:
-            return GamePlayer::Human;
+            player = GamePlayer::Human;
+            break;
         case GameTypeLocalHumanVsComputer:
-            return (
+            player = (
                 m_game_options.local_human_vs_computer.computer_color == m_board.if_player_white(PlayerColorWhite, PlayerColorBlack)
                 ?
                 GamePlayer::Computer
                 :
                 GamePlayer::Human
             );
+            break;
         case GameTypeOnline:
-            return (
+            player = (
                 m_game_options.online.remote_color == m_board.if_player_white(PlayerColorWhite, PlayerColorBlack)
                 ?
                 GamePlayer::Computer
                 :
                 GamePlayer::Human
             );
+            break;
     }
 
-    assert(false);
-    return {};
+    return player;
 }
 
 std::string NineMensMorrisBaseScene::get_setup_position() const {
@@ -89,22 +93,27 @@ void NineMensMorrisBaseScene::reset(const std::string& string) {
     }
 
     const auto clock_time {[](int time) -> unsigned int {
+        unsigned int time_centiseconds {};
+
         switch (time) {
             case NineMensMorrisTime1min:
-                return Clock::as_centiseconds(1);
+                time_centiseconds = Clock::as_centiseconds(1);
+                break;
             case NineMensMorrisTime3min:
-                return Clock::as_centiseconds(3);
+                time_centiseconds = Clock::as_centiseconds(3);
+                break;
             case NineMensMorrisTime10min:
-                return Clock::as_centiseconds(10);
+                time_centiseconds = Clock::as_centiseconds(10);
+                break;
             case NineMensMorrisTime60min:
-                return Clock::as_centiseconds(60);
+                time_centiseconds = Clock::as_centiseconds(60);
+                break;
             case NineMensMorrisTimeCustom:
                 // FIXME
                 break;
         }
 
-        assert(false);
-        return {};
+        return time_centiseconds;
     }};
 
     m_game_state = GameState::Ready;

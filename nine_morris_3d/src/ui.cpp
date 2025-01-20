@@ -23,16 +23,18 @@ static bool resign_available(GameScene& game_scene) {
 static PlayerColor resign_player(GameScene& game_scene) {
     const GameOptions& options {game_scene.get_game_options()};
 
+    PlayerColor color {};
+
     switch (options.game_type) {
         case GameTypeOnline:
-            return BoardObj::player_color_opponent(static_cast<PlayerColor>(options.online.remote_color));
+            color = BoardObj::player_color_opponent(static_cast<PlayerColor>(options.online.remote_color));
+            break;
         default:
             assert(false);
             break;
     }
 
-    assert(false);
-    return {};
+    return color;
 }
 
 static bool offer_draw_available(GameScene& game_scene) {
@@ -358,7 +360,7 @@ void Ui::game_window_before_game(GameScene& game_scene) {
             ImGui::TextWrapped("Local game between two human players");
             break;
         case GameTypeLocalHumanVsComputer:
-            ImGui::TextWrapped("Local game between human and computer players");
+            ImGui::TextWrapped("Local game between human and computer player");
             ImGui::TextWrapped(
                 "Computer plays as %s",
                 BoardObj::player_color_to_string(static_cast<PlayerColor>(game_scene.get_game_options().local_human_vs_computer.computer_color))
@@ -433,7 +435,7 @@ void Ui::game_over_window(GameScene& game_scene) {
         ImGui::SetCursorPosX((ImGui::GetWindowWidth() - ImGui::CalcTextSize(message).x) * 0.5f);
         ImGui::Text("%s", message);
 
-        const auto reason {static_cast<std::string>(game_scene.get_board().get_game_over())};
+        const auto& reason {static_cast<const std::string&>(game_scene.get_board().get_game_over())};
 
         ImGui::SetCursorPosX((ImGui::GetWindowWidth() - ImGui::CalcTextSize(reason.c_str()).x) * 0.5f);
         ImGui::Text("%s", reason.c_str());

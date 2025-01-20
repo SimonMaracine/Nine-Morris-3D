@@ -1,5 +1,7 @@
 #pragma once
 
+#include <vector>
+
 #include <glm/glm.hpp>
 
 #include "nine_morris_3d_engine/application/platform.hpp"
@@ -19,9 +21,10 @@ namespace sm::internal {
         void renderables(Scene& scene) noexcept;
         void lights(Scene& scene) noexcept;
         void shadows(Scene& scene) noexcept;
-        void texts(Scene& scene) noexcept;
+        void texts(Scene& scene);
         void quads(Scene& scene) noexcept;
         void tasks(Ctx& ctx) noexcept;
+        void frame_time(Ctx& ctx);
 
         void shadows_lines(
             Scene& scene,
@@ -42,6 +45,11 @@ namespace sm::internal {
         bool m_texts {false};
         bool m_quads {false};
         bool m_tasks {false};
+        bool m_frame_time {false};
+
+        static constexpr std::size_t FRAMES_SIZE {100};
+        std::vector<float> frames {FRAMES_SIZE};
+        std::size_t index {0};
     };
 #else
     class DebugUi {};
