@@ -67,8 +67,7 @@ def main(args: list[str]) -> int:
     commands = (
         comm.CdCommand(".."),
         comm.SubprocessCommand(["git", "submodule", "update", "--init"]),
-        comm.SubprocessCommand(["git", "submodule", "update", "--init", *submodules], "extern/boost"),
-        comm.SubprocessCommand(["cargo build"], "nine_morris_3d/extern/muhle_intelligence/muhle_intelligence")
+        comm.SubprocessCommand(["git", "submodule", "update", "--init", *submodules], "extern/boost")
     )
 
     try:

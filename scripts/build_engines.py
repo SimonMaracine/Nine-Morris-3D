@@ -26,7 +26,10 @@ def main(args: list[str]) -> int:
 
     commands = (
         comm.CdCommand(".."),
-        comm.SubprocessCommand(["cargo", "build", f"--{build_type}"], "nine_morris_3d/extern/muhle_intelligence/muhle_intelligence"),
+        comm.SubprocessCommand(
+            ["cargo", "build", "--release"] if build_type == "release" else ["cargo", "build"],
+            "nine_morris_3d/extern/muhle_intelligence/muhle_intelligence"
+        ),
         comm.CpCommand(
             f"nine_morris_3d/extern/muhle_intelligence/muhle_intelligence/target/{build_type}/muhle_intelligence",
             "assets/engines/muhle_intelligence"  # TODO strip symbols

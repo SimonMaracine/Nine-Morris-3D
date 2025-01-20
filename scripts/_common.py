@@ -10,41 +10,37 @@ class Command(abc.ABC):
     def execute(self):
         ...
 
-    @abc.abstractmethod
-    def __str__(self) -> str:
-        ...
-
 
 @dataclasses.dataclass(slots=True, frozen=True)
 class SubprocessCommand(Command):
-    command: list[str]
-    cwd: str = "."
+    _command: list[str]
+    _cwd: str = "."
 
     def execute(self):
-        subprocess.run(self.command, cwd=self.cwd).check_returncode()
+        subprocess.run(self._command, cwd=self._cwd).check_returncode()
 
     def __str__(self) -> str:
-        return " ".join(self.command)
+        return " ".join(self._command)
 
 
 @dataclasses.dataclass(slots=True, frozen=True)
 class CdCommand(Command):
-    path: str
+    _path: str
 
     def execute(self):
-        os.chdir(self.path)
+        os.chdir(self._path)
 
     def __str__(self) -> str:
-        return f"cd {self.path}"
+        return f"cd {self._path}"
 
 
 @dataclasses.dataclass(slots=True, frozen=True)
 class CpCommand(Command):
-    source_path: str
-    destination_path: str
+    _source_path: str
+    _destination_path: str
 
     def execute(self):
-        shutil.copy(self.source_path, self.destination_path)
+        shutil.copy(self._source_path, self._destination_path)
 
     def __str__(self) -> str:
-        return f"cp {self.source_path} {self.destination_path}"
+        return f"cp {self._source_path} {self._destination_path}"
