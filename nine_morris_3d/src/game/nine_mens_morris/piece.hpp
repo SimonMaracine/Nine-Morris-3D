@@ -19,6 +19,8 @@ enum class PieceMovement {
 
 class PieceObj : public HoverableObj {
 public:
+    using OnFinish = std::function<void(PieceObj&)>;
+
     PieceObj() = default;
     PieceObj(int id, const sm::Renderable& renderable, glm::vec3 position, PieceType type);
 
@@ -27,8 +29,8 @@ public:
     void update(sm::Ctx& ctx);
     void update_movement();
 
-    void move_direct(glm::vec3 origin, glm::vec3 target, std::function<void()>&& on_finish);
-    void move_three_step(glm::vec3 origin, glm::vec3 target0, glm::vec3 target1, glm::vec3 target, std::function<void()>&& on_finish);
+    void move_direct(glm::vec3 origin, glm::vec3 target, OnFinish&& on_finish);
+    void move_three_step(glm::vec3 origin, glm::vec3 target0, glm::vec3 target1, glm::vec3 target, OnFinish&& on_finish);
 
     bool active {true};
     bool to_remove {false};
@@ -48,5 +50,5 @@ private:
     glm::vec3 m_target {};
     bool m_reached_target0 {false};
     bool m_reached_target1 {false};
-    std::function<void()> m_on_finish;
+    OnFinish m_on_finish;
 };

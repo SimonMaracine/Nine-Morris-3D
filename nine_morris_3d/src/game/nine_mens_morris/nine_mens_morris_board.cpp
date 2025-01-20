@@ -267,15 +267,11 @@ const GameOver& NineMensMorrisBoard::get_game_over() const {
 }
 
 PlayerColor NineMensMorrisBoard::get_player_color() const {
-    switch (m_position.player) {
-        case Player::White:
-            return PlayerColorWhite;
-        case Player::Black:
-            return PlayerColorBlack;
+    if (m_position.player == Player::White) {
+        return PlayerColorWhite;
+    } else {
+        return PlayerColorBlack;
     }
-
-    assert(false);
-    return {};
 }
 
 void NineMensMorrisBoard::update(sm::Ctx& ctx, glm::vec3 ray, glm::vec3 camera, bool user_input) {
@@ -371,21 +367,14 @@ void NineMensMorrisBoard::play_move(const Move& move) {
                 m_pieces[PIECE(id)].node_id = move.place.place_index;
                 m_nodes[move.place.place_index].piece_id = id;
 
-                do_place_animation(m_pieces[PIECE(id)], m_nodes[move.place.place_index], []() {});
+                do_place_animation(m_pieces[PIECE(id)], m_nodes[move.place.place_index], [](PieceObj&) {});
             }
 
             play_place_move(move);
 
             break;
-        case MoveType::PlaceCapture:
-            {
-                const int id {new_piece_to_place(static_cast<PieceType>(m_position.player))};
-
-                m_pieces[PIECE(id)].node_id = move.place.place_index;
-                m_nodes[move.place.place_index].piece_id = id;
-
-                do_place_animation(m_pieces[PIECE(id)], m_nodes[move.place.place_index], []() {});
-            }
+        case MoveType::PlaceCapture: {
+            int take_id {};
             {
                 m_pieces[PIECE(m_nodes[move.place_capture.capture_index].piece_id)].node_id = -1;
 
@@ -393,14 +382,25 @@ void NineMensMorrisBoard::play_move(const Move& move) {
 
                 m_pieces[PIECE(id)].to_remove = true;
 
-                do_take_animation(m_pieces[PIECE(id)], [this, id]() {
-                    m_pieces[PIECE(id)].active = false;
+                take_id = id;
+            }
+            {
+                const int id {new_piece_to_place(static_cast<PieceType>(m_position.player))};
+
+                m_pieces[PIECE(id)].node_id = move.place.place_index;
+                m_nodes[move.place.place_index].piece_id = id;
+
+                do_place_animation(m_pieces[PIECE(id)], m_nodes[move.place.place_index], [this, take_id](PieceObj&) {
+                    do_take_animation(m_pieces[PIECE(take_id)], [](PieceObj& piece) {
+                        piece.active = false;
+                    });
                 });
             }
 
             play_place_capture_move(move);
 
             break;
+        }
         case MoveType::Move:
             {
                 m_pieces[PIECE(m_nodes[move.move.source_index].piece_id)].node_id = move.move.destination_index;
@@ -411,7 +411,7 @@ void NineMensMorrisBoard::play_move(const Move& move) {
                 do_move_animation(
                     m_pieces[PIECE(id)],
                     m_nodes[move.move.destination_index],
-                    []() {},
+                    [](PieceObj&) {},
                     !has_three_pieces(m_position.board, m_pieces[PIECE(id)])
                 );
             }
@@ -419,7 +419,17 @@ void NineMensMorrisBoard::play_move(const Move& move) {
             play_move_move(move);
 
             break;
-        case MoveType::MoveCapture:
+        case MoveType::MoveCapture: {
+            int take_id {};
+            {
+                m_pieces[PIECE(m_nodes[move.move_capture.capture_index].piece_id)].node_id = -1;
+
+                const int id {std::exchange(m_nodes[move.move_capture.capture_index].piece_id, -1)};
+
+                m_pieces[PIECE(id)].to_remove = true;
+
+                take_id = id;
+            }
             {
                 m_pieces[PIECE(m_nodes[move.move_capture.source_index].piece_id)].node_id = move.move_capture.destination_index;
                 m_nodes[move.move_capture.destination_index].piece_id = m_nodes[move.move_capture.source_index].piece_id;
@@ -429,25 +439,19 @@ void NineMensMorrisBoard::play_move(const Move& move) {
                 do_move_animation(
                     m_pieces[PIECE(id)],
                     m_nodes[move.move_capture.destination_index],
-                    []() {},
+                    [this, take_id](PieceObj&) {
+                        do_take_animation(m_pieces[PIECE(take_id)], [](PieceObj& piece) {
+                            piece.active = false;
+                        });
+                    },
                     !has_three_pieces(m_position.board, m_pieces[PIECE(id)])
                 );
-            }
-            {
-                m_pieces[PIECE(m_nodes[move.move_capture.capture_index].piece_id)].node_id = -1;
-
-                const int id {std::exchange(m_nodes[move.move_capture.capture_index].piece_id, -1)};
-
-                m_pieces[PIECE(id)].to_remove = true;
-
-                do_take_animation(m_pieces[PIECE(id)], [this, id]() {
-                    m_pieces[PIECE(id)].active = false;
-                });
             }
 
             play_move_capture_move(move);
 
             break;
+        }
     }
 }
 
@@ -791,7 +795,7 @@ void NineMensMorrisBoard::update_pieces(sm::Ctx& ctx) {
     }
 }
 
-void NineMensMorrisBoard::do_place_animation(PieceObj& piece, const NodeObj& node, std::function<void()>&& on_finish) {
+void NineMensMorrisBoard::do_place_animation(PieceObj& piece, const NodeObj& node, PieceObj::OnFinish&& on_finish) {
     const glm::vec3 origin {piece.get_renderable().transform.position};
     const glm::vec3 target0 {piece.get_renderable().transform.position.x, PIECE_Y_POSITION_AIR_MOVE, piece.get_renderable().transform.position.z};
     const glm::vec3 target1 {node.get_renderable().transform.position.x, PIECE_Y_POSITION_AIR_MOVE, node.get_renderable().transform.position.z};
@@ -800,7 +804,7 @@ void NineMensMorrisBoard::do_place_animation(PieceObj& piece, const NodeObj& nod
     piece.move_three_step(origin, target0, target1, target, std::move(on_finish));
 }
 
-void NineMensMorrisBoard::do_move_animation(PieceObj& piece, const NodeObj& node, std::function<void()>&& on_finish, bool direct) {
+void NineMensMorrisBoard::do_move_animation(PieceObj& piece, const NodeObj& node, PieceObj::OnFinish&& on_finish, bool direct) {
     if (direct) {
         const glm::vec3 origin {piece.get_renderable().transform.position};
         const glm::vec3 target {node.get_renderable().transform.position.x, PIECE_Y_POSITION_BOARD, node.get_renderable().transform.position.z};
@@ -816,7 +820,7 @@ void NineMensMorrisBoard::do_move_animation(PieceObj& piece, const NodeObj& node
     }
 }
 
-void NineMensMorrisBoard::do_take_animation(PieceObj& piece, std::function<void()>&& on_finish) {
+void NineMensMorrisBoard::do_take_animation(PieceObj& piece, PieceObj::OnFinish&& on_finish) {
     const glm::vec3 origin {piece.get_renderable().transform.position};
     const glm::vec3 target {piece.get_renderable().transform.position.x, PIECE_Y_POSITION_AIR_TAKE, piece.get_renderable().transform.position.z};
 
@@ -849,7 +853,7 @@ void NineMensMorrisBoard::try_place(int place_index) {
             m_pieces[PIECE(id)].node_id = place_index;
             m_nodes[place_index].piece_id = id;
 
-            do_place_animation(m_pieces[PIECE(id)], m_nodes[place_index], []() {});
+            do_place_animation(m_pieces[PIECE(id)], m_nodes[place_index], [](PieceObj&) {});
 
             const Move move {*iter};
             play_place_move(move);
@@ -870,7 +874,7 @@ void NineMensMorrisBoard::try_place(int place_index) {
         m_pieces[PIECE(id)].node_id = place_index;
         m_nodes[place_index].piece_id = id;
 
-        do_place_animation(m_pieces[PIECE(id)], m_nodes[place_index], []() {});
+        do_place_animation(m_pieces[PIECE(id)], m_nodes[place_index], [](PieceObj&) {});
 
         m_capture_piece = true;
     }
@@ -895,7 +899,7 @@ void NineMensMorrisBoard::try_move(int source_index, int destination_index) {
             do_move_animation(
                 m_pieces[PIECE(id)],
                 m_nodes[destination_index],
-                []() {},
+                [](PieceObj&) {},
                 !has_three_pieces(m_position.board, m_pieces[PIECE(id)])
             );
 
@@ -925,7 +929,7 @@ void NineMensMorrisBoard::try_move(int source_index, int destination_index) {
         do_move_animation(
             m_pieces[PIECE(id)],
             m_nodes[destination_index],
-            []() {},
+            [](PieceObj&) {},
             !has_three_pieces(m_position.board, m_pieces[PIECE(id)])
         );
 
@@ -958,8 +962,8 @@ void NineMensMorrisBoard::try_capture(int capture_index) {
 
             m_pieces[PIECE(id)].to_remove = true;
 
-            do_take_animation(m_pieces[PIECE(id)], [this, id]() {
-                m_pieces[PIECE(id)].active = false;
+            do_take_animation(m_pieces[PIECE(id)], [](PieceObj& piece) {
+                piece.active = false;
             });
 
             const Move move {*iter};
@@ -974,8 +978,8 @@ void NineMensMorrisBoard::try_capture(int capture_index) {
 
             m_pieces[PIECE(id)].to_remove = true;
 
-            do_take_animation(m_pieces[PIECE(id)], [this, id]() {
-                m_pieces[PIECE(id)].active = false;
+            do_take_animation(m_pieces[PIECE(id)], [](PieceObj& piece) {
+                piece.active = false;
             });
 
             const Move move {*iter};

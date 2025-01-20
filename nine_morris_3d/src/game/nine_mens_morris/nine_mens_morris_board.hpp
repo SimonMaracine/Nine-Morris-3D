@@ -134,9 +134,9 @@ private:
     void update_nodes(sm::Ctx& ctx);
     void update_pieces(sm::Ctx& ctx);
 
-    static void do_place_animation(PieceObj& piece, const NodeObj& node, std::function<void()>&& on_finish);
-    static void do_move_animation(PieceObj& piece, const NodeObj& node, std::function<void()>&& on_finish, bool direct);
-    static void do_take_animation(PieceObj& piece, std::function<void()>&& on_finish);
+    static void do_place_animation(PieceObj& piece, const NodeObj& node, PieceObj::OnFinish&& on_finish);
+    static void do_move_animation(PieceObj& piece, const NodeObj& node, PieceObj::OnFinish&& on_finish, bool direct);
+    static void do_take_animation(PieceObj& piece, PieceObj::OnFinish&& on_finish);
 
     void select(int id);
     void try_place(int place_index);
