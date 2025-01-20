@@ -26,3 +26,6 @@
 [submodule "nine_morris_3d/extern/muhle_intelligence"]
 	path = nine_morris_3d/extern/muhle_intelligence
 	url = https://github.com/SimonMaracine/Muhle-Intelligence
+[submodule "extern/boost"]
+	path = extern/boost
+	url = https://github.com/boostorg/boost

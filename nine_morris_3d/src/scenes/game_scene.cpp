@@ -3,24 +3,29 @@
 #include <nine_morris_3d_engine/external/resmanager.h++>
 
 #include "global.hpp"
-#include "muhle_engine.hpp"
 
 void GameScene::on_start() {
     ctx.connect_event<sm::WindowResizedEvent, &GameScene::on_window_resized>(this);
-    connect_events();
+    ctx.connect_event<sm::KeyReleasedEvent, &GameScene::on_key_released>(this);
+    ctx.connect_event<sm::MouseButtonPressedEvent, &GameScene::on_mouse_button_pressed>(this);
+    ctx.connect_event<sm::MouseButtonReleasedEvent, &GameScene::on_mouse_button_released>(this);
 
     ctx.set_renderer_clear_color(glm::vec3(0.1f, 0.1f, 0.1f));
+
+    m_ui.initialize(ctx);
 
     setup_camera();
     setup_skybox();
     setup_lights();
 
-    m_ui.initialize(ctx);
-
     scene_setup();
+
+    start_engine();
 }
 
 void GameScene::on_stop() {
+    stop_engine();
+
     m_camera_controller.disconnect_events(ctx);
     ctx.disconnect_events(this);
 }
@@ -147,25 +152,49 @@ void GameScene::on_mouse_button_released(const sm::MouseButtonReleasedEvent& eve
     }
 }
 
-/* FIXME
-    don't allow the computer to automatically start the game
-    make button for the computer to start the game
-    make button to stop the computer from thinking
-    board's nodes and pieces should update only when it's human's turn
-    when computer plays with itself, there is no pause and pieces end up in invalid places (probably a bug)
-    right now user can only change the player types when it's their turn, this is not good
-    the engine and protocol are not yet done and they have bugs (+ support the other game modes)
-*/
+void GameScene::stop_engine() {
+    if (!m_engine) {
+        return;
+    }
 
-/* TODO
-    saving and loading games
-    undo and redo moves
-    piece highlights (+ user feedback)
-    create the engine once at the beginning
-    loading screen
+    try {
+        m_engine->uninitialize();
+    } catch (const EngineError& e) {
+        LOG_DIST_ERROR("Engine error: {}", e.what());
+    }
 
-    implement all other game modes + finish engine
-*/
+    m_engine.reset();
+}
+
+void GameScene::assert_engine_game_over() {
+    try {
+        m_engine->start_thinking(
+            get_setup_position(),
+            m_move_list.get_moves(),
+            std::nullopt,
+            std::nullopt,
+            100
+        );
+
+        while (true) {
+            const auto best_move {m_engine->done_thinking()};
+
+            if (!best_move) {
+                continue;
+            }
+
+            if (!m_engine->is_null_move(*best_move)) {
+                SM_THROW_ERROR(sm::ApplicationError, "The GUI calls game over, but the engine doesn't agree");
+            }
+
+            break;
+        }
+    } catch (const EngineError& e) {
+        LOG_DIST_ERROR("Engine error: {}", e.what());
+        m_game_state = GameState::Stop;
+    }
+}
+
 void GameScene::update_game_state() {
     switch (m_game_state) {
         case GameState::Ready:
@@ -183,6 +212,8 @@ void GameScene::update_game_state() {
                 case GamePlayer::Computer:
                     m_game_state = GameState::ComputerStartThinking;
                     break;
+                case GamePlayer::Remote:
+                    break;
             }
 
             break;
@@ -190,48 +221,45 @@ void GameScene::update_game_state() {
         case GameState::HumanThinking:
             break;
         case GameState::ComputerStartThinking:
-            // try {
-            //     m_engine->start_thinking(
-            //         board::position_to_string(m_board.get_setup_position()),
-            //         m_moves,
-            //         m_clock.get_white_time(),
-            //         m_clock.get_black_time(),
-            //         std::nullopt,
-            //         std::nullopt
-            //     );
-            // } catch (const engine::EngineError& e) {
-            //     std::cerr << "Engine error: " << e.what() << '\n';
-            //     m_game_state = GameState::Stop;
-            //     break;
-            // }
+            try {
+                m_engine->start_thinking(
+                    get_setup_position(),
+                    m_move_list.get_moves(),
+                    m_clock.get_white_time(),
+                    m_clock.get_black_time(),
+                    std::nullopt
+                );
+            } catch (const EngineError& e) {
+                LOG_DIST_ERROR("Engine error: {}", e.what());
+                m_game_state = GameState::Stop;
+                break;
+            }
 
             m_game_state = GameState::ComputerThinking;
 
             break;
         case GameState::ComputerThinking: {
-            // std::optional<std::string> best_move;
+            std::optional<std::string> best_move;
 
-            // try {
-            //     best_move = m_engine->done_thinking();
-            // } catch (const engine::EngineError& e) {
-            //     std::cerr << "Engine error: " << e.what() << '\n';
-            //     m_game_state = GameState::Stop;
-            //     break;
-            // }
+            try {
+                best_move = m_engine->done_thinking();
+            } catch (const EngineError& e) {
+                LOG_DIST_ERROR("Engine error: {}", e.what());
+                m_game_state = GameState::Stop;
+                break;
+            }
 
-            // if (best_move) {
-            //     if (*best_move == "none") {
-            //         if (m_board.get_game_over() == board::GameOver::None) {
-            //             throw std::runtime_error("The engine calls game over, but the GUI doesn't agree");
-            //         }
+            if (best_move) {
+                if (m_engine->is_null_move(*best_move)) {
+                    if (get_board().get_game_over() == GameOver::None) {
+                        SM_THROW_ERROR(sm::ApplicationError, "The engine calls game over, but the GUI doesn't agree");
+                    }
 
-            //         break;
-            //     }
+                    break;
+                }
 
-            //     std::cout << "Playing move on the board " << *best_move << '\n';
-
-            //     m_board.play_move(board::move_from_string(*best_move));
-            // }
+                play_move(*best_move);
+            }
 
             break;
         }

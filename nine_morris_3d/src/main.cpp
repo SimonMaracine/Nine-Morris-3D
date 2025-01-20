@@ -34,7 +34,7 @@ struct Paths {
 
 static Paths get_paths() {
 #ifndef SM_BUILD_DISTRIBUTION
-    return {"", "", ""};
+    return {};
 #else
 
 #if defined(SM_PLATFORM_LINUX)

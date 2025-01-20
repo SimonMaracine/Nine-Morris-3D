@@ -4,7 +4,6 @@
 
 #include "game/nine_mens_morris/nine_mens_morris_board.hpp"
 #include "scenes/game_scene.hpp"
-#include "game_options.hpp"
 
 enum NineMensMorrisTime : int {
     NineMensMorrisTime1min,
@@ -19,7 +18,6 @@ public:
     explicit NineMensMorrisBaseScene(sm::Ctx& ctx)
         : GameScene(ctx) {}
 
-    void connect_events() override;
     void scene_setup() override;
     void scene_update() override;
     void scene_fixed_update() override;
@@ -27,6 +25,7 @@ public:
 
     BoardObj& get_board() override;
     GamePlayer get_player_type() const override;
+    std::string get_setup_position() const override;
     void reset() override;
     void reset(const std::string& string) override;
     void play_move(const std::string& string) override;
@@ -37,6 +36,8 @@ public:
 
     void reload_scene_texture_data() const override;
     void reload_and_set_scene_textures() override;
+
+    void start_engine() override;
 
     virtual bool twelve_mens_morris_mode() const = 0;
 private:

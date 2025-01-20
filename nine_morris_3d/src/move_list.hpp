@@ -9,6 +9,8 @@ public:
     void clear();
     void skip_first(bool skip);
     void update_window() const;
+
+    const std::vector<std::string>& get_moves() const { return m_moves; }
 private:
     std::vector<std::string> m_moves;
     bool m_skip_first {false};

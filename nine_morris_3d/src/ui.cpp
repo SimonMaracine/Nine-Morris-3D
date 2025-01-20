@@ -346,7 +346,8 @@ void Ui::game_window(GameScene& game_scene) {
 }
 
 void Ui::game_window_before_game(GameScene& game_scene) {
-    if (ImGui::Button("Start Game")) {  // FIXME check engine available, at most one computer player etc.
+    if (ImGui::Button("Start Game")) {
+        // The engine should be ready to play
         game_scene.get_game_state() = GameState::Start;
     }
 

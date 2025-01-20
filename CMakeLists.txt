@@ -21,6 +21,8 @@ if(NM3D_DISTRIBUTION_MODE AND NOT CMAKE_BUILD_TYPE STREQUAL "Release")
     message(FATAL_ERROR "Nine-Morris-3D: Distribution mode is incompatible with debug mode")
 endif()
 
+add_subdirectory(extern/boost EXCLUDE_FROM_ALL)
+
 # Build the engine
 add_subdirectory(nine_morris_3d_engine)
 

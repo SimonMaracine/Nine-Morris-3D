@@ -1,9 +1,11 @@
 #pragma once
 
 #include <string>
+#include <memory>
 
 #include <nine_morris_3d_engine/nine_morris_3d.hpp>
 
+#include "engines/engine.hpp"
 #include "game/board.hpp"
 #include "point_camera_controller.hpp"
 #include "ui.hpp"
@@ -41,7 +43,6 @@ public:
     void on_fixed_update() override;
     void on_imgui_update() override;
 
-    virtual void connect_events() = 0;
     virtual void scene_setup() = 0;
     virtual void scene_update() = 0;
     virtual void scene_fixed_update() = 0;
@@ -49,6 +50,7 @@ public:
 
     virtual BoardObj& get_board() = 0;
     virtual GamePlayer get_player_type() const = 0;
+    virtual std::string get_setup_position() const = 0;
     virtual void reset() = 0;
     virtual void reset(const std::string& string) = 0;
     virtual void play_move(const std::string& string) = 0;
@@ -74,6 +76,9 @@ protected:
     void on_mouse_button_pressed(const sm::MouseButtonPressedEvent& event);
     void on_mouse_button_released(const sm::MouseButtonReleasedEvent& event);
 
+    virtual void start_engine() = 0;
+    void stop_engine();
+    void assert_engine_game_over();
     void update_game_state();
 
     void setup_camera();
@@ -92,10 +97,11 @@ protected:
     PointCameraController m_camera_controller;
     Ui m_ui;
 
+    bool m_draw_offered_by_remote {false};
     GameState m_game_state {GameState::Ready};
     glm::vec3 m_default_camera_position {};
     GameOptions m_game_options;
     Clock m_clock;
     MoveList m_move_list;
-    bool m_draw_offered_by_remote {false};
+    std::unique_ptr<Engine> m_engine;
 };

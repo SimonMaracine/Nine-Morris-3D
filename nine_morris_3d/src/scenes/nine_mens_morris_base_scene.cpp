@@ -1,17 +1,13 @@
 #include "scenes/nine_mens_morris_base_scene.hpp"
 
+#include <cassert>
+
 #include <nine_morris_3d_engine/external/resmanager.h++>
 #include <nine_morris_3d_engine/external/imgui.h++>
 
+#include "engines/gbgp_engine.hpp"
 #include "game/ray.hpp"
 #include "global.hpp"
-#include "muhle_engine.hpp"
-
-void NineMensMorrisBaseScene::connect_events() {
-    ctx.connect_event<sm::KeyReleasedEvent, &NineMensMorrisBaseScene::on_key_released>(this);
-    ctx.connect_event<sm::MouseButtonPressedEvent, &NineMensMorrisBaseScene::on_mouse_button_pressed>(this);
-    ctx.connect_event<sm::MouseButtonReleasedEvent, &NineMensMorrisBaseScene::on_mouse_button_released>(this);
-}
 
 void NineMensMorrisBaseScene::scene_setup() {
     m_board = setup_renderables();
@@ -65,11 +61,27 @@ GamePlayer NineMensMorrisBaseScene::get_player_type() const {
     return {};
 }
 
+std::string NineMensMorrisBaseScene::get_setup_position() const {
+    return NineMensMorrisBoard::position_to_string(m_board.get_setup_position());
+}
+
 void NineMensMorrisBaseScene::reset() {
     reset("w:w:b:1");
 }
 
 void NineMensMorrisBaseScene::reset(const std::string& string) {
+    if (m_engine) {
+        try {
+            // Stop the engine first
+            m_engine->stop_thinking();
+            m_engine->new_game();
+            m_engine->synchronize();
+        } catch (const EngineError& e) {
+            LOG_DIST_ERROR("Engine error: {}", e.what());
+            return;
+        }
+    }
+
     try {
         m_board.reset(NineMensMorrisBoard::position_from_string(string));
     } catch (const BoardError& e) {
@@ -244,27 +256,16 @@ void NineMensMorrisBaseScene::reload_and_set_scene_textures() {
         1
     );
 
-    const auto white_piece_diffuse {load_piece_white_diffuse_texture(true)};
-    const auto black_piece_diffuse {load_piece_black_diffuse_texture(true)};
+    const auto piece_white_diffuse {load_piece_white_diffuse_texture(true)};
+    const auto piece_black_diffuse {load_piece_black_diffuse_texture(true)};
     const auto piece_normal {load_piece_normal_texture(true)};
 
     for (PieceObj& piece : m_board.get_pieces()) {
-        switch (piece.get_type()) {
-            case PieceType::White:
-                piece.get_renderable().get_material()->set_texture(
-                    "u_material.ambient_diffuse"_H,
-                    white_piece_diffuse,
-                    0
-                );
-                break;
-            case PieceType::Black:
-                piece.get_renderable().get_material()->set_texture(
-                    "u_material.ambient_diffuse"_H,
-                    black_piece_diffuse,
-                    0
-                );
-                break;
-        }
+        piece.get_renderable().get_material()->set_texture(
+            "u_material.ambient_diffuse"_H,
+            piece.get_type() == PieceType::White ? piece_white_diffuse : piece_black_diffuse,
+            0
+        );
 
         piece.get_renderable().get_material()->set_texture(
             "u_material.normal"_H,
@@ -272,6 +273,28 @@ void NineMensMorrisBaseScene::reload_and_set_scene_textures() {
             1
         );
     }
+}
+
+void NineMensMorrisBaseScene::start_engine() {
+    assert(!m_engine);
+
+    m_engine = std::make_unique<GbgpEngine>();
+
+    try {
+        m_engine->initialize(ctx.path_assets("engines/muhle_intelligence").string());
+        m_engine->set_debug(true);
+        m_engine->new_game();
+        m_engine->synchronize();
+    } catch (const EngineError& e) {
+        LOG_DIST_ERROR("Engine error: {}", e.what());
+        return;
+    }
+
+    m_engine->set_log_output(true, "nine_mens_morris_engine.log");
+
+    m_engine->set_info_callback([this](const Engine::Info& info) {
+
+    });
 }
 
 sm::Renderable NineMensMorrisBaseScene::setup_board() const {
@@ -493,6 +516,7 @@ NineMensMorrisBoard NineMensMorrisBaseScene::setup_renderables() {
             m_clock.switch_turn();
 
             if (m_board.get_game_over() != GameOver::None) {  // TODO assert game over
+                assert_engine_game_over();
                 m_ui.set_popup_window(PopupWindow::GameOver);
                 m_game_state = GameState::Stop;
                 return;

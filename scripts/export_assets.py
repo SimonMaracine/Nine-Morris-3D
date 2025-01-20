@@ -1,7 +1,7 @@
 #! /usr/bin/env python3
 
-import os
 import sys
+import os
 import shutil
 import dataclasses
 
@@ -90,19 +90,23 @@ def main(args: list[str]) -> int:
 
     exit_code = 0
 
-    for directory in directories:
-        if not os.path.isdir(directory):
-            print(f"Error: `{directory}` is not a directory", file=sys.stderr)
-            exit_code = 1
-            continue
+    try:
+        for directory in directories:
+            if not os.path.isdir(directory):
+                print(f"Error: `{directory}` is not a directory", file=sys.stderr)
+                exit_code = 1
+                continue
 
-        try:
-            process_assets_directory(directory, output)
-        except AssetsDirectoryProcessError as err:
-            print(f"Error: {err}", file=sys.stderr)
-            exit_code = 1
+            try:
+                process_assets_directory(directory, output)
+            except AssetsDirectoryProcessError as err:
+                print(f"Error: {err}", file=sys.stderr)
+                exit_code = 1
 
-    return exit_code
+        return exit_code
+    except KeyboardInterrupt:
+        print()
+        return 1
 
 
 if __name__ == "__main__":

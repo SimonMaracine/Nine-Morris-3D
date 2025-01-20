@@ -1,6 +1,8 @@
 .vscode
 build
 build_dist
+assets/engines/*
+__pycache__
 *.log
 *.dat
 *.blend1

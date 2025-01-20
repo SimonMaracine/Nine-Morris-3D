@@ -52,6 +52,9 @@ def main(args: list[str]) -> int:
     except subprocess.CalledProcessError as err:
         print(f"An error occurred: {err}", file=sys.stderr)
         return 1
+    except KeyboardInterrupt:
+        print()
+        return 1
     except Exception as err:
         print(f"An unexpected error occurred: {err}", file=sys.stderr)
         return 1
