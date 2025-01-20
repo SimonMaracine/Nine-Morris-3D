@@ -38,13 +38,13 @@ private:
     void wrapped_text_window(const char* title, const char* text);
     void generic_window(const char* title, std::function<void()>&& contents, std::function<void()>&& on_ok = []() {});
 
-    void set_scale_task(sm::Ctx& ctx, int scale);
-    void set_scale(sm::Ctx& ctx, int scale);
-    void set_anti_aliasing_task(sm::Ctx& ctx, int samples);
-    void set_shadow_quality_task(sm::Ctx& ctx, int size);
-    void set_anisotropic_filtering_task(sm::Ctx& ctx, GameScene& game_scene);
-    void create_font(sm::Ctx& ctx, int scale);
-    void set_style();
+    static void set_scale(sm::Ctx& ctx, int scale);
+    static void set_scale_task(sm::Ctx& ctx, int scale);
+    static void set_anti_aliasing_task(sm::Ctx& ctx, int samples);
+    static void set_shadow_quality_task(sm::Ctx& ctx, int size);
+    static void set_anisotropic_filtering_task(sm::Ctx& ctx, GameScene& game_scene);
+    static void create_font(sm::Ctx& ctx, int scale);
+    static void set_style();
     static float rem(float size);
 
     // Local options data

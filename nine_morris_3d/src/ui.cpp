@@ -178,12 +178,12 @@ void Ui::main_menu_bar(sm::Ctx& ctx, GameScene& game_scene) {
                 if (ImGui::BeginMenu("Texture Quality")) {
                     if (ImGui::RadioButton("Half", &m_options.texture_quality, TextureQualityHalf)) {
                         if (std::exchange(g.options.texture_quality, m_options.texture_quality) != TextureQualityHalf) {
-                            game_scene.load_and_set_textures();
+                            game_scene.reload_and_set_textures();
                         }
                     }
                     if (ImGui::RadioButton("Full", &m_options.texture_quality, TextureQualityFull)) {
                         if (std::exchange(g.options.texture_quality, m_options.texture_quality) != TextureQualityFull) {
-                            game_scene.load_and_set_textures();
+                            game_scene.reload_and_set_textures();
                         }
                     }
 
@@ -206,7 +206,7 @@ void Ui::main_menu_bar(sm::Ctx& ctx, GameScene& game_scene) {
                 if (ImGui::MenuItem("VSync", nullptr, &m_options.vsync)) {
                     g.options.vsync = m_options.vsync;
 
-                    ctx.set_window_vsync(g.options.vsync ? 1 : 0);
+                    ctx.set_window_vsync(g.options.vsync);
                 }
                 if (ImGui::MenuItem("Custom Cursor", nullptr, &m_options.custom_cursor)) {
                     // if (data.options.custom_cursor) {
@@ -274,19 +274,19 @@ void Ui::main_menu_bar(sm::Ctx& ctx, GameScene& game_scene) {
                     if (ImGui::RadioButton("None", &m_options.skybox, SkyboxNone)) {
                         if (std::exchange(g.options.skybox, m_options.skybox) != SkyboxNone) {
                             m_loading_skybox = true;
-                            game_scene.load_and_set_skybox();
+                            game_scene.reload_and_set_skybox();
                         }
                     }
                     if (ImGui::RadioButton("Field", &m_options.skybox, SkyboxField)) {
                         if (std::exchange(g.options.skybox, m_options.skybox) != SkyboxField) {
                             m_loading_skybox = true;
-                            game_scene.load_and_set_skybox();
+                            game_scene.reload_and_set_skybox();
                         }
                     }
                     if (ImGui::RadioButton("Autumn", &m_options.skybox, SkyboxAutumn)) {
                         if (std::exchange(g.options.skybox, m_options.skybox) != SkyboxAutumn) {
                             m_loading_skybox = true;
-                            game_scene.load_and_set_skybox();
+                            game_scene.reload_and_set_skybox();
                         }
                     }
                 }
@@ -527,14 +527,6 @@ void Ui::generic_window(const char* title, std::function<void()>&& contents, std
     }
 }
 
-void Ui::set_scale_task(sm::Ctx& ctx, int scale) {
-    ctx.add_task([this, &ctx, scale](const sm::Task&, void*) {
-        set_scale(ctx, scale);
-
-        return sm::Task::Result::Done;
-    });
-}
-
 void Ui::set_scale(sm::Ctx& ctx, int scale) {
     create_font(ctx, scale);
     set_style();
@@ -543,8 +535,16 @@ void Ui::set_scale(sm::Ctx& ctx, int scale) {
     style.ScaleAllSizes(static_cast<float>(scale));
 }
 
+void Ui::set_scale_task(sm::Ctx& ctx, int scale) {
+    ctx.add_task([&ctx, scale](const sm::Task&, void*) {
+        set_scale(ctx, scale);
+
+        return sm::Task::Result::Done;
+    });
+}
+
 void Ui::set_anti_aliasing_task(sm::Ctx& ctx, int samples) {
-    ctx.add_task([this, &ctx, samples](const sm::Task&, void*) {
+    ctx.add_task([&ctx, samples](const sm::Task&, void*) {
         ctx.set_renderer_samples(samples);
 
         return sm::Task::Result::Done;
@@ -552,7 +552,7 @@ void Ui::set_anti_aliasing_task(sm::Ctx& ctx, int samples) {
 }
 
 void Ui::set_shadow_quality_task(sm::Ctx& ctx, int size) {
-    ctx.add_task([this, &ctx, size](const sm::Task&, void*) {
+    ctx.add_task([&ctx, size](const sm::Task&, void*) {
         ctx.set_renderer_shadow_map_size(size);
 
         return sm::Task::Result::Done;
@@ -560,8 +560,8 @@ void Ui::set_shadow_quality_task(sm::Ctx& ctx, int size) {
 }
 
 void Ui::set_anisotropic_filtering_task(sm::Ctx& ctx, GameScene& game_scene) {
-    ctx.add_task([this, &ctx, &game_scene](const sm::Task&, void*) {
-        game_scene.set_scene_textures();
+    ctx.add_task([&game_scene](const sm::Task&, void*) {
+        game_scene.reload_and_set_scene_textures();
 
         return sm::Task::Result::Done;
     });

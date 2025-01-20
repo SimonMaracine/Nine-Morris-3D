@@ -64,10 +64,10 @@ public:
     const MoveList& get_move_list() const { return m_move_list; }
     bool& get_draw_offered_by_remote() { return m_draw_offered_by_remote; }
 
-    virtual void set_scene_textures() = 0;
-    virtual void load_all_texture_data() const = 0;
-    void load_and_set_skybox();
-    void load_and_set_textures();
+    virtual void reload_scene_texture_data() const = 0;
+    virtual void reload_and_set_scene_textures() = 0;
+    void reload_and_set_skybox();
+    void reload_and_set_textures();
 protected:
     void on_window_resized(const sm::WindowResizedEvent& event);
     void on_key_released(const sm::KeyReleasedEvent& event);
@@ -77,10 +77,10 @@ protected:
     void update_game_state();
 
     void setup_camera();
-    void setup_skybox();
+    void setup_skybox(bool reload = false);
     void setup_lights();
 
-    void load_skybox_texture_data() const;
+    void reload_skybox_texture_data() const;
     std::shared_ptr<sm::GlTextureCubemap> load_skybox_texture_cubemap(bool reload = false) const;
 
     sm::Camera m_camera;

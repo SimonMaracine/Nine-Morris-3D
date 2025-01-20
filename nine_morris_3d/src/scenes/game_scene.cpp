@@ -78,17 +78,17 @@ void GameScene::on_imgui_update() {
     scene_imgui_update();
 }
 
-void GameScene::load_and_set_skybox() {
+void GameScene::reload_and_set_skybox() {
     ctx.add_task_async([this](sm::AsyncTask& task, void*) {
         try {
-            load_skybox_texture_data();
+            reload_skybox_texture_data();
         } catch (const sm::RuntimeError&) {
             task.set_done(std::current_exception());
             return;
         }
 
         ctx.add_task([this](const sm::Task&, void*) {
-            setup_skybox();
+            setup_skybox(true);
             setup_lights();
             m_ui.set_loading_skybox_done();
 
@@ -99,18 +99,19 @@ void GameScene::load_and_set_skybox() {
     });
 }
 
-void GameScene::load_and_set_textures() {
+void GameScene::reload_and_set_textures() {
     ctx.add_task_async([this](sm::AsyncTask& task, void*) {
         try {
-            load_all_texture_data();
+            reload_skybox_texture_data();
+            reload_scene_texture_data();
         } catch (const sm::RuntimeError&) {
             task.set_done(std::current_exception());
             return;
         }
 
         ctx.add_task([this](const sm::Task&, void*) {
-            setup_skybox();
-            set_scene_textures();
+            setup_skybox(true);
+            reload_and_set_scene_textures();
 
             return sm::Task::Result::Done;
         });
@@ -266,8 +267,8 @@ void GameScene::setup_camera() {
     m_camera_2d.set_projection(0, ctx.get_window_width(), 0, ctx.get_window_height());
 }
 
-void GameScene::setup_skybox() {
-    m_skybox.texture = load_skybox_texture_cubemap();
+void GameScene::setup_skybox(bool reload) {
+    m_skybox.texture = load_skybox_texture_cubemap(reload);
 }
 
 void GameScene::setup_lights() {
@@ -295,13 +296,17 @@ void GameScene::setup_lights() {
     }
 }
 
-void GameScene::load_skybox_texture_data() const {
+void GameScene::reload_skybox_texture_data() const {
     // Global options must have been set to the desired skybox
 
     const auto& g {ctx.global<Global>()};
 
     sm::TexturePostProcessing post_processing;
     post_processing.flip = false;
+
+    if (g.options.texture_quality == TextureQualityHalf) {
+        post_processing.size = sm::TextureSize::Half;
+    }
 
     switch (g.options.skybox) {
         case SkyboxNone:

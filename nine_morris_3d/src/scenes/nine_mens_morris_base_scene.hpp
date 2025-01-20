@@ -35,8 +35,8 @@ public:
     void accept_draw_offer() override;
     void time_control_options_window() override;
 
-    void set_scene_textures() override;
-    void load_all_texture_data() const override;
+    void reload_scene_texture_data() const override;
+    void reload_and_set_scene_textures() override;
 
     virtual bool twelve_mens_morris_mode() const = 0;
 private:
@@ -49,8 +49,8 @@ private:
     std::shared_ptr<sm::GlTexture> load_board_diffuse_texture(bool reload = false) const;
     std::shared_ptr<sm::GlTexture> load_paint_diffuse_texture(bool reload = false) const;
     std::shared_ptr<sm::GlTexture> load_board_normal_texture(bool reload = false) const;
-    std::shared_ptr<sm::GlTexture> load_white_piece_diffuse_texture(bool reload = false) const;
-    std::shared_ptr<sm::GlTexture> load_black_piece_diffuse_texture(bool reload = false) const;
+    std::shared_ptr<sm::GlTexture> load_piece_white_diffuse_texture(bool reload = false) const;
+    std::shared_ptr<sm::GlTexture> load_piece_black_diffuse_texture(bool reload = false) const;
     std::shared_ptr<sm::GlTexture> load_piece_normal_texture(bool reload = false) const;
 
     NineMensMorrisBoard setup_renderables();

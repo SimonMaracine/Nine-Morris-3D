@@ -178,69 +178,10 @@ void NineMensMorrisBaseScene::time_control_options_window() {
     }
 }
 
-void NineMensMorrisBaseScene::set_scene_textures() {
-    const auto board_normal {load_board_normal_texture(true)};
-
-    m_board.get_board_renderable().get_material()->set_texture(
-        "u_material.ambient_diffuse"_H,
-        load_board_diffuse_texture(true),
-        0
-    );
-
-    m_board.get_board_renderable().get_material()->set_texture(
-        "u_material.normal"_H,
-        board_normal,
-        1
-    );
-
-    m_board.get_paint_renderable().get_material()->set_texture(
-        "u_material.ambient_diffuse"_H,
-        load_board_diffuse_texture(true),
-        0
-    );
-
-    m_board.get_paint_renderable().get_material()->set_texture(
-        "u_material.normal"_H,
-        board_normal,
-        1
-    );
-
-    const auto white_piece_diffuse {load_white_piece_diffuse_texture(true)};
-    const auto black_piece_diffuse {load_black_piece_diffuse_texture(true)};
-    const auto piece_normal {load_piece_normal_texture(true)};
-
-    for (PieceObj& piece : m_board.get_pieces()) {
-        switch (piece.get_type()) {
-            case PieceType::White:
-                piece.get_renderable().get_material()->set_texture(
-                    "u_material.ambient_diffuse"_H,
-                    white_piece_diffuse,
-                    0
-                );
-                break;
-            case PieceType::Black:
-                piece.get_renderable().get_material()->set_texture(
-                    "u_material.ambient_diffuse"_H,
-                    black_piece_diffuse,
-                    0
-                );
-                break;
-        }
-
-        piece.get_renderable().get_material()->set_texture(
-            "u_material.normal"_H,
-            piece_normal,
-            1
-        );
-    }
-}
-
-void NineMensMorrisBaseScene::load_all_texture_data() const {
+void NineMensMorrisBaseScene::reload_scene_texture_data() const {
     // Global options must have been set to the desired textures
 
     const auto& g {ctx.global<Global>()};
-
-    load_skybox_texture_data();
 
     {
         sm::TexturePostProcessing post_processing;
@@ -273,6 +214,63 @@ void NineMensMorrisBaseScene::load_all_texture_data() const {
         ctx.reload_texture_data(ctx.path_assets("textures/piece/piece_white_diffuse.png"), post_processing);
         ctx.reload_texture_data(ctx.path_assets("textures/piece/piece_black_diffuse.png"), post_processing);
         ctx.reload_texture_data(ctx.path_assets("textures/piece/piece_normal.png"), post_processing);
+    }
+}
+
+void NineMensMorrisBaseScene::reload_and_set_scene_textures() {
+    const auto board_normal {load_board_normal_texture(true)};
+
+    m_board.get_board_renderable().get_material()->set_texture(
+        "u_material.ambient_diffuse"_H,
+        load_board_diffuse_texture(true),
+        0
+    );
+
+    m_board.get_board_renderable().get_material()->set_texture(
+        "u_material.normal"_H,
+        board_normal,
+        1
+    );
+
+    m_board.get_paint_renderable().get_material()->set_texture(
+        "u_material.ambient_diffuse"_H,
+        load_paint_diffuse_texture(true),
+        0
+    );
+
+    m_board.get_paint_renderable().get_material()->set_texture(
+        "u_material.normal"_H,
+        board_normal,
+        1
+    );
+
+    const auto white_piece_diffuse {load_piece_white_diffuse_texture(true)};
+    const auto black_piece_diffuse {load_piece_black_diffuse_texture(true)};
+    const auto piece_normal {load_piece_normal_texture(true)};
+
+    for (PieceObj& piece : m_board.get_pieces()) {
+        switch (piece.get_type()) {
+            case PieceType::White:
+                piece.get_renderable().get_material()->set_texture(
+                    "u_material.ambient_diffuse"_H,
+                    white_piece_diffuse,
+                    0
+                );
+                break;
+            case PieceType::Black:
+                piece.get_renderable().get_material()->set_texture(
+                    "u_material.ambient_diffuse"_H,
+                    black_piece_diffuse,
+                    0
+                );
+                break;
+        }
+
+        piece.get_renderable().get_material()->set_texture(
+            "u_material.normal"_H,
+            piece_normal,
+            1
+        );
     }
 }
 
@@ -345,7 +343,7 @@ std::vector<sm::Renderable> NineMensMorrisBaseScene::setup_white_pieces() const 
 
     const auto vertex_array {ctx.load_vertex_array("piece_white"_H, mesh)};
 
-    const auto diffuse {load_white_piece_diffuse_texture()};
+    const auto diffuse {load_piece_white_diffuse_texture()};
     const auto normal {load_piece_normal_texture()};
 
     const auto material {ctx.load_material(sm::MaterialType::PhongDiffuseNormalShadow, sm::Material::CastShadow)};
@@ -370,7 +368,7 @@ std::vector<sm::Renderable> NineMensMorrisBaseScene::setup_black_pieces() const 
 
     const auto vertex_array {ctx.load_vertex_array("piece_black"_H, mesh)};
 
-    const auto diffuse {load_black_piece_diffuse_texture()};
+    const auto diffuse {load_piece_black_diffuse_texture()};
     const auto normal {load_piece_normal_texture()};
 
     const auto material {ctx.load_material(sm::MaterialType::PhongDiffuseNormalShadow, sm::Material::CastShadow)};
@@ -414,17 +412,9 @@ std::shared_ptr<sm::GlTexture> NineMensMorrisBaseScene::load_paint_diffuse_textu
     specification.mipmapping->anisotropic_filtering = g.options.anisotropic_filtering;
 
     if (reload) {
-        return ctx.reload_texture(
-            "paint_diffuse"_H,
-            ctx.get_texture_data("paint_diffuse.png"_H),
-            specification
-        );
+        return ctx.reload_texture("paint_diffuse"_H, ctx.get_texture_data("paint_diffuse.png"_H), specification);
     } else {
-        return ctx.load_texture(
-            "paint_diffuse"_H,
-            ctx.get_texture_data("paint_diffuse.png"_H),
-            specification
-        );
+        return ctx.load_texture("paint_diffuse"_H, ctx.get_texture_data("paint_diffuse.png"_H), specification);
     }
 }
 
@@ -444,7 +434,7 @@ std::shared_ptr<sm::GlTexture> NineMensMorrisBaseScene::load_board_normal_textur
     }
 }
 
-std::shared_ptr<sm::GlTexture> NineMensMorrisBaseScene::load_white_piece_diffuse_texture(bool reload) const {
+std::shared_ptr<sm::GlTexture> NineMensMorrisBaseScene::load_piece_white_diffuse_texture(bool reload) const {
     const auto& g {ctx.global<Global>()};
 
     sm::TextureSpecification specification;
@@ -459,7 +449,7 @@ std::shared_ptr<sm::GlTexture> NineMensMorrisBaseScene::load_white_piece_diffuse
     }
 }
 
-std::shared_ptr<sm::GlTexture> NineMensMorrisBaseScene::load_black_piece_diffuse_texture(bool reload) const {
+std::shared_ptr<sm::GlTexture> NineMensMorrisBaseScene::load_piece_black_diffuse_texture(bool reload) const {
     const auto& g {ctx.global<Global>()};
 
     sm::TextureSpecification specification;
