@@ -360,8 +360,8 @@ std::vector<sm::Renderable> NineMensMorrisBaseScene::setup_nodes() const {
 
     for (unsigned int i {0}; i < NineMensMorrisBoard::NODES; i++) {
         const auto material_instance {ctx.load_material_instance(sm::Id("node" + std::to_string(i)), material)};
-        material_instance->set_vec3("u_material.ambient_diffuse"_H, glm::vec3(0.075f));
-        material_instance->set_vec3("u_material.specular"_H, glm::vec3(0.3f));
+        material_instance->set_vec3("u_material.ambient_diffuse"_H, glm::vec3(0.07f));
+        material_instance->set_vec3("u_material.specular"_H, glm::vec3(0.2f));
         material_instance->set_float("u_material.shininess"_H, 8.0f);
 
         renderables.emplace_back(mesh, vertex_array, material_instance);
