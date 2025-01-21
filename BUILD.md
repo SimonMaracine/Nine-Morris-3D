@@ -13,20 +13,22 @@
 
 <!-- FIXME update these -->
 
-- GCC (version >= 13)
+- GCC: ?
 - X11: libXcursor-devel libXi-devel libXinerama-devel libXrandr-devel
 - Wayland: wayland-devel libxkbcommon-devel wayland-protocols-devel extra-cmake-modules
 - PipeWire: pipewire-devel.x86_64
-- mesa-libGL-devel.x86_64
-- libasan libubsan
+- OpenGL: mesa-libGL-devel.x86_64
+- Asan: libasan libubsan
 
 ### Linux (apt)
 
-- GCC (version >= 13)
+- GCC: build-essential
 - X11: xorg-dev
-- Wayland: libwayland-dev libxkbcommon-dev wayland-protocols extra-cmake-modules
+- Wayland: libwayland-dev libxkbcommon-dev (wayland-protocols extra-cmake-modules)?
 - PulseAudio: libasound2-dev libpulse-dev
-- libopengl-dev | libegl1-mesa-dev | mesa-common-dev (one of these)
+- OpenGL: libopengl-dev | libegl1-mesa-dev | mesa-common-dev (one of these)
+- zlib: zlib1g-dev
+- package-config: pkgconf
 
 ## Downloading
 
