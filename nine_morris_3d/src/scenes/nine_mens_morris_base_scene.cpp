@@ -521,17 +521,7 @@ NineMensMorrisBoard NineMensMorrisBaseScene::setup_renderables() {
         setup_black_pieces(),
         [this](const NineMensMorrisBoard::Move& move) {
             m_move_list.push(NineMensMorrisBoard::move_to_string(move));
-
-            m_clock.switch_turn();
-
-            if (m_board.get_game_over() != GameOver::None) {  // TODO assert game over
-                assert_engine_game_over();
-                m_ui.set_popup_window(PopupWindow::GameOver);
-                m_game_state = GameState::Stop;
-                return;
-            }
-
-            m_game_state = GameState::NextTurn;
+            m_game_state = GameState::FinishTurn;
         }
     );
 }

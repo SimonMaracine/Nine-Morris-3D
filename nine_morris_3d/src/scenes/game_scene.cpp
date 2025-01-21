@@ -263,6 +263,20 @@ void GameScene::update_game_state() {
 
             break;
         }
+        case GameState::FinishTurn:
+            if (get_board().is_next_turn_ready()) {
+                m_clock.switch_turn();
+
+                if (get_board().get_game_over() != GameOver::None) {
+                    assert_engine_game_over();
+                    m_ui.set_popup_window(PopupWindow::GameOver);
+                    m_game_state = GameState::Stop;
+                } else {
+                    m_game_state = GameState::NextTurn;
+                }
+            }
+
+            break;
         case GameState::Stop:
             m_clock.stop();
             m_game_state = GameState::Over;

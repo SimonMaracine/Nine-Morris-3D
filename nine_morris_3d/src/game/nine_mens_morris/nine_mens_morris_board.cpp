@@ -274,6 +274,16 @@ PlayerColor NineMensMorrisBoard::get_player_color() const {
     }
 }
 
+bool NineMensMorrisBoard::is_next_turn_ready() const {
+    for (const PieceObj& piece : m_pieces) {
+        if (piece.is_moving()) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
 void NineMensMorrisBoard::update(sm::Ctx& ctx, glm::vec3 ray, glm::vec3 camera, bool user_input) {
     if (user_input) {
         update_hover_id(ray, camera, [this]() {
@@ -1125,7 +1135,7 @@ void NineMensMorrisBoard::check_threefold_repetition() {
     if (count == 3) {
         m_game_over = GameOver(
             GameOver::Draw,
-            "The same position has appeared for the third time."
+            "The same position has happened three times."
         );
     }
 }

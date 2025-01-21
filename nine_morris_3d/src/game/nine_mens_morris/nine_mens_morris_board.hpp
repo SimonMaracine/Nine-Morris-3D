@@ -92,6 +92,7 @@ public:
     void user_click_release_callback() override;
     const GameOver& get_game_over() const override;
     PlayerColor get_player_color() const override;
+    bool is_next_turn_ready() const override;
 
     Player get_player() const { return m_position.player; }
     const Position& get_setup_position() const { return m_setup_position; }

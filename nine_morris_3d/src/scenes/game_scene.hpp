@@ -20,6 +20,7 @@ enum class GameState {
     HumanThinking,
     ComputerStartThinking,
     ComputerThinking,
+    FinishTurn,
     Stop,
     Over
 };
