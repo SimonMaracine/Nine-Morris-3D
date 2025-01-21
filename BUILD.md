@@ -3,11 +3,11 @@
 ## Requirements
 
 - Git
-- CMake (version >= 3.20)
+- CMake
 
 ### Windows
 
-- Visual Studio (version >= 2022)
+- Visual Studio
 
 ### Linux (dnf)
 
@@ -32,10 +32,20 @@
 
 ## Downloading
 
+### Linux
+
 ```txt
 git clone https://github.com/SimonMaracine/Nine-Morris-3D
-cd Nine-Morris-3D
-git submodule update --init
+cd Nine-Morris-3D/scripts
+./download_dependencies.py
+```
+
+### Windows
+
+```txt
+git clone https://github.com/SimonMaracine/Nine-Morris-3D
+cd Nine-Morris-3D\scripts
+python download_dependencies.py
 ```
 
 ## Building

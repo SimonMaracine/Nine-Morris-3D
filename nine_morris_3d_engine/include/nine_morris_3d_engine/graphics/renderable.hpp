@@ -36,7 +36,7 @@ namespace sm {
             float scale {1.0f};  // Only uniform scaling
         } transform;
 
-        struct {
+        struct Outline {
             glm::vec3 color {1.0f};
             float thickness {1.1f};
         } outline;

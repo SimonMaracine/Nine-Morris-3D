@@ -30,7 +30,7 @@ namespace sm::internal {
         int get_height() const noexcept;
 
         void show() const noexcept;
-        void set_vsync(int interval) const noexcept;
+        void set_vsync(bool enable) const noexcept;
         void add_cursor(Id id, std::unique_ptr<TextureData>&& cursor, int x_hotspot, int y_hotspot);
         void set_cursor(Id id) const;
         void set_icons(std::initializer_list<std::unique_ptr<TextureData>> icons) const;

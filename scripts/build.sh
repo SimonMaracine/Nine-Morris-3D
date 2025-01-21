@@ -1,11 +1,11 @@
 #! /bin/bash
 
-build_directory="build"
+BUILD_DIRECTORY="build"
 
 if [ "$1" = "dist" ]; then
-    build_directory="build_dist"
+    BUILD_DIRECTORY="build_dist"
 fi
 
 clear
-cd ../$build_directory
+cd ../$BUILD_DIRECTORY
 cmake --build . -j 10

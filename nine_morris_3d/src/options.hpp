@@ -7,37 +7,66 @@
 #include <nine_morris_3d_engine/external/cereal.h++>
 
 #include "ver.hpp"
-#include "constants.hpp"
 
 inline constexpr const char* OPTIONS_FILE_NAME {"options.dat"};
 
+enum GameMode : int {
+    GameModeNineMensMorris
+};
+
+enum Skybox : int {
+    SkyboxNone,
+    SkyboxField,
+    SkyboxAutumn
+};
+
+enum AntiAliasing : int {
+    AntiAliasingOff = 1,
+    AntiAliasing2x = 2,
+    AntiAliasing4x = 4
+};
+
+enum AnisotropicFiltering : int {
+    AnisotropicFilteringOff = 0,
+    AnisotropicFiltering4x = 4,
+    AnisotropicFiltering8x = 8
+};
+
+enum TextureQuality : int {
+    TextureQualityHalf,
+    TextureQualityFull
+};
+
+enum ShadowQuality : int {
+    ShadowQualityHalf = 2048,
+    ShadowQualityFull = 4096
+};
+
+enum Scale : int {
+    Scale100 = 1,
+    Scale200 = 2
+};
+
+// Structure representing data saved and loaded from disk
 struct Options {
-    int game_mode {static_cast<int>(GameMode::Standard)};
-    int white_player {static_cast<int>(PlayerType::Human)};
-    int black_player {static_cast<int>(PlayerType::Computer)};
+    int game_mode {GameModeNineMensMorris};
     float master_volume {1.0f};
     float music_volume {0.7f};
-    int skybox {static_cast<int>(Skybox::Field)};
-    int anti_aliasing {static_cast<int>(AntiAliasing::_2x)};
-    int anisotropic_filtering {static_cast<int>(AnisotropicFiltering::_4x)};
-    int texture_quality {static_cast<int>(TextureQuality::Full)};
-    int shadow_quality {static_cast<int>(ShadowQuality::Full)};
-    int scale {static_cast<int>(Scale::_100)};
+    int skybox {SkyboxField};
+    int anti_aliasing {AntiAliasing2x};
+    int anisotropic_filtering {AnisotropicFiltering4x};
+    int texture_quality {TextureQualityFull};
+    int shadow_quality {ShadowQualityFull};
+    int scale {Scale100};
     float camera_sensitivity {1.0f};
     bool enable_music {false};
     bool vsync {true};
     bool custom_cursor {false};
-    bool save_on_exit {false};
-    bool hide_timer {false};
-    bool hide_turn_indicator {false};
-    bool labeled_board {true};
 
     template<typename Archive>
     void serialize(Archive& archive, const std::uint32_t) {
         archive(
             game_mode,
-            white_player,
-            black_player,
             master_volume,
             music_volume,
             skybox,
@@ -49,20 +78,17 @@ struct Options {
             camera_sensitivity,
             enable_music,
             vsync,
-            custom_cursor,
-            save_on_exit,
-            hide_timer,
-            hide_turn_indicator,
-            labeled_board
+            custom_cursor
         );
     }
 };
 
 CEREAL_CLASS_VERSION(Options, version_number())
 
-void load_options(Options& options, const std::filesystem::path& file_path);
+void load_options(Options& options, const std::filesystem::path& file_path);  // TODO validation
 void save_options(const Options& options, const std::filesystem::path& file_path);
 
+// Error thrown by load and save operations
 struct OptionsFileError : std::runtime_error {
     explicit OptionsFileError(const char* message)
         : std::runtime_error(message) {}

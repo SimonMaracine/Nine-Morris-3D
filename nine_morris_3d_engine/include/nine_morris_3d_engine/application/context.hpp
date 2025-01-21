@@ -100,7 +100,7 @@ namespace sm {
         int get_window_width() const noexcept;
         int get_window_height() const noexcept;
         void show_window() const noexcept;
-        void set_window_vsync(int interval) const noexcept;
+        void set_window_vsync(bool enable) const noexcept;
         void add_window_cursor(Id id, std::unique_ptr<TextureData>&& cursor, int x_hotspot, int y_hotspot);
         void set_window_cursor(Id id) const;
         void set_window_icons(std::initializer_list<std::unique_ptr<TextureData>> icons) const;
@@ -137,7 +137,7 @@ namespace sm {
         // Scene
         void capture(const Camera& camera, glm::vec3 position) noexcept;
         void capture(const Camera2D& camera_2d) noexcept;
-        void skybox(std::shared_ptr<GlTextureCubemap> texture) noexcept;
+        void environment(const Skybox& skybox) noexcept;
         void shadow(ShadowBox& box) noexcept;
         void add_post_processing(std::shared_ptr<PostProcessingStep> step);
         void add_renderable(Renderable& renderable);
@@ -217,9 +217,9 @@ namespace sm {
         float m_delta {};
         float m_fps {};
 
-        std::any m_global_data;
-        void* m_user_data {};  // Arbitrary data defined by the user
-        Application* m_application {};
+        std::any m_global_data;  // Arbitrary data defined by the user
+        void* m_user_data {};  // Arbitrary pointer to data defined by the user
+        Application* m_application {};  // Context needs to know about the application
 
         friend class Application;
         friend class internal::DebugUi;

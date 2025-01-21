@@ -1,16 +1,16 @@
 #include "nine_morris_3d_engine/graphics/internal/debug_ui.hpp"
 
 #include <cstring>
+#include <cstdio>
 
 #include <imgui.h>
 #include <glm/gtc/type_ptr.hpp>
 
 #include "nine_morris_3d_engine/application/context.hpp"
-#include "nine_morris_3d_engine/application/platform.hpp"
 
 namespace sm::internal {
 #ifndef SM_BUILD_DISTRIBUTION
-    void DebugUi::render_dear_imgui(Scene& scene, Ctx& ctx) noexcept {
+    void DebugUi::render(Scene& scene, Ctx& ctx) noexcept {
         if (ImGui::Begin("Debug")) {
             ImGui::Checkbox("Renderables", &m_renderables);
             ImGui::Checkbox("Lights", &m_lights);
@@ -18,42 +18,47 @@ namespace sm::internal {
             ImGui::Checkbox("Texts", &m_texts);
             ImGui::Checkbox("Quads", &m_quads);
             ImGui::Checkbox("Tasks", &m_tasks);
+            ImGui::Checkbox("Frame Time", &m_frame_time);
 
             if (ImGui::Checkbox("VSync", &m_vsync)) {
-                ctx.m_win.set_vsync(static_cast<int>(m_vsync));
+                ctx.m_win.set_vsync(m_vsync);
             }
         }
 
         ImGui::End();
 
         if (m_renderables) {
-            draw_renderables(scene);
+            renderables(scene);
         }
 
         if (m_lights) {
-            draw_lights(scene);
+            lights(scene);
         }
 
         if (m_shadows) {
-            draw_shadows(scene);
+            shadows(scene);
         }
 
         if (m_texts) {
-            draw_texts(scene);
+            texts(scene);
         }
 
         if (m_quads) {
-            draw_quads(scene);
+            quads(scene);
         }
 
         if (m_tasks) {
-            draw_tasks(ctx);
+            tasks(ctx);
+        }
+
+        if (m_frame_time) {
+            frame_time(ctx);
         }
     }
 
-    void DebugUi::add_lines(Scene& scene) {
+    void DebugUi::render_lines(Scene& scene) {
         if (m_shadows) {
-            add_shadows_lines(
+            shadows_lines(
                 scene,
                 scene.m_debug.shadow_box->left,
                 scene.m_debug.shadow_box->right,
@@ -67,7 +72,7 @@ namespace sm::internal {
         }
     }
 
-    void DebugUi::draw_renderables(Scene& scene) noexcept {
+    void DebugUi::renderables(Scene& scene) noexcept {
         if (ImGui::Begin("Debug Renderables")) {
             for (int index {0}; Renderable* renderable : scene.m_debug.renderables) {
                 ImGui::PushID(index);
@@ -85,7 +90,7 @@ namespace sm::internal {
         ImGui::End();
     }
 
-    void DebugUi::draw_lights(Scene& scene) noexcept {
+    void DebugUi::lights(Scene& scene) noexcept {
         if (ImGui::Begin("Debug Directional Light")) {
             ImGui::DragFloat3("Direction", glm::value_ptr(scene.m_debug.directional_light->direction), 0.01f, -1.0f, 1.0f);
             ImGui::DragFloat3("Ambient", glm::value_ptr(scene.m_debug.directional_light->ambient_color), 0.01f, 0.0f, 1.0f);
@@ -115,7 +120,7 @@ namespace sm::internal {
         ImGui::End();
     }
 
-    void DebugUi::draw_shadows(Scene& scene) noexcept {
+    void DebugUi::shadows(Scene& scene) noexcept {
         if (ImGui::Begin("Debug Shadows")) {
             ImGui::DragFloat("Left", &scene.m_debug.shadow_box->left, 1.0f, -500.0f, 0.0f);
             ImGui::DragFloat("Right", &scene.m_debug.shadow_box->right, 1.0f, 0.0f, 500.0f);
@@ -134,7 +139,7 @@ namespace sm::internal {
         ImGui::End();
     }
 
-    void DebugUi::draw_texts(Scene& scene) noexcept {
+    void DebugUi::texts(Scene& scene) {
         if (ImGui::Begin("Debug Texts")) {
             for (int index {0}; Text* text : scene.m_debug.texts) {
                 char buffer[512] {};
@@ -158,7 +163,7 @@ namespace sm::internal {
         ImGui::End();
     }
 
-    void DebugUi::draw_quads(Scene& scene) noexcept {
+    void DebugUi::quads(Scene& scene) noexcept {
         if (ImGui::Begin("Debug Quads")) {
             for (int index {0}; Quad* quad : scene.m_debug.quads) {
                 ImGui::PushID(index);
@@ -175,16 +180,38 @@ namespace sm::internal {
         ImGui::End();
     }
 
-    void DebugUi::draw_tasks(Ctx& ctx) noexcept {
+    void DebugUi::tasks(Ctx& ctx) noexcept {
         if (ImGui::Begin("Debug Tasks")) {
-            ImGui::Text("Tasks count %lu", ctx.m_tsk.m_tasks_active.size());
-            ImGui::Text("Async tasks count %lu", ctx.m_tsk.m_async_tasks.size());
+            ImGui::Text("Tasks count: %lu", ctx.m_tsk.m_tasks_active.size());
+            ImGui::Text("Async tasks count: %lu", ctx.m_tsk.m_async_tasks.size());
         }
 
         ImGui::End();
     }
 
-    void DebugUi::add_shadows_lines(
+    void DebugUi::frame_time(Ctx& ctx) {
+        const float time {ctx.get_delta() * 1000.0f};
+        frames[index] = time;
+
+        if (index < FRAMES_SIZE) {
+            index++;
+            frames.push_back(time);
+        } else {
+            frames.push_back(time);
+            frames.erase(frames.cbegin());
+        }
+
+        char text[32] {};
+        std::snprintf(text, sizeof(text), "%.3f", time);
+
+        if (ImGui::Begin("Frame Time")) {
+            ImGui::PlotLines("time (ms)", frames.data(), FRAMES_SIZE, 0, text, 0.0f, 50.0f, ImVec2(200, 60));
+        }
+
+        ImGui::End();
+    }
+
+    void DebugUi::shadows_lines(
         Scene& scene,
         float left,
         float right,

@@ -3,14 +3,14 @@
 #include <string>
 
 namespace sm {
-    enum class Size {
+    enum class TextureSize {
         Default,
         Half
     };
 
     struct TexturePostProcessing {
         bool flip {true};
-        Size size {Size::Default};
+        TextureSize size {TextureSize::Default};
     };
 
     class TextureData {

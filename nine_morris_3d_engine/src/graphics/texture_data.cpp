@@ -43,7 +43,7 @@ namespace sm {
             SM_THROW_ERROR(ResourceError, "Could not load texture data");
         }
 
-        if (post_processing.size == Size::Half) {
+        if (post_processing.size == TextureSize::Half) {
             resize(m_width / 2, m_height / 2);
 
             LOG_DEBUG("Resized texture");

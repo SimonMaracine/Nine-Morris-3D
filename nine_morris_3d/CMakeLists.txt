@@ -14,7 +14,7 @@ add_executable(NineMorris3D ${GUI_EXECUTABLE_WINDOWS} ${NM3D_SOURCES} ${NM3D_HEA
 
 target_include_directories(NineMorris3D PRIVATE "src")
 
-target_link_libraries(NineMorris3D PRIVATE nine_morris_3d_engine)
+target_link_libraries(NineMorris3D PRIVATE nine_morris_3d_engine Boost::process)
 
 if(UNIX)
     target_compile_options(NineMorris3D PRIVATE "-Wall" "-Wextra" "-Wpedantic" "-Wconversion")

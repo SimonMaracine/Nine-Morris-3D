@@ -1,7 +1,5 @@
 #include "nine_morris_3d_engine/application/context.hpp"
 
-#include <array>
-
 #include <resmanager/resmanager.hpp>
 
 #include "nine_morris_3d_engine/application/application.hpp"
@@ -96,8 +94,8 @@ namespace sm {
         m_win.show();
     }
 
-    void Ctx::set_window_vsync(int interval) const noexcept {
-        m_win.set_vsync(interval);
+    void Ctx::set_window_vsync(bool enable) const noexcept {
+        m_win.set_vsync(enable);
     }
 
     void Ctx::add_window_cursor(Id id, std::unique_ptr<TextureData>&& cursor, int x_hotspot, int y_hotspot) {
@@ -204,8 +202,8 @@ namespace sm {
         m_scn.capture(camera_2d);
     }
 
-    void Ctx::skybox(std::shared_ptr<GlTextureCubemap> texture) noexcept {
-        m_scn.skybox(texture);
+    void Ctx::environment(const Skybox& skybox) noexcept {
+        m_scn.environment(skybox);
     }
 
     void Ctx::shadow(ShadowBox& box) noexcept {

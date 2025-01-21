@@ -23,6 +23,7 @@
 
 // shader uniform limit https://www.khronos.org/opengl/wiki/Uniform_(GLSL)#Implementation_limits
 // gamma https://blog.johnnovak.net/2016/09/21/what-every-coder-should-know-about-gamma/
+// gamma https://www.cambridgeincolour.com/tutorials/gamma-correction.htm
 
 using namespace resmanager::literals;
 
@@ -317,7 +318,7 @@ namespace sm::internal {
         draw_renderables(scene);
 
         // Skybox is rendered last, but with its depth values modified to keep it in the background
-        if (scene.m_skybox_texture != nullptr) {
+        if (scene.m_skybox.texture != nullptr) {
             draw_skybox(scene);
         }
 
@@ -625,7 +626,7 @@ namespace sm::internal {
         m_storage.skybox_shader->upload_uniform_mat4("u_projection_view_matrix"_H, projection * view);
 
         m_storage.skybox_vertex_array->bind();
-        scene.m_skybox_texture->bind(0);
+        scene.m_skybox.texture->bind(0);
 
         opengl::draw_arrays(36);
 

@@ -10,10 +10,10 @@
 #include <nine_morris_3d_engine/external/resmanager.h++>
 
 #include "scenes/loading_scene.hpp"
-#include "scenes/standard_game_scene.hpp"
+#include "scenes/nine_mens_morris_scene.hpp"
 #include "game.hpp"
 #include "global.hpp"
-#include "constants.hpp"
+#include "window_size.hpp"
 #include "ver.hpp"
 
 struct Paths {
@@ -34,7 +34,7 @@ struct Paths {
 
 static Paths get_paths() {
 #ifndef SM_BUILD_DISTRIBUTION
-    return {"", "", ""};
+    return {};
 #else
 
 #if defined(SM_PLATFORM_LINUX)
@@ -94,7 +94,7 @@ int application_main() {
         try {
             sm::Application game {properties};
             game.add_scene<LoadingScene>();
-            game.add_scene<StandardGameScene>();
+            game.add_scene<NineMensMorrisScene>();
             game.set_global_data<Global>();
             exit_code = game.run("loading"_H, functions);
         } catch (const sm::RuntimeError& e) {  // FIXME once an exception from a thread managed to not be caught; don't know how; seems to be working now

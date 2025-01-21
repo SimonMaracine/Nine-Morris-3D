@@ -1,5 +1,7 @@
 #include "point_camera_controller.hpp"
 
+#include <nine_morris_3d_engine/external/glm.h++>
+
 static constexpr float ZOOM_BASE_VELOCITY {0.03f};
 static constexpr float ZOOM_VARIABLE_VELOCITY {5.0f};
 static constexpr float Y_BASE_VELOCITY {0.03f};

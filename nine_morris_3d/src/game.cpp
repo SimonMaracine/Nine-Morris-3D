@@ -2,6 +2,7 @@
 
 #include "global.hpp"
 #include "options.hpp"
+#include "window_size.hpp"
 
 void game_start(sm::Ctx& ctx) {
     auto& g {ctx.global<Global>()};
@@ -12,7 +13,7 @@ void game_start(sm::Ctx& ctx) {
         LOG_DIST_ERROR("Could not load options: {}", e.what());
     }
 
-    ctx.set_window_vsync(g.options.vsync ? 1 : 0);
+    ctx.set_window_vsync(g.options.vsync);
 
     // The window is still hidden at this point
     if (g.get_scale() == 2.0f) {

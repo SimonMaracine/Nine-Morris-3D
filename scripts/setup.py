@@ -1,4 +1,4 @@
-#! /usr/bin/python3
+#! /usr/bin/env python3
 
 import sys
 import os
@@ -10,21 +10,21 @@ def print_help():
 
 
 def main(args: list[str]) -> int:
-    build_type="Debug"
-    distribution_mode="OFF"
-    asan="OFF"
-    build_directory="build"
+    build_type = "Debug"
+    distribution_mode = "OFF"
+    asan = "OFF"
+    build_directory = "build"
 
     try:
         match args[1]:
             case "rel":
-                build_type="Release"
+                build_type = "Release"
             case "dist":
-                build_type="Release"
-                distribution_mode="ON"
+                build_type = "Release"
+                distribution_mode = "ON"
 
                 if sys.platform == "linux":
-                    build_directory="build_dist"
+                    build_directory = "build_dist"
             case invalid:
                 print(f"Invalid argument: {invalid}", file=sys.stderr)
                 print_help()
@@ -40,7 +40,7 @@ def main(args: list[str]) -> int:
         f"-DNM3D_ASAN={asan}"
     ]
 
-    if sys.platform == "win32":
+    if sys.platform.startswith("win32"):
         cmake_command.append("-A")
         cmake_command.append("x64")
 
@@ -51,6 +51,9 @@ def main(args: list[str]) -> int:
         subprocess.run(cmake_command).check_returncode()
     except subprocess.CalledProcessError as err:
         print(f"An error occurred: {err}", file=sys.stderr)
+        return 1
+    except KeyboardInterrupt:
+        print()
         return 1
     except Exception as err:
         print(f"An unexpected error occurred: {err}", file=sys.stderr)
