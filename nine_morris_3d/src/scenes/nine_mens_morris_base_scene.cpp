@@ -318,7 +318,7 @@ sm::Renderable NineMensMorrisBaseScene::setup_board() const {
 
     const auto material_instance {ctx.load_material_instance("board"_H, material)};
     material_instance->set_texture("u_material.ambient_diffuse"_H, diffuse, 0);
-    material_instance->set_vec3("u_material.specular"_H, glm::vec3(0.2f));
+    material_instance->set_vec3("u_material.specular"_H, glm::vec3(0.05f));
     material_instance->set_float("u_material.shininess"_H, 8.0f);
     material_instance->set_texture("u_material.normal"_H, normal, 1);
 
@@ -342,7 +342,7 @@ sm::Renderable NineMensMorrisBaseScene::setup_paint() const {
 
     const auto material_instance {ctx.load_material_instance("paint"_H, material)};
     material_instance->set_texture("u_material.ambient_diffuse"_H, diffuse, 0);
-    material_instance->set_vec3("u_material.specular"_H, glm::vec3(0.2f));
+    material_instance->set_vec3("u_material.specular"_H, glm::vec3(0.05f));
     material_instance->set_float("u_material.shininess"_H, 8.0f);
     material_instance->set_texture("u_material.normal"_H, normal, 1);
 
@@ -360,8 +360,8 @@ std::vector<sm::Renderable> NineMensMorrisBaseScene::setup_nodes() const {
 
     for (unsigned int i {0}; i < NineMensMorrisBoard::NODES; i++) {
         const auto material_instance {ctx.load_material_instance(sm::Id("node" + std::to_string(i)), material)};
-        material_instance->set_vec3("u_material.ambient_diffuse"_H, glm::vec3(0.07f));
-        material_instance->set_vec3("u_material.specular"_H, glm::vec3(0.2f));
+        material_instance->set_vec3("u_material.ambient_diffuse"_H, glm::vec3(0.065f));
+        material_instance->set_vec3("u_material.specular"_H, glm::vec3(0.05f));
         material_instance->set_float("u_material.shininess"_H, 8.0f);
 
         renderables.emplace_back(mesh, vertex_array, material_instance);
@@ -385,7 +385,7 @@ std::vector<sm::Renderable> NineMensMorrisBaseScene::setup_white_pieces() const 
     for (unsigned int i {0}; i < NineMensMorrisBoard::PIECES / 2; i++) {
         const auto material_instance {ctx.load_material_instance(sm::Id("piece_white" + std::to_string(i)), material)};
         material_instance->set_texture("u_material.ambient_diffuse"_H, diffuse, 0);
-        material_instance->set_vec3("u_material.specular"_H, glm::vec3(0.2f));
+        material_instance->set_vec3("u_material.specular"_H, glm::vec3(0.05f));
         material_instance->set_float("u_material.shininess"_H, 8.0f);
         material_instance->set_texture("u_material.normal"_H, normal, 1);
 
@@ -410,7 +410,7 @@ std::vector<sm::Renderable> NineMensMorrisBaseScene::setup_black_pieces() const 
     for (unsigned int i {0}; i < NineMensMorrisBoard::PIECES / 2; i++) {
         const auto material_instance {ctx.load_material_instance(sm::Id("piece_black" + std::to_string(i)), material)};
         material_instance->set_texture("u_material.ambient_diffuse"_H, diffuse, 0);
-        material_instance->set_vec3("u_material.specular"_H, glm::vec3(0.2f));
+        material_instance->set_vec3("u_material.specular"_H, glm::vec3(0.05f));
         material_instance->set_float("u_material.shininess"_H, 8.0f);
         material_instance->set_texture("u_material.normal"_H, normal, 1);
 
