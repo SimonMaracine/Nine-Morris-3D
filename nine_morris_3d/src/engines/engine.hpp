@@ -25,7 +25,7 @@ public:
         const std::vector<std::string>& moves,
         std::optional<unsigned int> wtime,
         std::optional<unsigned int> btime,
-        std::optional<unsigned int> max_time
+        std::optional<unsigned int> movetime
     ) = 0;
     virtual void stop_thinking() = 0;
     virtual std::optional<std::string> done_thinking() = 0;

@@ -145,19 +145,19 @@ void GbgpEngine::start_thinking(
     const std::vector<std::string>& moves,
     std::optional<unsigned int> wtime,
     std::optional<unsigned int> btime,
-    std::optional<unsigned int> max_time
+    std::optional<unsigned int> movetime
 ) {
-    try {
-        const auto moves_str {
-            !moves.empty()
-            ?
-            " moves " + std::accumulate(++moves.cbegin(), moves.cend(), *moves.cbegin(), [](std::string r, const std::string& move) {
-                return std::move(r) + " " + move;
-            })
-            :
-            ""
-        };
+    const auto moves_str {
+        !moves.empty()
+        ?
+        " moves " + std::accumulate(++moves.cbegin(), moves.cend(), *moves.cbegin(), [](std::string r, const std::string& move) {
+            return std::move(r) + " " + move;
+        })
+        :
+        ""
+    };
 
+    try {
         m_subprocess.write_line("position" + (position ? " pos " + *position : " startpos") + moves_str);
     } catch (const SubprocessError& e) {
         throw EngineError("Could not write to subprocess: "s + e.what());
@@ -168,7 +168,7 @@ void GbgpEngine::start_thinking(
             "go"s +
             (wtime ? " wtime " + std::to_string(*wtime) : "") +
             (btime ? " btime " + std::to_string(*btime) : "") +
-            (max_time ? " maxtime " + std::to_string(*max_time) : "")
+            (movetime ? " movetime " + std::to_string(*movetime) : "")
         );
     } catch (const SubprocessError& e) {
         throw EngineError("Could not write to subprocess: "s + e.what());

@@ -29,7 +29,7 @@ public:
         const std::vector<std::string>& moves,
         std::optional<unsigned int> wtime,
         std::optional<unsigned int> btime,
-        std::optional<unsigned int> max_time
+        std::optional<unsigned int> movetime
     ) override;
     void stop_thinking() override;
     std::optional<std::string> done_thinking() override;
