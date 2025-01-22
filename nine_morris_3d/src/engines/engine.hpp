@@ -4,6 +4,7 @@
 #include <optional>
 #include <vector>
 #include <functional>
+#include <variant>
 #include <fstream>
 #include <stdexcept>
 
@@ -12,6 +13,34 @@
 class Engine {
 public:
     struct Info {};
+
+    struct Option {
+        struct Check {
+            bool default_;
+        };
+
+        struct Spin {
+            int default_;
+            int min;
+            int max;
+        };
+
+        struct Combo {
+            std::string default_;
+            std::vector<std::string> vars;
+        };
+
+        struct Button {};
+
+        struct String {
+            std::string default_;
+        };
+
+        using Value = std::variant<Check, Spin, Combo, Button, String>;
+
+        std::string name;
+        Value value;
+    };
 
     virtual ~Engine() = default;
 
@@ -36,14 +65,23 @@ public:
     void set_info_callback(std::function<void(const Info&)>&& info_callback);
     void set_log_output(bool enable, const std::string& file_path);
     const std::string& get_name() const { return m_name; }
+    const std::vector<Option>& get_options() const { return m_options; }
 protected:
     static std::vector<std::string> parse_message(const std::string& message);
+    static std::optional<Option> parse_option(const std::vector<std::string>& tokens);
+    static std::optional<std::string> parse_option_name(const std::vector<std::string>& tokens);
+    static std::optional<std::string> parse_option_type(const std::vector<std::string>& tokens);
+    static std::optional<std::string> parse_option_default(const std::vector<std::string>& tokens);
+    static std::optional<int> parse_option_min(const std::vector<std::string>& tokens);
+    static std::optional<int> parse_option_max(const std::vector<std::string>& tokens);
+    static std::optional<std::vector<std::string>> parse_option_vars(const std::vector<std::string>& tokens);
     static bool token_available(const std::vector<std::string>& tokens, std::size_t index);
 
     Subprocess m_subprocess;
     std::function<void(const Info&)> m_info_callback;
     std::ofstream m_log_output_stream;
     std::string m_name;
+    std::vector<Option> m_options;
 };
 
 struct EngineError : std::runtime_error {

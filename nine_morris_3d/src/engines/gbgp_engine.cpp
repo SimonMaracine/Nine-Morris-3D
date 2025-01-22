@@ -66,7 +66,11 @@ void GbgpEngine::initialize(const std::string& file_path) {
                 }
             }
         } else if (tokens[0] == "option") {
-            // TODO
+            const auto option {parse_option(tokens)};
+
+            if (option) {
+                m_options.push_back(*option);
+            }
         }
     }
 }
@@ -209,7 +213,7 @@ std::optional<std::string> GbgpEngine::done_thinking() {
 
     if (tokens[0] == "bestmove") {
         if (token_available(tokens, 1)) {
-            return std::make_optional(tokens[1]);
+            return tokens[1];
         }
     } else if (tokens[0] == "info") {
         if (m_info_callback) {
@@ -260,7 +264,7 @@ std::optional<unsigned int> GbgpEngine::parse_info_ui(const std::vector<std::str
 
     if (++iter != tokens.cend()) {
         try {
-            return std::make_optional(std::stoul(*iter));
+            return std::stoul(*iter);
         } catch (...) {
             return std::nullopt;
         }
@@ -283,7 +287,7 @@ std::optional<GbgpEngine::Info::Score> GbgpEngine::parse_info_score(const std::v
     if (*iter == "eval") {
         if (++iter != tokens.cend()) {
             try {
-                return std::make_optional(Info::ScoreEval {std::stoi(*iter)});
+                return Info::ScoreEval {std::stoi(*iter)};
             } catch (...) {
                 return std::nullopt;
             }
@@ -291,7 +295,7 @@ std::optional<GbgpEngine::Info::Score> GbgpEngine::parse_info_score(const std::v
     } else if (*iter == "win") {
         if (++iter != tokens.cend()) {
             try {
-                return std::make_optional(Info::ScoreWin {std::stoi(*iter)});
+                return Info::ScoreWin {std::stoi(*iter)};
             } catch (...) {
                 return std::nullopt;
             }
@@ -314,5 +318,5 @@ std::optional<std::vector<std::string>> GbgpEngine::parse_info_pv(const std::vec
         pv.push_back(*iter);
     }
 
-    return std::make_optional(pv);
+    return pv;
 }

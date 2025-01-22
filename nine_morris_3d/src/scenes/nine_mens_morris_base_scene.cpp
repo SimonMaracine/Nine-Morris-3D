@@ -288,6 +288,7 @@ void NineMensMorrisBaseScene::start_engine() {
     assert(!m_engine);
 
     m_engine = std::make_unique<GbgpEngine>();
+    m_engine->set_log_output(true, "nine_mens_morris_engine.log");
 
     try {
         m_engine->initialize(ctx.path_assets("engines/muhle_intelligence").string());
@@ -298,12 +299,6 @@ void NineMensMorrisBaseScene::start_engine() {
         LOG_DIST_ERROR("Engine error: {}", e.what());
         return;
     }
-
-    m_engine->set_log_output(true, "nine_mens_morris_engine.log");
-
-    m_engine->set_info_callback([this](const Engine::Info& info) {
-
-    });
 }
 
 sm::Renderable NineMensMorrisBaseScene::setup_board() const {
