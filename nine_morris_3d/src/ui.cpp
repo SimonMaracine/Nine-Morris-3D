@@ -82,6 +82,9 @@ void Ui::update(sm::Ctx& ctx, GameScene& game_scene) {
         case PopupWindow::GameOptions:
             game_options_window(game_scene);
             break;
+        case PopupWindow::EngineError:
+            engine_error_window();
+            break;
         case PopupWindow::RulesNineMensMorris:
             rules_nine_mens_morris_window();
             break;
@@ -353,10 +356,14 @@ void Ui::game_window(GameScene& game_scene) {
 }
 
 void Ui::game_window_before_game(GameScene& game_scene) {
+    // The engine may be down, so don't allow play
+    ImGui::BeginDisabled(game_scene.get_game_options().game_type == GameTypeLocalHumanVsComputer && !game_scene.is_engine_alive());
+
     if (ImGui::Button("Start Game")) {
-        // The engine should be ready to play
         game_scene.get_game_state() = GameState::Start;
     }
+
+    ImGui::EndDisabled();
 
     ImGui::Separator();
 
@@ -477,6 +484,12 @@ void Ui::game_options_window(GameScene& game_scene) {
         game_scene.time_control_options_window();
 
         ImGui::EndDisabled();
+    });
+}
+
+void Ui::engine_error_window() {
+    generic_window("Engine Error", []() {
+        ImGui::Text("There was an error with the engine. It has probably crashed. You may want to restart it.");
     });
 }
 

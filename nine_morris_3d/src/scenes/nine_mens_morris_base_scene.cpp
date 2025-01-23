@@ -77,13 +77,12 @@ void NineMensMorrisBaseScene::reset() {
 void NineMensMorrisBaseScene::reset(const std::string& string) {
     if (m_engine) {
         try {
-            // Stop the engine first
-            m_engine->stop_thinking();
+            m_engine->stop_thinking();  // Stop the engine first
             m_engine->new_game();
             m_engine->synchronize();
         } catch (const EngineError& e) {
-            LOG_DIST_ERROR("Engine error: {}", e.what());
-            return;
+            engine_error(e);
+            // Reset the other stuff anyway
         }
     }
 
@@ -297,7 +296,7 @@ void NineMensMorrisBaseScene::start_engine() {
         m_engine->new_game();
         m_engine->synchronize();
     } catch (const EngineError& e) {
-        LOG_DIST_ERROR("Engine error: {}", e.what());
+        engine_error(e);
         return;
     }
 
@@ -312,7 +311,7 @@ void NineMensMorrisBaseScene::start_engine() {
     try {
         m_engine->set_option("TwelveMensMorris", twelve_mens_morris() ? "true" : "false");
     } catch (const EngineError& e) {
-        LOG_DIST_ERROR("Engine error: {}", e.what());
+        engine_error(e);
     }
 }
 

@@ -14,6 +14,7 @@ enum class PopupWindow {
     About,
     GameOver,
     GameOptions,
+    EngineError,
     RulesNineMensMorris
 };
 
@@ -34,6 +35,7 @@ private:
     void about_window();
     void game_over_window(GameScene& game_scene);
     void game_options_window(GameScene& game_scene);
+    void engine_error_window();
     void rules_nine_mens_morris_window();
     void wrapped_text_window(const char* title, const char* text);
     void generic_window(const char* title, std::function<void()>&& contents, std::function<void()>&& on_ok = []() {});

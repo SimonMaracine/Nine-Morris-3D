@@ -276,7 +276,7 @@ PlayerColor NineMensMorrisBoard::get_player_color() const {
     }
 }
 
-bool NineMensMorrisBoard::is_next_turn_ready() const {
+bool NineMensMorrisBoard::is_turn_finished() const {
     for (const PieceObj& piece : m_pieces) {
         if (piece.is_moving()) {
             return false;

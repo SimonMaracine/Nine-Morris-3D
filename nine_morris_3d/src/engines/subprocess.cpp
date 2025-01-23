@@ -3,15 +3,21 @@
 #include <utility>
 #include <cassert>
 
+#include <nine_morris_3d_engine/nine_morris_3d.hpp>
+
+#ifdef SM_PLATFORM_LINUX
+    #include <boost/process/posix/vfork_launcher.hpp>
+#endif
+
 Subprocess::Subprocess()
     : m_out(m_context), m_in(m_context), m_process(m_context) {}
 
 Subprocess::~Subprocess() {
     kill();
 
-    try {
-        wait();
-    } catch (...) {}
+    if (m_context_thread.joinable()) {
+        m_context_thread.join();
+    }
 }
 
 void Subprocess::open(const std::string& file_path) {
@@ -20,7 +26,12 @@ void Subprocess::open(const std::string& file_path) {
     }
 
     try {
+#ifdef SM_PLATFORM_LINUX
+        auto launcher {boost_process::posix::vfork_launcher()};
+        m_process = launcher(m_context, file_path, std::vector<std::string> {}, boost_process::process_stdio{m_in, m_out, nullptr});
+#else
         m_process = boost_process::process(m_context, file_path, {}, boost_process::process_stdio{m_in, m_out, nullptr});
+#endif
     } catch (const boost_process::system_error& e) {
         throw SubprocessError(e.what());
     }

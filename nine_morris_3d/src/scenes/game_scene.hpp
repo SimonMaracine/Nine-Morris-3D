@@ -66,6 +66,7 @@ public:
     const Clock& get_clock() const { return m_clock; }
     const MoveList& get_move_list() const { return m_move_list; }
     bool& get_draw_offered_by_remote() { return m_draw_offered_by_remote; }
+    bool is_engine_alive() const { return static_cast<bool>(m_engine); }
 
     virtual void reload_scene_texture_data() const = 0;
     virtual void reload_and_set_scene_textures() = 0;
@@ -79,6 +80,7 @@ protected:
 
     virtual void start_engine() = 0;
     void stop_engine();
+    void engine_error(const EngineError& e);
     void assert_engine_game_over();
     void update_game_state();
 

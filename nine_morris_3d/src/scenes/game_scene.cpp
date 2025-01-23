@@ -167,6 +167,8 @@ void GameScene::stop_engine() {
 }
 
 void GameScene::assert_engine_game_over() {
+    assert(m_engine);
+
     try {
         m_engine->start_thinking(
             get_setup_position(),
@@ -190,9 +192,14 @@ void GameScene::assert_engine_game_over() {
             break;
         }
     } catch (const EngineError& e) {
-        LOG_DIST_ERROR("Engine error: {}", e.what());
-        m_game_state = GameState::Stop;
+        engine_error(e);
     }
+}
+
+void GameScene::engine_error(const EngineError& e) {
+    LOG_DIST_ERROR("Engine error: {}", e.what());
+    m_engine.reset();
+    m_ui.set_popup_window(PopupWindow::EngineError);
 }
 
 void GameScene::update_game_state() {
@@ -221,6 +228,8 @@ void GameScene::update_game_state() {
         case GameState::HumanThinking:
             break;
         case GameState::ComputerStartThinking:
+            assert(m_engine);
+
             try {
                 m_engine->start_thinking(
                     get_setup_position(),
@@ -230,7 +239,7 @@ void GameScene::update_game_state() {
                     std::nullopt
                 );
             } catch (const EngineError& e) {
-                LOG_DIST_ERROR("Engine error: {}", e.what());
+                engine_error(e);
                 m_game_state = GameState::Stop;
                 break;
             }
@@ -239,12 +248,14 @@ void GameScene::update_game_state() {
 
             break;
         case GameState::ComputerThinking: {
+            assert(m_engine);
+
             std::optional<std::string> best_move;
 
             try {
                 best_move = m_engine->done_thinking();
             } catch (const EngineError& e) {
-                LOG_DIST_ERROR("Engine error: {}", e.what());
+                engine_error(e);
                 m_game_state = GameState::Stop;
                 break;
             }
@@ -254,17 +265,15 @@ void GameScene::update_game_state() {
                     if (get_board().get_game_over() == GameOver::None) {
                         SM_THROW_ERROR(sm::ApplicationError, "The engine calls game over, but the GUI doesn't agree");
                     }
-
-                    break;
+                } else {
+                    play_move(*best_move);
                 }
-
-                play_move(*best_move);
             }
 
             break;
         }
         case GameState::FinishTurn:
-            if (get_board().is_next_turn_ready()) {
+            if (get_board().is_turn_finished()) {
                 m_clock.switch_turn();
 
                 if (get_board().get_game_over() != GameOver::None) {
