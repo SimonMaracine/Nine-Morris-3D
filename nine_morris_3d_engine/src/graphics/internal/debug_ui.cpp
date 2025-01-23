@@ -96,6 +96,9 @@ namespace sm::internal {
             ImGui::DragFloat3("Ambient", glm::value_ptr(scene.m_debug.directional_light->ambient_color), 0.01f, 0.0f, 1.0f);
             ImGui::DragFloat3("Diffuse", glm::value_ptr(scene.m_debug.directional_light->diffuse_color), 0.01f, 0.0f, 1.0f);
             ImGui::DragFloat3("Specular", glm::value_ptr(scene.m_debug.directional_light->specular_color), 0.01f, 0.0f, 1.0f);
+
+            // Direction should stay normalized no matter what
+            scene.m_debug.directional_light->direction = glm::normalize(scene.m_debug.directional_light->direction);
         }
 
         ImGui::End();

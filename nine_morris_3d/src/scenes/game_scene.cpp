@@ -318,22 +318,22 @@ void GameScene::setup_lights() {
 
     switch (g.options.skybox) {
         case SkyboxNone:
-            m_directional_light.direction = glm::normalize(glm::vec3(0.123f, -0.985f, 0.123f));
-            m_directional_light.ambient_color = glm::vec3(0.07f);
-            m_directional_light.diffuse_color = glm::vec3(0.6f);
-            m_directional_light.specular_color = glm::vec3(0.75f);
+            m_directional_light.direction = glm::normalize(glm::vec3(0.307f, -0.901f, 0.307f));
+            m_directional_light.ambient_color = glm::vec3(0.1f);
+            m_directional_light.diffuse_color = glm::vec3(0.5f);
+            m_directional_light.specular_color = glm::vec3(0.8f);
             break;
         case SkyboxField:
             m_directional_light.direction = glm::normalize(glm::vec3(-0.525f, -0.405f, -0.748f));
-            m_directional_light.ambient_color = glm::vec3(0.08f);
-            m_directional_light.diffuse_color = glm::vec3(0.95f);
+            m_directional_light.ambient_color = glm::vec3(0.25f);
+            m_directional_light.diffuse_color = glm::vec3(0.7f);
             m_directional_light.specular_color = glm::vec3(1.0f);
             break;
         case SkyboxAutumn:
-            m_directional_light.direction = glm::normalize(glm::vec3(0.37f, -0.925f, -0.092f));
-            m_directional_light.ambient_color = glm::vec3(0.15f);
-            m_directional_light.diffuse_color = glm::vec3(0.75f);
-            m_directional_light.specular_color = glm::vec3(0.65f);
+            m_directional_light.direction = glm::normalize(glm::vec3(0.370f, -0.925f, -0.092f));
+            m_directional_light.ambient_color = glm::vec3(0.2f);
+            m_directional_light.diffuse_color = glm::vec3(0.7f);
+            m_directional_light.specular_color = glm::vec3(0.9f);
             break;
     }
 }

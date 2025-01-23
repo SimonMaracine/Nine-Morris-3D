@@ -370,7 +370,7 @@ NineMensMorrisBoard::NodeRenderables NineMensMorrisBaseScene::setup_nodes() cons
 
     for (int i {0}; i < NineMensMorrisBoard::NODES; i++) {
         const auto material_instance {ctx.load_material_instance(sm::Id("node" + std::to_string(i)), material)};
-        material_instance->set_vec3("u_material.ambient_diffuse"_H, glm::vec3(0.065f));
+        material_instance->set_vec3("u_material.ambient_diffuse"_H, glm::vec3(0.065f));  // FIXME depends on the environment lighting
         material_instance->set_vec3("u_material.specular"_H, glm::vec3(0.05f));
         material_instance->set_float("u_material.shininess"_H, 8.0f);
 
