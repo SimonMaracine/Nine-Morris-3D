@@ -23,8 +23,8 @@
 
 #include "nine_morris_3d_engine/application/platform.hpp"
 
-namespace sm {
-    std::string dependencies::get_information() {
+namespace sm::dependencies {
+    std::string get_information() {
         char buffer[128] {};
         std::string result;
 

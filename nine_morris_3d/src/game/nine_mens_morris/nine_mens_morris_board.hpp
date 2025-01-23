@@ -14,7 +14,9 @@
 class NineMensMorrisBoard : public BoardObj {
 public:
     static constexpr int NODES {24};
-    static constexpr int PIECES {18};
+    static constexpr int PIECES {24};
+    static constexpr int NINE {18};
+    static constexpr int TWELVE {24};
 
     enum class Player {
         White = 1,
@@ -72,20 +74,26 @@ public:
     struct Position {
         Board board {};
         Player player {Player::White};
-        unsigned int plies {0};
+        int plies {0};
 
-        bool operator==(const Position& other) const {
-            return board == other.board && player == other.player && plies >= 18 && other.plies >= 18;
+        bool eq(const Position& other, int p) const {
+            return board == other.board && player == other.player && plies >= p && other.plies >= p;
         }
     };
+
+    using NodeRenderables = sm::utils::Array<sm::Renderable, int, NODES>;
+    using PieceRenderables = sm::utils::Array<sm::Renderable, int, PIECES / 2>;
+
+    using Nodes = std::array<NodeObj, NODES>;
+    using Pieces = sm::utils::Array<PieceObj, int, PIECES>;
 
     NineMensMorrisBoard() = default;
     NineMensMorrisBoard(
         const sm::Renderable& board,
         const sm::Renderable& paint,
-        const std::vector<sm::Renderable>& nodes,
-        const std::vector<sm::Renderable>& white_pieces,
-        const std::vector<sm::Renderable>& black_pieces,
+        const NodeRenderables& nodes,
+        const PieceRenderables& white_pieces,
+        const PieceRenderables& black_pieces,
         std::function<void(const Move&)>&& move_callback
     );
 
@@ -99,8 +107,8 @@ public:
 
     sm::Renderable& get_board_renderable() { return m_board_renderable; }
     sm::Renderable& get_paint_renderable() { return m_paint_renderable; }
-    std::array<NodeObj, NODES>& get_nodes() { return m_nodes; }
-    std::array<PieceObj, PIECES>& get_pieces() { return m_pieces; }
+    Nodes& get_nodes() { return m_nodes; }
+    Pieces& get_pieces() { return m_pieces; }
 
     void update(sm::Ctx& ctx, glm::vec3 ray, glm::vec3 camera, bool user_input);
     void update_movement();
@@ -123,11 +131,7 @@ public:
         return m_position.player == Player::White ? value_if_white : value_if_black;
     }
 private:
-    void initialize_objects(
-        const std::vector<sm::Renderable>& nodes,
-        const std::vector<sm::Renderable>& white_pieces,
-        const std::vector<sm::Renderable>& black_pieces
-    );
+    void initialize_objects(const NodeRenderables& nodes, const PieceRenderables& white_pieces, const PieceRenderables& black_pieces);
     void initialize_objects();
 
     void update_nodes_highlight(std::function<bool()>&& highlight, bool enabled);
@@ -163,22 +167,26 @@ private:
 
     // Move generation
     std::vector<Move> generate_moves() const;
-    static std::vector<Move> generate_moves_phase1(Board& board, Player player);
-    static std::vector<Move> generate_moves_phase2(Board& board, Player player);
-    static std::vector<Move> generate_moves_phase3(Board& board, Player player);
+    static std::vector<Move> generate_moves_phase1(Board& board, Player player, int p);
+    static std::vector<Move> generate_moves_phase2(Board& board, Player player, int p);
+    static std::vector<Move> generate_moves_phase3(Board& board, Player player, int p);
     static void make_place_move(Board& board, Player player, int place_index);
     static void unmake_place_move(Board& board, int place_index);
     static void make_move_move(Board& board, int source_index, int destination_index);
     static void unmake_move_move(Board& board, int source_index, int destination_index);
-    static bool is_mill(const Board& board, Player player, int index);
-    static bool all_pieces_in_mills(const Board& board, Player player);
-    static std::vector<int> neighbor_free_positions(const Board& board, int index);
+    static bool is_mill(const Board& board, Player player, int index, int p);
+    static bool is_mill9(const Board& board, Player player, int index);
+    static bool is_mill12(const Board& board, Player player, int index);
+    static bool all_pieces_in_mills(const Board& board, Player player, int p);
+    static std::vector<int> neighbor_free_positions(const Board& board, int index, int p);
+    static std::vector<int> neighbor_free_positions9(const Board& board, int index);
+    static std::vector<int> neighbor_free_positions12(const Board& board, int index);
     static int count_pieces(const Board& board, Player player);
     static Player opponent(Player player);
 
     // Game data
     Position m_position;
-    unsigned int m_plies_no_advancement {};
+    int m_plies_no_advancement {};
     std::vector<Position> m_positions;
 
     // Management data
@@ -192,6 +200,6 @@ private:
     // Objects
     sm::Renderable m_board_renderable;
     sm::Renderable m_paint_renderable;
-    std::array<NodeObj, NODES> m_nodes;
-    std::array<PieceObj, PIECES> m_pieces;
+    Nodes m_nodes;
+    Pieces m_pieces;
 };

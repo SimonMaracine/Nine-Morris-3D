@@ -114,6 +114,11 @@ void Ui::main_menu_bar(sm::Ctx& ctx, GameScene& game_scene) {
                         ctx.change_scene("nine_mens_morris"_H);
                     }
                 }
+                if (ImGui::RadioButton("Twelve Men's Morris", &m_options.game_mode, GameModeTwelveMensMorris)) {
+                    if (std::exchange(g.options.game_mode, m_options.game_mode) != GameModeTwelveMensMorris) {
+                        ctx.change_scene("twelve_mens_morris"_H);
+                    }
+                }
 
                 ImGui::EndMenu();
             }

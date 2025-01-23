@@ -7,8 +7,8 @@
 #include "nine_morris_3d_engine/application/platform.hpp"
 #include "nine_morris_3d_engine/application/logging.hpp"
 
-namespace sm {
-    void openal_debug::check_errors() noexcept {
+namespace sm::openal_debug {
+    void check_errors() noexcept {
 #ifndef SM_BUILD_DISTRIBUTION
         const ALenum error {alGetError()};
 
@@ -39,7 +39,7 @@ namespace sm {
 #endif
     }
 
-    std::string openal_debug::get_information() {
+    std::string get_information() {
         std::string result;
 
         result += "*** OpenAL Version And Driver ***\n";
@@ -58,7 +58,7 @@ namespace sm {
         return result;
     }
 
-    const char* openal_debug::get_version() noexcept {
+    const char* get_version() noexcept {
         return alGetString(AL_VERSION);
     }
 }

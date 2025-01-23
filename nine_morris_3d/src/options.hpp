@@ -11,7 +11,8 @@
 inline constexpr const char* OPTIONS_FILE_NAME {"options.dat"};
 
 enum GameMode : int {
-    GameModeNineMensMorris
+    GameModeNineMensMorris,
+    GameModeTwelveMensMorris
 };
 
 enum Skybox : int {

@@ -1,5 +1,6 @@
 #include "scenes/nine_mens_morris_base_scene.hpp"
 
+#include <algorithm>
 #include <cassert>
 
 #include <nine_morris_3d_engine/external/resmanager.h++>
@@ -299,6 +300,20 @@ void NineMensMorrisBaseScene::start_engine() {
         LOG_DIST_ERROR("Engine error: {}", e.what());
         return;
     }
+
+    const auto iter {std::find_if(m_engine->get_options().cbegin(), m_engine->get_options().cend(), [](const auto& option) {
+        return option.name == "TwelveMensMorris";
+    })};
+
+    if (iter == m_engine->get_options().cend()) {
+        SM_THROW_ERROR(sm::ApplicationError, "Engine doesn't support twelve men's morris");
+    }
+
+    try {
+        m_engine->set_option("TwelveMensMorris", twelve_mens_morris() ? "true" : "false");
+    } catch (const EngineError& e) {
+        LOG_DIST_ERROR("Engine error: {}", e.what());
+    }
 }
 
 sm::Renderable NineMensMorrisBaseScene::setup_board() const {
@@ -344,16 +359,16 @@ sm::Renderable NineMensMorrisBaseScene::setup_paint() const {
     return sm::Renderable(mesh, vertex_array, material_instance);
 }
 
-std::vector<sm::Renderable> NineMensMorrisBaseScene::setup_nodes() const {
+NineMensMorrisBoard::NodeRenderables NineMensMorrisBaseScene::setup_nodes() const {
     const auto mesh {ctx.get_mesh("node.obj"_H)};
 
     const auto vertex_array {ctx.load_vertex_array("node"_H, mesh)};
 
     const auto material {ctx.load_material(sm::MaterialType::Phong)};
 
-    std::vector<sm::Renderable> renderables;
+    NineMensMorrisBoard::NodeRenderables renderables;
 
-    for (unsigned int i {0}; i < NineMensMorrisBoard::NODES; i++) {
+    for (int i {0}; i < NineMensMorrisBoard::NODES; i++) {
         const auto material_instance {ctx.load_material_instance(sm::Id("node" + std::to_string(i)), material)};
         material_instance->set_vec3("u_material.ambient_diffuse"_H, glm::vec3(0.065f));
         material_instance->set_vec3("u_material.specular"_H, glm::vec3(0.05f));
@@ -365,7 +380,7 @@ std::vector<sm::Renderable> NineMensMorrisBaseScene::setup_nodes() const {
     return renderables;
 }
 
-std::vector<sm::Renderable> NineMensMorrisBaseScene::setup_white_pieces() const {
+NineMensMorrisBoard::PieceRenderables NineMensMorrisBaseScene::setup_white_pieces() const {
     const auto mesh {ctx.get_mesh("piece_white.obj"_H)};
 
     const auto vertex_array {ctx.load_vertex_array("piece_white"_H, mesh)};
@@ -375,9 +390,9 @@ std::vector<sm::Renderable> NineMensMorrisBaseScene::setup_white_pieces() const 
 
     const auto material {ctx.load_material(sm::MaterialType::PhongDiffuseNormalShadow, sm::Material::CastShadow)};
 
-    std::vector<sm::Renderable> renderables;
+    NineMensMorrisBoard::PieceRenderables renderables;
 
-    for (unsigned int i {0}; i < NineMensMorrisBoard::PIECES / 2; i++) {
+    for (int i {0}; i < pieces_count() / 2; i++) {
         const auto material_instance {ctx.load_material_instance(sm::Id("piece_white" + std::to_string(i)), material)};
         material_instance->set_texture("u_material.ambient_diffuse"_H, diffuse, 0);
         material_instance->set_vec3("u_material.specular"_H, glm::vec3(0.05f));
@@ -390,7 +405,7 @@ std::vector<sm::Renderable> NineMensMorrisBaseScene::setup_white_pieces() const 
     return renderables;
 }
 
-std::vector<sm::Renderable> NineMensMorrisBaseScene::setup_black_pieces() const {
+NineMensMorrisBoard::PieceRenderables NineMensMorrisBaseScene::setup_black_pieces() const {
     const auto mesh {ctx.get_mesh("piece_black.obj"_H)};
 
     const auto vertex_array {ctx.load_vertex_array("piece_black"_H, mesh)};
@@ -400,9 +415,9 @@ std::vector<sm::Renderable> NineMensMorrisBaseScene::setup_black_pieces() const 
 
     const auto material {ctx.load_material(sm::MaterialType::PhongDiffuseNormalShadow, sm::Material::CastShadow)};
 
-    std::vector<sm::Renderable> renderables;
+    NineMensMorrisBoard::PieceRenderables renderables;
 
-    for (unsigned int i {0}; i < NineMensMorrisBoard::PIECES / 2; i++) {
+    for (int i {0}; i < pieces_count() / 2; i++) {
         const auto material_instance {ctx.load_material_instance(sm::Id("piece_black" + std::to_string(i)), material)};
         material_instance->set_texture("u_material.ambient_diffuse"_H, diffuse, 0);
         material_instance->set_vec3("u_material.specular"_H, glm::vec3(0.05f));
@@ -505,6 +520,10 @@ std::shared_ptr<sm::GlTexture> NineMensMorrisBaseScene::load_piece_normal_textur
     } else {
         return ctx.load_texture("piece_normal"_H, ctx.get_texture_data("piece_normal.png"_H), specification);
     }
+}
+
+int NineMensMorrisBaseScene::pieces_count() const {
+    return twelve_mens_morris() ? NineMensMorrisBoard::TWELVE : NineMensMorrisBoard::NINE;
 }
 
 NineMensMorrisBoard NineMensMorrisBaseScene::setup_renderables() {

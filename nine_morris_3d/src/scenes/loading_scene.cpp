@@ -29,6 +29,9 @@ void LoadingScene::on_update() {
             case GameModeNineMensMorris:
                 ctx.change_scene("nine_mens_morris"_H);
                 break;
+            case GameModeTwelveMensMorris:
+                ctx.change_scene("twelve_mens_morris"_H);
+                break;
         }
     }
 }

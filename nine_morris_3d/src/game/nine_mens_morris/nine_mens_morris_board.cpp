@@ -216,9 +216,9 @@ NineMensMorrisBoard::Move NineMensMorrisBoard::Move::create_move_capture(int sou
 NineMensMorrisBoard::NineMensMorrisBoard(
     const sm::Renderable& board,
     const sm::Renderable& paint,
-    const std::vector<sm::Renderable>& nodes,
-    const std::vector<sm::Renderable>& white_pieces,
-    const std::vector<sm::Renderable>& black_pieces,
+    const NodeRenderables& nodes,
+    const PieceRenderables& white_pieces,
+    const PieceRenderables& black_pieces,
     std::function<void(const Move&)>&& move_callback
 )
     : m_move_callback(std::move(move_callback)) {
@@ -229,13 +229,15 @@ NineMensMorrisBoard::NineMensMorrisBoard(
     m_paint_renderable.transform.scale = 20.0f;
     m_paint_renderable.transform.position.y = 0.062f;
 
-    m_legal_moves = generate_moves();
-
+    // The number of pieces given decides the variant of the game
     initialize_objects(nodes, white_pieces, black_pieces);
+
+    // Move generation depends on the number of pieces
+    m_legal_moves = generate_moves();
 }
 
 void NineMensMorrisBoard::user_click_release_callback() {
-    if (m_position.plies >= 18) {
+    if (m_position.plies >= m_pieces.size()) {
         if (m_capture_piece) {
             if (is_piece_id(m_hover_id)) {
                 try_capture(m_pieces[PIECE(m_hover_id)].node_id);
@@ -313,8 +315,8 @@ void NineMensMorrisBoard::update(sm::Ctx& ctx, glm::vec3 ray, glm::vec3 camera, 
     update_nodes_highlight(
         [this]() {
             return (
-                m_position.plies < 18 && !m_capture_piece ||
-                m_position.plies >= 18 && m_select_id != -1 && !m_capture_piece
+                m_position.plies < m_pieces.size() && !m_capture_piece ||
+                m_position.plies >= m_pieces.size() && m_select_id != -1 && !m_capture_piece
             );
         },
         user_input
@@ -324,7 +326,7 @@ void NineMensMorrisBoard::update(sm::Ctx& ctx, glm::vec3 ray, glm::vec3 camera, 
         [this](const PieceObj& piece) {
             return (
                 m_capture_piece && static_cast<Player>(piece.get_type()) != m_position.player && piece.node_id != -1 ||
-                m_position.plies >= 18 && static_cast<Player>(piece.get_type()) == m_position.player && !m_capture_piece
+                m_position.plies >= m_pieces.size() && static_cast<Player>(piece.get_type()) == m_position.player && !m_capture_piece
             );
         },
         user_input
@@ -583,10 +585,10 @@ NineMensMorrisBoard::Position NineMensMorrisBoard::position_from_string(const st
     const auto player {parse_player(tokens[0])};
     const auto pieces1 {parse_pieces(tokens[1])};
     const auto pieces2 {parse_pieces(tokens[2])};
-    unsigned long turns {};
+    int turns {};
 
     try {
-        turns = std::stoul(tokens[3]);
+        turns = std::stoi(tokens[3]);
     } catch (...) {
         throw BoardError("Invalid position string");
     }
@@ -615,7 +617,7 @@ NineMensMorrisBoard::Position NineMensMorrisBoard::position_from_string(const st
         position.board[index] = static_cast<Node>(pieces2.second);
     }
 
-    position.plies = (static_cast<unsigned int>(turns) - 1) * 2 + static_cast<unsigned int>(player == Player::Black);
+    position.plies = (turns - 1) * 2 + static_cast<int>(player == Player::Black);
 
     return position;
 }
@@ -670,8 +672,8 @@ void NineMensMorrisBoard::debug() {
     if (ImGui::Begin("Debug Board")) {
         ImGui::Text("player: %s", if_player_white("white", "black"));
         ImGui::Text("game_over: %s", m_game_over.to_string());
-        ImGui::Text("plies: %u", m_position.plies);
-        ImGui::Text("plies_no_advancement: %u", m_plies_no_advancement);
+        ImGui::Text("plies: %d", m_position.plies);
+        ImGui::Text("plies_no_advancement: %d", m_plies_no_advancement);
         ImGui::Text("positions: %lu", m_positions.size());
         ImGui::Text("capture_piece: %s", m_capture_piece ? "true" : "false");
         ImGui::Text("select_id: %d", m_select_id);
@@ -683,78 +685,79 @@ void NineMensMorrisBoard::debug() {
     ImGui::End();
 }
 
-void NineMensMorrisBoard::initialize_objects(
-    const std::vector<sm::Renderable>& nodes,
-    const std::vector<sm::Renderable>& white_pieces,
-    const std::vector<sm::Renderable>& black_pieces
-) {
-    for (std::size_t i {0}; i < m_nodes.size(); i++) {
-        m_nodes[i] = NodeObj(static_cast<int>(i), nodes[i], NODE_POSITIONS[i]);
+void NineMensMorrisBoard::initialize_objects(const NodeRenderables& nodes, const PieceRenderables& white_pieces, const PieceRenderables& black_pieces) {
+    assert(white_pieces.size() == black_pieces.size());
+    assert(white_pieces.size() + black_pieces.size() == NINE || white_pieces.size() + black_pieces.size() == TWELVE);
+
+    for (int i {0}; i < NODES; i++) {
+        m_nodes[i] = NodeObj(i, nodes[i], NODE_POSITIONS[i]);
     }
+
+    // Thus it always contains the correct number of pieces
+    m_pieces.resize(white_pieces.size() + black_pieces.size());
 
     // Offset pieces' IDs, so that they are different from nodes' IDs
 
-    for (int i {0}; i < PIECES / 2; i++) {
+    for (int i {0}; i < m_pieces.size() / 2; i++) {
         m_pieces[i] = PieceObj(
-            i + static_cast<int>(m_nodes.size()),
+            i + NODES,
             white_pieces[i],
-            glm::vec3(-3.0f, PIECE_Y_POSITION_AIR_INITIAL, static_cast<float>(i) * 0.5f - 2.0f),
+            glm::vec3(
+                -3.0f,
+                PIECE_Y_POSITION_AIR_INITIAL,
+                static_cast<float>(i) * 0.5f - (m_pieces.size() == NINE ? 2.0f : 2.75f)
+            ),
             PieceType::White
         );
     }
 
-    for (int i {PIECES / 2}; i < PIECES; i++) {
+    for (int i {m_pieces.size() / 2}; i < m_pieces.size(); i++) {
         m_pieces[i] = PieceObj(
-            i + static_cast<int>(m_nodes.size()),
-            black_pieces[i - PIECES / 2],
-            glm::vec3(3.0f, PIECE_Y_POSITION_AIR_INITIAL, static_cast<float>(i - PIECES / 2) * -0.5f + 2.0f),
+            i + NODES,
+            black_pieces[i - m_pieces.size() / 2],
+            glm::vec3(
+                3.0f,
+                PIECE_Y_POSITION_AIR_INITIAL,
+                static_cast<float>(i - m_pieces.size() / 2) * -0.5f + (m_pieces.size() == NINE ? 2.0f : 2.75f)
+            ),
             PieceType::Black
         );
     }
 }
 
 void NineMensMorrisBoard::initialize_objects() {
-    for (std::size_t i {0}; i < m_nodes.size(); i++) {
-        const auto renderable {m_nodes[i].get_renderable()};
-        m_nodes[i] = NodeObj(static_cast<int>(i), renderable, NODE_POSITIONS[i]);
+    NodeRenderables nodes;
+    PieceRenderables white_pieces;
+    PieceRenderables black_pieces;
+
+    for (int i {0}; i < NODES; i++) {
+        nodes.push_back(m_nodes[i].get_renderable());
     }
 
-    // Offset pieces' IDs, so that they are different from nodes' IDs
-
-    for (int i {0}; i < PIECES / 2; i++) {
-        const auto renderable {m_pieces[i].get_renderable()};
-        m_pieces[i] = PieceObj(
-            i + static_cast<int>(m_nodes.size()),
-            renderable,
-            glm::vec3(-3.0f, PIECE_Y_POSITION_AIR_INITIAL, static_cast<float>(i) * 0.5f - 2.0f),
-            PieceType::White
-        );
+    for (int i {0}; i < m_pieces.size() / 2; i++) {
+        white_pieces.push_back(m_pieces[i].get_renderable());
     }
 
-    for (int i {PIECES / 2}; i < PIECES; i++) {
-        const auto renderable {m_pieces[i].get_renderable()};
-        m_pieces[i] = PieceObj(
-            i + static_cast<int>(m_nodes.size()),
-            renderable,
-            glm::vec3(3.0f, PIECE_Y_POSITION_AIR_INITIAL, static_cast<float>(i - PIECES / 2) * -0.5f + 2.0f),
-            PieceType::Black
-        );
+    for (int i {m_pieces.size() / 2}; i < m_pieces.size(); i++) {
+        black_pieces.push_back(m_pieces[i].get_renderable());
     }
+
+    initialize_objects(nodes, white_pieces, black_pieces);
 }
 
 void NineMensMorrisBoard::update_nodes_highlight(std::function<bool()>&& highlight, bool enabled) {
     if (!enabled) {
-        std::for_each(m_nodes.begin(), m_nodes.end(), [](NodeObj& node) {
+        for (NodeObj& node : m_nodes) {
             node.set_highlighted(false);
-        });
+        }
 
         return;
     }
 
     if (!highlight()) {
-        std::for_each(m_nodes.begin(), m_nodes.end(), [](NodeObj& node) {
+        for (NodeObj& node : m_nodes) {
             node.set_highlighted(false);
-        });
+        }
 
         return;
     }
@@ -766,9 +769,9 @@ void NineMensMorrisBoard::update_nodes_highlight(std::function<bool()>&& highlig
 
 void NineMensMorrisBoard::update_pieces_highlight(std::function<bool(const PieceObj&)>&& highlight, bool enabled) {
     if (!enabled) {
-        std::for_each(m_pieces.begin(), m_pieces.end(), [](PieceObj& piece) {
+        for (PieceObj& piece : m_pieces) {
             piece.get_renderable().get_material()->flags &= ~sm::Material::Outline;
-        });
+        }
 
         return;
     }
@@ -787,8 +790,8 @@ void NineMensMorrisBoard::update_pieces_highlight(std::function<bool(const Piece
         const int piece_id {m_nodes[m_select_id].piece_id};
 
         if (piece_id != -1) {
-            m_pieces[piece_id - m_nodes.size()].get_renderable().get_material()->flags |= sm::Material::Outline;
-            m_pieces[piece_id - m_nodes.size()].get_renderable().outline.color = RED;
+            m_pieces[piece_id - NODES].get_renderable().get_material()->flags |= sm::Material::Outline;
+            m_pieces[piece_id - NODES].get_renderable().outline.color = RED;
         }
     }
 }
@@ -1085,7 +1088,7 @@ void NineMensMorrisBoard::check_material() {
         return;
     }
 
-    if (m_position.plies < 18) {
+    if (m_position.plies < m_pieces.size()) {
         return;
     }
 
@@ -1128,7 +1131,9 @@ void NineMensMorrisBoard::check_threefold_repetition() {
         return;
     }
 
-    const auto count {std::count(m_positions.cbegin(), m_positions.cend(), m_position)};
+    const auto count {std::count_if(m_positions.cbegin(), m_positions.cend(), [this](const auto& position) {
+        return position.eq(m_position, m_pieces.size());
+    })};
 
     assert(count >= 1);
 
@@ -1165,18 +1170,18 @@ bool NineMensMorrisBoard::has_three_pieces(const Board& board, const PieceObj& p
 std::vector<NineMensMorrisBoard::Move> NineMensMorrisBoard::generate_moves() const {
     Board local_board {m_position.board};
 
-    if (m_position.plies < 18) {
-        return generate_moves_phase1(local_board, m_position.player);
+    if (m_position.plies < m_pieces.size()) {
+        return generate_moves_phase1(local_board, m_position.player, m_pieces.size());
     } else {
         if (count_pieces(local_board, m_position.player) == 3) {
-            return generate_moves_phase3(local_board, m_position.player);
+            return generate_moves_phase3(local_board, m_position.player, m_pieces.size());
         } else {
-            return generate_moves_phase2(local_board, m_position.player);
+            return generate_moves_phase2(local_board, m_position.player, m_pieces.size());
         }
     }
 }
 
-std::vector<NineMensMorrisBoard::Move> NineMensMorrisBoard::generate_moves_phase1(Board& board, Player player) {
+std::vector<NineMensMorrisBoard::Move> NineMensMorrisBoard::generate_moves_phase1(Board& board, Player player, int p) {
     std::vector<Move> moves;
 
     for (int i {0}; i < 24; i++) {
@@ -1186,16 +1191,16 @@ std::vector<NineMensMorrisBoard::Move> NineMensMorrisBoard::generate_moves_phase
 
         make_place_move(board, player, i);
 
-        if (is_mill(board, player, i)) {
+        if (is_mill(board, player, i, p)) {
             const Player opponent_player {opponent(player)};
-            const bool all_in_mills {all_pieces_in_mills(board, opponent_player)};
+            const bool all_in_mills {all_pieces_in_mills(board, opponent_player, p)};
 
             for (int j {0}; j < 24; j++) {
                 if (board[j] != static_cast<Node>(opponent_player)) {
                     continue;
                 }
 
-                if (is_mill(board, opponent_player, j) && !all_in_mills) {
+                if (is_mill(board, opponent_player, j, p) && !all_in_mills) {
                     continue;
                 }
 
@@ -1211,7 +1216,7 @@ std::vector<NineMensMorrisBoard::Move> NineMensMorrisBoard::generate_moves_phase
     return moves;
 }
 
-std::vector<NineMensMorrisBoard::Move> NineMensMorrisBoard::generate_moves_phase2(Board& board, Player player) {
+std::vector<NineMensMorrisBoard::Move> NineMensMorrisBoard::generate_moves_phase2(Board& board, Player player, int p) {
     std::vector<Move> moves;
 
     for (int i {0}; i < 24; i++) {
@@ -1219,21 +1224,21 @@ std::vector<NineMensMorrisBoard::Move> NineMensMorrisBoard::generate_moves_phase
             continue;
         }
 
-        const auto free_positions {neighbor_free_positions(board, i)};
+        const auto free_positions {neighbor_free_positions(board, i, p)};
 
         for (int j {0}; j < static_cast<int>(free_positions.size()); j++) {
             make_move_move(board, i, free_positions[j]);
 
-            if (is_mill(board, player, free_positions[j])) {
+            if (is_mill(board, player, free_positions[j], p)) {
                 const Player opponent_player {opponent(player)};
-                const bool all_in_mills {all_pieces_in_mills(board, opponent_player)};
+                const bool all_in_mills {all_pieces_in_mills(board, opponent_player, p)};
 
                 for (int k {0}; k < 24; k++) {
                     if (board[k] != static_cast<Node>(opponent_player)) {
                         continue;
                     }
 
-                    if (is_mill(board, opponent_player, k) && !all_in_mills) {
+                    if (is_mill(board, opponent_player, k, p) && !all_in_mills) {
                         continue;
                     }
 
@@ -1250,7 +1255,7 @@ std::vector<NineMensMorrisBoard::Move> NineMensMorrisBoard::generate_moves_phase
     return moves;
 }
 
-std::vector<NineMensMorrisBoard::Move> NineMensMorrisBoard::generate_moves_phase3(Board& board, Player player) {
+std::vector<NineMensMorrisBoard::Move> NineMensMorrisBoard::generate_moves_phase3(Board& board, Player player, int p) {
     std::vector<Move> moves;
 
     for (int i {0}; i < 24; i++) {
@@ -1265,16 +1270,16 @@ std::vector<NineMensMorrisBoard::Move> NineMensMorrisBoard::generate_moves_phase
 
             make_move_move(board, i, j);
 
-            if (is_mill(board, player, j)) {
+            if (is_mill(board, player, j, p)) {
                 const Player opponent_player {opponent(player)};
-                const bool all_in_mills {all_pieces_in_mills(board, opponent_player)};
+                const bool all_in_mills {all_pieces_in_mills(board, opponent_player, p)};
 
                 for (int k {0}; k < 24; k++) {
                     if (board[k] != static_cast<Node>(opponent_player)) {
                         continue;
                     }
 
-                    if (is_mill(board, opponent_player, k) && !all_in_mills) {
+                    if (is_mill(board, opponent_player, k, p) && !all_in_mills) {
                         continue;
                     }
 
@@ -1317,57 +1322,97 @@ void NineMensMorrisBoard::unmake_move_move(Board& board, int source_index, int d
     std::swap(board[source_index], board[destination_index]);
 }
 
-#ifdef __GNUG__
-    #pragma GCC diagnostic push
-    #pragma GCC diagnostic ignored "-Wparentheses"
-#endif
+static bool mill(const NineMensMorrisBoard::Board& board, NineMensMorrisBoard::Node node, int index1, int index2) {
+    return board[index1] == node && board[index2] == node;
+}
 
-bool NineMensMorrisBoard::is_mill(const Board& board, Player player, int index) {
+bool NineMensMorrisBoard::is_mill(const Board& board, Player player, int index, int p) {
+    if (p == NINE) {
+        return is_mill9(board, player, index);
+    } else {
+        return is_mill12(board, player, index);
+    }
+}
+
+bool NineMensMorrisBoard::is_mill9(const Board& board, Player player, int index) {
     const Node node {static_cast<Node>(player)};
 
     assert(board[index] == node);
 
     switch (index) {
-        case 0: return board[1] == node && board[2] == node || board[9] == node && board[21] == node;
-        case 1: return board[0] == node && board[2] == node || board[4] == node && board[7] == node;
-        case 2: return board[0] == node && board[1] == node || board[14] == node && board[23] == node;
-        case 3: return board[4] == node && board[5] == node || board[10] == node && board[18] == node;
-        case 4: return board[3] == node && board[5] == node || board[1] == node && board[7] == node;
-        case 5: return board[3] == node && board[4] == node || board[13] == node && board[20] == node;
-        case 6: return board[7] == node && board[8] == node || board[11] == node && board[15] == node;
-        case 7: return board[6] == node && board[8] == node || board[1] == node && board[4] == node;
-        case 8: return board[6] == node && board[7] == node || board[12] == node && board[17] == node;
-        case 9: return board[0] == node && board[21] == node || board[10] == node && board[11] == node;
-        case 10: return board[9] == node && board[11] == node || board[3] == node && board[18] == node;
-        case 11: return board[9] == node && board[10] == node || board[6] == node && board[15] == node;
-        case 12: return board[13] == node && board[14] == node || board[8] == node && board[17] == node;
-        case 13: return board[12] == node && board[14] == node || board[5] == node && board[20] == node;
-        case 14: return board[12] == node && board[13] == node || board[2] == node && board[23] == node;
-        case 15: return board[16] == node && board[17] == node || board[6] == node && board[11] == node;
-        case 16: return board[15] == node && board[17] == node || board[19] == node && board[22] == node;
-        case 17: return board[15] == node && board[16] == node || board[8] == node && board[12] == node;
-        case 18: return board[19] == node && board[20] == node || board[3] == node && board[10] == node;
-        case 19: return board[18] == node && board[20] == node || board[16] == node && board[22] == node;
-        case 20: return board[18] == node && board[19] == node || board[5] == node && board[13] == node;
-        case 21: return board[22] == node && board[23] == node || board[0] == node && board[9] == node;
-        case 22: return board[21] == node && board[23] == node || board[16] == node && board[19] == node;
-        case 23: return board[21] == node && board[22] == node || board[2] == node && board[14] == node;
+        case 0: return mill(board, node, 1, 2) || mill(board, node, 9, 21);
+        case 1: return mill(board, node, 0, 2) || mill(board, node, 4, 7);
+        case 2: return mill(board, node, 0, 1) || mill(board, node, 14, 23);
+        case 3: return mill(board, node, 4, 5) || mill(board, node, 10, 18);
+        case 4: return mill(board, node, 3, 5) || mill(board, node, 1, 7);
+        case 5: return mill(board, node, 3, 4) || mill(board, node, 13, 20);
+        case 6: return mill(board, node, 7, 8) || mill(board, node, 11, 15);
+        case 7: return mill(board, node, 6, 8) || mill(board, node, 1, 4);
+        case 8: return mill(board, node, 6, 7) || mill(board, node, 12, 17);
+        case 9: return mill(board, node, 0, 21) || mill(board, node, 10, 11);
+        case 10: return mill(board, node, 9, 11) || mill(board, node, 3, 18);
+        case 11: return mill(board, node, 9, 10) || mill(board, node, 6, 15);
+        case 12: return mill(board, node, 13, 14) || mill(board, node, 8, 17);
+        case 13: return mill(board, node, 12, 14) || mill(board, node, 5, 20);
+        case 14: return mill(board, node, 12, 13) || mill(board, node, 2, 23);
+        case 15: return mill(board, node, 16, 17) || mill(board, node, 6, 11);
+        case 16: return mill(board, node, 15, 17) || mill(board, node, 19, 22);
+        case 17: return mill(board, node, 15, 16) || mill(board, node, 8, 12);
+        case 18: return mill(board, node, 19, 20) || mill(board, node, 3, 10);
+        case 19: return mill(board, node, 18, 20) || mill(board, node, 16, 22);
+        case 20: return mill(board, node, 18, 19) || mill(board, node, 5, 13);
+        case 21: return mill(board, node, 22, 23) || mill(board, node, 0, 9);
+        case 22: return mill(board, node, 21, 23) || mill(board, node, 16, 19);
+        case 23: return mill(board, node, 21, 22) || mill(board, node, 2, 14);
     }
 
+    assert(false);
     return {};
 }
 
-#ifdef __GNUG__
-    #pragma GCC diagnostic pop
-#endif
+bool NineMensMorrisBoard::is_mill12(const Board& board, Player player, int index) {
+    const Node node {static_cast<Node>(player)};
 
-bool NineMensMorrisBoard::all_pieces_in_mills(const Board& board, Player player) {
+    assert(board[index] == node);
+
+    switch (index) {
+        case 0: return mill(board, node, 1, 2) || mill(board, node, 9, 21) || mill(board, node, 3, 6);
+        case 1: return mill(board, node, 0, 2) || mill(board, node, 4, 7);
+        case 2: return mill(board, node, 0, 1) || mill(board, node, 14, 23) || mill(board, node, 5, 8);
+        case 3: return mill(board, node, 4, 5) || mill(board, node, 10, 18) || mill(board, node, 0, 6);
+        case 4: return mill(board, node, 3, 5) || mill(board, node, 1, 7);
+        case 5: return mill(board, node, 3, 4) || mill(board, node, 13, 20) || mill(board, node, 2, 8);
+        case 6: return mill(board, node, 7, 8) || mill(board, node, 11, 15) || mill(board, node, 0, 3);
+        case 7: return mill(board, node, 6, 8) || mill(board, node, 1, 4);
+        case 8: return mill(board, node, 6, 7) || mill(board, node, 12, 17) || mill(board, node, 2, 5);
+        case 9: return mill(board, node, 0, 21) || mill(board, node, 10, 11);
+        case 10: return mill(board, node, 9, 11) || mill(board, node, 3, 18);
+        case 11: return mill(board, node, 9, 10) || mill(board, node, 6, 15);
+        case 12: return mill(board, node, 13, 14) || mill(board, node, 8, 17);
+        case 13: return mill(board, node, 12, 14) || mill(board, node, 5, 20);
+        case 14: return mill(board, node, 12, 13) || mill(board, node, 2, 23);
+        case 15: return mill(board, node, 16, 17) || mill(board, node, 6, 11) || mill(board, node, 18, 21);
+        case 16: return mill(board, node, 15, 17) || mill(board, node, 19, 22);
+        case 17: return mill(board, node, 15, 16) || mill(board, node, 8, 12) || mill(board, node, 20, 23);
+        case 18: return mill(board, node, 19, 20) || mill(board, node, 3, 10) || mill(board, node, 15, 21);
+        case 19: return mill(board, node, 18, 20) || mill(board, node, 16, 22);
+        case 20: return mill(board, node, 18, 19) || mill(board, node, 5, 13) || mill(board, node, 17, 23);
+        case 21: return mill(board, node, 22, 23) || mill(board, node, 0, 9) || mill(board, node, 15, 18);
+        case 22: return mill(board, node, 21, 23) || mill(board, node, 16, 19);
+        case 23: return mill(board, node, 21, 22) || mill(board, node, 2, 14) || mill(board, node, 17, 20);
+    }
+
+    assert(false);
+    return {};
+}
+
+bool NineMensMorrisBoard::all_pieces_in_mills(const Board& board, Player player, int p) {
     for (int i {0}; i < 24; i++) {
         if (board[i] != static_cast<Node>(player)) {
             continue;
         }
 
-        if (!is_mill(board, player, i)) {
+        if (!is_mill(board, player, i, p)) {
             return false;
         }
     }
@@ -1375,127 +1420,272 @@ bool NineMensMorrisBoard::all_pieces_in_mills(const Board& board, Player player)
     return true;
 }
 
-#define IS_FREE_CHECK(const_index) \
-    if (board[const_index] == Node::None) { \
-        result.push_back(const_index); \
+static void neighbor(const NineMensMorrisBoard::Board& board, std::vector<int>& result, int index) {
+    if (board[index] == NineMensMorrisBoard::Node::None) {
+        result.push_back(index);
     }
+}
 
-std::vector<int> NineMensMorrisBoard::neighbor_free_positions(const Board& board, int index) {
+std::vector<int> NineMensMorrisBoard::neighbor_free_positions(const Board& board, int index, int p) {
+    if (p == NINE) {
+        return neighbor_free_positions9(board, index);
+    } else {
+        return neighbor_free_positions12(board, index);
+    }
+}
+
+std::vector<int> NineMensMorrisBoard::neighbor_free_positions9(const Board& board, int index) {
+    std::vector<int> result;
+    result.reserve(4);
+    switch (index) {
+        case 0:
+            neighbor(board, result, 1);
+            neighbor(board, result, 9);
+            break;
+        case 1:
+            neighbor(board, result, 0);
+            neighbor(board, result, 2);
+            neighbor(board, result, 4);
+            break;
+        case 2:
+            neighbor(board, result, 1);
+            neighbor(board, result, 14);
+            break;
+        case 3:
+            neighbor(board, result, 4);
+            neighbor(board, result, 10);
+            break;
+        case 4:
+            neighbor(board, result, 1);
+            neighbor(board, result, 3);
+            neighbor(board, result, 5);
+            neighbor(board, result, 7);
+            break;
+        case 5:
+            neighbor(board, result, 4);
+            neighbor(board, result, 13);
+            break;
+        case 6:
+            neighbor(board, result, 7);
+            neighbor(board, result, 11);
+            break;
+        case 7:
+            neighbor(board, result, 4);
+            neighbor(board, result, 6);
+            neighbor(board, result, 8);
+            break;
+        case 8:
+            neighbor(board, result, 7);
+            neighbor(board, result, 12);
+            break;
+        case 9:
+            neighbor(board, result, 0);
+            neighbor(board, result, 10);
+            neighbor(board, result, 21);
+            break;
+        case 10:
+            neighbor(board, result, 3);
+            neighbor(board, result, 9);
+            neighbor(board, result, 11);
+            neighbor(board, result, 18);
+            break;
+        case 11:
+            neighbor(board, result, 6);
+            neighbor(board, result, 10);
+            neighbor(board, result, 15);
+            break;
+        case 12:
+            neighbor(board, result, 8);
+            neighbor(board, result, 13);
+            neighbor(board, result, 17);
+            break;
+        case 13:
+            neighbor(board, result, 5);
+            neighbor(board, result, 12);
+            neighbor(board, result, 14);
+            neighbor(board, result, 20);
+            break;
+        case 14:
+            neighbor(board, result, 2);
+            neighbor(board, result, 13);
+            neighbor(board, result, 23);
+            break;
+        case 15:
+            neighbor(board, result, 11);
+            neighbor(board, result, 16);
+            break;
+        case 16:
+            neighbor(board, result, 15);
+            neighbor(board, result, 17);
+            neighbor(board, result, 19);
+            break;
+        case 17:
+            neighbor(board, result, 12);
+            neighbor(board, result, 16);
+            break;
+        case 18:
+            neighbor(board, result, 10);
+            neighbor(board, result, 19);
+            break;
+        case 19:
+            neighbor(board, result, 16);
+            neighbor(board, result, 18);
+            neighbor(board, result, 20);
+            neighbor(board, result, 22);
+            break;
+        case 20:
+            neighbor(board, result, 13);
+            neighbor(board, result, 19);
+            break;
+        case 21:
+            neighbor(board, result, 9);
+            neighbor(board, result, 22);
+            break;
+        case 22:
+            neighbor(board, result, 19);
+            neighbor(board, result, 21);
+            neighbor(board, result, 23);
+            break;
+        case 23:
+            neighbor(board, result, 14);
+            neighbor(board, result, 22);
+            break;
+    }
+    return result;
+}
+
+std::vector<int> NineMensMorrisBoard::neighbor_free_positions12(const Board& board, int index) {
     std::vector<int> result;
     result.reserve(4);
 
     switch (index) {
         case 0:
-            IS_FREE_CHECK(1)
-            IS_FREE_CHECK(9)
+            neighbor(board, result, 1);
+            neighbor(board, result, 9);
+            neighbor(board, result, 3);
             break;
         case 1:
-            IS_FREE_CHECK(0)
-            IS_FREE_CHECK(2)
-            IS_FREE_CHECK(4)
+            neighbor(board, result, 0);
+            neighbor(board, result, 2);
+            neighbor(board, result, 4);
             break;
         case 2:
-            IS_FREE_CHECK(1)
-            IS_FREE_CHECK(14)
+            neighbor(board, result, 1);
+            neighbor(board, result, 14);
+            neighbor(board, result, 5);
             break;
         case 3:
-            IS_FREE_CHECK(4)
-            IS_FREE_CHECK(10)
+            neighbor(board, result, 4);
+            neighbor(board, result, 10);
+            neighbor(board, result, 0);
+            neighbor(board, result, 6);
             break;
         case 4:
-            IS_FREE_CHECK(1)
-            IS_FREE_CHECK(3)
-            IS_FREE_CHECK(5)
-            IS_FREE_CHECK(7)
+            neighbor(board, result, 1);
+            neighbor(board, result, 3);
+            neighbor(board, result, 5);
+            neighbor(board, result, 7);
             break;
         case 5:
-            IS_FREE_CHECK(4)
-            IS_FREE_CHECK(13)
+            neighbor(board, result, 4);
+            neighbor(board, result, 13);
+            neighbor(board, result, 2);
+            neighbor(board, result, 8);
             break;
         case 6:
-            IS_FREE_CHECK(7)
-            IS_FREE_CHECK(11)
+            neighbor(board, result, 7);
+            neighbor(board, result, 11);
+            neighbor(board, result, 3);
             break;
         case 7:
-            IS_FREE_CHECK(4)
-            IS_FREE_CHECK(6)
-            IS_FREE_CHECK(8)
+            neighbor(board, result, 4);
+            neighbor(board, result, 6);
+            neighbor(board, result, 8);
             break;
         case 8:
-            IS_FREE_CHECK(7)
-            IS_FREE_CHECK(12)
+            neighbor(board, result, 7);
+            neighbor(board, result, 12);
+            neighbor(board, result, 5);
             break;
         case 9:
-            IS_FREE_CHECK(0)
-            IS_FREE_CHECK(10)
-            IS_FREE_CHECK(21)
+            neighbor(board, result, 0);
+            neighbor(board, result, 10);
+            neighbor(board, result, 21);
             break;
         case 10:
-            IS_FREE_CHECK(3)
-            IS_FREE_CHECK(9)
-            IS_FREE_CHECK(11)
-            IS_FREE_CHECK(18)
+            neighbor(board, result, 3);
+            neighbor(board, result, 9);
+            neighbor(board, result, 11);
+            neighbor(board, result, 18);
             break;
         case 11:
-            IS_FREE_CHECK(6)
-            IS_FREE_CHECK(10)
-            IS_FREE_CHECK(15)
+            neighbor(board, result, 6);
+            neighbor(board, result, 10);
+            neighbor(board, result, 15);
             break;
         case 12:
-            IS_FREE_CHECK(8)
-            IS_FREE_CHECK(13)
-            IS_FREE_CHECK(17)
+            neighbor(board, result, 8);
+            neighbor(board, result, 13);
+            neighbor(board, result, 17);
             break;
         case 13:
-            IS_FREE_CHECK(5)
-            IS_FREE_CHECK(12)
-            IS_FREE_CHECK(14)
-            IS_FREE_CHECK(20)
+            neighbor(board, result, 5);
+            neighbor(board, result, 12);
+            neighbor(board, result, 14);
+            neighbor(board, result, 20);
             break;
         case 14:
-            IS_FREE_CHECK(2)
-            IS_FREE_CHECK(13)
-            IS_FREE_CHECK(23)
+            neighbor(board, result, 2);
+            neighbor(board, result, 13);
+            neighbor(board, result, 23);
             break;
         case 15:
-            IS_FREE_CHECK(11)
-            IS_FREE_CHECK(16)
+            neighbor(board, result, 11);
+            neighbor(board, result, 16);
+            neighbor(board, result, 18);
             break;
         case 16:
-            IS_FREE_CHECK(15)
-            IS_FREE_CHECK(17)
-            IS_FREE_CHECK(19)
+            neighbor(board, result, 15);
+            neighbor(board, result, 17);
+            neighbor(board, result, 19);
             break;
         case 17:
-            IS_FREE_CHECK(12)
-            IS_FREE_CHECK(16)
+            neighbor(board, result, 12);
+            neighbor(board, result, 16);
+            neighbor(board, result, 20);
             break;
         case 18:
-            IS_FREE_CHECK(10)
-            IS_FREE_CHECK(19)
+            neighbor(board, result, 10);
+            neighbor(board, result, 19);
+            neighbor(board, result, 15);
+            neighbor(board, result, 21);
             break;
         case 19:
-            IS_FREE_CHECK(16)
-            IS_FREE_CHECK(18)
-            IS_FREE_CHECK(20)
-            IS_FREE_CHECK(22)
+            neighbor(board, result, 16);
+            neighbor(board, result, 18);
+            neighbor(board, result, 20);
+            neighbor(board, result, 22);
             break;
         case 20:
-            IS_FREE_CHECK(13)
-            IS_FREE_CHECK(19)
+            neighbor(board, result, 13);
+            neighbor(board, result, 19);
+            neighbor(board, result, 17);
+            neighbor(board, result, 23);
             break;
         case 21:
-            IS_FREE_CHECK(9)
-            IS_FREE_CHECK(22)
+            neighbor(board, result, 9);
+            neighbor(board, result, 22);
+            neighbor(board, result, 18);
             break;
         case 22:
-            IS_FREE_CHECK(19)
-            IS_FREE_CHECK(21)
-            IS_FREE_CHECK(23)
+            neighbor(board, result, 19);
+            neighbor(board, result, 21);
+            neighbor(board, result, 23);
             break;
         case 23:
-            IS_FREE_CHECK(14)
-            IS_FREE_CHECK(22)
+            neighbor(board, result, 14);
+            neighbor(board, result, 22);
+            neighbor(board, result, 20);
             break;
     }
 

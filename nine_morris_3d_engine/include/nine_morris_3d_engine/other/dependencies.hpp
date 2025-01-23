@@ -2,8 +2,6 @@
 
 #include <string>
 
-namespace sm {
-    namespace dependencies {
-        std::string get_information();
-    }
+namespace sm::dependencies {
+    std::string get_information();
 }

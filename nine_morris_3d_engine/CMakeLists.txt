@@ -114,6 +114,7 @@ add_library(nine_morris_3d_engine STATIC
     "include/nine_morris_3d_engine/graphics/renderable.hpp"
     "include/nine_morris_3d_engine/graphics/skybox.hpp"
     "include/nine_morris_3d_engine/graphics/texture_data.hpp"
+    "include/nine_morris_3d_engine/other/internal/array.hpp"
     "include/nine_morris_3d_engine/other/internal/resources_cache.hpp"
     "include/nine_morris_3d_engine/other/camera_controller.hpp"
     "include/nine_morris_3d_engine/other/dependencies.hpp"

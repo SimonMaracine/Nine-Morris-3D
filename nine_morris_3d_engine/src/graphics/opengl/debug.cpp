@@ -9,7 +9,7 @@
 #include "nine_morris_3d_engine/application/logging.hpp"
 #include "nine_morris_3d_engine/graphics/opengl/capabilities.hpp"
 
-namespace sm {
+namespace sm::opengl_debug {
     static const unsigned int parameters[] {
         GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS,
         GL_MAX_CUBE_MAP_TEXTURE_SIZE,
@@ -56,7 +56,7 @@ namespace sm {
         "GL_MAX_VIEWPORT_DIMS"
     };
 
-    void opengl_debug::initialize() noexcept {
+    void initialize() noexcept {
         glDebugMessageCallback(
             [](
                 unsigned int,
@@ -98,7 +98,7 @@ namespace sm {
         LOG_INFO("Set OpenGL message callback");
     }
 
-    std::string opengl_debug::get_information() {
+    std::string get_information() {
         std::string result;
 
         result += "*** OpenGL Version And Driver ***\n";
@@ -149,7 +149,7 @@ namespace sm {
         return result;
     }
 
-    std::pair<int, int> opengl_debug::get_version_number() noexcept {
+    std::pair<int, int> get_version_number() noexcept {
         int major {};
         int minor {};
         glGetIntegerv(GL_MAJOR_VERSION, &major);
@@ -158,19 +158,19 @@ namespace sm {
         return std::make_pair(major, minor);
     }
 
-    const unsigned char* opengl_debug::get_opengl_version() noexcept {
+    const unsigned char* get_opengl_version() noexcept {
         return glGetString(GL_VERSION);
     }
 
-    const unsigned char* opengl_debug::get_glsl_version() noexcept {
+    const unsigned char* get_glsl_version() noexcept {
         return glGetString(GL_SHADING_LANGUAGE_VERSION);
     }
 
-    const unsigned char* opengl_debug::get_vendor() noexcept {
+    const unsigned char* get_vendor() noexcept {
         return glGetString(GL_VENDOR);
     }
 
-    const unsigned char* opengl_debug::get_renderer() noexcept {
+    const unsigned char* get_renderer() noexcept {
         return glGetString(GL_RENDERER);
     }
 }

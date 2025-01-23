@@ -39,13 +39,13 @@ public:
 
     void start_engine() override;
 
-    virtual bool twelve_mens_morris_mode() const = 0;
+    virtual bool twelve_mens_morris() const = 0;
 private:
     sm::Renderable setup_board() const;
     sm::Renderable setup_paint() const;
-    std::vector<sm::Renderable> setup_nodes() const;
-    std::vector<sm::Renderable> setup_white_pieces() const;
-    std::vector<sm::Renderable> setup_black_pieces() const;
+    NineMensMorrisBoard::NodeRenderables setup_nodes() const;
+    NineMensMorrisBoard::PieceRenderables setup_white_pieces() const;
+    NineMensMorrisBoard::PieceRenderables setup_black_pieces() const;
 
     std::shared_ptr<sm::GlTexture> load_board_diffuse_texture(bool reload = false) const;
     std::shared_ptr<sm::GlTexture> load_paint_diffuse_texture(bool reload = false) const;
@@ -53,6 +53,8 @@ private:
     std::shared_ptr<sm::GlTexture> load_piece_white_diffuse_texture(bool reload = false) const;
     std::shared_ptr<sm::GlTexture> load_piece_black_diffuse_texture(bool reload = false) const;
     std::shared_ptr<sm::GlTexture> load_piece_normal_texture(bool reload = false) const;
+
+    int pieces_count() const;
 
     NineMensMorrisBoard setup_renderables();
 

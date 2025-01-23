@@ -8,5 +8,5 @@ struct NineMensMorrisScene : NineMensMorrisBaseScene {
 
     SM_SCENE_NAME("nine_mens_morris")
 
-    bool twelve_mens_morris_mode() const override { return false; }
+    bool twelve_mens_morris() const override { return false; }
 };

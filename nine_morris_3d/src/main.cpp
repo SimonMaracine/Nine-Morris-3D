@@ -11,6 +11,7 @@
 
 #include "scenes/loading_scene.hpp"
 #include "scenes/nine_mens_morris_scene.hpp"
+#include "scenes/twelve_mens_morris_scene.hpp"
 #include "game.hpp"
 #include "global.hpp"
 #include "window_size.hpp"
@@ -95,6 +96,7 @@ int application_main() {
             sm::Application game {properties};
             game.add_scene<LoadingScene>();
             game.add_scene<NineMensMorrisScene>();
+            game.add_scene<TwelveMensMorrisScene>();
             game.set_global_data<Global>();
             exit_code = game.run("loading"_H, functions);
         } catch (const sm::RuntimeError& e) {  // FIXME once an exception from a thread managed to not be caught; don't know how; seems to be working now
