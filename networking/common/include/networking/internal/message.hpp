@@ -52,7 +52,7 @@ namespace networking::internal {
 
         template<typename Payload>
         void write(const Payload& payload) {
-            std::ostringstream stream;
+            std::ostringstream stream {std::ios_base::binary};
 
             cereal::BinaryOutputArchive archive {stream};
             archive(payload);
@@ -62,7 +62,7 @@ namespace networking::internal {
 
         template<typename Payload>
         void read(Payload& payload) const {
-            std::ostringstream stream;
+            std::ostringstream stream {std::ios_base::binary};
             stream.write(reinterpret_cast<char*>(m_payload.get()), m_header.payload_size);
 
             cereal::BinaryInputArchive archive {stream};
