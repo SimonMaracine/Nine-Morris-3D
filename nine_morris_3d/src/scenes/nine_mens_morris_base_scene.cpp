@@ -288,11 +288,15 @@ void NineMensMorrisBaseScene::start_engine() {
     assert(!m_engine);
 
     m_engine = std::make_unique<GbgpEngine>();
+#ifndef SM_BUILD_DISTRIBUTION
     m_engine->set_log_output(true, "nine_mens_morris_engine.log");
+#endif
 
     try {
         m_engine->initialize(ctx.path_assets("engines/muhle_intelligence").string());
+#ifndef SM_BUILD_DISTRIBUTION
         m_engine->set_debug(true);
+#endif
         m_engine->new_game();
         m_engine->synchronize();
     } catch (const EngineError& e) {

@@ -65,6 +65,7 @@ public:
     void set_info_callback(std::function<void(const Info&)>&& info_callback);
     void set_log_output(bool enable, const std::string& file_path);
     const std::string& get_name() const { return m_name; }
+    const std::string& get_author() const { return m_author; }
     const std::vector<Option>& get_options() const { return m_options; }
 protected:
     static std::vector<std::string> parse_message(const std::string& message);
@@ -81,6 +82,7 @@ protected:
     std::function<void(const Info&)> m_info_callback;
     std::ofstream m_log_output_stream;
     std::string m_name;
+    std::string m_author;
     std::vector<Option> m_options;
 };
 

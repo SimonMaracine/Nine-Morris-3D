@@ -318,6 +318,23 @@ void Ui::main_menu_bar(sm::Ctx& ctx, GameScene& game_scene) {
 
             ImGui::EndMenu();
         }
+        if (ImGui::BeginMenu("Engine")) {
+            if (ImGui::BeginMenu("Name", static_cast<bool>(game_scene.get_engine()))) {
+                ImGui::Text("%s", game_scene.get_engine()->get_name().c_str());
+
+                ImGui::EndMenu();
+            }
+            if (ImGui::BeginMenu("Author", static_cast<bool>(game_scene.get_engine()))) {
+                ImGui::Text("%s", game_scene.get_engine()->get_author().c_str());
+
+                ImGui::EndMenu();
+            }
+            if (ImGui::MenuItem("Restart", nullptr, nullptr, !game_scene.get_engine())) {
+                game_scene.start_engine();
+            }
+
+            ImGui::EndMenu();
+        }
         if (ImGui::BeginMenu("Help")) {
             if (ImGui::MenuItem("About")) {
                 m_current_popup_window = PopupWindow::About;
@@ -357,7 +374,7 @@ void Ui::game_window(GameScene& game_scene) {
 
 void Ui::game_window_before_game(GameScene& game_scene) {
     // The engine may be down, so don't allow play
-    ImGui::BeginDisabled(game_scene.get_game_options().game_type == GameTypeLocalHumanVsComputer && !game_scene.is_engine_alive());
+    ImGui::BeginDisabled(game_scene.get_game_options().game_type == GameTypeLocalHumanVsComputer && !game_scene.get_engine());
 
     if (ImGui::Button("Start Game")) {
         game_scene.get_game_state() = GameState::Start;
@@ -489,7 +506,8 @@ void Ui::game_options_window(GameScene& game_scene) {
 
 void Ui::engine_error_window() {
     generic_window("Engine Error", []() {
-        ImGui::Text("There was an error with the engine. It has probably crashed. You may want to restart it.");
+        ImGui::Text("There was an error with the engine. It has probably crashed.");
+        ImGui::Text("You may want to restart it.");
     });
 }
 

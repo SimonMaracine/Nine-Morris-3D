@@ -65,20 +65,21 @@ public:
     GameOptions& get_game_options() { return m_game_options; }
     const Clock& get_clock() const { return m_clock; }
     const MoveList& get_move_list() const { return m_move_list; }
+    const std::unique_ptr<Engine>& get_engine() const { return m_engine; }
     bool& get_draw_offered_by_remote() { return m_draw_offered_by_remote; }
-    bool is_engine_alive() const { return static_cast<bool>(m_engine); }
 
     virtual void reload_scene_texture_data() const = 0;
     virtual void reload_and_set_scene_textures() = 0;
     void reload_and_set_skybox();
     void reload_and_set_textures();
+
+    virtual void start_engine() = 0;
 protected:
     void on_window_resized(const sm::WindowResizedEvent& event);
     void on_key_released(const sm::KeyReleasedEvent& event);
     void on_mouse_button_pressed(const sm::MouseButtonPressedEvent& event);
     void on_mouse_button_released(const sm::MouseButtonReleasedEvent& event);
 
-    virtual void start_engine() = 0;
     void stop_engine();
     void engine_error(const EngineError& e);
     void assert_engine_game_over();
