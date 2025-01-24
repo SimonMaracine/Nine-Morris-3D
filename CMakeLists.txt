@@ -42,6 +42,7 @@ endfunction()
 include(cmake/cereal.cmake)
 
 add_subdirectory(extern/boost EXCLUDE_FROM_ALL)
+add_subdirectory(extern/spdlog)
 
 add_subdirectory(networking)
 

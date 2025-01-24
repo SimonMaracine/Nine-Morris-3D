@@ -13,7 +13,7 @@ include(cmake/stb.cmake)
 add_subdirectory(extern/entt)
 add_subdirectory(extern/glm)
 add_subdirectory(extern/resmanager)
-add_subdirectory(extern/spdlog)
+# add_subdirectory(extern/spdlog)
 add_subdirectory(extern/utfcpp)
 
 add_library(nine_morris_3d_engine STATIC
