@@ -4,7 +4,6 @@ cmake_minimum_required(VERSION 3.20)
 set(BUILD_SHARED_LIBS OFF)
 
 include(cmake/assimp.cmake)
-include(cmake/cereal.cmake)
 include(cmake/dear_imgui.cmake)
 include(cmake/glad.cmake)
 include(cmake/glfw.cmake)
@@ -143,19 +142,8 @@ target_link_libraries(nine_morris_3d_engine PUBLIC
     spdlog
 )
 
-if(UNIX)
-    target_compile_options(nine_morris_3d_engine PRIVATE "-Wall" "-Wextra" "-Wpedantic" "-Wconversion")
-elseif(WIN32)
-    target_compile_options(nine_morris_3d_engine PRIVATE "/W4")
-endif()
-
-# Enable sanitizing in debug mode for GCC
-if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-    if(UNIX AND NM3D_ASAN)
-        target_compile_options(nine_morris_3d_engine PRIVATE "-fsanitize=address" "-fsanitize=undefined" "-g" "-fno-omit-frame-pointer")
-        target_link_options(nine_morris_3d_engine PRIVATE "-fsanitize=address" "-fsanitize=undefined")
-    endif()
-endif()
+enable_warnings(nine_morris_3d_engine)
+enable_sanitizers_debug_linux(nine_morris_3d_engine)
 
 # Use UTF-8 encoding on Windows
 if(WIN32)

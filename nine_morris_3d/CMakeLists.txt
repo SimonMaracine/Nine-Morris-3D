@@ -16,19 +16,8 @@ target_include_directories(NineMorris3D PRIVATE "src")
 
 target_link_libraries(NineMorris3D PRIVATE nine_morris_3d_engine Boost::process)
 
-if(UNIX)
-    target_compile_options(NineMorris3D PRIVATE "-Wall" "-Wextra" "-Wpedantic" "-Wconversion")
-elseif(WIN32)
-    target_compile_options(NineMorris3D PRIVATE "/W4")
-endif()
-
-# Enable sanitizing in debug mode for GCC
-if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-    if(UNIX AND NM3D_ASAN)
-        target_compile_options(NineMorris3D PRIVATE "-fsanitize=address" "-fsanitize=undefined" "-g" "-fno-omit-frame-pointer")
-        target_link_options(NineMorris3D PRIVATE "-fsanitize=address" "-fsanitize=undefined")
-    endif()
-endif()
+enable_warnings(NineMorris3D)
+enable_sanitizers_debug_linux(NineMorris3D)
 
 # On Windows set Visual Studio working directory
 set_property(TARGET NineMorris3D PROPERTY VS_DEBUGGER_WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}")

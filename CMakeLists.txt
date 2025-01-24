@@ -21,7 +21,29 @@ if(NM3D_DISTRIBUTION_MODE AND NOT CMAKE_BUILD_TYPE STREQUAL "Release")
     message(FATAL_ERROR "Nine-Morris-3D: Distribution mode is incompatible with debug mode")
 endif()
 
+function(enable_warnings target)
+    if(UNIX)
+        target_compile_options(${target} PRIVATE "-Wall" "-Wextra" "-Wpedantic" "-Wconversion")
+    elseif(WIN32)
+        target_compile_options(${target} PRIVATE "/W4")
+    endif()
+endfunction()
+
+function(enable_sanitizers_debug_linux target)
+    # Enable sanitizing in debug mode for GCC
+    if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+        if(UNIX AND NM3D_ASAN)
+            target_compile_options(${target} PRIVATE "-fsanitize=address" "-fsanitize=undefined" "-g" "-fno-omit-frame-pointer")
+            target_link_options(${target} PRIVATE "-fsanitize=address" "-fsanitize=undefined")
+        endif()
+    endif()
+endfunction()
+
+include(cmake/cereal.cmake)
+
 add_subdirectory(extern/boost EXCLUDE_FROM_ALL)
+
+add_subdirectory(networking)
 
 # Build the engine
 add_subdirectory(nine_morris_3d_engine)

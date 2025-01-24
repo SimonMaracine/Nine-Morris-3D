@@ -1,6 +1,6 @@
 #include "clock.hpp"
 
-#include <cmath>
+#include <cstdlib>
 
 void Clock::reset(unsigned int time) {
     m_running = false;
