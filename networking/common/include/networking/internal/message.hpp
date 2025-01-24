@@ -5,6 +5,10 @@
 #include <type_traits>
 #include <memory>
 #include <limits>
+#include <sstream>
+
+#include <cereal/cereal.hpp>
+#include <cereal/archives/binary.hpp>
 
 namespace networking::internal {
     class Message;
@@ -23,7 +27,7 @@ namespace networking::internal {
         std::unique_ptr<unsigned char[]> payload;
     };
 
-    BasicMessage basic_message(Message&& message);
+    BasicMessage basic_message(Message&& message) noexcept;
 
     // Class representing a message, a blob of data
     // Messages can only contain data from trivially copyable types
@@ -45,10 +49,31 @@ namespace networking::internal {
 
         // Get the message ID
         std::uint16_t id() const noexcept;
+
+        template<typename Payload>
+        void write(const Payload& payload) {
+            std::ostringstream stream;
+
+            cereal::BinaryOutputArchive archive {stream};
+            archive(payload);
+
+            allocate_payload(stream.str());
+        }
+
+        template<typename Payload>
+        void read(Payload& payload) const {
+            std::ostringstream stream;
+            stream.write(reinterpret_cast<char*>(m_payload.get()), m_header.payload_size);
+
+            cereal::BinaryInputArchive archive {stream};
+            archive(payload);
+        }
     private:
+        void allocate_payload(std::string&& buffer);
+
         MsgHeader m_header;
         std::unique_ptr<unsigned char[]> m_payload;
 
-        friend BasicMessage basic_message(Message&& message);
+        friend BasicMessage basic_message(Message&& message) noexcept;
     };
 }

@@ -4,6 +4,8 @@
 #include <memory>
 #include <functional>
 
+#include <spdlog/spdlog.h>
+
 #include "networking/internal/connection.hpp"
 #include "networking/internal/id.hpp"
 
@@ -19,9 +21,11 @@ namespace networking::internal {
             boost::asio::io_context& context,
             boost::asio::ip::tcp::socket&& tcp_socket,
             SyncQueue<std::pair<Message, std::shared_ptr<ClientConnection>>>& incoming_messages,
-            ClientId client_id
+            ClientId client_id,
+            std::shared_ptr<spdlog::logger> logger
         )
-            : Connection(context, std::move(tcp_socket)), m_incoming_messages(incoming_messages), m_client_id(client_id) {}
+            : Connection(context, std::move(tcp_socket)), m_incoming_messages(incoming_messages),
+            m_client_id(client_id), m_logger(logger) {}
 
         // Send a message asynchronously
         void send(const Message& message);
@@ -38,6 +42,7 @@ namespace networking::internal {
         void task_send_message(const Message& message);
 
         SyncQueue<std::pair<Message, std::shared_ptr<ClientConnection>>>& m_incoming_messages;
+        std::shared_ptr<spdlog::logger> m_logger;
         ClientId m_client_id {};  // Given by the server
         bool m_used {false};  // Set to true after using the connection and calling on_client_disconnected()
 

@@ -7,9 +7,6 @@
 [submodule "nine_morris_3d_engine/extern/glm"]
 	path = nine_morris_3d_engine/extern/glm
 	url = https://github.com/SimonMaracine/glm.git
-[submodule "nine_morris_3d_engine/extern/spdlog"]
-	path = nine_morris_3d_engine/extern/spdlog
-	url = https://github.com/SimonMaracine/spdlog.git
 [submodule "nine_morris_3d_engine/extern/utfcpp"]
 	path = nine_morris_3d_engine/extern/utfcpp
 	url = https://github.com/SimonMaracine/utfcpp.git
@@ -29,3 +26,6 @@
 [submodule "extern/boost"]
 	path = extern/boost
 	url = https://github.com/boostorg/boost
+[submodule "extern/spdlog"]
+	path = extern/spdlog
+	url = https://github.com/SimonMaracine/spdlog

@@ -3,9 +3,18 @@
 #include <stdexcept>
 #include <cassert>
 
-using namespace std::string_literals;
+#include <spdlog/sinks/stdout_color_sinks.h>
 
 namespace networking {
+    Server::Server(
+        std::function<void(Server&, std::shared_ptr<ClientConnection>)> on_client_connected,
+        std::function<void(Server&, std::shared_ptr<ClientConnection>)> on_client_disconnected
+    )
+        : m_acceptor(m_context), m_on_client_connected(std::move(on_client_connected)),
+        m_on_client_disconnected(std::move(on_client_disconnected)) {
+        initialize_logging();
+    }
+
     Server::~Server() {
         stop();
     }
@@ -24,7 +33,7 @@ namespace networking {
             m_acceptor.bind(endpoint);
             m_acceptor.listen();
         } catch (const std::system_error& e) {
-            m_on_log("Unexpected error: "s + e.what());
+            m_logger->critical("Unexpected error: {}", e.what());
             throw ConnectionError(e.what());
         }
 
@@ -36,15 +45,15 @@ namespace networking {
             try {
                 m_context.run();
             } catch (const std::system_error& e) {
-                m_on_log("Unexpected error: "s + e.what());
+                m_logger->critical("Unexpected error: {}", e.what());
                 m_error = std::make_exception_ptr(ConnectionError(e.what()));
             } catch (const ConnectionError& e) {
-                m_on_log("Unexpected error: "s + e.what());
+                m_logger->critical("Unexpected error: {}", + e.what());
                 m_error = std::current_exception();
             }
         });
 
-        m_on_log("Server started (port " + std::to_string(port) + ", max " + std::to_string(max_clients) + " clients)");
+        m_logger->info("Server started (port {}, max {} clients)", port, max_clients);
     }
 
     void Server::stop() {
@@ -177,12 +186,11 @@ namespace networking {
         m_acceptor.async_accept(
             [this](boost::system::error_code ec, boost::asio::ip::tcp::socket socket) {
                 if (ec) {
-                    m_on_log("Could not accept new connection: " + ec.message());
+                    m_logger->error("Could not accept new connection: {}", ec.message());
                 } else {
-                    m_on_log(
-                        "Accepted new connection: " +
-                        socket.remote_endpoint().address().to_string() +
-                        ", " +
+                    m_logger->info(
+                        "Accepted new connection: {}, {}",
+                        socket.remote_endpoint().address().to_string(),
                         std::to_string(socket.remote_endpoint().port())
                     );
 
@@ -191,14 +199,15 @@ namespace networking {
                     if (!new_id) {
                         socket.close();
 
-                        m_on_log("Actively rejected connection; ran out of IDs");
+                        m_logger->error("Actively rejected connection: ran out of IDs");
                     } else {
                         m_new_connections.push_back(
                             std::make_shared<ClientConnection>(
                                 m_context,
                                 std::move(socket),
                                 m_incoming_messages,
-                                *new_id
+                                *new_id,
+                                m_logger
                             )
                         );
                     }
@@ -236,5 +245,11 @@ namespace networking {
         connection->m_used = true;
 
         return (iter = m_connections.erase_after(before_iter)) == m_connections.end();
+    }
+
+    void Server::initialize_logging() {
+        m_logger = spdlog::stdout_color_mt("Console");
+        m_logger->set_pattern("%^[%l] [%H:%M:%S]%$ %v");
+        m_logger->set_level(spdlog::level::trace);
     }
 }

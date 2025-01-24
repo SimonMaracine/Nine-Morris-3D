@@ -4,7 +4,7 @@
 #include <cstring>
 
 namespace networking::internal {
-    BasicMessage basic_message(Message&& message) {
+    BasicMessage basic_message(Message&& message) noexcept {
         BasicMessage result;
         result.header = message.m_header;
         result.payload = std::move(message.m_payload);
@@ -45,5 +45,11 @@ namespace networking::internal {
 
     std::uint16_t Message::id() const noexcept {
         return m_header.id;
+    }
+
+    void Message::allocate_payload(std::string&& buffer) {
+        m_payload = std::make_unique<unsigned char[]>(buffer.size());
+        std::memcpy(m_payload.get(), reinterpret_cast<unsigned char*>(buffer.data()), buffer.size());
+        m_header.payload_size = buffer.size();
     }
 }

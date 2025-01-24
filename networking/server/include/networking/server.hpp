@@ -10,6 +10,8 @@
 #include <functional>
 #include <exception>
 
+#include <spdlog/spdlog.h>
+
 #include "networking/internal/client_connection.hpp"
 #include "networking/internal/queue.hpp"
 #include "networking/internal/pool.hpp"
@@ -32,9 +34,7 @@ namespace networking {
         Server(
             std::function<void(Server&, std::shared_ptr<ClientConnection>)> on_client_connected,
             std::function<void(Server&, std::shared_ptr<ClientConnection>)> on_client_disconnected
-        )
-            : m_acceptor(m_context), m_on_client_connected(std::move(on_client_connected)),
-            m_on_client_disconnected(std::move(on_client_disconnected)) {}
+        );
 
         ~Server();
 
@@ -85,6 +85,7 @@ namespace networking {
         void task_accept_connection();
         void maybe_client_disconnected(std::shared_ptr<ClientConnection> connection);
         bool maybe_client_disconnected(std::shared_ptr<ClientConnection> connection, ConnectionsIter& iter, ConnectionsIter before_iter);
+        void initialize_logging();
 
         std::forward_list<std::shared_ptr<ClientConnection>> m_connections;
         internal::SyncQueue<std::shared_ptr<ClientConnection>> m_new_connections;
@@ -99,6 +100,7 @@ namespace networking {
 
         internal::Pool m_pool;
         std::exception_ptr m_error;
+        std::shared_ptr<spdlog::logger> m_logger;
         bool m_running {false};
     };
 }

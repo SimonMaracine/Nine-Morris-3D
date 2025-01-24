@@ -41,7 +41,7 @@ namespace networking::internal {
                 if (ec) {
                     m_tcp_socket.close();
 
-                    throw ConnectionError("Could not write message: " + ec.message());
+                    throw ConnectionError("Could not write header/payload: " + ec.message());
                 }
 
                 assert(bytes_transferred == size);

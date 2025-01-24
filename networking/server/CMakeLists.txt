@@ -12,4 +12,4 @@ add_library(networking_server
 
 target_include_directories(networking_server PUBLIC "include")
 
-target_link_libraries(networking_server PUBLIC networking_common)
+target_link_libraries(networking_server PUBLIC networking_common spdlog)
