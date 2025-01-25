@@ -8,8 +8,8 @@
 
 namespace networking {
     Server::Server(
-        std::function<void(Server&, std::shared_ptr<ClientConnection>)> on_client_connected,
-        std::function<void(Server&, std::shared_ptr<ClientConnection>)> on_client_disconnected
+        std::function<void(std::shared_ptr<ClientConnection>)> on_client_connected,
+        std::function<void(std::shared_ptr<ClientConnection>)> on_client_disconnected
     )
         : m_acceptor(m_context), m_on_client_connected(std::move(on_client_connected)),
         m_on_client_disconnected(std::move(on_client_disconnected)) {
@@ -97,7 +97,7 @@ namespace networking {
         while (!m_new_connections.empty()) {
             const auto connection {m_new_connections.pop_front()};
 
-            m_on_client_connected(*this, connection);
+            m_on_client_connected(connection);
             m_connections.push_front(connection);
             connection->start_communication();
         }
@@ -226,7 +226,7 @@ namespace networking {
             return;
         }
 
-        m_on_client_disconnected(*this, connection);
+        m_on_client_disconnected(connection);
         m_pool.free_id(connection->get_id());
         m_connections.remove(connection);
 
@@ -238,7 +238,7 @@ namespace networking {
             return false;
         }
 
-        m_on_client_disconnected(*this, connection);
+        m_on_client_disconnected(connection);
         m_pool.free_id(connection->get_id());
 
         connection->m_used = true;

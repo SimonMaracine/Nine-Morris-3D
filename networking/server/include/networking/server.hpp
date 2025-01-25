@@ -29,8 +29,8 @@ namespace networking {
     class Server final {
     public:
         Server(
-            std::function<void(Server&, std::shared_ptr<ClientConnection>)> on_client_connected,
-            std::function<void(Server&, std::shared_ptr<ClientConnection>)> on_client_disconnected
+            std::function<void(std::shared_ptr<ClientConnection>)> on_client_connected,
+            std::function<void(std::shared_ptr<ClientConnection>)> on_client_disconnected
         );
 
         ~Server();
@@ -92,8 +92,8 @@ namespace networking {
         boost::asio::io_context m_context;
         boost::asio::ip::tcp::acceptor m_acceptor;
 
-        std::function<void(Server&, std::shared_ptr<ClientConnection>)> m_on_client_connected;
-        std::function<void(Server&, std::shared_ptr<ClientConnection>)> m_on_client_disconnected;
+        std::function<void(std::shared_ptr<ClientConnection>)> m_on_client_connected;
+        std::function<void(std::shared_ptr<ClientConnection>)> m_on_client_disconnected;
 
         internal::Pool m_pool;
         std::exception_ptr m_error;

@@ -26,7 +26,7 @@ namespace networking::internal {
             std::shared_ptr<spdlog::logger> logger
         )
             : Connection(context, std::move(tcp_socket)), m_incoming_messages(incoming_messages),
-            m_client_id(client_id), m_logger(logger) {}
+            m_logger(logger), m_client_id(client_id) {}
 
         // Send a message asynchronously
         void send(const Message& message);
