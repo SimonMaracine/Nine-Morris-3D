@@ -4,6 +4,8 @@
 #include <cstddef>
 #include <cassert>
 
+#include <boost/endian/conversion.hpp>
+
 #include "networking/internal/error.hpp"
 
 namespace networking::internal {
@@ -31,8 +33,12 @@ namespace networking::internal {
     void ClientConnection::task_write_header_payload() {
         assert(!m_outgoing_messages.empty());
 
+        MsgHeader header_to_write {m_outgoing_messages.front().header};
+        boost::endian::native_to_big_inplace(header_to_write.id);
+        boost::endian::native_to_big_inplace(header_to_write.payload_size);
+
         std::vector<boost::asio::const_buffer> buffers;
-        buffers.emplace_back(&m_outgoing_messages.front().header, sizeof(MsgHeader));
+        buffers.emplace_back(&header_to_write, sizeof(MsgHeader));
 
         if (m_outgoing_messages.front().header.payload_size > 0) {
             buffers.emplace_back(m_outgoing_messages.front().payload.get(), m_outgoing_messages.front().header.payload_size);
@@ -72,6 +78,9 @@ namespace networking::internal {
                 }
 
                 assert(bytes_transferred == sizeof(MsgHeader));
+
+                boost::endian::big_to_native_inplace(m_incoming_message.header.id);
+                boost::endian::big_to_native_inplace(m_incoming_message.header.payload_size);
 
                 // Check if there is a payload to read
                 if (m_incoming_message.header.payload_size > 0) {

@@ -3,6 +3,8 @@
 #include <utility>
 #include <atomic>
 
+#include <boost/endian/conversion.hpp>
+
 #include "networking/internal/connection.hpp"
 
 namespace networking {

@@ -26,6 +26,7 @@ def main(args: list[str]) -> int:
         "libs/date_time",
         "libs/describe",
         "libs/detail",
+        "libs/endian",
         "libs/exception",
         "libs/filesystem",  # TODO avoid
         "libs/function",

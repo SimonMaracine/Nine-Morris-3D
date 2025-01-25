@@ -11,7 +11,7 @@ add_library(networking_common
 
 target_include_directories(networking_common PUBLIC "include")
 
-target_link_libraries(networking_common PUBLIC Boost::asio cereal)
+target_link_libraries(networking_common PUBLIC Boost::asio Boost::endian cereal)
 
 target_compile_definitions(networking_common PUBLIC
     "ASIO_NO_DEPRECATED"
