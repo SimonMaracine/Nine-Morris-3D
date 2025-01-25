@@ -18,7 +18,7 @@ namespace networking {
     using Message = internal::Message;
     using ConnectionError = internal::ConnectionError;
 
-    // Base class for the client application
+    // Main class for the client application
     class Client final {
     public:
         Client() = default;

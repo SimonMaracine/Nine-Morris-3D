@@ -30,7 +30,8 @@ namespace networking::internal {
     BasicMessage basic_message(Message&& message) noexcept;
 
     // Class representing a message, a blob of data
-    // Messages can only contain data from trivially copyable types
+    // Message payload can be any data that cereal supports
+    // If the payload is not written into from one side, it should not be read from the other side
     class Message final {
     public:
         Message() noexcept = default;
@@ -44,12 +45,13 @@ namespace networking::internal {
         Message(Message&&) noexcept = default;
         Message& operator=(Message&&) noexcept = default;
 
-        // Get the size of the message, including header and payload
+        // Get the size of the message (including header and payload)
         std::size_t size() const noexcept;
 
-        // Get the message ID
+        // Get the ID of the message
         std::uint16_t id() const noexcept;
 
+        // Write a serializable struct into the payload
         template<typename Payload>
         void write(const Payload& payload) {
             std::ostringstream stream {std::ios_base::binary};
@@ -57,9 +59,10 @@ namespace networking::internal {
             cereal::PortableBinaryOutputArchive archive {stream};
             archive(payload);
 
-            allocate_payload(stream.str());
+            write_payload(stream.str());
         }
 
+        // Read a serializable struct from the payload
         template<typename Payload>
         void read(Payload& payload) const {
             std::ostringstream stream {std::ios_base::binary};
@@ -69,7 +72,7 @@ namespace networking::internal {
             archive(payload);
         }
     private:
-        void allocate_payload(std::string&& buffer);
+        void write_payload(std::string&& buffer);
 
         MsgHeader m_header;
         std::unique_ptr<unsigned char[]> m_payload;

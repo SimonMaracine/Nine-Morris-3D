@@ -4,6 +4,7 @@
 #include <string>
 
 namespace networking::internal {
+    // Error thrown for any generic connection problem
     struct ConnectionError : public std::runtime_error {
         explicit ConnectionError(const std::string& message)
             : std::runtime_error(message) {}

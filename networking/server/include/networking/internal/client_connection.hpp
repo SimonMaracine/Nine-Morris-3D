@@ -14,7 +14,8 @@ namespace networking {
 }
 
 namespace networking::internal {
-    // Owner of this is the server
+    // Object representing a connection to a client
+    // Should be managed by a smart pointer
     class ClientConnection final : public Connection, public std::enable_shared_from_this<ClientConnection> {
     public:
         ClientConnection(
@@ -30,7 +31,7 @@ namespace networking::internal {
         // Send a message asynchronously
         void send(const Message& message);
 
-        // Get the unique ID of this client
+        // Get the ID of the client
         ClientId get_id() const noexcept;
     private:
         void start_communication();

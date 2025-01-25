@@ -5,7 +5,6 @@
 #include <thread>
 #include <forward_list>
 #include <limits>
-#include <string>
 #include <utility>
 #include <functional>
 #include <exception>
@@ -24,13 +23,11 @@ namespace networking {
     using ClientConnection = internal::ClientConnection;
     using Message = internal::Message;
     using ConnectionError = internal::ConnectionError;
+    using ClientId = internal::ClientId;
 
-    // Base class for the server program
+    // Main class for the server program
     class Server final {
     public:
-        // Default capacity of clients
-        static constexpr std::uint32_t MAX_CLIENTS {std::numeric_limits<std::uint16_t>::max()};
-
         Server(
             std::function<void(Server&, std::shared_ptr<ClientConnection>)> on_client_connected,
             std::function<void(Server&, std::shared_ptr<ClientConnection>)> on_client_disconnected
@@ -47,7 +44,7 @@ namespace networking {
         // You may call this only once in the beginning or after calling stop()
         // Specify the port number on which to listen and the maximum amount of clients allowed
         // Throws connection errors
-        void start(std::uint16_t port, std::uint32_t max_clients = MAX_CLIENTS);
+        void start(std::uint16_t port, std::uint32_t max_clients = std::numeric_limits<std::uint16_t>::max());
 
         // Disconnect from all the clients and stop the internal event loop
         // You may call this at any time
@@ -55,7 +52,7 @@ namespace networking {
         // It is automatically called in the destructor
         void stop();
 
-        // Accepting new connections; you must call this regularly
+        // Accept new connections; you must call this regularly
         // Invokes on_client_connected() when needed
         // Throws connection errors
         void accept_connections();

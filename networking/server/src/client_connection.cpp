@@ -82,7 +82,7 @@ namespace networking::internal {
                 boost::endian::big_to_native_inplace(m_incoming_message.header.id);
                 boost::endian::big_to_native_inplace(m_incoming_message.header.payload_size);
 
-                // Check if there is a payload to read
+                // A payload may be empty
                 if (m_incoming_message.header.payload_size > 0) {
                     // Allocate space so that we write to it later
                     m_incoming_message.payload = std::make_unique<unsigned char[]>(m_incoming_message.header.payload_size);

@@ -1,6 +1,5 @@
 #include "networking/client.hpp"
 
-#include <string>
 #include <stdexcept>
 #include <utility>
 

@@ -7,7 +7,7 @@
 
 namespace networking::internal {
     template<typename T>
-    class SyncQueue {
+    class SyncQueue final {
     public:
         SyncQueue() = default;
         ~SyncQueue() = default;

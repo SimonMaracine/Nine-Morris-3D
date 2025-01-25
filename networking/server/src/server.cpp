@@ -1,5 +1,6 @@
 #include "networking/server.hpp"
 
+#include <string>
 #include <stdexcept>
 #include <cassert>
 
@@ -84,16 +85,14 @@ namespace networking {
         }
 
         m_connections.clear();
-
         m_new_connections.clear();
-
         m_incoming_messages.clear();
     }
 
     void Server::accept_connections() {
         throw_if_error();
 
-        // This function may only pop m_connections and the accepting thread may only push m_connections
+        // This function may only pop m_new_connections and the accepting thread may only push m_new_connections
 
         while (!m_new_connections.empty()) {
             const auto connection {m_new_connections.pop_front()};
@@ -181,7 +180,7 @@ namespace networking {
     }
 
     void Server::task_accept_connection() {
-        // In this thread IDs are allocated, but in the main thread they are freed
+        // IDs are allocated in this thread, but they are freed in the main thread
 
         m_acceptor.async_accept(
             [this](boost::system::error_code ec, boost::asio::ip::tcp::socket socket) {

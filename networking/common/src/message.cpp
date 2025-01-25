@@ -47,7 +47,7 @@ namespace networking::internal {
         return m_header.id;
     }
 
-    void Message::allocate_payload(std::string&& buffer) {
+    void Message::write_payload(std::string&& buffer) {
         m_payload = std::make_unique<unsigned char[]>(buffer.size());
         std::memcpy(m_payload.get(), reinterpret_cast<unsigned char*>(buffer.data()), buffer.size());
         m_header.payload_size = buffer.size();

@@ -12,7 +12,8 @@ namespace networking {
 }
 
 namespace networking::internal {
-    // Owner of this is the client
+    // Object representing a connection to a server
+    // Should be managed by a smart pointer
     class ServerConnection final : public Connection {
     public:
         ServerConnection(
@@ -38,7 +39,7 @@ namespace networking::internal {
         void task_connect_to_server();
 
         SyncQueue<Message>& m_incoming_messages;
-        std::atomic_bool m_established_connection {false};
+        std::atomic_bool m_established_connection {false};  // Set to true once when the connection is established
         boost::asio::ip::tcp::resolver::results_type m_endpoints;
 
         friend class ::networking::Client;
