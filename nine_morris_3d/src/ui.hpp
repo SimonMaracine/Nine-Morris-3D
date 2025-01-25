@@ -2,6 +2,7 @@
 
 #include <string>
 #include <functional>
+#include <deque>
 
 #include <nine_morris_3d_engine/nine_morris_3d.hpp>
 
@@ -15,17 +16,18 @@ enum class PopupWindow {
     GameOver,
     GameOptions,
     EngineError,
+    ConnectionError,
     RulesNineMensMorris
 };
 
 class Ui {
 public:
-    void set_popup_window(PopupWindow window) { m_current_popup_window = window; }
-    void set_loading_skybox_done() { m_loading_skybox = false; }
 
     void initialize(sm::Ctx& ctx);
     void update(sm::Ctx& ctx, GameScene& game_scene);
+    void push_popup_window(PopupWindow window);
 
+    void set_loading_skybox_done() { m_loading_skybox = false; }
     bool get_show_information() const { return m_show_information; }
 private:
     void main_menu_bar(sm::Ctx& ctx, GameScene& game_scene);
@@ -36,6 +38,7 @@ private:
     void game_over_window(GameScene& game_scene);
     void game_options_window(GameScene& game_scene);
     void engine_error_window();
+    void connection_error_window();
     void rules_nine_mens_morris_window();
     void wrapped_text_window(const char* title, const char* text);
     void generic_window(const char* title, std::function<void()>&& contents, std::function<void()>&& on_ok = []() {});
@@ -49,11 +52,13 @@ private:
     static void set_style();
     static float rem(float size);
 
+    // Multiple modal windows may request attention at a time; put them in a queue
+    std::deque<PopupWindow> m_popup_window_queue;
+
     // Local options data
     // When changed, update the options from the global data
     Options m_options;
 
-    PopupWindow m_current_popup_window {PopupWindow::None};
     bool m_loading_skybox {false};  // This is needed, because selecting a skybox doesn't close the interface
     bool m_show_information {false};
 };

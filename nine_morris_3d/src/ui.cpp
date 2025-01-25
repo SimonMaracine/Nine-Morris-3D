@@ -70,7 +70,7 @@ void Ui::update(sm::Ctx& ctx, GameScene& game_scene) {
     main_menu_bar(ctx, game_scene);
     game_window(game_scene);
 
-    switch (m_current_popup_window) {
+    switch (m_popup_window_queue.front()) {
         case PopupWindow::None:
             break;
         case PopupWindow::About:
@@ -85,10 +85,17 @@ void Ui::update(sm::Ctx& ctx, GameScene& game_scene) {
         case PopupWindow::EngineError:
             engine_error_window();
             break;
+        case PopupWindow::ConnectionError:
+            connection_error_window();
+            break;
         case PopupWindow::RulesNineMensMorris:
             rules_nine_mens_morris_window();
             break;
     }
+}
+
+void Ui::push_popup_window(PopupWindow window) {
+    m_popup_window_queue.push_back(window);
 }
 
 void Ui::main_menu_bar(sm::Ctx& ctx, GameScene& game_scene) {
@@ -109,7 +116,7 @@ void Ui::main_menu_bar(sm::Ctx& ctx, GameScene& game_scene) {
                 // TODO
             }
             if (ImGui::MenuItem("Game Options")) {
-                m_current_popup_window = PopupWindow::GameOptions;
+                m_popup_window_queue.push_back(PopupWindow::GameOptions);
             }
             if (ImGui::BeginMenu("Game Mode")) {
                 if (ImGui::RadioButton("Nine Men's Morris", &m_options.game_mode, GameModeNineMensMorris)) {
@@ -337,11 +344,11 @@ void Ui::main_menu_bar(sm::Ctx& ctx, GameScene& game_scene) {
         }
         if (ImGui::BeginMenu("Help")) {
             if (ImGui::MenuItem("About")) {
-                m_current_popup_window = PopupWindow::About;
+                m_popup_window_queue.push_back(PopupWindow::About);
             }
             if (ImGui::BeginMenu("Game Rules")) {
                 if (ImGui::MenuItem("Nine Men's Morris")) {
-                    m_current_popup_window = PopupWindow::RulesNineMensMorris;
+                    m_popup_window_queue.push_back(PopupWindow::RulesNineMensMorris);
                 }
 
                 ImGui::EndMenu();
@@ -506,8 +513,15 @@ void Ui::game_options_window(GameScene& game_scene) {
 
 void Ui::engine_error_window() {
     generic_window("Engine Error", []() {
-        ImGui::Text("There was an error with the engine. It has probably crashed.");
+        ImGui::Text("An error occurred with the engine. It has probably crashed.");
         ImGui::Text("You may want to restart it.");
+    });
+}
+
+void Ui::connection_error_window() {
+    generic_window("Connection Error", []() {
+        ImGui::Text("An error occurred with the connection to the server.");
+        ImGui::Text("You may want to reconnect.");
     });
 }
 
@@ -555,7 +569,7 @@ void Ui::generic_window(const char* title, std::function<void()>&& contents, std
 
         if (ImGui::Button("Ok", ImVec2(ok_button_width, 0.0f))) {
             ImGui::CloseCurrentPopup();
-            m_current_popup_window = PopupWindow::None;
+            m_popup_window_queue.pop_front();
 
             on_ok();
         }
@@ -575,7 +589,7 @@ void Ui::set_scale(sm::Ctx& ctx, int scale) {
 }
 
 void Ui::set_scale_task(sm::Ctx& ctx, int scale) {
-    ctx.add_task([&ctx, scale](const sm::Task&, void*) {
+    ctx.add_task([&ctx, scale]() {
         set_scale(ctx, scale);
 
         return sm::Task::Result::Done;
@@ -583,7 +597,7 @@ void Ui::set_scale_task(sm::Ctx& ctx, int scale) {
 }
 
 void Ui::set_anti_aliasing_task(sm::Ctx& ctx, int samples) {
-    ctx.add_task([&ctx, samples](const sm::Task&, void*) {
+    ctx.add_task([&ctx, samples]() {
         ctx.set_renderer_samples(samples);
 
         return sm::Task::Result::Done;
@@ -591,7 +605,7 @@ void Ui::set_anti_aliasing_task(sm::Ctx& ctx, int samples) {
 }
 
 void Ui::set_shadow_quality_task(sm::Ctx& ctx, int size) {
-    ctx.add_task([&ctx, size](const sm::Task&, void*) {
+    ctx.add_task([&ctx, size]() {
         ctx.set_renderer_shadow_map_size(size);
 
         return sm::Task::Result::Done;
@@ -599,7 +613,7 @@ void Ui::set_shadow_quality_task(sm::Ctx& ctx, int size) {
 }
 
 void Ui::set_anisotropic_filtering_task(sm::Ctx& ctx, GameScene& game_scene) {
-    ctx.add_task([&game_scene](const sm::Task&, void*) {
+    ctx.add_task([&game_scene]() {
         game_scene.reload_and_set_scene_textures();
 
         return sm::Task::Result::Done;

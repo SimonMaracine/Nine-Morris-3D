@@ -4,6 +4,7 @@
 #include <memory>
 
 #include <nine_morris_3d_engine/nine_morris_3d.hpp>
+#include <networking/client.hpp>
 
 #include "engines/engine.hpp"
 #include "game/board.hpp"
@@ -23,6 +24,12 @@ enum class GameState {
     FinishTurn,
     Stop,
     Over
+};
+
+enum class ConnectionState {
+    Disconnected,
+    Connecting,
+    Connected
 };
 
 // Type of player
@@ -92,6 +99,11 @@ protected:
     void reload_skybox_texture_data() const;
     std::shared_ptr<sm::GlTextureCubemap> load_skybox_texture_cubemap(bool reload = false) const;
 
+    void connection_error(const networking::ConnectionError& e);
+    void update_connection_state();
+    void handle_message(const networking::Message& message);
+    void client_ping();
+
     sm::Camera m_camera;
     sm::Camera2D m_camera_2d;
     sm::DirectionalLight m_directional_light;
@@ -103,9 +115,11 @@ protected:
 
     bool m_draw_offered_by_remote {false};
     GameState m_game_state {GameState::Ready};
+    ConnectionState m_connection_state {ConnectionState::Disconnected};
     glm::vec3 m_default_camera_position {};
     GameOptions m_game_options;
     Clock m_clock;
     MoveList m_move_list;
     std::unique_ptr<Engine> m_engine;
+    networking::Client m_client;
 };

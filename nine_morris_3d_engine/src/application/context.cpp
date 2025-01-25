@@ -174,12 +174,12 @@ namespace sm {
         m_mus.set_gain(gain);
     }
 
-    void Ctx::add_task(const Task::TaskFunction& function, void* user_data) {
-        m_tsk.add(function, user_data);
+    void Ctx::add_task(const Task::TaskFunction& function, double delay) {
+        m_tsk.add(function, delay);
     }
 
-    void Ctx::add_task_async(const AsyncTask::TaskFunction& function, void* user_data) {
-        m_tsk.add_async(function, user_data);
+    void Ctx::add_task_async(const AsyncTask::TaskFunction& function) {
+        m_tsk.add_async(function);
     }
 
     bool Ctx::is_key_pressed(Key key) const noexcept {

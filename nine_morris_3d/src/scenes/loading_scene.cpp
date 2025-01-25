@@ -5,7 +5,7 @@
 #include "global.hpp"
 
 void LoadingScene::on_start() {
-    ctx.add_task_async([this](sm::AsyncTask& task, void*) {
+    ctx.add_task_async([this](sm::AsyncTask& task) {
         try {
             load_assets();
         } catch (const sm::RuntimeError&) {
@@ -111,7 +111,7 @@ void LoadingScene::load_assets() {
         ctx.load_texture_data(ctx.path_assets("textures/piece/piece_normal.png"), post_processing);
     }
 
-    ctx.add_task([this](const sm::Task&, void*) {
+    ctx.add_task([this]() {
         m_done = true;
         return sm::Task::Result::Done;
     });

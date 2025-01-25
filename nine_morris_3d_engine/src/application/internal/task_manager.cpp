@@ -8,16 +8,16 @@
 #include "nine_morris_3d_engine/application/logging.hpp"
 
 namespace sm::internal {
-    void TaskManager::add(const Task::TaskFunction& function, void* user_data) {
+    void TaskManager::add(const Task::TaskFunction& function, double delay) {
         std::lock_guard lock {m_mutex};
 
-        m_tasks_active.emplace_back(function, user_data);
+        m_tasks_active.emplace_back(function, Window::get_time(), delay);
     }
 
-    void TaskManager::add_async(const AsyncTask::TaskFunction& function, void* user_data) {
+    void TaskManager::add_async(const AsyncTask::TaskFunction& function) {
         std::lock_guard lock {m_async_mutex};
 
-        m_async_tasks.push_back(std::make_unique<AsyncTask>(function, user_data));
+        m_async_tasks.push_back(std::make_unique<AsyncTask>(function));
     }
 
     void TaskManager::update() {
@@ -58,18 +58,20 @@ namespace sm::internal {
 
     void TaskManager::update_tasks() {
         for (Task& task : m_tasks_active) {
-            if (task.m_start_time == 0.0) {
-                task.m_start_time = Window::get_time();
-            } else {
-                task.m_total_time = Window::get_time() - task.m_start_time;
+            const double time_now {Window::get_time()};
+
+            if (task.m_delay > 0.0) {
+                if (time_now - task.m_last_time < task.m_delay) {
+                    task.m_last_time = time_now;
+                    continue;
+                }
             }
 
-            const Task::Result result {task.m_function(task, task.m_user_data)};
-
-            switch (result) {
+            switch (task.m_function()) {
                 case Task::Result::Done:
                     break;
                 case Task::Result::Repeat:
+                    task.m_last_time = time_now;
                     m_tasks_next.push_back(task);
                     break;
             }

@@ -146,7 +146,7 @@ void NineMensMorrisBaseScene::timeout(PlayerColor color) {
             break;
     }
 
-    m_ui.set_popup_window(PopupWindow::GameOver);
+    m_ui.push_popup_window(PopupWindow::GameOver);
     m_game_state = GameState::Stop;
 }
 
@@ -160,14 +160,14 @@ void NineMensMorrisBaseScene::resign(PlayerColor color) {
             break;
     }
 
-    m_ui.set_popup_window(PopupWindow::GameOver);
+    m_ui.push_popup_window(PopupWindow::GameOver);
     m_game_state = GameState::Stop;
 }
 
 void NineMensMorrisBaseScene::accept_draw_offer() {
     m_board.accept_draw_offer();
 
-    m_ui.set_popup_window(PopupWindow::GameOver);
+    m_ui.push_popup_window(PopupWindow::GameOver);
     m_game_state = GameState::Stop;
 }
 

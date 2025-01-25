@@ -126,8 +126,8 @@ namespace sm {
         void set_music_gain(float gain) noexcept;
 
         // Task manager
-        void add_task(const Task::TaskFunction& function, void* user_data = nullptr);
-        void add_task_async(const AsyncTask::TaskFunction& function, void* user_data = nullptr);
+        void add_task(const Task::TaskFunction& function, double delay = 0.0);
+        void add_task_async(const AsyncTask::TaskFunction& function);
 
         // Input
         bool is_key_pressed(Key key) const noexcept;

@@ -1,6 +1,7 @@
 #include "scenes/game_scene.hpp"
 
 #include <nine_morris_3d_engine/external/resmanager.h++>
+#include <protocol.hpp>
 
 #include "global.hpp"
 
@@ -21,6 +22,22 @@ void GameScene::on_start() {
     scene_setup();
 
     start_engine();
+
+    ctx.add_task([this]() {  // FIXME
+        if (m_connection_state == ConnectionState::Connected) {
+            client_ping();
+        }
+
+        LOG_DEBUG("ABC");
+
+        return sm::Task::Result::Repeat;
+    }, 3.0);
+
+    try {
+        m_client.connect("localhost", 7915);
+    } catch (const networking::ConnectionError& e) {
+        connection_error(e);
+    }
 }
 
 void GameScene::on_stop() {
@@ -69,6 +86,8 @@ void GameScene::on_update() {
 
     // This needs to be called after all scene is updated
     ctx.shadow(m_shadow_box);
+
+    update_connection_state();
 }
 
 void GameScene::on_fixed_update() {
@@ -84,7 +103,7 @@ void GameScene::on_imgui_update() {
 }
 
 void GameScene::reload_and_set_skybox() {
-    ctx.add_task_async([this](sm::AsyncTask& task, void*) {
+    ctx.add_task_async([this](sm::AsyncTask& task) {
         try {
             reload_skybox_texture_data();
         } catch (const sm::RuntimeError&) {
@@ -92,7 +111,7 @@ void GameScene::reload_and_set_skybox() {
             return;
         }
 
-        ctx.add_task([this](const sm::Task&, void*) {
+        ctx.add_task([this]() {
             setup_skybox(true);
             setup_lights();
             m_ui.set_loading_skybox_done();
@@ -105,7 +124,7 @@ void GameScene::reload_and_set_skybox() {
 }
 
 void GameScene::reload_and_set_textures() {
-    ctx.add_task_async([this](sm::AsyncTask& task, void*) {
+    ctx.add_task_async([this](sm::AsyncTask& task) {
         try {
             reload_skybox_texture_data();
             reload_scene_texture_data();
@@ -114,7 +133,7 @@ void GameScene::reload_and_set_textures() {
             return;
         }
 
-        ctx.add_task([this](const sm::Task&, void*) {
+        ctx.add_task([this]() {
             setup_skybox(true);
             reload_and_set_scene_textures();
 
@@ -199,7 +218,7 @@ void GameScene::assert_engine_game_over() {
 void GameScene::engine_error(const EngineError& e) {
     LOG_DIST_ERROR("Engine error: {}", e.what());
     m_engine.reset();
-    m_ui.set_popup_window(PopupWindow::EngineError);
+    m_ui.push_popup_window(PopupWindow::EngineError);
 }
 
 void GameScene::update_game_state() {
@@ -278,7 +297,7 @@ void GameScene::update_game_state() {
 
                 if (get_board().get_game_over() != GameOver::None) {
                     assert_engine_game_over();
-                    m_ui.set_popup_window(PopupWindow::GameOver);
+                    m_ui.push_popup_window(PopupWindow::GameOver);
                     m_game_state = GameState::Stop;
                 } else {
                     m_game_state = GameState::NextTurn;
@@ -426,4 +445,51 @@ std::shared_ptr<sm::GlTextureCubemap> GameScene::load_skybox_texture_cubemap(boo
     }
 
     return {};
+}
+
+void GameScene::connection_error(const networking::ConnectionError& e) {
+    LOG_DIST_ERROR("Connection error: {}", e.what());
+    m_connection_state = ConnectionState::Disconnected;
+    m_ui.push_popup_window(PopupWindow::ConnectionError);
+}
+
+void GameScene::update_connection_state() {
+    switch (m_connection_state) {
+        case ConnectionState::Disconnected:
+            break;
+        case ConnectionState::Connecting:
+            try {
+                if (m_client.connection_established()) {
+                    m_connection_state = ConnectionState::Connected;
+                }
+            } catch (const networking::ConnectionError& e) {
+                connection_error(e);
+            }
+
+            break;
+        case ConnectionState::Connected:
+            try {
+                while (m_client.available_messages()) {
+                    handle_message(m_client.next_message());
+                }
+            } catch (const networking::ConnectionError& e) {
+                connection_error(e);
+            }
+
+            break;
+    }
+}
+
+void GameScene::handle_message(const networking::Message& message) {
+    LOG_DEBUG("MESSAGE {}", message.id());
+
+    switch (message.id()) {
+        case Server_Ping:
+            LOG_DEBUG("Server pinged us!");
+            break;
+    }
+}
+
+void GameScene::client_ping() {
+    m_client.send_message(networking::Message(Client_Ping));
 }

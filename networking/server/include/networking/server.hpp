@@ -70,11 +70,13 @@ namespace networking {
 
         // Send a message to all clients; invokes on_client_disconnected() when needed
         // Throws connection errors
-        void send_message_broadcast(const Message& message);
+        void send_message_all(const Message& message);
 
         // Send a message to all clients except a specific client; invokes on_client_disconnected() when needed
         // Throws connection errors
-        void send_message_broadcast(const Message& message, std::shared_ptr<ClientConnection> exception);
+        void send_message_all(const Message& message, std::shared_ptr<ClientConnection> exception);
+
+        std::shared_ptr<spdlog::logger> get_logger() { return m_logger; }
     private:
         using ConnectionsIter = std::forward_list<std::shared_ptr<ClientConnection>>::iterator;
 

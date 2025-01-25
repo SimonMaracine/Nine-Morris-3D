@@ -11,8 +11,8 @@ namespace sm::internal {
 
     class TaskManager {
     public:
-        void add(const Task::TaskFunction& function, void* user_data = nullptr);
-        void add_async(const AsyncTask::TaskFunction& function, void* user_data = nullptr);
+        void add(const Task::TaskFunction& function, double delay = 0.0);
+        void add_async(const AsyncTask::TaskFunction& function);
 
         void update();
         void wait_async();

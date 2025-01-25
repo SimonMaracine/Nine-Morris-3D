@@ -124,7 +124,7 @@ namespace networking {
         connection->send(message);
     }
 
-    void Server::send_message_broadcast(const Message& message) {
+    void Server::send_message_all(const Message& message) {
         throw_if_error();
 
         for (auto before_iter {m_connections.before_begin()}, iter {m_connections.begin()}; iter != m_connections.end(); before_iter++, iter++) {
@@ -144,7 +144,7 @@ namespace networking {
         }
     }
 
-    void Server::send_message_broadcast(const Message& message, std::shared_ptr<ClientConnection> exception) {
+    void Server::send_message_all(const Message& message, std::shared_ptr<ClientConnection> exception) {
         throw_if_error();
 
         for (auto before_iter {m_connections.before_begin()}, iter {m_connections.begin()}; iter != m_connections.end(); before_iter++, iter++) {

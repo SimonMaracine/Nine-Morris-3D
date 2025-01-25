@@ -20,19 +20,14 @@ namespace sm {
             Repeat
         };
 
-        using TaskFunction = std::function<Result(const Task&, void*)>;
+        using TaskFunction = std::function<Result()>;
 
-        Task(const TaskFunction& function, void* user_data)
-            : m_function(function), m_user_data(user_data) {}
-
-        double get_total_time() const noexcept {
-            return m_total_time;
-        }
+        Task(const TaskFunction& function, double last_time, double delay)
+            : m_function(function), m_last_time(last_time), m_delay(delay) {}
     private:
         TaskFunction m_function;
-        void* m_user_data {};
-        double m_total_time {};
-        double m_start_time {};
+        double m_last_time {};
+        double m_delay {};
 
         friend class internal::TaskManager;
     };
@@ -40,10 +35,10 @@ namespace sm {
     // Long-lived procedure executed on a separate thread, bound to the calling scene
     class AsyncTask {
     public:
-        using TaskFunction = std::function<void(AsyncTask&, void*)>;
+        using TaskFunction = std::function<void(AsyncTask&)>;
 
-        AsyncTask(const TaskFunction& function, void* user_data)
-            : m_thread(function, std::ref(*this), user_data) {}
+        AsyncTask(const TaskFunction& function)
+            : m_thread(function, std::ref(*this)) {}
 
         ~AsyncTask() {
             m_thread.join();
