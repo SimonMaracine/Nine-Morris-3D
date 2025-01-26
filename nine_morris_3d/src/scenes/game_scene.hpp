@@ -94,10 +94,12 @@ protected:
     void reload_skybox_texture_data() const;
     std::shared_ptr<sm::GlTextureCubemap> load_skybox_texture_cubemap(bool reload = false) const;
 
+    void disconnect();
     void connection_error(const networking::ConnectionError& e);
     void update_connection_state();
     void handle_message(const networking::Message& message);
     void client_ping();
+    void server_ping(const networking::Message& message);
 
     sm::Camera m_camera;
     sm::Camera2D m_camera_2d;

@@ -2,12 +2,15 @@
 
 #include <string>
 #include <vector>
+#include <chrono>
 #include <cstdint>
 
 /*
     Client_Ping
+        The client tests if the server is still alive. The server sends back a reply with the same data.
+
     Server_Ping
-        The client and server test if the other party is still alive. The other party doesn't send anything back.
+        The server replies to a client ping.
 
     Client_RequestGameSession
         The client presses the start new game button. It then blocks in a modal window, waiting for the remote to join.
@@ -66,8 +69,8 @@
 */
 
 enum MessageType : std::uint16_t {
-    Client_Ping,  // Client has checked if the server is alive
-    Server_Ping,  // Server has checked if the client is alive
+    Client_Ping,  // Client wanted to know if the server is alive
+    Server_Ping,  // Server has responded back
 
     Client_RequestGameSession,  // Client has pressed the start new game button
     Server_AcceptGameSession,  // Server has accepted and started a new session
@@ -128,9 +131,23 @@ namespace types {
 }
 
 namespace messages {
-    struct Client_Ping {};
+    struct Client_Ping {
+        decltype(std::chrono::system_clock::time_point::duration().count()) time;
 
-    struct Server_Ping {};
+        template<typename Archive>
+        void serialize(Archive& archive) {
+            archive(time);
+        }
+    };
+
+    struct Server_Ping {
+        decltype(std::chrono::system_clock::time_point::duration().count()) time;
+
+        template<typename Archive>
+        void serialize(Archive& archive) {
+            archive(time);
+        }
+    };
 
     struct Client_RequestGameSession {
         std::string player_name;

@@ -23,6 +23,7 @@ namespace networking {
     using ClientConnection = internal::ClientConnection;
     using Message = internal::Message;
     using ConnectionError = internal::ConnectionError;
+    using SerializationError = internal::SerializationError;
     using ClientId = internal::ClientId;
 
     // Main class for the server program
@@ -59,7 +60,7 @@ namespace networking {
 
         // Poll the next incoming message from the queue
         // You may call it in a loop to process as many messages as you want
-        std::pair<Message, std::shared_ptr<ClientConnection>> next_message();
+        std::pair<std::shared_ptr<ClientConnection>, Message> next_message();
 
         // Check if there are available incoming messages
         bool available_messages() const;
@@ -88,7 +89,7 @@ namespace networking {
 
         std::forward_list<std::shared_ptr<ClientConnection>> m_connections;
         internal::SyncQueue<std::shared_ptr<ClientConnection>> m_new_connections;
-        internal::SyncQueue<std::pair<Message, std::shared_ptr<ClientConnection>>> m_incoming_messages;
+        internal::SyncQueue<std::pair<std::shared_ptr<ClientConnection>, Message>> m_incoming_messages;
 
         std::thread m_context_thread;
         boost::asio::io_context m_context;

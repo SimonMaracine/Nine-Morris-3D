@@ -17,6 +17,7 @@ namespace networking {
     using ServerConnection = internal::ServerConnection;
     using Message = internal::Message;
     using ConnectionError = internal::ConnectionError;
+    using SerializationError = internal::SerializationError;
 
     // Main class for the client application
     class Client final {

@@ -10,6 +10,8 @@
 #include <cereal/cereal.hpp>
 #include <cereal/archives/portable_binary.hpp>
 
+#include "networking/internal/error.hpp"
+
 namespace networking::internal {
     class Message;
 
@@ -56,8 +58,12 @@ namespace networking::internal {
         void write(const Payload& payload) {
             std::ostringstream stream {std::ios_base::binary};
 
-            cereal::PortableBinaryOutputArchive archive {stream};
-            archive(payload);
+            try {
+                cereal::PortableBinaryOutputArchive archive {stream};
+                archive(payload);
+            } catch (const cereal::Exception& e) {
+                throw SerializationError(e.what());
+            }
 
             write_payload(stream.str());
         }
@@ -65,11 +71,19 @@ namespace networking::internal {
         // Read a serializable struct from the payload
         template<typename Payload>
         void read(Payload& payload) const {
-            std::ostringstream stream {std::ios_base::binary};
-            stream.write(reinterpret_cast<char*>(m_payload.get()), m_header.payload_size);
+            std::istringstream stream {std::ios_base::binary};
+            stream.str(std::string(reinterpret_cast<char*>(m_payload.get()), m_header.payload_size));
 
-            cereal::PortableBinaryInputArchive archive {stream};
-            archive(payload);
+            if (!stream.good()) {
+                throw SerializationError("Stream is not in a good state");
+            }
+
+            try {
+                cereal::PortableBinaryInputArchive archive {stream.seekg(0, std::ios_base::beg)};
+                archive(payload);
+            } catch (const cereal::Exception& e) {
+                throw SerializationError(e.what());
+            }
         }
     private:
         void write_payload(std::string&& buffer);

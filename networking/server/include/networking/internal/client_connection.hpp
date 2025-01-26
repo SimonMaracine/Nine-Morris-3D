@@ -21,7 +21,7 @@ namespace networking::internal {
         ClientConnection(
             boost::asio::io_context& context,
             boost::asio::ip::tcp::socket&& tcp_socket,
-            SyncQueue<std::pair<Message, std::shared_ptr<ClientConnection>>>& incoming_messages,
+            SyncQueue<std::pair<std::shared_ptr<ClientConnection>, Message>>& incoming_messages,
             ClientId client_id,
             std::shared_ptr<spdlog::logger> logger
         )
@@ -30,6 +30,9 @@ namespace networking::internal {
 
         // Send a message asynchronously
         void send(const Message& message);
+
+        // Close the connection asynchronously
+        void close();
 
         // Get the ID of the client
         ClientId get_id() const noexcept;
@@ -42,7 +45,7 @@ namespace networking::internal {
         void task_read_payload();
         void task_send_message(const Message& message);
 
-        SyncQueue<std::pair<Message, std::shared_ptr<ClientConnection>>>& m_incoming_messages;
+        SyncQueue<std::pair<std::shared_ptr<ClientConnection>, Message>>& m_incoming_messages;
         std::shared_ptr<spdlog::logger> m_logger;
         ClientId m_client_id {};  // Given by the server
         bool m_used {false};  // Set to true after using the connection and calling on_client_disconnected()

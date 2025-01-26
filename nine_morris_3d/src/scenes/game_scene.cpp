@@ -25,7 +25,12 @@ void GameScene::on_start() {
     connect("localhost", 7915);
 
     ctx.add_task_delayed([this]() {
-        client_ping();
+        try {
+            client_ping();
+        } catch (const networking::SerializationError& e) {
+            LOG_DIST_CRITICAL("Serialization error: {}", e.what());
+            disconnect();
+        }
 
         return sm::Task::Result::Repeat;
     }, 3.0);
@@ -146,9 +151,9 @@ void GameScene::connect(const std::string& address, std::uint16_t port, bool rec
     g.client.disconnect();
 
     try {
+        LOG_DIST_INFO("Connecting to {}:{}...", address, port);
         g.client.connect(address, port);
         g.connection_state = ConnectionState::Connecting;
-        LOG_DIST_INFO("Connecting to {}:{}", address, port);
     } catch (const networking::ConnectionError& e) {
         connection_error(e);
     }
@@ -457,6 +462,14 @@ std::shared_ptr<sm::GlTextureCubemap> GameScene::load_skybox_texture_cubemap(boo
     return {};
 }
 
+void GameScene::disconnect() {
+    auto& g {ctx.global<Global>()};
+
+    g.connection_state = ConnectionState::Disconnected;
+    g.client.disconnect();
+    LOG_DIST_INFO("Disconnected from server");
+}
+
 void GameScene::connection_error(const networking::ConnectionError& e) {
     auto& g {ctx.global<Global>()};
 
@@ -474,7 +487,7 @@ void GameScene::update_connection_state() {
         case ConnectionState::Connecting:
             try {
                 if (g.client.connection_established()) {
-                    LOG_DIST_INFO("Successfully connected to server");
+                    LOG_DIST_INFO("Connected to server");
                     g.connection_state = ConnectionState::Connected;
                 }
             } catch (const networking::ConnectionError& e) {
@@ -496,19 +509,37 @@ void GameScene::update_connection_state() {
 }
 
 void GameScene::handle_message(const networking::Message& message) {
-    switch (message.id()) {
-        case Server_Ping:
-            LOG_DEBUG("Server pinged us!");
-            break;
+    try {
+        switch (message.id()) {
+            case Server_Ping:
+                server_ping(message);
+                break;
+        }
+    } catch (const networking::SerializationError& e) {
+        LOG_DIST_CRITICAL("Serialization error: {}", e.what());
+        disconnect();
     }
 }
 
 void GameScene::client_ping() {
     auto& g {ctx.global<Global>()};
 
+    messages::Client_Ping payload;
+    payload.time = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+
+    networking::Message message {Client_Ping};
+    message.write(payload);
+
     try {
-        g.client.send_message(networking::Message(Client_Ping));
+        g.client.send_message(message);
     } catch (const networking::ConnectionError& e) {
         connection_error(e);
     }
+}
+
+void GameScene::server_ping(const networking::Message& message) {
+    messages::Client_Ping payload;
+    message.read(payload);
+
+    LOG_DEBUG("Ping: {}", std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count() - payload.time);
 }

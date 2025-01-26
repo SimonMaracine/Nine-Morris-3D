@@ -105,7 +105,7 @@ namespace networking {
         }
     }
 
-    std::pair<Message, std::shared_ptr<ClientConnection>> Server::next_message() {
+    std::pair<std::shared_ptr<ClientConnection>, Message> Server::next_message() {
         return m_incoming_messages.pop_front();
     }
 

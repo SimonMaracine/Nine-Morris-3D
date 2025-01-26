@@ -11,9 +11,8 @@ void load_options(Options& options, const std::filesystem::path& file_path) {
         throw OptionsFileError("Could not open options file for reading: `" + file_path.string() + "`");
     }
 
-    cereal::BinaryInputArchive archive {stream};
-
     try {
+        cereal::BinaryInputArchive archive {stream};
         archive(options);
     } catch (const cereal::Exception& e) {
         throw OptionsFileError("Error reading from options file: "s + e.what());
@@ -27,9 +26,8 @@ void save_options(const Options& options, const std::filesystem::path& file_path
         throw OptionsFileError("Could not open options file for writing: `" + file_path.string() + "`");
     }
 
-    cereal::BinaryOutputArchive archive {stream};
-
     try {
+        cereal::BinaryOutputArchive archive {stream};
         archive(options);
     } catch (const cereal::Exception& e) {
         throw OptionsFileError("Error writing to options file: "s + e.what());

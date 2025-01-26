@@ -13,6 +13,10 @@ namespace networking::internal {
         task_send_message(message);
     }
 
+    void ClientConnection::close() {
+        Connection::close();
+    }
+
     ClientId ClientConnection::get_id() const noexcept {
         return m_client_id;
     }
@@ -23,8 +27,8 @@ namespace networking::internal {
 
     void ClientConnection::add_to_incoming_messages() {
         m_incoming_messages.emplace_back(
-            Message(m_incoming_message.header, std::move(m_incoming_message.payload)),
-            shared_from_this()
+            shared_from_this(),
+            Message(m_incoming_message.header, std::move(m_incoming_message.payload))
         );
 
         m_incoming_message = {};
