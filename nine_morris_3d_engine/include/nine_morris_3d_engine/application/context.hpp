@@ -1,6 +1,5 @@
 #pragma once
 
-#include <any>
 #include <string>
 #include <utility>
 #include <initializer_list>
@@ -16,6 +15,7 @@
 #include "nine_morris_3d_engine/application/platform.hpp"
 #include "nine_morris_3d_engine/application/properties.hpp"
 #include "nine_morris_3d_engine/application/id.hpp"
+#include "nine_morris_3d_engine/application/global_data.hpp"
 #include "nine_morris_3d_engine/audio/internal/context.hpp"
 #include "nine_morris_3d_engine/audio/internal/music_player.hpp"
 #include "nine_morris_3d_engine/audio/openal/buffer.hpp"
@@ -187,7 +187,7 @@ namespace sm {
 
         template<typename T>
         T& global() {
-            return std::any_cast<T&>(m_global_data);
+            return *static_cast<T*>(m_global_data.get());
         }
 
         template<typename T>
@@ -219,7 +219,7 @@ namespace sm {
         float m_delta {};
         float m_fps {};
 
-        std::any m_global_data;  // Arbitrary data defined by the user
+        std::unique_ptr<GlobalData> m_global_data;  // Arbitrary data defined by the user
         void* m_user_data {};  // Arbitrary pointer to data defined by the user
         Application* m_application {};  // Context needs to know about the application
 

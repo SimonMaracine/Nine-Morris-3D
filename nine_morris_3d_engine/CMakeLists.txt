@@ -66,6 +66,7 @@ add_library(nine_morris_3d_engine STATIC
     "include/nine_morris_3d_engine/application/context.hpp"
     "include/nine_morris_3d_engine/application/error.hpp"
     "include/nine_morris_3d_engine/application/events.hpp"
+    "include/nine_morris_3d_engine/application/global_data.hpp"
     "include/nine_morris_3d_engine/application/id.hpp"
     "include/nine_morris_3d_engine/application/input_codes.hpp"
     "include/nine_morris_3d_engine/application/logging.hpp"

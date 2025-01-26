@@ -26,12 +26,6 @@ enum class GameState {
     Over
 };
 
-enum class ConnectionState {
-    Disconnected,
-    Connecting,
-    Connected
-};
-
 // Type of player
 enum class GamePlayer {
     Human,
@@ -69,7 +63,6 @@ public:
 
     PointCameraController& get_camera_controller() { return m_camera_controller; }
     GameState& get_game_state() { return m_game_state; }
-    ConnectionState& get_connection_state() { return m_connection_state; }
     GameOptions& get_game_options() { return m_game_options; }
     const Clock& get_clock() const { return m_clock; }
     const MoveList& get_move_list() const { return m_move_list; }
@@ -116,13 +109,10 @@ protected:
     Ui m_ui;
 
     bool m_draw_offered_by_remote {false};
-    bool m_want_disconnect {false};  // Set to true when the user really wants to disconect and reconnect
     GameState m_game_state {GameState::Ready};
-    ConnectionState m_connection_state {ConnectionState::Disconnected};
     glm::vec3 m_default_camera_position {};
     GameOptions m_game_options;
     Clock m_clock;
     MoveList m_move_list;
     std::unique_ptr<Engine> m_engine;
-    std::shared_ptr<networking::Client> m_client;
 };

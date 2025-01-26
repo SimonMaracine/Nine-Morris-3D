@@ -27,16 +27,13 @@ void game_start(sm::Ctx& ctx) {
     specification.shadow_map_size = g.options.shadow_quality;
 
     ctx.initialize_renderer(specification);
-
-    // Should never be null until the end of the application
-    g.client = std::make_shared<networking::Client>();
 }
 
 void game_stop(sm::Ctx& ctx) {
     auto& g {ctx.global<Global>()};
 
     // It's better to disconnect explicitly
-    g.client.reset();
+    g.client.disconnect();
 
     try {
         save_options(g.options, ctx.path_saved_data(OPTIONS_FILE_NAME));

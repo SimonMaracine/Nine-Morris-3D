@@ -47,6 +47,9 @@ namespace sm {
         LOG_INFO("Waiting for other threads...");
 
         m_ctx.m_tsk.wait_async();
+
+        // The global data is destroyed soon together with the context
+        // From this point on, no user logic code should execute
     }
 
     int Application::run(Id start_scene_id, const UserFunctions& user_functions) {

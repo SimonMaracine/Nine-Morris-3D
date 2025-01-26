@@ -44,9 +44,10 @@ namespace sm {
         }
 
         // Setup a struct that is shared across all scenes
+        // The lifetime of it is from this function call until the destruction of the application class
         template<typename T>
         void set_global_data() {
-            m_ctx.m_global_data.emplace<T>();
+            m_ctx.m_global_data = std::make_unique<T>();
         }
     private:
         struct MetaScene {

@@ -22,9 +22,6 @@ void GameScene::on_start() {
     scene_setup();
     start_engine();
 
-    // Global client should never be null
-    m_client = ctx.global<Global>().client;
-
     connect("localhost", 7915);
 
     ctx.add_task_delayed([this]() {
@@ -139,16 +136,18 @@ void GameScene::reload_and_set_textures() {
 }
 
 void GameScene::connect(const std::string& address, std::uint16_t port, bool reconnect) {
+    auto& g {ctx.global<Global>()};
+
     // This prevents unwanted disconnections and reconnections
-    if (!reconnect && m_connection_state == ConnectionState::Connected) {
+    if (!reconnect && g.connection_state == ConnectionState::Connected) {
         return;
     }
 
-    m_client->disconnect();
+    g.client.disconnect();
 
     try {
-        m_client->connect(address, port);
-        m_connection_state = ConnectionState::Connecting;
+        g.client.connect(address, port);
+        g.connection_state = ConnectionState::Connecting;
         LOG_DIST_INFO("Connecting to {}:{}", address, port);
     } catch (const networking::ConnectionError& e) {
         connection_error(e);
@@ -459,20 +458,24 @@ std::shared_ptr<sm::GlTextureCubemap> GameScene::load_skybox_texture_cubemap(boo
 }
 
 void GameScene::connection_error(const networking::ConnectionError& e) {
+    auto& g {ctx.global<Global>()};
+
     LOG_DIST_ERROR("Connection error: {}", e.what());
-    m_connection_state = ConnectionState::Disconnected;
+    g.connection_state = ConnectionState::Disconnected;
     m_ui.push_popup_window(PopupWindow::ConnectionError);
 }
 
 void GameScene::update_connection_state() {
-    switch (m_connection_state) {
+    auto& g {ctx.global<Global>()};
+
+    switch (g.connection_state) {
         case ConnectionState::Disconnected:
             break;
         case ConnectionState::Connecting:
             try {
-                if (m_client->connection_established()) {
+                if (g.client.connection_established()) {
                     LOG_DIST_INFO("Successfully connected to server");
-                    m_connection_state = ConnectionState::Connected;
+                    g.connection_state = ConnectionState::Connected;
                 }
             } catch (const networking::ConnectionError& e) {
                 connection_error(e);
@@ -481,8 +484,8 @@ void GameScene::update_connection_state() {
             break;
         case ConnectionState::Connected:
             try {
-                while (m_client->available_messages()) {
-                    handle_message(m_client->next_message());
+                while (g.client.available_messages()) {
+                    handle_message(g.client.next_message());
                 }
             } catch (const networking::ConnectionError& e) {
                 connection_error(e);
@@ -501,8 +504,10 @@ void GameScene::handle_message(const networking::Message& message) {
 }
 
 void GameScene::client_ping() {
+    auto& g {ctx.global<Global>()};
+
     try {
-        m_client->send_message(networking::Message(Client_Ping));
+        g.client.send_message(networking::Message(Client_Ping));
     } catch (const networking::ConnectionError& e) {
         connection_error(e);
     }

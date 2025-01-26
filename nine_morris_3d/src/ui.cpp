@@ -349,7 +349,7 @@ void Ui::main_menu_bar(sm::Ctx& ctx, GameScene& game_scene) {
             if (ImGui::BeginMenu("Status")) {
                 const char* status {};
 
-                switch (game_scene.get_connection_state()) {
+                switch (g.connection_state) {
                     case ConnectionState::Disconnected:
                         status = "Disconnected";
                         break;

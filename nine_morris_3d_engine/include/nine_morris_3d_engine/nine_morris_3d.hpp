@@ -6,6 +6,7 @@
 #include "nine_morris_3d_engine/application/context.hpp"
 #include "nine_morris_3d_engine/application/error.hpp"
 #include "nine_morris_3d_engine/application/events.hpp"
+#include "nine_morris_3d_engine/application/global_data.hpp"
 #include "nine_morris_3d_engine/application/id.hpp"
 #include "nine_morris_3d_engine/application/logging.hpp"
 #include "nine_morris_3d_engine/application/platform.hpp"
