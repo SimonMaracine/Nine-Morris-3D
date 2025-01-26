@@ -33,7 +33,7 @@ namespace networking {
             m_acceptor.open(endpoint.protocol());
             m_acceptor.bind(endpoint);
             m_acceptor.listen();
-        } catch (const std::system_error& e) {
+        } catch (const boost::system::system_error& e) {
             m_logger->critical("Unexpected error: {}", e.what());
             throw ConnectionError(e.what());
         }
@@ -45,7 +45,7 @@ namespace networking {
         m_context_thread = std::thread([this]() {
             try {
                 m_context.run();
-            } catch (const std::system_error& e) {
+            } catch (const boost::system::system_error& e) {
                 m_logger->critical("Unexpected error: {}", e.what());
                 m_error = std::make_exception_ptr(ConnectionError(e.what()));
             } catch (const ConnectionError& e) {
@@ -73,7 +73,7 @@ namespace networking {
         if (m_acceptor.is_open()) {
             try {
                 m_acceptor.close();
-            } catch (const std::system_error&) {}
+            } catch (const boost::system::system_error&) {}
         }
 
         if (m_context_thread.joinable()) {
@@ -87,6 +87,8 @@ namespace networking {
         m_connections.clear();
         m_new_connections.clear();
         m_incoming_messages.clear();
+
+        m_error = nullptr;
     }
 
     void Server::accept_connections() {
@@ -173,9 +175,8 @@ namespace networking {
             return;
         }
 
+        const auto error {m_error};
         stop();
-
-        const auto error {std::exchange(m_error, nullptr)};
         std::rethrow_exception(error);
     }
 
@@ -185,7 +186,7 @@ namespace networking {
         m_acceptor.async_accept(
             [this](boost::system::error_code ec, boost::asio::ip::tcp::socket socket) {
                 if (ec) {
-                    m_logger->error("Could not accept new connection: {}", ec.message());
+                    m_logger->warn("Could not accept new connection: {}", ec.message());
                 } else {
                     m_logger->info(
                         "Accepted new connection: {}, {}",

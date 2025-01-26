@@ -49,7 +49,7 @@ namespace networking {
         // Disconnect from all the clients and stop the internal event loop
         // You may call this at any time
         // After a call to stop(), you may restart by calling start() again
-        // It is automatically called in the destructor
+        // It is automatically called in the destructor and when a fatal error occurrs
         void stop();
 
         // Accept new connections; you must call this regularly

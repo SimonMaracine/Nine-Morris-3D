@@ -20,24 +20,18 @@ void GameScene::on_start() {
     setup_lights();
 
     scene_setup();
-
     start_engine();
 
-    ctx.add_task([this]() {  // FIXME
-        if (m_connection_state == ConnectionState::Connected) {
-            client_ping();
-        }
+    // Global client should never be null
+    m_client = ctx.global<Global>().client;
 
-        LOG_DEBUG("ABC");
+    connect("localhost", 7915);
+
+    ctx.add_task_delayed([this]() {
+        client_ping();
 
         return sm::Task::Result::Repeat;
     }, 3.0);
-
-    try {
-        m_client.connect("localhost", 7915);
-    } catch (const networking::ConnectionError& e) {
-        connection_error(e);
-    }
 }
 
 void GameScene::on_stop() {
@@ -111,7 +105,7 @@ void GameScene::reload_and_set_skybox() {
             return;
         }
 
-        ctx.add_task([this]() {
+        ctx.add_task_immediate([this]() {
             setup_skybox(true);
             setup_lights();
             m_ui.set_loading_skybox_done();
@@ -133,7 +127,7 @@ void GameScene::reload_and_set_textures() {
             return;
         }
 
-        ctx.add_task([this]() {
+        ctx.add_task_immediate([this]() {
             setup_skybox(true);
             reload_and_set_scene_textures();
 
@@ -142,6 +136,23 @@ void GameScene::reload_and_set_textures() {
 
         task.set_done();
     });
+}
+
+void GameScene::connect(const std::string& address, std::uint16_t port, bool reconnect) {
+    // This prevents unwanted disconnections and reconnections
+    if (!reconnect && m_connection_state == ConnectionState::Connected) {
+        return;
+    }
+
+    m_client->disconnect();
+
+    try {
+        m_client->connect(address, port);
+        m_connection_state = ConnectionState::Connecting;
+        LOG_DIST_INFO("Connecting to {}:{}", address, port);
+    } catch (const networking::ConnectionError& e) {
+        connection_error(e);
+    }
 }
 
 void GameScene::on_window_resized(const sm::WindowResizedEvent& event) {
@@ -459,7 +470,8 @@ void GameScene::update_connection_state() {
             break;
         case ConnectionState::Connecting:
             try {
-                if (m_client.connection_established()) {
+                if (m_client->connection_established()) {
+                    LOG_DIST_INFO("Successfully connected to server");
                     m_connection_state = ConnectionState::Connected;
                 }
             } catch (const networking::ConnectionError& e) {
@@ -469,8 +481,8 @@ void GameScene::update_connection_state() {
             break;
         case ConnectionState::Connected:
             try {
-                while (m_client.available_messages()) {
-                    handle_message(m_client.next_message());
+                while (m_client->available_messages()) {
+                    handle_message(m_client->next_message());
                 }
             } catch (const networking::ConnectionError& e) {
                 connection_error(e);
@@ -481,8 +493,6 @@ void GameScene::update_connection_state() {
 }
 
 void GameScene::handle_message(const networking::Message& message) {
-    LOG_DEBUG("MESSAGE {}", message.id());
-
     switch (message.id()) {
         case Server_Ping:
             LOG_DEBUG("Server pinged us!");
@@ -491,5 +501,9 @@ void GameScene::handle_message(const networking::Message& message) {
 }
 
 void GameScene::client_ping() {
-    m_client.send_message(networking::Message(Client_Ping));
+    try {
+        m_client->send_message(networking::Message(Client_Ping));
+    } catch (const networking::ConnectionError& e) {
+        connection_error(e);
+    }
 }

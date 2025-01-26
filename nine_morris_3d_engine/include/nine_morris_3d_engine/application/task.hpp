@@ -13,6 +13,9 @@ namespace sm {
     }
 
     // Short-lived procedure executed in the main loop
+    // May be instantiated from any thread
+    // May be deffered by one frame and/or may be delayed until a certain amount of time
+    // Delays are repeated, but defers are not
     class Task {
     public:
         enum class Result {
@@ -20,14 +23,15 @@ namespace sm {
             Repeat
         };
 
-        using TaskFunction = std::function<Result()>;
+        using Function = std::function<Result()>;
 
-        Task(const TaskFunction& function, double last_time, double delay)
-            : m_function(function), m_last_time(last_time), m_delay(delay) {}
+        Task(const Function& function, double last_time, double delay, bool defer)
+            : m_function(function), m_last_time(last_time), m_delay(delay), m_defer(defer) {}
     private:
-        TaskFunction m_function;
+        Function m_function;
         double m_last_time {};
-        double m_delay {};
+        double m_delay {};  // Time until the task is delayed
+        bool m_defer {};  // If the task should be deffered until the next update
 
         friend class internal::TaskManager;
     };
@@ -35,9 +39,9 @@ namespace sm {
     // Long-lived procedure executed on a separate thread, bound to the calling scene
     class AsyncTask {
     public:
-        using TaskFunction = std::function<void(AsyncTask&)>;
+        using Function = std::function<void(AsyncTask&)>;
 
-        AsyncTask(const TaskFunction& function)
+        explicit AsyncTask(const Function& function)
             : m_thread(function, std::ref(*this)) {}
 
         ~AsyncTask() {
@@ -63,7 +67,7 @@ namespace sm {
         }
     private:
         std::thread m_thread;
-        std::atomic_bool m_done {false};
+        std::atomic_bool m_done {false};  // Must be set by the user before the task finishes
         std::atomic_bool m_stop {false};  // Set by task manager
         std::exception_ptr m_exception;
 

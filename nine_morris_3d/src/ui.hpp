@@ -22,7 +22,6 @@ enum class PopupWindow {
 
 class Ui {
 public:
-
     void initialize(sm::Ctx& ctx);
     void update(sm::Ctx& ctx, GameScene& game_scene);
     void push_popup_window(PopupWindow window);

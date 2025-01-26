@@ -37,7 +37,7 @@ namespace networking {
         // Disconnect from the server and stop the internal event loop
         // You may call this at any time
         // After a call to disconnect(), you may reconnect by calling connect() again
-        // It is automatically called in the destructor
+        // It is automatically called in the destructor and when a fatal error occurrs
         void disconnect();
 
         // After a call to connect(), check if the connection has been established

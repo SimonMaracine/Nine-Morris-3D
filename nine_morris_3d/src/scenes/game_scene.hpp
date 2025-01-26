@@ -69,6 +69,7 @@ public:
 
     PointCameraController& get_camera_controller() { return m_camera_controller; }
     GameState& get_game_state() { return m_game_state; }
+    ConnectionState& get_connection_state() { return m_connection_state; }
     GameOptions& get_game_options() { return m_game_options; }
     const Clock& get_clock() const { return m_clock; }
     const MoveList& get_move_list() const { return m_move_list; }
@@ -81,6 +82,7 @@ public:
     void reload_and_set_textures();
 
     virtual void start_engine() = 0;
+    void connect(const std::string& address, std::uint16_t port, bool reconnect = false);
 protected:
     void on_window_resized(const sm::WindowResizedEvent& event);
     void on_key_released(const sm::KeyReleasedEvent& event);
@@ -114,6 +116,7 @@ protected:
     Ui m_ui;
 
     bool m_draw_offered_by_remote {false};
+    bool m_want_disconnect {false};  // Set to true when the user really wants to disconect and reconnect
     GameState m_game_state {GameState::Ready};
     ConnectionState m_connection_state {ConnectionState::Disconnected};
     glm::vec3 m_default_camera_position {};
@@ -121,5 +124,5 @@ protected:
     Clock m_clock;
     MoveList m_move_list;
     std::unique_ptr<Engine> m_engine;
-    networking::Client m_client;
+    std::shared_ptr<networking::Client> m_client;
 };

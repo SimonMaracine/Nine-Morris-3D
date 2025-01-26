@@ -72,7 +72,6 @@ namespace sm {
             }
 
             m_scene_current->scene->on_update();
-            m_ctx.m_tsk.update();
 
             if (!m_minimized) {
 #ifndef SM_BUILD_DISTRIBUTION
@@ -86,6 +85,9 @@ namespace sm {
 
             m_ctx.m_win.update();
             m_ctx.m_evt.update();
+
+            // Update tasks after scene update and after events
+            m_ctx.m_tsk.update();
 
             check_changed_scene();
         }

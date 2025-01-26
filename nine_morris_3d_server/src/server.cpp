@@ -15,7 +15,6 @@ void Server::start() {
 
     m_ping_task = PeriodicTask([this]() {
         server_ping();
-        m_server.get_logger()->debug("ABC");
     }, 10s);
 }
 

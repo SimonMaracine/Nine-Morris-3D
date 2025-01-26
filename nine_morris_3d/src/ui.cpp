@@ -1,6 +1,7 @@
 #include "ui.hpp"
 
 #include <utility>
+#include <cstring>
 #include <cassert>
 
 #include <nine_morris_3d_engine/external/imgui.h++>
@@ -70,27 +71,29 @@ void Ui::update(sm::Ctx& ctx, GameScene& game_scene) {
     main_menu_bar(ctx, game_scene);
     game_window(game_scene);
 
-    switch (m_popup_window_queue.front()) {
-        case PopupWindow::None:
-            break;
-        case PopupWindow::About:
-            about_window();
-            break;
-        case PopupWindow::GameOver:
-            game_over_window(game_scene);
-            break;
-        case PopupWindow::GameOptions:
-            game_options_window(game_scene);
-            break;
-        case PopupWindow::EngineError:
-            engine_error_window();
-            break;
-        case PopupWindow::ConnectionError:
-            connection_error_window();
-            break;
-        case PopupWindow::RulesNineMensMorris:
-            rules_nine_mens_morris_window();
-            break;
+    if (!m_popup_window_queue.empty()) {
+        switch (m_popup_window_queue.front()) {
+            case PopupWindow::None:
+                break;
+            case PopupWindow::About:
+                about_window();
+                break;
+            case PopupWindow::GameOver:
+                game_over_window(game_scene);
+                break;
+            case PopupWindow::GameOptions:
+                game_options_window(game_scene);
+                break;
+            case PopupWindow::EngineError:
+                engine_error_window();
+                break;
+            case PopupWindow::ConnectionError:
+                connection_error_window();
+                break;
+            case PopupWindow::RulesNineMensMorris:
+                rules_nine_mens_morris_window();
+                break;
+        }
     }
 }
 
@@ -342,6 +345,63 @@ void Ui::main_menu_bar(sm::Ctx& ctx, GameScene& game_scene) {
 
             ImGui::EndMenu();
         }
+        if (ImGui::BeginMenu("Server")) {
+            if (ImGui::BeginMenu("Status")) {
+                const char* status {};
+
+                switch (game_scene.get_connection_state()) {
+                    case ConnectionState::Disconnected:
+                        status = "Disconnected";
+                        break;
+                    case ConnectionState::Connecting:
+                        status = "Connecting";
+                        break;
+                    case ConnectionState::Connected:
+                        status = "Connected";
+                        break;
+                }
+
+                ImGui::Text("%s", status);
+
+                ImGui::EndMenu();
+            }
+            if (ImGui::BeginMenu("Address")) {
+                if (ImGui::Checkbox("Default", &m_options.default_address_port)) {
+                    g.options.default_address_port = m_options.default_address_port;
+                }
+                ImGui::PushItemWidth(rem(5.0f));
+                if (g.options.default_address_port) {
+                    ImGui::BeginDisabled();
+                    ImGui::InputText("Address", m_options.address, sizeof(m_options.address));
+                    ImGui::InputText("Port", m_options.port, sizeof(m_options.port));
+                    ImGui::EndDisabled();
+                } else {
+                    if (ImGui::InputText("Address", m_options.address, sizeof(m_options.address))) {
+                        std::memcpy(g.options.address, m_options.address, sizeof(m_options.address));
+                    }
+
+                    if (ImGui::InputText("Port", m_options.port, sizeof(m_options.port))) {
+                        std::memcpy(g.options.port, m_options.port, sizeof(m_options.port));
+                    }
+                }
+                ImGui::PopItemWidth();
+
+                ImGui::EndMenu();
+            }
+            if (ImGui::MenuItem("Reconnect")) {
+                if (g.options.default_address_port) {
+                    game_scene.connect("localhost", 7915, true);
+                } else {
+                    try {
+                        game_scene.connect(g.options.address, static_cast<std::uint16_t>(std::stoul(g.options.port)), true);
+                    } catch (const std::invalid_argument& e) {
+                        LOG_DIST_ERROR("Invalid port: {}", e.what());
+                    }
+                }
+            }
+
+            ImGui::EndMenu();
+        }
         if (ImGui::BeginMenu("Help")) {
             if (ImGui::MenuItem("About")) {
                 m_popup_window_queue.push_back(PopupWindow::About);
@@ -589,7 +649,7 @@ void Ui::set_scale(sm::Ctx& ctx, int scale) {
 }
 
 void Ui::set_scale_task(sm::Ctx& ctx, int scale) {
-    ctx.add_task([&ctx, scale]() {
+    ctx.add_task_immediate([&ctx, scale]() {
         set_scale(ctx, scale);
 
         return sm::Task::Result::Done;
@@ -597,7 +657,7 @@ void Ui::set_scale_task(sm::Ctx& ctx, int scale) {
 }
 
 void Ui::set_anti_aliasing_task(sm::Ctx& ctx, int samples) {
-    ctx.add_task([&ctx, samples]() {
+    ctx.add_task_immediate([&ctx, samples]() {
         ctx.set_renderer_samples(samples);
 
         return sm::Task::Result::Done;
@@ -605,7 +665,7 @@ void Ui::set_anti_aliasing_task(sm::Ctx& ctx, int samples) {
 }
 
 void Ui::set_shadow_quality_task(sm::Ctx& ctx, int size) {
-    ctx.add_task([&ctx, size]() {
+    ctx.add_task_immediate([&ctx, size]() {
         ctx.set_renderer_shadow_map_size(size);
 
         return sm::Task::Result::Done;
@@ -613,7 +673,7 @@ void Ui::set_shadow_quality_task(sm::Ctx& ctx, int size) {
 }
 
 void Ui::set_anisotropic_filtering_task(sm::Ctx& ctx, GameScene& game_scene) {
-    ctx.add_task([&game_scene]() {
+    ctx.add_task_immediate([&game_scene]() {
         game_scene.reload_and_set_scene_textures();
 
         return sm::Task::Result::Done;

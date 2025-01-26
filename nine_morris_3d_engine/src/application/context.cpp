@@ -174,11 +174,19 @@ namespace sm {
         m_mus.set_gain(gain);
     }
 
-    void Ctx::add_task(const Task::TaskFunction& function, double delay) {
-        m_tsk.add(function, delay);
+    void Ctx::add_task_immediate(const Task::Function& function) {
+        m_tsk.add_immediate(function);
     }
 
-    void Ctx::add_task_async(const AsyncTask::TaskFunction& function) {
+    void Ctx::add_task_delayed(const Task::Function& function, double delay) {
+        m_tsk.add_delayed(function, delay);
+    }
+
+    void Ctx::add_task_deffered(const Task::Function& function) {
+        m_tsk.add_deffered(function);
+    }
+
+    void Ctx::add_task_async(const AsyncTask::Function& function) {
         m_tsk.add_async(function);
     }
 

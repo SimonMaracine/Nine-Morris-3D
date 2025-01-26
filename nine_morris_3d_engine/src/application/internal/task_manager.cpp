@@ -8,13 +8,25 @@
 #include "nine_morris_3d_engine/application/logging.hpp"
 
 namespace sm::internal {
-    void TaskManager::add(const Task::TaskFunction& function, double delay) {
+    void TaskManager::add_immediate(const Task::Function& function) {
         std::lock_guard lock {m_mutex};
 
-        m_tasks_active.emplace_back(function, Window::get_time(), delay);
+        m_tasks_active.emplace_back(function, Window::get_time(), 0.0, false);
     }
 
-    void TaskManager::add_async(const AsyncTask::TaskFunction& function) {
+    void TaskManager::add_delayed(const Task::Function& function, double delay) {
+        std::lock_guard lock {m_mutex};
+
+        m_tasks_active.emplace_back(function, Window::get_time(), delay, false);
+    }
+
+    void TaskManager::add_deffered(const Task::Function& function) {
+        std::lock_guard lock {m_mutex};
+
+        m_tasks_active.emplace_back(function, Window::get_time(), 0.0, true);
+    }
+
+    void TaskManager::add_async(const AsyncTask::Function& function) {
         std::lock_guard lock {m_async_mutex};
 
         m_async_tasks.push_back(std::make_unique<AsyncTask>(function));
@@ -58,11 +70,17 @@ namespace sm::internal {
 
     void TaskManager::update_tasks() {
         for (Task& task : m_tasks_active) {
+            if (task.m_defer) {
+                task.m_defer = false;
+                m_tasks_next.push_back(task);
+                continue;
+            }
+
             const double time_now {Window::get_time()};
 
             if (task.m_delay > 0.0) {
                 if (time_now - task.m_last_time < task.m_delay) {
-                    task.m_last_time = time_now;
+                    m_tasks_next.push_back(task);
                     continue;
                 }
             }

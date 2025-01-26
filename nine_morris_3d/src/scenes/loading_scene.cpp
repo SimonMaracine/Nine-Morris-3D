@@ -111,7 +111,7 @@ void LoadingScene::load_assets() {
         ctx.load_texture_data(ctx.path_assets("textures/piece/piece_normal.png"), post_processing);
     }
 
-    ctx.add_task([this]() {
+    ctx.add_task_immediate([this]() {
         m_done = true;
         return sm::Task::Result::Done;
     });

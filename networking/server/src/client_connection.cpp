@@ -51,7 +51,7 @@ namespace networking::internal {
                 if (ec) {
                     m_tcp_socket.close();
 
-                    m_logger->error("[{}] Could not write header/payload: {}", get_id(), ec.message());
+                    m_logger->warn("[{}] Could not write header/payload: {}", get_id(), ec.message());
                     return;
                 }
 
@@ -73,7 +73,7 @@ namespace networking::internal {
                 if (ec) {
                     m_tcp_socket.close();
 
-                    m_logger->error("[{}] Could not read header: {}", get_id(), ec.message());
+                    m_logger->warn("[{}] Could not read header: {}", get_id(), ec.message());
                     return;
                 }
 
@@ -102,7 +102,7 @@ namespace networking::internal {
                 if (ec) {
                     m_tcp_socket.close();
 
-                    m_logger->error("[{}] Could not read payload: {}", get_id(), ec.message());
+                    m_logger->warn("[{}] Could not read payload: {}", get_id(), ec.message());
                     return;
                 }
 

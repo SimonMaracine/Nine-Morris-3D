@@ -1,7 +1,6 @@
 #include "networking/client.hpp"
 
 #include <stdexcept>
-#include <utility>
 
 namespace networking {
     Client::~Client() {
@@ -19,7 +18,7 @@ namespace networking {
 
         try {
             endpoints = resolver.resolve(host, std::to_string(port));
-        } catch (const std::system_error& e) {
+        } catch (const boost::system::system_error& e) {
             throw ConnectionError(e.what());
         }
 
@@ -35,7 +34,7 @@ namespace networking {
         m_context_thread = std::thread([this]() {
             try {
                 m_context.run();
-            } catch (const std::system_error& e) {
+            } catch (const boost::system::system_error& e) {
                 m_error = std::make_exception_ptr(ConnectionError(e.what()));
             } catch (const ConnectionError& e) {
                 m_error = std::current_exception();
@@ -59,6 +58,8 @@ namespace networking {
         m_connection.reset();
 
         m_incoming_messages.clear();
+
+        m_error = nullptr;
     }
 
     bool Client::connection_established() {
@@ -94,9 +95,8 @@ namespace networking {
             return;
         }
 
+        const auto error {m_error};
         disconnect();
-
-        const auto error {std::exchange(m_error, nullptr)};
         std::rethrow_exception(error);
     }
 }
