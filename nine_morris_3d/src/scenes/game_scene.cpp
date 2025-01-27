@@ -4,6 +4,7 @@
 #include <protocol.hpp>
 
 #include "global.hpp"
+#include "default_address.hpp"
 
 void GameScene::on_start() {
     ctx.connect_event<sm::WindowResizedEvent, &GameScene::on_window_resized>(this);
@@ -22,7 +23,13 @@ void GameScene::on_start() {
     scene_setup();
     start_engine();
 
-    connect("localhost", 7915);
+    const auto& g {ctx.global<Global>()};
+
+    if (g.options.default_address_port) {
+        connect(DEFAULT_ADDRESS, DEFAULT_PORT);
+    } else {
+        connect(g.options.address, g.options.port);
+    }
 
     ctx.add_task_delayed([this]() {
         try {
@@ -156,6 +163,14 @@ void GameScene::connect(const std::string& address, std::uint16_t port, bool rec
         g.connection_state = ConnectionState::Connecting;
     } catch (const networking::ConnectionError& e) {
         connection_error(e);
+    }
+}
+
+void GameScene::connect(const std::string& address, const std::string& port, bool reconnect) {
+    try {
+        connect(address, static_cast<std::uint16_t>(std::stoul(port)), reconnect);
+    } catch (const std::invalid_argument& e) {
+        LOG_DIST_ERROR("Invalid port: {}", e.what());
     }
 }
 
@@ -511,7 +526,7 @@ void GameScene::update_connection_state() {
 void GameScene::handle_message(const networking::Message& message) {
     try {
         switch (message.id()) {
-            case Server_Ping:
+            case protocol::message::Server_Ping:
                 server_ping(message);
                 break;
         }
@@ -524,10 +539,10 @@ void GameScene::handle_message(const networking::Message& message) {
 void GameScene::client_ping() {
     auto& g {ctx.global<Global>()};
 
-    messages::Client_Ping payload;
-    payload.time = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+    protocol::Client_Ping payload;
+    payload.time = std::chrono::system_clock::now();
 
-    networking::Message message {Client_Ping};
+    networking::Message message {protocol::message::Client_Ping};
     message.write(payload);
 
     try {
@@ -538,8 +553,8 @@ void GameScene::client_ping() {
 }
 
 void GameScene::server_ping(const networking::Message& message) {
-    messages::Client_Ping payload;
+    protocol::Server_Ping payload;
     message.read(payload);
 
-    LOG_DEBUG("Ping: {}", std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count() - payload.time);
+    LOG_DEBUG("Ping: {}", std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - payload.time).count());
 }

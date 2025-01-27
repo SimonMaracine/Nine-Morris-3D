@@ -32,7 +32,7 @@ void Server::on_client_disconnected(std::shared_ptr<networking::ClientConnection
 void Server::handle_message(std::shared_ptr<networking::ClientConnection> connection, const networking::Message& message) {
     try {
         switch (message.id()) {
-            case Client_Ping:
+            case protocol::message::Client_Ping:
                 client_ping(connection, message);
                 break;
         }
@@ -43,17 +43,17 @@ void Server::handle_message(std::shared_ptr<networking::ClientConnection> connec
 }
 
 void Server::client_ping(std::shared_ptr<networking::ClientConnection> connection, const networking::Message& message) {
-    messages::Client_Ping payload;
+    protocol::Client_Ping payload;
     message.read(payload);
 
     server_ping(connection, payload.time);
 }
 
-void Server::server_ping(std::shared_ptr<networking::ClientConnection> connection, decltype(messages::Client_Ping::time) time) {
-    messages::Server_Ping payload;
+void Server::server_ping(std::shared_ptr<networking::ClientConnection> connection, protocol::type::TimePoint time) {
+    protocol::Server_Ping payload;
     payload.time = time;
 
-    networking::Message message {Server_Ping};
+    networking::Message message {protocol::message::Server_Ping};
     message.write(payload);
 
     m_server.send_message(connection, message);

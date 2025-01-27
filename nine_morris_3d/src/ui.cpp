@@ -12,6 +12,7 @@
 #include "global.hpp"
 #include "game_options.hpp"
 #include "ver.hpp"
+#include "default_address.hpp"
 
 static bool resign_available(GameScene& game_scene) {
     return (
@@ -390,13 +391,9 @@ void Ui::main_menu_bar(sm::Ctx& ctx, GameScene& game_scene) {
             }
             if (ImGui::MenuItem("Reconnect")) {
                 if (g.options.default_address_port) {
-                    game_scene.connect("localhost", 7915, true);
+                    game_scene.connect(DEFAULT_ADDRESS, DEFAULT_PORT, true);
                 } else {
-                    try {
-                        game_scene.connect(g.options.address, static_cast<std::uint16_t>(std::stoul(g.options.port)), true);
-                    } catch (const std::invalid_argument& e) {
-                        LOG_DIST_ERROR("Invalid port: {}", e.what());
-                    }
+                    game_scene.connect(g.options.address, g.options.port, true);
                 }
             }
 

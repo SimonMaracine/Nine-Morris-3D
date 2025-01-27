@@ -76,6 +76,7 @@ public:
 
     virtual void start_engine() = 0;
     void connect(const std::string& address, std::uint16_t port, bool reconnect = false);
+    void connect(const std::string& address, const std::string& port, bool reconnect = false);
 protected:
     void on_window_resized(const sm::WindowResizedEvent& event);
     void on_key_released(const sm::KeyReleasedEvent& event);

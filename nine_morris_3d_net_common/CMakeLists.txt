@@ -5,3 +5,5 @@ add_library(nine_morris_3d_net_common INTERFACE
 )
 
 target_include_directories(nine_morris_3d_net_common INTERFACE "include")
+
+target_link_libraries(nine_morris_3d_net_common INTERFACE cereal)

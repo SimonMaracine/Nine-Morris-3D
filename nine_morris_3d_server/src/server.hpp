@@ -21,7 +21,7 @@ private:
     void handle_message(std::shared_ptr<networking::ClientConnection> connection, const networking::Message& message);
 
     void client_ping(std::shared_ptr<networking::ClientConnection> connection, const networking::Message& message);
-    void server_ping(std::shared_ptr<networking::ClientConnection> connection, decltype(messages::Client_Ping::time) time);
+    void server_ping(std::shared_ptr<networking::ClientConnection> connection, protocol::type::TimePoint time);
 
     networking::Server m_server;
 
