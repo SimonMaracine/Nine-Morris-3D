@@ -2,6 +2,7 @@
 
 #include <string>
 #include <memory>
+#include <optional>
 
 #include <nine_morris_3d_engine/nine_morris_3d.hpp>
 #include <networking/client.hpp>
@@ -31,6 +32,13 @@ enum class GamePlayer {
     Human,
     Computer,
     Remote
+};
+
+struct GameSession {
+    bool active {false};
+    bool remote_active {false};
+    std::uint16_t session_id {};
+    std::string remote_player_name;
 };
 
 // Base class for scenes representing games
@@ -64,6 +72,7 @@ public:
     PointCameraController& get_camera_controller() { return m_camera_controller; }
     GameState& get_game_state() { return m_game_state; }
     GameOptions& get_game_options() { return m_game_options; }
+    std::optional<GameSession>& get_game_session() { return m_game_session; }
     const Clock& get_clock() const { return m_clock; }
     const MoveList& get_move_list() const { return m_move_list; }
     const std::unique_ptr<Engine>& get_engine() const { return m_engine; }
@@ -77,6 +86,10 @@ public:
     virtual void start_engine() = 0;
     void connect(const std::string& address, std::uint16_t port, bool reconnect = false);
     void connect(const std::string& address, const std::string& port, bool reconnect = false);
+
+    void serialization_error(const networking::SerializationError& e);
+    void client_request_game_session();
+    void client_quit_game_session();
 protected:
     void on_window_resized(const sm::WindowResizedEvent& event);
     void on_key_released(const sm::KeyReleasedEvent& event);
@@ -101,6 +114,8 @@ protected:
     void handle_message(const networking::Message& message);
     void client_ping();
     void server_ping(const networking::Message& message);
+    void server_accept_game_session(const networking::Message& message);
+    void server_deny_game_session(const networking::Message& message);
 
     sm::Camera m_camera;
     sm::Camera2D m_camera_2d;
@@ -114,6 +129,7 @@ protected:
     bool m_draw_offered_by_remote {false};
     GameState m_game_state {GameState::Ready};
     glm::vec3 m_default_camera_position {};
+    std::optional<GameSession> m_game_session;
     GameOptions m_game_options;
     Clock m_clock;
     MoveList m_move_list;

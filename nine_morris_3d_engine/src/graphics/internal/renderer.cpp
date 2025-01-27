@@ -486,20 +486,20 @@ namespace sm::internal {
     void Renderer::clear_expired_resources() {
         m_storage.shaders.erase(
             std::remove_if(m_storage.shaders.begin(), m_storage.shaders.end(), [](const std::weak_ptr<GlShader>& wshader) {
-                return wshader.lock() == nullptr;
+                return wshader.expired();
             }),
             m_storage.shaders.cend()
         );
 
         m_storage.framebuffers.erase(
             std::remove_if(m_storage.framebuffers.begin(), m_storage.framebuffers.end(), [](const std::weak_ptr<GlFramebuffer>& wframebuffer) {
-                return wframebuffer.lock() == nullptr;
+                return wframebuffer.expired();
             }),
             m_storage.framebuffers.cend()
         );
 
         for (auto iter {m_storage.uniform_buffers.begin()}; iter != m_storage.uniform_buffers.end();) {
-            if (iter->second.lock() == nullptr) {
+            if (iter->second.expired()) {
                 iter = m_storage.uniform_buffers.erase(iter);
             } else {
                 iter++;

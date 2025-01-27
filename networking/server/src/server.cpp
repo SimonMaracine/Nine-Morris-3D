@@ -105,6 +105,24 @@ namespace networking {
         }
     }
 
+    void Server::check_connections() {
+        throw_if_error();
+
+        for (auto before_iter {m_connections.before_begin()}, iter {m_connections.begin()}; iter != m_connections.end(); before_iter++, iter++) {
+            const auto& connection {*iter};
+
+            assert(connection != nullptr);
+
+            if (!connection->is_open()) {
+                if (maybe_client_disconnected(connection, iter, before_iter)) {
+                    break;
+                }
+
+                continue;
+            }
+        }
+    }
+
     std::pair<std::shared_ptr<ClientConnection>, Message> Server::next_message() {
         return m_incoming_messages.pop_front();
     }
@@ -227,9 +245,9 @@ namespace networking {
             return;
         }
 
+        m_connections.remove(connection);
         m_on_client_disconnected(connection);
         m_pool.free_id(connection->get_id());
-        m_connections.remove(connection);
 
         connection->m_used = true;
     }
@@ -239,12 +257,13 @@ namespace networking {
             return false;
         }
 
+        const bool end {(iter = m_connections.erase_after(before_iter)) == m_connections.end()};
         m_on_client_disconnected(connection);
         m_pool.free_id(connection->get_id());
 
         connection->m_used = true;
 
-        return (iter = m_connections.erase_after(before_iter)) == m_connections.end();
+        return end;
     }
 
     void Server::initialize_logging() {

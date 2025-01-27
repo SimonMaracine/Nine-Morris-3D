@@ -17,6 +17,9 @@ enum class PopupWindow {
     GameOptions,
     EngineError,
     ConnectionError,
+    NewGameSessionError,
+    WaitServerAcceptGameSession,
+    WaitRemoteJoinGameSession,
     RulesNineMensMorris
 };
 
@@ -24,23 +27,30 @@ class Ui {
 public:
     void initialize(sm::Ctx& ctx);
     void update(sm::Ctx& ctx, GameScene& game_scene);
-    void push_popup_window(PopupWindow window);
+    void push_popup_window(PopupWindow window, const std::string& string = {});
+    void clear_popup_window();
 
     void set_loading_skybox_done() { m_loading_skybox = false; }
     bool get_show_information() const { return m_show_information; }
 private:
     void main_menu_bar(sm::Ctx& ctx, GameScene& game_scene);
-    void game_window(GameScene& game_scene);
-    void game_window_before_game(GameScene& game_scene);
+    void game_window(sm::Ctx& ctx, GameScene& game_scene);
+    void game_window_before_game(sm::Ctx& ctx, GameScene& game_scene);
+    void game_window_before_game_local(sm::Ctx& ctx, GameScene& game_scene);
+    void game_window_before_game_online(sm::Ctx& ctx, GameScene& game_scene);
     void game_window_during_game(GameScene& game_scene);
     void about_window();
     void game_over_window(GameScene& game_scene);
     void game_options_window(GameScene& game_scene);
     void engine_error_window();
     void connection_error_window();
+    void new_game_session_error_window(const std::string& string);
+    void wait_server_accept_game_session_window(GameScene& game_scene);
+    void wait_remote_join_game_session_window(GameScene& game_scene);
     void rules_nine_mens_morris_window();
     void wrapped_text_window(const char* title, const char* text);
-    void generic_window(const char* title, std::function<void()>&& contents, std::function<void()>&& on_ok = []() {});
+    void generic_window_ok(const char* title, std::function<void()>&& contents, std::function<void()>&& on_ok = []() {});
+    void generic_window(const char* title, std::function<bool()>&& contents);
 
     static void set_scale(sm::Ctx& ctx, int scale);
     static void set_scale_task(sm::Ctx& ctx, int scale);
@@ -52,11 +62,13 @@ private:
     static float rem(float size);
 
     // Multiple modal windows may request attention at a time; put them in a queue
-    std::deque<PopupWindow> m_popup_window_queue;
+    std::deque<std::pair<PopupWindow, std::string>> m_popup_window_queue;
 
     // Local options data
     // When changed, update the options from the global data
     Options m_options;
+
+    char m_session_id[5 + 1] {};
 
     bool m_loading_skybox {false};  // This is needed, because selecting a skybox doesn't close the interface
     bool m_show_information {false};

@@ -60,8 +60,9 @@ struct Options {
     int shadow_quality {ShadowQualityFull};
     int scale {Scale100};
     float camera_sensitivity {1.0f};
-    char address[253] {};
-    char port[5] {};  // Must be 5 bytes
+    char name[15 + 1] {};
+    char address[253 + 1] {};
+    char port[5 + 1] {};
     bool default_address_port {true};
     bool enable_music {false};
     bool vsync {true};
@@ -80,6 +81,7 @@ struct Options {
             shadow_quality,
             scale,
             camera_sensitivity,
+            name,
             address,
             port,
             default_address_port,

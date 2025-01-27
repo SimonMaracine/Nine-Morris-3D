@@ -32,12 +32,7 @@ void GameScene::on_start() {
     }
 
     ctx.add_task_delayed([this]() {
-        try {
-            client_ping();
-        } catch (const networking::SerializationError& e) {
-            LOG_DIST_CRITICAL("Serialization error: {}", e.what());
-            disconnect();
-        }
+        client_ping();
 
         return sm::Task::Result::Repeat;
     }, 3.0);
@@ -173,6 +168,58 @@ void GameScene::connect(const std::string& address, const std::string& port, boo
         LOG_DIST_ERROR("Invalid port: {}", e.what());
     } catch (const std::out_of_range& e) {
         LOG_DIST_ERROR("Invalid port: {}", e.what());
+    }
+}
+
+void GameScene::serialization_error(const networking::SerializationError& e) {
+    LOG_DIST_CRITICAL("Serialization error: {}", e.what());
+    disconnect();
+}
+
+void GameScene::client_request_game_session() {
+    auto& g {ctx.global<Global>()};
+
+    protocol::Client_RequestGameSession payload;
+    payload.player_name = g.options.name;
+    payload.remote_player_type = protocol::Player(m_game_options.online.remote_color);
+
+    networking::Message message {protocol::message::Client_RequestGameSession};
+
+    try {
+        message.write(payload);
+    } catch (const networking::SerializationError& e) {
+        serialization_error(e);
+        return;
+    }
+
+    try {
+        g.client.send_message(message);
+    } catch (const networking::ConnectionError& e) {
+        connection_error(e);
+    }
+}
+
+void GameScene::client_quit_game_session() {
+    assert(m_game_session);
+
+    protocol::Client_QuitGameSession payload;
+    payload.session_id = m_game_session->session_id;
+
+    networking::Message message {protocol::message::Client_QuitGameSession};
+
+    try {
+        message.write(payload);
+    } catch (const networking::SerializationError& e) {
+        serialization_error(e);
+        return;
+    }
+
+    auto& g {ctx.global<Global>()};
+
+    try {
+        g.client.send_message(message);
+    } catch (const networking::ConnectionError& e) {
+        connection_error(e);
     }
 }
 
@@ -498,43 +545,40 @@ void GameScene::connection_error(const networking::ConnectionError& e) {
 void GameScene::update_connection_state() {
     auto& g {ctx.global<Global>()};
 
-    switch (g.connection_state) {
-        case ConnectionState::Disconnected:
-            break;
-        case ConnectionState::Connecting:
-            try {
+    try {
+        switch (g.connection_state) {
+            case ConnectionState::Disconnected:
+                break;
+            case ConnectionState::Connecting:
                 if (g.client.connection_established()) {
                     LOG_DIST_INFO("Connected to server");
                     g.connection_state = ConnectionState::Connected;
                 }
-            } catch (const networking::ConnectionError& e) {
-                connection_error(e);
-            }
 
-            break;
-        case ConnectionState::Connected:
-            try {
+                break;
+            case ConnectionState::Connected:
                 while (g.client.available_messages()) {
                     handle_message(g.client.next_message());
                 }
-            } catch (const networking::ConnectionError& e) {
-                connection_error(e);
-            }
 
-            break;
+                break;
+        }
+    } catch (const networking::ConnectionError& e) {
+        connection_error(e);
     }
 }
 
 void GameScene::handle_message(const networking::Message& message) {
-    try {
-        switch (message.id()) {
-            case protocol::message::Server_Ping:
-                server_ping(message);
-                break;
-        }
-    } catch (const networking::SerializationError& e) {
-        LOG_DIST_CRITICAL("Serialization error: {}", e.what());
-        disconnect();
+    switch (message.id()) {
+        case protocol::message::Server_Ping:
+            server_ping(message);
+            break;
+        case protocol::message::Server_AcceptGameSession:
+            server_accept_game_session(message);
+            break;
+        case protocol::message::Server_DenyGameSession:
+            server_deny_game_session(message);
+            break;
     }
 }
 
@@ -545,7 +589,13 @@ void GameScene::client_ping() {
     payload.time = std::chrono::system_clock::now();
 
     networking::Message message {protocol::message::Client_Ping};
-    message.write(payload);
+
+    try {
+        message.write(payload);
+    } catch (const networking::SerializationError& e) {
+        serialization_error(e);
+        return;
+    }
 
     try {
         g.client.send_message(message);
@@ -556,7 +606,56 @@ void GameScene::client_ping() {
 
 void GameScene::server_ping(const networking::Message& message) {
     protocol::Server_Ping payload;
-    message.read(payload);
+
+    try {
+        message.read(payload);
+    } catch (const networking::SerializationError& e) {
+        serialization_error(e);
+        return;
+    }
 
     LOG_DEBUG("Ping: {}", std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - payload.time).count());
+}
+
+void GameScene::server_accept_game_session(const networking::Message& message) {
+    if (!m_game_session) {
+        // The user has canceled the session in the meantime
+        return;
+    }
+
+    protocol::Server_AcceptGameSession payload;
+
+    try {
+        message.read(payload);
+    } catch (const networking::SerializationError& e) {
+        serialization_error(e);
+        return;
+    }
+
+    m_game_session->active = true;
+    m_game_session->session_id = payload.session_id;
+
+    m_ui.clear_popup_window();
+    m_ui.push_popup_window(PopupWindow::WaitRemoteJoinGameSession);
+}
+
+void GameScene::server_deny_game_session(const networking::Message& message) {
+    if (!m_game_session) {
+        // The user has canceled the session in the meantime
+        return;
+    }
+
+    m_game_session = std::nullopt;
+
+    protocol::Server_DenyGameSession payload;
+
+    try{
+        message.read(payload);
+    } catch (const networking::SerializationError& e) {
+        serialization_error(e);
+        return;
+    }
+
+    m_ui.clear_popup_window();
+    m_ui.push_popup_window(PopupWindow::NewGameSessionError, protocol::error_code_string(payload.error_code));
 }

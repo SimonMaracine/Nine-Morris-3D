@@ -70,10 +70,12 @@ void Ui::initialize(sm::Ctx& ctx) {
 
 void Ui::update(sm::Ctx& ctx, GameScene& game_scene) {
     main_menu_bar(ctx, game_scene);
-    game_window(game_scene);
+    game_window(ctx, game_scene);
 
     if (!m_popup_window_queue.empty()) {
-        switch (m_popup_window_queue.front()) {
+        const auto& [popup_window, string] {m_popup_window_queue.front()};
+
+        switch (popup_window) {
             case PopupWindow::None:
                 break;
             case PopupWindow::About:
@@ -91,6 +93,15 @@ void Ui::update(sm::Ctx& ctx, GameScene& game_scene) {
             case PopupWindow::ConnectionError:
                 connection_error_window();
                 break;
+            case PopupWindow::NewGameSessionError:
+                new_game_session_error_window(string);
+                break;
+            case PopupWindow::WaitServerAcceptGameSession:
+                wait_server_accept_game_session_window(game_scene);
+                break;
+            case PopupWindow::WaitRemoteJoinGameSession:
+                wait_remote_join_game_session_window(game_scene);
+                break;
             case PopupWindow::RulesNineMensMorris:
                 rules_nine_mens_morris_window();
                 break;
@@ -98,8 +109,12 @@ void Ui::update(sm::Ctx& ctx, GameScene& game_scene) {
     }
 }
 
-void Ui::push_popup_window(PopupWindow window) {
-    m_popup_window_queue.push_back(window);
+void Ui::push_popup_window(PopupWindow window, const std::string& string) {
+    m_popup_window_queue.emplace_back(window, string);
+}
+
+void Ui::clear_popup_window() {
+    m_popup_window_queue.clear();
 }
 
 void Ui::main_menu_bar(sm::Ctx& ctx, GameScene& game_scene) {
@@ -120,7 +135,7 @@ void Ui::main_menu_bar(sm::Ctx& ctx, GameScene& game_scene) {
                 // TODO
             }
             if (ImGui::MenuItem("Game Options")) {
-                m_popup_window_queue.push_back(PopupWindow::GameOptions);
+                push_popup_window(PopupWindow::GameOptions);
             }
             if (ImGui::BeginMenu("Game Mode")) {
                 if (ImGui::RadioButton("Nine Men's Morris", &m_options.game_mode, GameModeNineMensMorris)) {
@@ -366,6 +381,25 @@ void Ui::main_menu_bar(sm::Ctx& ctx, GameScene& game_scene) {
 
                 ImGui::EndMenu();
             }
+            if (ImGui::BeginMenu("Session")) {
+                if (ImGui::BeginMenu("Status")) {
+                    ImGui::Text("%s", game_scene.get_game_session().value_or(GameSession()).active ? "Active" : "Inactive");
+
+                    ImGui::EndMenu();
+                }
+
+                ImGui::PushItemWidth(rem(7.0f));
+                if (ImGui::InputText("Name", m_options.name, sizeof(m_options.name))) {
+                    std::memcpy(g.options.name, m_options.name, sizeof(m_options.name));
+                }
+                ImGui::PopItemWidth();
+
+                if (ImGui::IsItemHovered()) {
+                    ImGui::SetTooltip("Your name appears to other players.");
+                }
+
+                ImGui::EndMenu();
+            }
             if (ImGui::BeginMenu("Address")) {
                 if (ImGui::Checkbox("Default", &m_options.default_address_port)) {
                     g.options.default_address_port = m_options.default_address_port;
@@ -401,11 +435,11 @@ void Ui::main_menu_bar(sm::Ctx& ctx, GameScene& game_scene) {
         }
         if (ImGui::BeginMenu("Help")) {
             if (ImGui::MenuItem("About")) {
-                m_popup_window_queue.push_back(PopupWindow::About);
+                push_popup_window(PopupWindow::About);
             }
             if (ImGui::BeginMenu("Game Rules")) {
                 if (ImGui::MenuItem("Nine Men's Morris")) {
-                    m_popup_window_queue.push_back(PopupWindow::RulesNineMensMorris);
+                    push_popup_window(PopupWindow::RulesNineMensMorris);
                 }
 
                 ImGui::EndMenu();
@@ -424,19 +458,39 @@ void Ui::main_menu_bar(sm::Ctx& ctx, GameScene& game_scene) {
     }
 }
 
-void Ui::game_window(GameScene& game_scene) {
+void Ui::game_window(sm::Ctx& ctx, GameScene& game_scene) {
     if (ImGui::Begin("Game")) {
         if (game_scene.get_game_state() != GameState::Ready) {
             game_window_during_game(game_scene);
         } else {
-            game_window_before_game(game_scene);
+            game_window_before_game(ctx, game_scene);
         }
     }
 
     ImGui::End();
 }
 
-void Ui::game_window_before_game(GameScene& game_scene) {
+void Ui::game_window_before_game(sm::Ctx& ctx, GameScene& game_scene) {
+    switch (game_scene.get_game_options().game_type) {
+        case GameTypeLocalHumanVsHuman:
+        case GameTypeLocalHumanVsComputer:
+            game_window_before_game_local(ctx, game_scene);
+            break;
+        case GameTypeOnline:
+            game_window_before_game_online(ctx, game_scene);
+            break;
+    }
+
+    const auto minutes {std::get<0>(Clock::split_time(game_scene.get_clock().get_white_time()))};
+
+    if (minutes == 1) {
+        ImGui::TextWrapped("%u minute", minutes);
+    } else {
+        ImGui::TextWrapped("%u minutes", minutes);
+    }
+}
+
+void Ui::game_window_before_game_local(sm::Ctx&, GameScene& game_scene) {
     // The engine may be down, so don't allow play
     ImGui::BeginDisabled(game_scene.get_game_options().game_type == GameTypeLocalHumanVsComputer && !game_scene.get_engine());
 
@@ -460,21 +514,63 @@ void Ui::game_window_before_game(GameScene& game_scene) {
             );
             break;
         case GameTypeOnline:
-            ImGui::TextWrapped("Online game between two human players");
-            ImGui::TextWrapped(
-                "Remote plays as %s",
-                BoardObj::player_color_to_string(static_cast<PlayerColor>(game_scene.get_game_options().online.remote_color))
-            );
+            assert(false);
             break;
     }
+}
 
-    const auto minutes {std::get<0>(Clock::split_time(game_scene.get_clock().get_white_time()))};
+void Ui::game_window_before_game_online(sm::Ctx& ctx, GameScene& game_scene) {
+    const auto& g {ctx.global<Global>()};
 
-    if (minutes == 1) {
-        ImGui::TextWrapped("%u minute", minutes);
-    } else {
-        ImGui::TextWrapped("%u minutes", minutes);
+    // The connection may be down, so don't allow play
+    ImGui::BeginDisabled(g.connection_state == ConnectionState::Disconnected);
+
+    if (ImGui::Button("Start New Game")) {
+        if (game_scene.get_game_session()) {
+            game_scene.client_quit_game_session();
+        }
+
+        game_scene.get_game_session() = GameSession();
+
+        game_scene.client_request_game_session();
+
+        LOG_DEBUG("Requested a new game session");
+
+        push_popup_window(PopupWindow::WaitServerAcceptGameSession);
     }
+
+    ImGui::SameLine();
+
+    if (ImGui::Button("Rematch")) {
+
+    }
+
+    // The user must enter 5 digits
+    ImGui::BeginDisabled(m_session_id[sizeof(m_session_id) - 2] == 0);
+
+    if (ImGui::Button("Join Game")) {
+        // TODO Client_RequestJoinGameSession
+    }
+
+    ImGui::EndDisabled();
+
+    ImGui::SameLine();
+
+    ImGui::PushItemWidth(rem(3.0f));
+    ImGui::InputText("Code", m_session_id, sizeof(m_session_id));
+    ImGui::PopItemWidth();
+
+    ImGui::EndDisabled();
+
+    ImGui::Separator();
+
+    assert(game_scene.get_game_options().game_type == GameTypeOnline);
+
+    ImGui::TextWrapped("Online game between two human players");
+    ImGui::TextWrapped(
+        "Remote plays as %s",
+        BoardObj::player_color_to_string(static_cast<PlayerColor>(game_scene.get_game_options().online.remote_color))
+    );
 }
 
 void Ui::game_window_during_game(GameScene& game_scene) {
@@ -497,7 +593,7 @@ void Ui::game_window_during_game(GameScene& game_scene) {
 }
 
 void Ui::about_window() {
-    generic_window("About Nine Morris 3D", []() {
+    generic_window_ok("About Nine Morris 3D", []() {
         ImGui::Text("A 3D implementation of the board game nine men's morris");
         ImGui::Text("Version %u.%u.%u", VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH);
         ImGui::Separator();
@@ -507,7 +603,7 @@ void Ui::about_window() {
 }
 
 void Ui::game_over_window(GameScene& game_scene) {
-    generic_window("Game Over", [&]() {
+    generic_window_ok("Game Over", [&]() {
         const char* message {};
 
         switch (game_scene.get_board().get_game_over()) {
@@ -536,7 +632,7 @@ void Ui::game_over_window(GameScene& game_scene) {
 }
 
 void Ui::game_options_window(GameScene& game_scene) {
-    generic_window("Game Options", [&]() {
+    generic_window_ok("Game Options", [&]() {
         GameOptions& options {game_scene.get_game_options()};
 
         ImGui::BeginDisabled(game_scene.get_game_state() != GameState::Ready);
@@ -569,16 +665,48 @@ void Ui::game_options_window(GameScene& game_scene) {
 }
 
 void Ui::engine_error_window() {
-    generic_window("Engine Error", []() {
+    generic_window_ok("Engine Error", []() {
         ImGui::Text("An error occurred with the engine. It has probably crashed.");
         ImGui::Text("You may want to restart it.");
     });
 }
 
 void Ui::connection_error_window() {
-    generic_window("Connection Error", []() {
+    generic_window_ok("Connection Error", []() {
         ImGui::Text("An error occurred with the connection to the server.");
         ImGui::Text("You may want to reconnect.");
+    });
+}
+
+void Ui::new_game_session_error_window(const std::string& string) {
+    generic_window_ok("New Online Game Error", [&string]() {
+        ImGui::Text("Could not start a new online game. Reason:");
+        ImGui::Text("%s", string.c_str());
+    });
+}
+
+void Ui::wait_server_accept_game_session_window(GameScene&) {
+    generic_window("Waiting For Server To Accept", []() {
+        ImGui::Text("The server should reply any time soon.");
+
+        return false;
+    });
+}
+
+void Ui::wait_remote_join_game_session_window(GameScene& game_scene) {
+    generic_window("Waiting For Player To Join", [&game_scene]() {
+        ImGui::Text("An online game has been created.");
+        ImGui::Text("Send your opponent the following code: %.5u", game_scene.get_game_session()->session_id);
+
+        if (ImGui::Button("Cancel Game")) {
+            game_scene.client_quit_game_session();
+
+            game_scene.get_game_session() = std::nullopt;
+
+            return true;
+        }
+
+        return false;
     });
 }
 
@@ -599,7 +727,7 @@ void Ui::wrapped_text_window(const char* title, const char* text) {
     const auto viewport_size {ImGui::GetMainViewport()->WorkSize};
     const bool wrapped {viewport_size.x < ImGui::CalcTextSize(text).x + ImGui::GetStyle().WindowPadding.x * 2.0f};
 
-    generic_window(title, [=]() {
+    generic_window_ok(title, [=]() {
         if (wrapped) {
             ImGui::TextWrapped("%s", text);  // FIXME
         } else {
@@ -608,7 +736,7 @@ void Ui::wrapped_text_window(const char* title, const char* text) {
     });
 }
 
-void Ui::generic_window(const char* title, std::function<void()>&& contents, std::function<void()>&& on_ok) {
+void Ui::generic_window_ok(const char* title, std::function<void()>&& contents, std::function<void()>&& on_ok) {
     ImGui::OpenPopup(title);
 
     const ImVec2 center {ImGui::GetMainViewport()->GetWorkCenter()};
@@ -629,6 +757,26 @@ void Ui::generic_window(const char* title, std::function<void()>&& contents, std
             m_popup_window_queue.pop_front();
 
             on_ok();
+        }
+
+        ImGui::Dummy(ImVec2(0.0f, rem(0.5f)));
+
+        ImGui::EndPopup();
+    }
+}
+
+void Ui::generic_window(const char* title, std::function<bool()>&& contents) {
+    ImGui::OpenPopup(title);
+
+    const ImVec2 center {ImGui::GetMainViewport()->GetWorkCenter()};
+    ImGui::SetNextWindowPos(center, 0, ImVec2(0.5f, 0.5f));
+
+    const auto flags {ImGuiWindowFlags_NoResize | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoCollapse};
+
+    if (ImGui::BeginPopupModal(title, nullptr, flags)) {
+        if (contents()) {
+            ImGui::CloseCurrentPopup();
+            m_popup_window_queue.pop_front();
         }
 
         ImGui::Dummy(ImVec2(0.0f, rem(0.5f)));

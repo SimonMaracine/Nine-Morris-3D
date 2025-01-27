@@ -58,6 +58,11 @@ namespace networking {
         // Throws connection errors
         void accept_connections();
 
+        // Check the state of all connections
+        // Invokes on_client_disconnected() when needed
+        // Throws connection errors
+        void check_connections();
+
         // Poll the next incoming message from the queue
         // You may call it in a loop to process as many messages as you want
         std::pair<std::shared_ptr<ClientConnection>, Message> next_message();
@@ -77,6 +82,7 @@ namespace networking {
         // Throws connection errors
         void send_message_all(const Message& message, std::shared_ptr<ClientConnection> exception);
 
+        // Get a pointer to the logger
         std::shared_ptr<spdlog::logger> get_logger() { return m_logger; }
     private:
         using ConnectionsIter = std::forward_list<std::shared_ptr<ClientConnection>>::iterator;
