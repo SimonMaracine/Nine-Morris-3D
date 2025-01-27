@@ -171,6 +171,8 @@ void GameScene::connect(const std::string& address, const std::string& port, boo
         connect(address, static_cast<std::uint16_t>(std::stoul(port)), reconnect);
     } catch (const std::invalid_argument& e) {
         LOG_DIST_ERROR("Invalid port: {}", e.what());
+    } catch (const std::out_of_range& e) {
+        LOG_DIST_ERROR("Invalid port: {}", e.what());
     }
 }
 
