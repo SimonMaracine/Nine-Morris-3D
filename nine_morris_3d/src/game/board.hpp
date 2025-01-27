@@ -57,6 +57,7 @@ public:
 
     void user_click_press();
     void user_click_release();
+    void enable_move_callback(bool enable);
 
     static PlayerColor player_color_opponent(PlayerColor color);
     static const char* player_color_to_string(PlayerColor color);
@@ -65,6 +66,7 @@ protected:
 
     static std::string format(const char* format, ...);
 
+    bool m_enable_move_callback {true};
     int m_click_id {-1};
     int m_hover_id {-1};
     GameOver m_game_over;

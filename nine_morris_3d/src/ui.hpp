@@ -18,8 +18,10 @@ enum class PopupWindow {
     EngineError,
     ConnectionError,
     NewGameSessionError,
+    JoinGameSessionError,
     WaitServerAcceptGameSession,
     WaitRemoteJoinGameSession,
+    WaitServerAcceptJoinGameSession,
     RulesNineMensMorris
 };
 
@@ -35,18 +37,20 @@ public:
 private:
     void main_menu_bar(sm::Ctx& ctx, GameScene& game_scene);
     void game_window(sm::Ctx& ctx, GameScene& game_scene);
-    void game_window_before_game(sm::Ctx& ctx, GameScene& game_scene);
-    void game_window_before_game_local(sm::Ctx& ctx, GameScene& game_scene);
-    void game_window_before_game_online(sm::Ctx& ctx, GameScene& game_scene);
-    void game_window_during_game(GameScene& game_scene);
+    void before_game_window(sm::Ctx& ctx, GameScene& game_scene);
+    void before_game_local_window(sm::Ctx& ctx, GameScene& game_scene);
+    void before_game_online_window(sm::Ctx& ctx, GameScene& game_scene);
+    void during_game_window(GameScene& game_scene);
     void about_window();
     void game_over_window(GameScene& game_scene);
     void game_options_window(GameScene& game_scene);
     void engine_error_window();
     void connection_error_window();
     void new_game_session_error_window(const std::string& string);
+    void join_game_session_error_window(const std::string& string);
     void wait_server_accept_game_session_window(GameScene& game_scene);
     void wait_remote_join_game_session_window(GameScene& game_scene);
+    void wait_server_accept_join_game_session_window(GameScene& game_scene);
     void rules_nine_mens_morris_window();
     void wrapped_text_window(const char* title, const char* text);
     void generic_window_ok(const char* title, std::function<void()>&& contents, std::function<void()>&& on_ok = []() {});

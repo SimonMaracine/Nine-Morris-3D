@@ -21,6 +21,8 @@ namespace sm::utils {
     unsigned int random_int(unsigned int end) noexcept;
     unsigned int random_int(unsigned int begin, unsigned int end) noexcept;
 
+    unsigned short string_to_unsigned_short(const std::string& string);
+
     void center_image(
         float screen_width,
         float screen_height,

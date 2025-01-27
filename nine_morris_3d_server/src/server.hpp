@@ -26,6 +26,10 @@ private:
     void client_request_game_session(std::shared_ptr<networking::ClientConnection> connection, const networking::Message& message);
     void server_accept_game_session(std::shared_ptr<networking::ClientConnection> connection, protocol::SessionId session_id);
     void server_deny_game_session(std::shared_ptr<networking::ClientConnection> connection);
+    void client_request_join_game_session(std::shared_ptr<networking::ClientConnection> connection, const networking::Message& message);
+    void server_accept_join_game_session(std::shared_ptr<networking::ClientConnection> connection, protocol::Server_AcceptJoinGameSession&& payload);
+    void server_deny_join_game_session(std::shared_ptr<networking::ClientConnection> connection, protocol::ErrorCode error_code);
+    void server_remote_joined_game_session(std::shared_ptr<networking::ClientConnection> connection, const std::string& remote_player_name);
     void client_quit_game_session(std::shared_ptr<networking::ClientConnection> connection, const networking::Message& message);
 
     networking::Server m_server;

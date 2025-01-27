@@ -70,11 +70,11 @@ std::string NineMensMorrisBaseScene::get_setup_position() const {
     return NineMensMorrisBoard::position_to_string(m_board.get_setup_position());
 }
 
-void NineMensMorrisBaseScene::reset() {
-    reset("w:w:b:1");
+void NineMensMorrisBaseScene::reset(const std::vector<std::string>& moves) {
+    reset("w:w:b:1", moves);
 }
 
-void NineMensMorrisBaseScene::reset(const std::string& string) {
+void NineMensMorrisBaseScene::reset(const std::string& string, const std::vector<std::string>& moves) {
     if (m_engine) {
         try {
             m_engine->stop_thinking();  // Stop the engine first
@@ -124,6 +124,16 @@ void NineMensMorrisBaseScene::reset(const std::string& string) {
         m_clock.switch_turn();
         m_move_list.skip_first(true);
     }
+
+    m_board.enable_move_callback(false);
+
+    for (const auto& move : moves) {
+        play_move(move);
+        m_clock.switch_turn();
+        m_move_list.push(move);
+    }
+
+    m_board.enable_move_callback(true);
 
     m_camera_controller.go_towards_position(m_default_camera_position);
 }

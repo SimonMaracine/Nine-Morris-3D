@@ -26,8 +26,8 @@ public:
     BoardObj& get_board() override;
     GamePlayer get_player_type() const override;
     std::string get_setup_position() const override;
-    void reset() override;
-    void reset(const std::string& string) override;
+    void reset(const std::vector<std::string>& moves = {}) override;
+    void reset(const std::string& string, const std::vector<std::string>& moves = {}) override;
     void play_move(const std::string& string) override;
     void timeout(PlayerColor color) override;
     void resign(PlayerColor color) override;

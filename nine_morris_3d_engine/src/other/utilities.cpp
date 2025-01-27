@@ -22,6 +22,24 @@ namespace sm::utils {
         return glm::linearRand(begin, end);
     }
 
+    unsigned short string_to_unsigned_short(const std::string& string) {
+        unsigned long result {};
+
+        try {
+            result = std::stoul(string);
+        } catch (const std::invalid_argument& e) {
+            throw OtherError(e.what());
+        } catch (const std::out_of_range& e) {
+            throw OtherError(e.what());
+        }
+
+        if (result > std::numeric_limits<unsigned short>::max()) {
+            throw OtherError("Too large to fit unsigned short");
+        }
+
+        return static_cast<unsigned short>(result);
+    }
+
     void center_image(
         float screen_width,
         float screen_height,

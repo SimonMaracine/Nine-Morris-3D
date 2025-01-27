@@ -65,6 +65,10 @@ void BoardObj::user_click_release() {
     user_click_release_callback();
 }
 
+void BoardObj::enable_move_callback(bool enable) {
+    m_enable_move_callback = enable;
+}
+
 PlayerColor BoardObj::player_color_opponent(PlayerColor color) {
     if (color == PlayerColorWhite) {
         return PlayerColorBlack;

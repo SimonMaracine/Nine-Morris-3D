@@ -11,7 +11,6 @@ struct GameSession {
     std::weak_ptr<networking::ClientConnection> connection2;
     std::string name1;
     std::string name2;
-    std::string position;
     std::vector<std::string> moves;
     protocol::Player player1;
     bool acknowledged_game_over1 {false};

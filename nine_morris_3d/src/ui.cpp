@@ -1,6 +1,7 @@
 #include "ui.hpp"
 
 #include <utility>
+#include <algorithm>
 #include <cstring>
 #include <cassert>
 
@@ -96,11 +97,17 @@ void Ui::update(sm::Ctx& ctx, GameScene& game_scene) {
             case PopupWindow::NewGameSessionError:
                 new_game_session_error_window(string);
                 break;
+            case PopupWindow::JoinGameSessionError:
+                join_game_session_error_window(string);
+                break;
             case PopupWindow::WaitServerAcceptGameSession:
                 wait_server_accept_game_session_window(game_scene);
                 break;
             case PopupWindow::WaitRemoteJoinGameSession:
                 wait_remote_join_game_session_window(game_scene);
+                break;
+            case PopupWindow::WaitServerAcceptJoinGameSession:
+                wait_server_accept_join_game_session_window(game_scene);
                 break;
             case PopupWindow::RulesNineMensMorris:
                 rules_nine_mens_morris_window();
@@ -461,23 +468,23 @@ void Ui::main_menu_bar(sm::Ctx& ctx, GameScene& game_scene) {
 void Ui::game_window(sm::Ctx& ctx, GameScene& game_scene) {
     if (ImGui::Begin("Game")) {
         if (game_scene.get_game_state() != GameState::Ready) {
-            game_window_during_game(game_scene);
+            during_game_window(game_scene);
         } else {
-            game_window_before_game(ctx, game_scene);
+            before_game_window(ctx, game_scene);
         }
     }
 
     ImGui::End();
 }
 
-void Ui::game_window_before_game(sm::Ctx& ctx, GameScene& game_scene) {
+void Ui::before_game_window(sm::Ctx& ctx, GameScene& game_scene) {
     switch (game_scene.get_game_options().game_type) {
         case GameTypeLocalHumanVsHuman:
         case GameTypeLocalHumanVsComputer:
-            game_window_before_game_local(ctx, game_scene);
+            before_game_local_window(ctx, game_scene);
             break;
         case GameTypeOnline:
-            game_window_before_game_online(ctx, game_scene);
+            before_game_online_window(ctx, game_scene);
             break;
     }
 
@@ -490,7 +497,7 @@ void Ui::game_window_before_game(sm::Ctx& ctx, GameScene& game_scene) {
     }
 }
 
-void Ui::game_window_before_game_local(sm::Ctx&, GameScene& game_scene) {
+void Ui::before_game_local_window(sm::Ctx&, GameScene& game_scene) {
     // The engine may be down, so don't allow play
     ImGui::BeginDisabled(game_scene.get_game_options().game_type == GameTypeLocalHumanVsComputer && !game_scene.get_engine());
 
@@ -519,7 +526,7 @@ void Ui::game_window_before_game_local(sm::Ctx&, GameScene& game_scene) {
     }
 }
 
-void Ui::game_window_before_game_online(sm::Ctx& ctx, GameScene& game_scene) {
+void Ui::before_game_online_window(sm::Ctx& ctx, GameScene& game_scene) {
     const auto& g {ctx.global<Global>()};
 
     // The connection may be down, so don't allow play
@@ -530,26 +537,24 @@ void Ui::game_window_before_game_online(sm::Ctx& ctx, GameScene& game_scene) {
             game_scene.client_quit_game_session();
         }
 
-        game_scene.get_game_session() = GameSession();
-
         game_scene.client_request_game_session();
-
-        LOG_DEBUG("Requested a new game session");
-
-        push_popup_window(PopupWindow::WaitServerAcceptGameSession);
     }
 
     ImGui::SameLine();
 
     if (ImGui::Button("Rematch")) {
-
+        // TODO
     }
 
     // The user must enter 5 digits
-    ImGui::BeginDisabled(m_session_id[sizeof(m_session_id) - 2] == 0);
+    ImGui::BeginDisabled(std::any_of(std::cbegin(m_session_id), std::prev(std::cend(m_session_id)), [](char c) { return c == 0; }));
 
     if (ImGui::Button("Join Game")) {
-        // TODO Client_RequestJoinGameSession
+        if (game_scene.get_game_session()) {
+            game_scene.client_quit_game_session();
+        }
+
+        game_scene.client_request_join_game_session(m_session_id);
     }
 
     ImGui::EndDisabled();
@@ -573,7 +578,7 @@ void Ui::game_window_before_game_online(sm::Ctx& ctx, GameScene& game_scene) {
     );
 }
 
-void Ui::game_window_during_game(GameScene& game_scene) {
+void Ui::during_game_window(GameScene& game_scene) {
     {
         ImGui::Text("B");
         ImGui::SameLine();
@@ -680,8 +685,15 @@ void Ui::connection_error_window() {
 
 void Ui::new_game_session_error_window(const std::string& string) {
     generic_window_ok("New Online Game Error", [&string]() {
-        ImGui::Text("Could not start a new online game. Reason:");
-        ImGui::Text("%s", string.c_str());
+        ImGui::Text("Could not start a new online game.");
+        ImGui::Text("%s.", string.c_str());
+    });
+}
+
+void Ui::join_game_session_error_window(const std::string& string) {
+    generic_window_ok("Join Online Game Error", [&string]() {
+        ImGui::Text("Could not join the online game.");
+        ImGui::Text("%s.", string.c_str());
     });
 }
 
@@ -701,10 +713,16 @@ void Ui::wait_remote_join_game_session_window(GameScene& game_scene) {
         if (ImGui::Button("Cancel Game")) {
             game_scene.client_quit_game_session();
 
-            game_scene.get_game_session() = std::nullopt;
-
             return true;
         }
+
+        return false;
+    });
+}
+
+void Ui::wait_server_accept_join_game_session_window(GameScene&) {
+    generic_window("Waiting For Server To Accept", []() {
+        ImGui::Text("The server should reply any time soon.");
 
         return false;
     });

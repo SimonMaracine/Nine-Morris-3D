@@ -1015,7 +1015,9 @@ void NineMensMorrisBoard::play_place_move(const Move& move) {
     finish_turn();
     check_legal_moves();
 
-    m_move_callback(move);
+    if (m_enable_move_callback) {
+        m_move_callback(move);
+    }
 }
 
 void NineMensMorrisBoard::play_place_capture_move(const Move& move) {
@@ -1030,7 +1032,9 @@ void NineMensMorrisBoard::play_place_capture_move(const Move& move) {
     check_material();
     check_legal_moves();
 
-    m_move_callback(move);
+    if (m_enable_move_callback) {
+        m_move_callback(move);
+    }
 }
 
 void NineMensMorrisBoard::play_move_move(const Move& move) {
@@ -1045,7 +1049,9 @@ void NineMensMorrisBoard::play_move_move(const Move& move) {
     check_threefold_repetition();
     check_fifty_move_rule();
 
-    m_move_callback(move);
+    if (m_enable_move_callback) {
+        m_move_callback(move);
+    }
 }
 
 void NineMensMorrisBoard::play_move_capture_move(const Move& move) {
@@ -1061,7 +1067,9 @@ void NineMensMorrisBoard::play_move_capture_move(const Move& move) {
     check_material();
     check_legal_moves();
 
-    m_move_callback(move);
+    if (m_enable_move_callback) {
+        m_move_callback(move);
+    }
 }
 
 void NineMensMorrisBoard::finish_turn(bool advancement) {

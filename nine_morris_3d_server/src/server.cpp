@@ -61,6 +61,9 @@ void Server::handle_message(std::shared_ptr<networking::ClientConnection> connec
             case protocol::message::Client_RequestGameSession:
                 client_request_game_session(connection, message);
                 break;
+            case protocol::message::Client_RequestJoinGameSession:
+                client_request_join_game_session(connection, message);
+                break;
             case protocol::message::Client_QuitGameSession:
                 client_quit_game_session(connection, message);
                 break;
@@ -98,9 +101,7 @@ void Server::client_request_game_session(std::shared_ptr<networking::ClientConne
 
     if (!session_id) {
         server_deny_game_session(connection);
-
         m_server.get_logger()->debug("Denied new session");
-
         return;
     }
 
@@ -134,13 +135,84 @@ void Server::server_deny_game_session(std::shared_ptr<networking::ClientConnecti
     m_server.send_message(connection, message);
 }
 
+void Server::client_request_join_game_session(std::shared_ptr<networking::ClientConnection> connection, const networking::Message& message) {
+    protocol::Client_RequestJoinGameSession payload;
+    message.read(payload);
+
+    const auto iter {m_game_sessions.find(payload.session_id)};
+
+    if (iter == m_game_sessions.end()) {
+        server_deny_join_game_session(connection, protocol::ErrorCode::InvalidSessionId);
+        m_server.get_logger()->debug("Denied join session");
+        return;
+    }
+
+    protocol::Server_AcceptJoinGameSession payload_accept;
+    payload_accept.moves = iter->second.moves;
+
+    if (iter->second.connection1.expired()) {
+        iter->second.connection1 = connection;
+        iter->second.name1 = payload.player_name;
+
+        payload_accept.remote_player_name = iter->second.name2;
+        payload_accept.remote_player_type = protocol::opponent(iter->second.player1);
+
+        if (const auto connection2 {iter->second.connection2.lock()}) {
+            server_remote_joined_game_session(connection2, payload.player_name);
+        }
+    } else if (iter->second.connection2.expired()) {
+        iter->second.connection2 = connection;
+        iter->second.name2 = payload.player_name;
+
+        payload_accept.remote_player_name = iter->second.name1;
+        payload_accept.remote_player_type = iter->second.player1;
+
+        if (const auto connection1 {iter->second.connection1.lock()}) {
+            server_remote_joined_game_session(connection1, payload.player_name);
+        }
+    } else {
+        server_deny_join_game_session(connection, protocol::ErrorCode::SessionOccupied);
+        m_server.get_logger()->warn("Client requested to join an occupied session");
+        return;
+    }
+
+    server_accept_join_game_session(connection, std::move(payload_accept));
+}
+
+void Server::server_accept_join_game_session(std::shared_ptr<networking::ClientConnection> connection, protocol::Server_AcceptJoinGameSession&& payload) {
+    networking::Message message {protocol::message::Server_AcceptJoinGameSession};
+    message.write(payload);
+
+    m_server.send_message(connection, message);
+}
+
+void Server::server_deny_join_game_session(std::shared_ptr<networking::ClientConnection> connection, protocol::ErrorCode error_code) {
+    protocol::Server_DenyJoinGameSession payload;
+    payload.error_code = error_code;
+
+    networking::Message message {protocol::message::Server_DenyJoinGameSession};
+    message.write(payload);
+
+    m_server.send_message(connection, message);
+}
+
+void Server::server_remote_joined_game_session(std::shared_ptr<networking::ClientConnection> connection, const std::string& remote_player_name) {
+    protocol::Server_RemoteJoinedGameSession payload;
+    payload.remote_player_name = remote_player_name;
+
+    networking::Message message {protocol::message::Server_RemoteJoinedGameSession};
+    message.write(payload);
+
+    m_server.send_message(connection, message);
+}
+
 void Server::client_quit_game_session(std::shared_ptr<networking::ClientConnection> connection, const networking::Message& message) {
     protocol::Client_QuitGameSession payload;
     message.read(payload);
 
     auto iter {m_game_sessions.find(payload.session_id)};
 
-    if (iter == m_game_sessions.cend()) {
+    if (iter == m_game_sessions.end()) {
         return;
     }
 
@@ -148,5 +220,8 @@ void Server::client_quit_game_session(std::shared_ptr<networking::ClientConnecti
         iter->second.connection1.reset();
     } else if (iter->second.connection2.lock() == connection) {
         iter->second.connection2.reset();
+    } else {
+        m_server.get_logger()->warn("Client tried to quit a session in which it doesn't belong");
+        m_server.get_logger()->info("The previous situation may be normal");
     }
 }

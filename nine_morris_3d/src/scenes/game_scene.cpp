@@ -1,5 +1,7 @@
 #include "scenes/game_scene.hpp"
 
+#include <limits>
+
 #include <nine_morris_3d_engine/external/resmanager.h++>
 #include <protocol.hpp>
 
@@ -163,10 +165,8 @@ void GameScene::connect(const std::string& address, std::uint16_t port, bool rec
 
 void GameScene::connect(const std::string& address, const std::string& port, bool reconnect) {
     try {
-        connect(address, static_cast<std::uint16_t>(std::stoul(port)), reconnect);
-    } catch (const std::invalid_argument& e) {
-        LOG_DIST_ERROR("Invalid port: {}", e.what());
-    } catch (const std::out_of_range& e) {
+        connect(address, sm::utils::string_to_unsigned_short(port), reconnect);
+    } catch (const sm::OtherError& e) {
         LOG_DIST_ERROR("Invalid port: {}", e.what());
     }
 }
@@ -196,7 +196,16 @@ void GameScene::client_request_game_session() {
         g.client.send_message(message);
     } catch (const networking::ConnectionError& e) {
         connection_error(e);
+        return;
     }
+
+    m_game_session = GameSession();
+
+    // The game should be ready before the remote finally joins
+    reset();
+
+    LOG_DEBUG("Requested a new game session");
+    m_ui.push_popup_window(PopupWindow::WaitServerAcceptGameSession);
 }
 
 void GameScene::client_quit_game_session() {
@@ -220,7 +229,47 @@ void GameScene::client_quit_game_session() {
         g.client.send_message(message);
     } catch (const networking::ConnectionError& e) {
         connection_error(e);
+        return;
     }
+
+    m_game_session.reset();
+}
+
+void GameScene::client_request_join_game_session(const std::string& session_id) {
+    auto& g {ctx.global<Global>()};
+
+    protocol::Client_RequestJoinGameSession payload;
+
+    try {
+        payload.session_id = sm::utils::string_to_unsigned_short(session_id);
+        payload.player_name = g.options.name;
+    } catch (const sm::OtherError& e) {
+        LOG_DIST_ERROR("Invalid code: {}", e.what());
+        m_ui.push_popup_window(PopupWindow::JoinGameSessionError, "Invalid code");
+        return;
+    }
+
+    networking::Message message {protocol::message::Client_RequestJoinGameSession};
+
+    try {
+        message.write(payload);
+    } catch (const networking::SerializationError& e) {
+        serialization_error(e);
+        return;
+    }
+
+    try {
+        g.client.send_message(message);
+    } catch (const networking::ConnectionError& e) {
+        connection_error(e);
+        return;
+    }
+
+    m_game_session = GameSession();
+    m_game_session->session_id = payload.session_id;
+
+    LOG_DEBUG("Requested to join a game session");
+    m_ui.push_popup_window(PopupWindow::WaitServerAcceptJoinGameSession);
 }
 
 void GameScene::on_window_resized(const sm::WindowResizedEvent& event) {
@@ -529,6 +578,7 @@ std::shared_ptr<sm::GlTextureCubemap> GameScene::load_skybox_texture_cubemap(boo
 void GameScene::disconnect() {
     auto& g {ctx.global<Global>()};
 
+    m_game_session.reset();
     g.connection_state = ConnectionState::Disconnected;
     g.client.disconnect();
     LOG_DIST_INFO("Disconnected from server");
@@ -538,6 +588,7 @@ void GameScene::connection_error(const networking::ConnectionError& e) {
     auto& g {ctx.global<Global>()};
 
     LOG_DIST_ERROR("Connection error: {}", e.what());
+    m_game_session.reset();
     g.connection_state = ConnectionState::Disconnected;
     m_ui.push_popup_window(PopupWindow::ConnectionError);
 }
@@ -579,6 +630,15 @@ void GameScene::handle_message(const networking::Message& message) {
         case protocol::message::Server_DenyGameSession:
             server_deny_game_session(message);
             break;
+        case protocol::message::Server_AcceptJoinGameSession:
+            server_accept_join_game_session(message);
+            break;
+        case protocol::message::Server_DenyJoinGameSession:
+            server_deny_join_game_session(message);
+            break;
+        case protocol::message::Server_RemoteJoinedGameSession:
+            server_remote_joined_game_session(message);
+            break;
     }
 }
 
@@ -618,10 +678,7 @@ void GameScene::server_ping(const networking::Message& message) {
 }
 
 void GameScene::server_accept_game_session(const networking::Message& message) {
-    if (!m_game_session) {
-        // The user has canceled the session in the meantime
-        return;
-    }
+    assert(m_game_session);
 
     protocol::Server_AcceptGameSession payload;
 
@@ -640,12 +697,9 @@ void GameScene::server_accept_game_session(const networking::Message& message) {
 }
 
 void GameScene::server_deny_game_session(const networking::Message& message) {
-    if (!m_game_session) {
-        // The user has canceled the session in the meantime
-        return;
-    }
+    assert(m_game_session);
 
-    m_game_session = std::nullopt;
+    m_game_session.reset();
 
     protocol::Server_DenyGameSession payload;
 
@@ -658,4 +712,61 @@ void GameScene::server_deny_game_session(const networking::Message& message) {
 
     m_ui.clear_popup_window();
     m_ui.push_popup_window(PopupWindow::NewGameSessionError, protocol::error_code_string(payload.error_code));
+}
+
+void GameScene::server_accept_join_game_session(const networking::Message& message) {
+    assert(m_game_session);
+
+    protocol::Server_AcceptJoinGameSession payload;
+
+    try {
+        message.read(payload);
+    } catch (const networking::SerializationError& e) {
+        serialization_error(e);
+        return;
+    }
+
+    reset(payload.moves);
+
+    m_game_session->active = true;
+    m_game_session->remote_player_name = payload.remote_player_name;
+
+    // Unblock from waiting
+    m_ui.clear_popup_window();
+}
+
+void GameScene::server_deny_join_game_session(const networking::Message& message) {
+    assert(m_game_session);
+
+    m_game_session.reset();
+
+    protocol::Server_DenyJoinGameSession payload;
+
+    try {
+        message.read(payload);
+    } catch (const networking::SerializationError& e) {
+        serialization_error(e);
+        return;
+    }
+
+    m_ui.clear_popup_window();
+    m_ui.push_popup_window(PopupWindow::JoinGameSessionError, protocol::error_code_string(payload.error_code));
+}
+
+void GameScene::server_remote_joined_game_session(const networking::Message& message) {
+    assert(m_game_session);
+
+    protocol::Server_RemoteJoinedGameSession payload;
+
+    try {
+        message.read(payload);
+    } catch (const networking::SerializationError& e) {
+        serialization_error(e);
+        return;
+    }
+
+    m_game_session->remote_player_name = payload.remote_player_name;
+
+    // Unblock from waiting
+    m_ui.clear_popup_window();
 }

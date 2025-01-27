@@ -61,8 +61,8 @@ public:
     virtual BoardObj& get_board() = 0;
     virtual GamePlayer get_player_type() const = 0;
     virtual std::string get_setup_position() const = 0;
-    virtual void reset() = 0;
-    virtual void reset(const std::string& string) = 0;
+    virtual void reset(const std::vector<std::string>& moves = {}) = 0;
+    virtual void reset(const std::string& string, const std::vector<std::string>& moves = {}) = 0;
     virtual void play_move(const std::string& string) = 0;
     virtual void timeout(PlayerColor color) = 0;
     virtual void resign(PlayerColor color) = 0;
@@ -90,6 +90,7 @@ public:
     void serialization_error(const networking::SerializationError& e);
     void client_request_game_session();
     void client_quit_game_session();
+    void client_request_join_game_session(const std::string& session_id);
 protected:
     void on_window_resized(const sm::WindowResizedEvent& event);
     void on_key_released(const sm::KeyReleasedEvent& event);
@@ -116,6 +117,9 @@ protected:
     void server_ping(const networking::Message& message);
     void server_accept_game_session(const networking::Message& message);
     void server_deny_game_session(const networking::Message& message);
+    void server_accept_join_game_session(const networking::Message& message);
+    void server_deny_join_game_session(const networking::Message& message);
+    void server_remote_joined_game_session(const networking::Message& message);
 
     sm::Camera m_camera;
     sm::Camera2D m_camera_2d;

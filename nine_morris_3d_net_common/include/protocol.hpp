@@ -124,7 +124,8 @@ namespace protocol {
 
     enum class ErrorCode {
         TooManySessions,
-        InvalidSessionId
+        InvalidSessionId,
+        SessionOccupied
     };
 
     inline const char* error_code_string(ErrorCode error_code) {
@@ -135,7 +136,10 @@ namespace protocol {
                 string = "There is no room for another session";
                 break;
             case ErrorCode::InvalidSessionId:
-                string = "No session could be found with that ID";
+                string = "No session could be found";
+                break;
+            case ErrorCode::SessionOccupied:
+                string = "The session is occupied";
                 break;
         }
 
@@ -179,7 +183,7 @@ namespace protocol {
     };
 
     struct Server_AcceptGameSession {
-        SessionId session_id {};  // FIXME the client already knows the ID
+        SessionId session_id {};
 
         template<typename Archive>
         void serialize(Archive& archive) {
@@ -207,15 +211,13 @@ namespace protocol {
     };
 
     struct Server_AcceptJoinGameSession {
-        SessionId session_id {};
-        std::string position;
         std::vector<std::string> moves;
         std::string remote_player_name;
         Player remote_player_type {};
 
         template<typename Archive>
         void serialize(Archive& archive) {
-            archive(session_id, position, moves, remote_player_name, remote_player_type);
+            archive(moves, remote_player_name, remote_player_type);
         }
     };
 
