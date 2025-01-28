@@ -56,7 +56,7 @@ GamePlayer NineMensMorrisBaseScene::get_player_type() const {
             player = (
                 m_game_options.online.remote_color == m_board.if_player_white(PlayerColorWhite, PlayerColorBlack)
                 ?
-                GamePlayer::Computer
+                GamePlayer::Remote
                 :
                 GamePlayer::Human
             );
@@ -547,6 +547,10 @@ NineMensMorrisBoard NineMensMorrisBaseScene::setup_renderables() {
         setup_white_pieces(),
         setup_black_pieces(),
         [this](const NineMensMorrisBoard::Move& move) {
+            if (get_player_type() == GamePlayer::Remote) {
+                client_play_move(NineMensMorrisBoard::move_to_string(move));
+            }
+
             m_move_list.push(NineMensMorrisBoard::move_to_string(move));
             m_game_state = GameState::FinishTurn;
         }

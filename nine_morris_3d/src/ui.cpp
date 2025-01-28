@@ -124,6 +124,14 @@ void Ui::clear_popup_window() {
     m_popup_window_queue.clear();
 }
 
+PopupWindow Ui::get_popup_window() const {
+    if (!m_popup_window_queue.empty()) {
+        return m_popup_window_queue.front().first;
+    }
+
+    return PopupWindow::None;
+}
+
 void Ui::main_menu_bar(sm::Ctx& ctx, GameScene& game_scene) {
     auto& g {ctx.global<Global>()};
 
@@ -395,7 +403,7 @@ void Ui::main_menu_bar(sm::Ctx& ctx, GameScene& game_scene) {
                     ImGui::EndMenu();
                 }
 
-                ImGui::PushItemWidth(rem(7.0f));
+                ImGui::PushItemWidth(rem(6.0f));
                 if (ImGui::InputText("Name", m_options.name, sizeof(m_options.name))) {
                     std::memcpy(g.options.name, m_options.name, sizeof(m_options.name));
                 }
@@ -532,7 +540,7 @@ void Ui::before_game_online_window(sm::Ctx& ctx, GameScene& game_scene) {
     // The connection may be down, so don't allow play
     ImGui::BeginDisabled(g.connection_state == ConnectionState::Disconnected);
 
-    if (ImGui::Button("Start New Game")) {
+    if (ImGui::Button("Start Game")) {
         if (game_scene.get_game_session()) {
             game_scene.client_quit_game_session();
         }
@@ -579,6 +587,16 @@ void Ui::before_game_online_window(sm::Ctx& ctx, GameScene& game_scene) {
 }
 
 void Ui::during_game_window(GameScene& game_scene) {
+    if (game_scene.get_game_options().game_type == GameTypeOnline) {
+        if (game_scene.get_game_session()->remote_active) {
+            ImGui::TextWrapped("Playing against %s.", game_scene.get_game_session()->remote_player_name.c_str());
+        } else {
+            ImGui::TextWrapped("The opponent has left the session. You may wait for them to rejoin.");
+        }
+
+        ImGui::Separator();
+    }
+
     {
         ImGui::Text("B");
         ImGui::SameLine();
@@ -594,7 +612,7 @@ void Ui::during_game_window(GameScene& game_scene) {
 
     ImGui::Separator();
 
-    game_scene.get_move_list().update_window();
+    game_scene.get_move_list().moves_window();
 }
 
 void Ui::about_window() {

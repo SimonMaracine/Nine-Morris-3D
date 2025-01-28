@@ -201,9 +201,6 @@ void GameScene::client_request_game_session() {
 
     m_game_session = GameSession();
 
-    // The game should be ready before the remote finally joins
-    reset();
-
     LOG_DEBUG("Requested a new game session");
     m_ui.push_popup_window(PopupWindow::WaitServerAcceptGameSession);
 }
@@ -270,6 +267,31 @@ void GameScene::client_request_join_game_session(const std::string& session_id) 
 
     LOG_DEBUG("Requested to join a game session");
     m_ui.push_popup_window(PopupWindow::WaitServerAcceptJoinGameSession);
+}
+
+void GameScene::client_play_move(const std::string& move) {
+    assert(m_game_session);
+
+    protocol::Client_PlayMove payload;
+    payload.session_id = m_game_session->session_id;
+    payload.move = move;
+
+    networking::Message message {protocol::message::Client_PlayMove};
+
+    try {
+        message.write(payload);
+    } catch (const networking::SerializationError& e) {
+        serialization_error(e);
+        return;
+    }
+
+    auto& g {ctx.global<Global>()};
+
+    try {
+        g.client.send_message(message);
+    } catch (const networking::ConnectionError& e) {
+        connection_error(e);
+    }
 }
 
 void GameScene::on_window_resized(const sm::WindowResizedEvent& event) {
@@ -367,6 +389,7 @@ void GameScene::update_game_state() {
                     m_game_state = GameState::ComputerStartThinking;
                     break;
                 case GamePlayer::Remote:
+                    m_game_state = GameState::RemoteThinking;
                     break;
             }
 
@@ -419,6 +442,8 @@ void GameScene::update_game_state() {
 
             break;
         }
+        case GameState::RemoteThinking:
+            break;
         case GameState::FinishTurn:
             if (get_board().is_turn_finished()) {
                 m_clock.switch_turn();
@@ -639,6 +664,12 @@ void GameScene::handle_message(const networking::Message& message) {
         case protocol::message::Server_RemoteJoinedGameSession:
             server_remote_joined_game_session(message);
             break;
+        case protocol::message::Server_RemoteQuitGameSession:
+            server_remote_quit_game_session(message);
+            break;
+        case protocol::message::Server_RemotePlayedMove:
+            server_remote_played_move(message);
+            break;
     }
 }
 
@@ -729,10 +760,15 @@ void GameScene::server_accept_join_game_session(const networking::Message& messa
     reset(payload.moves);
 
     m_game_session->active = true;
+    m_game_session->remote_active = true;
     m_game_session->remote_player_name = payload.remote_player_name;
+
+    m_game_options.online.remote_color = PlayerColor(payload.remote_player_type);
 
     // Unblock from waiting
     m_ui.clear_popup_window();
+
+    m_game_state = GameState::Start;
 }
 
 void GameScene::server_deny_join_game_session(const networking::Message& message) {
@@ -765,8 +801,44 @@ void GameScene::server_remote_joined_game_session(const networking::Message& mes
         return;
     }
 
+    m_game_session->remote_active = true;
     m_game_session->remote_player_name = payload.remote_player_name;
 
-    // Unblock from waiting
-    m_ui.clear_popup_window();
+    // Prevent from clearing unwanted popup windows
+    if (m_ui.get_popup_window() == PopupWindow::WaitRemoteJoinGameSession) {
+        // Unblock from waiting
+        m_ui.clear_popup_window();
+    }
+
+    m_game_state = GameState::Start;
+}
+
+void GameScene::server_remote_quit_game_session(const networking::Message&) {
+    // The user may have quit the session in the meantime
+    if (!m_game_session) {
+        return;
+    }
+
+    m_game_session->remote_active = false;
+    m_game_session->remote_player_name.clear();
+}
+
+void GameScene::server_remote_played_move(const networking::Message& message) {
+    // The user may have quit the session in the meantime
+    if (!m_game_session) {
+        return;
+    }
+
+    protocol::Server_RemotePlayedMove payload;
+
+    try {
+        message.read(payload);
+    } catch (const networking::SerializationError& e) {
+        serialization_error(e);
+        return;
+    }
+
+    assert(m_game_state == GameState::RemoteThinking);
+
+    play_move(payload.move);
 }

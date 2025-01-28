@@ -19,6 +19,7 @@ private:
     void on_client_connected(std::shared_ptr<networking::ClientConnection> connection);
     void on_client_disconnected(std::shared_ptr<networking::ClientConnection> connection);
 
+    void disconnected_client_from_game_session(std::shared_ptr<networking::ClientConnection> connection, protocol::SessionId session_id);
     void handle_message(std::shared_ptr<networking::ClientConnection> connection, const networking::Message& message);
 
     void client_ping(std::shared_ptr<networking::ClientConnection> connection, const networking::Message& message);
@@ -31,11 +32,24 @@ private:
     void server_deny_join_game_session(std::shared_ptr<networking::ClientConnection> connection, protocol::ErrorCode error_code);
     void server_remote_joined_game_session(std::shared_ptr<networking::ClientConnection> connection, const std::string& remote_player_name);
     void client_quit_game_session(std::shared_ptr<networking::ClientConnection> connection, const networking::Message& message);
+    void server_remote_quit_game_session(std::shared_ptr<networking::ClientConnection> connection);
+    void client_play_move(std::shared_ptr<networking::ClientConnection> connection, const networking::Message& message);
+    void server_remote_played_move(std::shared_ptr<networking::ClientConnection> connection, const std::string& move);
 
     networking::Server m_server;
 
-    std::unordered_map<std::uint16_t, GameSession> m_game_sessions;
+    // Storage for the game sessions
+    // Sessions are kept in memory as long as there is one client active in it
+    std::unordered_map<protocol::SessionId, GameSession> m_game_sessions;
+
+    // Map from clients to sessions
+    // Should be used to quickly find out if a client is active in a session
+    // Must never be out of date
+    std::unordered_map<networking::ClientId, protocol::SessionId> m_clients_sessions;
+
+    // Manager of session IDs
     SessionPool m_session_pool;
+
     PeriodicTask m_session_garbage_collector_task;
     PeriodicTask m_check_connections_task;
 };

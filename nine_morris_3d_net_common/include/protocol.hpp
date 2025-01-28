@@ -102,11 +102,11 @@ namespace protocol {
             // Client_AcceptDrawOffer,  // Client has pressed the accept draw offer button
             // Server_RemoteAcceptedDrawOffer,  // Remote client has pressed the accept draw offer button
 
-            // Client_Resign,  // Client has pressed the resign button
-            // Server_RemoteResigned,  // Remote client has pressed the resign button
+            // Client_Resign,  // Client has pressed the resign button or the new game button
+            // Server_RemoteResigned,  // Remote client has pressed the resign button or the new game button
 
-            Client_AcknowledgeGameOver,  // Client has acknowledged that the game is over on their side
-            Server_AcknowledgeGameOver,  // Server has acknowledged that both clients have acknowledged game over
+            // Client_AcknowledgeGameOver,  // Client has acknowledged that the game is over on their side
+            // Server_AcknowledgeGameOver,  // Server has acknowledged that both clients have acknowledged game over
 
             Client_Rematch,  // Client has pressed the rematch button (server has already acknowledged game over)
             Server_Rematch  // Both clients have pressed the rematch button (game is ready)

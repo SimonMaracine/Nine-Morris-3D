@@ -15,7 +15,7 @@ void MoveList::skip_first(bool skip) {
     m_skip_first = skip;
 }
 
-void MoveList::update_window() const {
+void MoveList::moves_window() const {
     if (ImGui::BeginChild("Move List")) {
         if (ImGui::BeginTable("Move Table", 3)) {
             if (m_skip_first) {

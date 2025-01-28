@@ -31,6 +31,7 @@ public:
     void update(sm::Ctx& ctx, GameScene& game_scene);
     void push_popup_window(PopupWindow window, const std::string& string = {});
     void clear_popup_window();
+    PopupWindow get_popup_window() const;
 
     void set_loading_skybox_done() { m_loading_skybox = false; }
     bool get_show_information() const { return m_show_information; }
