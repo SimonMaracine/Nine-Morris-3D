@@ -4,6 +4,7 @@
 #include <thread>
 #include <atomic>
 #include <exception>
+#include <utility>
 
 #include "nine_morris_3d_engine/application/error.hpp"
 
@@ -25,8 +26,8 @@ namespace sm {
 
         using Function = std::function<Result()>;
 
-        Task(const Function& function, double last_time, double delay, bool defer)
-            : m_function(function), m_last_time(last_time), m_delay(delay), m_defer(defer) {}
+        Task(Function&& function, double last_time, double delay, bool defer)
+            : m_function(std::move(function)), m_last_time(last_time), m_delay(delay), m_defer(defer) {}
     private:
         Function m_function;
         double m_last_time {};
@@ -41,8 +42,8 @@ namespace sm {
     public:
         using Function = std::function<void(AsyncTask&)>;
 
-        explicit AsyncTask(const Function& function)
-            : m_thread(function, std::ref(*this)) {}
+        explicit AsyncTask(Function&& function)
+            : m_thread(std::move(function), std::ref(*this)) {}
 
         ~AsyncTask() {
             m_thread.join();

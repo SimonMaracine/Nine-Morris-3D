@@ -174,20 +174,20 @@ namespace sm {
         m_mus.set_gain(gain);
     }
 
-    void Ctx::add_task_immediate(const Task::Function& function) {
-        m_tsk.add_immediate(function);
+    void Ctx::add_task_immediate(Task::Function&& function) {
+        m_tsk.add_immediate(std::move(function));
     }
 
-    void Ctx::add_task_delayed(const Task::Function& function, double delay) {
-        m_tsk.add_delayed(function, delay);
+    void Ctx::add_task_delayed(Task::Function&& function, double delay) {
+        m_tsk.add_delayed(std::move(function), delay);
     }
 
-    void Ctx::add_task_deffered(const Task::Function& function) {
-        m_tsk.add_deffered(function);
+    void Ctx::add_task_deffered(Task::Function&& function) {
+        m_tsk.add_deffered(std::move(function));
     }
 
-    void Ctx::add_task_async(const AsyncTask::Function& function) {
-        m_tsk.add_async(function);
+    void Ctx::add_task_async(AsyncTask::Function&& function) {
+        m_tsk.add_async(std::move(function));
     }
 
     bool Ctx::is_key_pressed(Key key) const noexcept {

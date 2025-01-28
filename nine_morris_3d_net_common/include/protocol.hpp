@@ -60,6 +60,12 @@ namespace protocol {
         Server_RemotePlayedMove
             The server informs the client that the remote has played a move.
 
+        Client_Resign
+            The client wants to end the game by losing. It either presses the resign button, or the new game button.
+
+        Server_RemoteResigned
+            The server informs the client that the remote has resigned.
+
         Client_AcknowledgeGameOver
             The client acknowledges that the game is over. When both players acknowledge this fact, the server
             acknowledges it too.
@@ -102,8 +108,8 @@ namespace protocol {
             // Client_AcceptDrawOffer,  // Client has pressed the accept draw offer button
             // Server_RemoteAcceptedDrawOffer,  // Remote client has pressed the accept draw offer button
 
-            // Client_Resign,  // Client has pressed the resign button or the new game button
-            // Server_RemoteResigned,  // Remote client has pressed the resign button or the new game button
+            Client_Resign,  // Client has pressed the resign button or the new game button
+            Server_RemoteResigned,  // Remote client has pressed the resign button or the new game button
 
             // Client_AcknowledgeGameOver,  // Client has acknowledged that the game is over on their side
             // Server_AcknowledgeGameOver,  // Server has acknowledged that both clients have acknowledged game over
@@ -268,6 +274,17 @@ namespace protocol {
             archive(move);
         }
     };
+
+    struct Client_Resign {
+        SessionId session_id {};
+
+        template<typename Archive>
+        void serialize(Archive& archive) {
+            archive(session_id);
+        }
+    };
+
+    struct Server_RemoteResigned {};
 
     struct Client_AcknowledgeGameOver {
         SessionId session_id {};

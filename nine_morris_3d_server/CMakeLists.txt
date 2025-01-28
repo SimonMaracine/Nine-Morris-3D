@@ -3,12 +3,12 @@ cmake_minimum_required(VERSION 3.20)
 add_executable(nine_morris_3d_server
     "src/game_session.hpp"
     "src/main.cpp"
-    "src/periodic_task.cpp"
-    "src/periodic_task.hpp"
     "src/server.cpp"
     "src/server.hpp"
     "src/session_pool.cpp"
     "src/session_pool.hpp"
+    "src/task_manager.cpp"
+    "src/task_manager.hpp"
 )
 
 target_include_directories(nine_morris_3d_server PUBLIC "src")

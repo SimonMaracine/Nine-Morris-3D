@@ -26,18 +26,9 @@ static bool resign_available(GameScene& game_scene) {
 static PlayerColor resign_player(GameScene& game_scene) {
     const GameOptions& options {game_scene.get_game_options()};
 
-    PlayerColor color {};
+    assert(options.game_type == GameTypeOnline);
 
-    switch (options.game_type) {
-        case GameTypeOnline:
-            color = BoardObj::player_color_opponent(static_cast<PlayerColor>(options.online.remote_color));
-            break;
-        default:
-            assert(false);
-            break;
-    }
-
-    return color;
+    return BoardObj::player_color_opponent(PlayerColor(options.online.remote_color));
 }
 
 static bool offer_draw_available(GameScene& game_scene) {
@@ -138,9 +129,11 @@ void Ui::main_menu_bar(sm::Ctx& ctx, GameScene& game_scene) {
     if (ImGui::BeginMainMenuBar()) {
         if (ImGui::BeginMenu("Game")) {
             if (ImGui::MenuItem("New Game")) {
+                game_scene.client_resign();
                 game_scene.reset();
             }
             if (ImGui::MenuItem("Resign", nullptr, nullptr, resign_available(game_scene))) {
+                game_scene.client_resign();
                 game_scene.resign(resign_player(game_scene));
             }
             if (ImGui::MenuItem("Accept Draw Offer", nullptr, nullptr, accept_draw_offer_available(game_scene))) {

@@ -8,28 +8,28 @@
 #include "nine_morris_3d_engine/application/logging.hpp"
 
 namespace sm::internal {
-    void TaskManager::add_immediate(const Task::Function& function) {
+    void TaskManager::add_immediate(Task::Function&& function) {
         std::lock_guard lock {m_mutex};
 
-        m_tasks_active.emplace_back(function, Window::get_time(), 0.0, false);
+        m_tasks_next.emplace_back(std::move(function), Window::get_time(), 0.0, false);
     }
 
-    void TaskManager::add_delayed(const Task::Function& function, double delay) {
+    void TaskManager::add_delayed(Task::Function&& function, double delay) {
         std::lock_guard lock {m_mutex};
 
-        m_tasks_active.emplace_back(function, Window::get_time(), delay, false);
+        m_tasks_next.emplace_back(std::move(function), Window::get_time(), delay, false);
     }
 
-    void TaskManager::add_deffered(const Task::Function& function) {
+    void TaskManager::add_deffered(Task::Function&& function) {
         std::lock_guard lock {m_mutex};
 
-        m_tasks_active.emplace_back(function, Window::get_time(), 0.0, true);
+        m_tasks_next.emplace_back(std::move(function), Window::get_time(), 0.0, true);
     }
 
-    void TaskManager::add_async(const AsyncTask::Function& function) {
+    void TaskManager::add_async(AsyncTask::Function&& function) {
         std::lock_guard lock {m_async_mutex};
 
-        m_async_tasks.push_back(std::make_unique<AsyncTask>(function));
+        m_async_tasks.push_back(std::make_unique<AsyncTask>(std::move(function)));
     }
 
     void TaskManager::update() {
@@ -72,7 +72,7 @@ namespace sm::internal {
         for (Task& task : m_tasks_active) {
             if (task.m_defer) {
                 task.m_defer = false;
-                m_tasks_next.push_back(task);
+                m_tasks_next.push_back(std::move(task));
                 continue;
             }
 
@@ -80,7 +80,7 @@ namespace sm::internal {
 
             if (task.m_delay > 0.0) {
                 if (time_now - task.m_last_time < task.m_delay) {
-                    m_tasks_next.push_back(task);
+                    m_tasks_next.push_back(std::move(task));
                     continue;
                 }
             }
@@ -90,7 +90,7 @@ namespace sm::internal {
                     break;
                 case Task::Result::Repeat:
                     task.m_last_time = time_now;
-                    m_tasks_next.push_back(task);
+                    m_tasks_next.push_back(std::move(task));
                     break;
             }
         }

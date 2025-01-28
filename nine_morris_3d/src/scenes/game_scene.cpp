@@ -294,6 +294,30 @@ void GameScene::client_play_move(const std::string& move) {
     }
 }
 
+void GameScene::client_resign() {
+    assert(m_game_session);
+
+    protocol::Client_Resign payload;
+    payload.session_id = m_game_session->session_id;
+
+    networking::Message message {protocol::message::Client_Resign};
+
+    try {
+        message.write(payload);
+    } catch (const networking::SerializationError& e) {
+        serialization_error(e);
+        return;
+    }
+
+    auto& g {ctx.global<Global>()};
+
+    try {
+        g.client.send_message(message);
+    } catch (const networking::ConnectionError& e) {
+        connection_error(e);
+    }
+}
+
 void GameScene::on_window_resized(const sm::WindowResizedEvent& event) {
     m_camera.set_projection(event.width, event.height, LENS_FOV, LENS_NEAR, LENS_FAR);
     m_camera_2d.set_projection(0, event.width, 0, event.height);
@@ -670,6 +694,9 @@ void GameScene::handle_message(const networking::Message& message) {
         case protocol::message::Server_RemotePlayedMove:
             server_remote_played_move(message);
             break;
+        case protocol::message::Server_RemoteResigned:
+            server_remote_resigned(message);
+            break;
     }
 }
 
@@ -841,4 +868,13 @@ void GameScene::server_remote_played_move(const networking::Message& message) {
     assert(m_game_state == GameState::RemoteThinking);
 
     play_move(payload.move);
+}
+
+void GameScene::server_remote_resigned(const networking::Message&) {
+    // The user may have quit the session in the meantime
+    if (!m_game_session) {
+        return;
+    }
+
+    resign(PlayerColor(m_game_options.online.remote_color));
 }

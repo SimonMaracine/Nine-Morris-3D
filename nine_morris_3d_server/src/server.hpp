@@ -6,7 +6,7 @@
 #include <protocol.hpp>
 
 #include "game_session.hpp"
-#include "periodic_task.hpp"
+#include "task_manager.hpp"
 #include "session_pool.hpp"
 
 class Server {
@@ -35,6 +35,8 @@ private:
     void server_remote_quit_game_session(std::shared_ptr<networking::ClientConnection> connection);
     void client_play_move(std::shared_ptr<networking::ClientConnection> connection, const networking::Message& message);
     void server_remote_played_move(std::shared_ptr<networking::ClientConnection> connection, const std::string& move);
+    void client_resign(std::shared_ptr<networking::ClientConnection> connection, const networking::Message& message);
+    void server_remote_resigned(std::shared_ptr<networking::ClientConnection> connection);
 
     networking::Server m_server;
 
@@ -50,6 +52,5 @@ private:
     // Manager of session IDs
     SessionPool m_session_pool;
 
-    PeriodicTask m_session_garbage_collector_task;
-    PeriodicTask m_check_connections_task;
+    TaskManager m_task_manager;
 };

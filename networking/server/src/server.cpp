@@ -108,18 +108,17 @@ namespace networking {
     void Server::check_connections() {
         throw_if_error();
 
-        for (auto before_iter {m_connections.before_begin()}, iter {m_connections.begin()}; iter != m_connections.end(); before_iter++, iter++) {
+        for (auto before_iter {m_connections.before_begin()}, iter {m_connections.begin()}; iter != m_connections.end();) {
             const auto& connection {*iter};
 
             assert(connection != nullptr);
 
             if (!connection->is_open()) {
-                if (maybe_client_disconnected(connection, iter, before_iter)) {
-                    break;
-                }
-
+                maybe_client_disconnected(connection, iter, before_iter);
                 continue;
             }
+
+            before_iter++, iter++;
         }
     }
 
@@ -147,27 +146,26 @@ namespace networking {
     void Server::send_message_all(const Message& message) {
         throw_if_error();
 
-        for (auto before_iter {m_connections.before_begin()}, iter {m_connections.begin()}; iter != m_connections.end(); before_iter++, iter++) {
+        for (auto before_iter {m_connections.before_begin()}, iter {m_connections.begin()}; iter != m_connections.end();) {
             const auto& connection {*iter};
 
             assert(connection != nullptr);
 
             if (!connection->is_open()) {
-                if (maybe_client_disconnected(connection, iter, before_iter)) {
-                    break;
-                }
-
+                maybe_client_disconnected(connection, iter, before_iter);
                 continue;
             }
 
             connection->send(message);
+
+            before_iter++, iter++;
         }
     }
 
     void Server::send_message_all(const Message& message, std::shared_ptr<ClientConnection> exception) {
         throw_if_error();
 
-        for (auto before_iter {m_connections.before_begin()}, iter {m_connections.begin()}; iter != m_connections.end(); before_iter++, iter++) {
+        for (auto before_iter {m_connections.before_begin()}, iter {m_connections.begin()}; iter != m_connections.end();) {
             const auto& connection {*iter};
 
             assert(connection != nullptr);
@@ -177,14 +175,13 @@ namespace networking {
             }
 
             if (!connection->is_open()) {
-                if (maybe_client_disconnected(connection, iter, before_iter)) {
-                    break;
-                }
-
+                maybe_client_disconnected(connection, iter, before_iter);
                 continue;
             }
 
             connection->send(message);
+
+            before_iter++, iter++;
         }
     }
 
@@ -245,25 +242,21 @@ namespace networking {
             return;
         }
 
+        connection->m_used = true;  // Avoid calling on_client_disconnected again
         m_connections.remove(connection);
         m_on_client_disconnected(connection);
         m_pool.free_id(connection->get_id());
-
-        connection->m_used = true;
     }
 
-    bool Server::maybe_client_disconnected(std::shared_ptr<ClientConnection> connection, ConnectionsIter& iter, ConnectionsIter before_iter) {
+    void Server::maybe_client_disconnected(std::shared_ptr<ClientConnection> connection, ConnectionsIter& iter, ConnectionsIter before_iter) {
         if (connection->m_used) {
-            return false;
+            return;
         }
 
-        const bool end {(iter = m_connections.erase_after(before_iter)) == m_connections.end()};
+        connection->m_used = true;  // Avoid calling on_client_disconnected again
+        iter = m_connections.erase_after(before_iter);
         m_on_client_disconnected(connection);
         m_pool.free_id(connection->get_id());
-
-        connection->m_used = true;
-
-        return end;
     }
 
     void Server::initialize_logging() {

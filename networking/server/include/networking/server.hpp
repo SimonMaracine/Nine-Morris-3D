@@ -29,6 +29,7 @@ namespace networking {
     // Main class for the server program
     class Server final {
     public:
+        // Sending messages or calling check_connections is prohibited in on_client_disconnected
         Server(
             std::function<void(std::shared_ptr<ClientConnection>)> on_client_connected,
             std::function<void(std::shared_ptr<ClientConnection>)> on_client_disconnected
@@ -90,7 +91,7 @@ namespace networking {
         void throw_if_error();
         void task_accept_connection();
         void maybe_client_disconnected(std::shared_ptr<ClientConnection> connection);
-        bool maybe_client_disconnected(std::shared_ptr<ClientConnection> connection, ConnectionsIter& iter, ConnectionsIter before_iter);
+        void maybe_client_disconnected(std::shared_ptr<ClientConnection> connection, ConnectionsIter& iter, ConnectionsIter before_iter);
         void initialize_logging();
 
         std::forward_list<std::shared_ptr<ClientConnection>> m_connections;

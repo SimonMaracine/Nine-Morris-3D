@@ -13,7 +13,7 @@ void Server::start() {
 
     using namespace std::chrono_literals;
 
-    m_session_garbage_collector_task = PeriodicTask([this]() {
+    m_task_manager.add_delayed([this]() {
         m_server.get_logger()->debug("Collecting sessions...");
 
         for (auto iter {m_game_sessions.begin()}; iter != m_game_sessions.end();) {
@@ -25,12 +25,16 @@ void Server::start() {
                 iter++;
             }
         }
+
+        return Task::Result::Repeat;
     }, 12s);
 
-    m_check_connections_task = PeriodicTask([this]() {
+    m_task_manager.add_delayed([this]() {
         m_server.get_logger()->debug("Checking connections...");
 
         m_server.check_connections();
+
+        return Task::Result::Repeat;
     }, 10s);
 }
 
@@ -42,8 +46,7 @@ void Server::update() {
         handle_message(connection, message);
     }
 
-    m_session_garbage_collector_task.update();
-    m_check_connections_task.update();
+    m_task_manager.update();
 }
 
 void Server::on_client_connected(std::shared_ptr<networking::ClientConnection>) {
@@ -70,16 +73,23 @@ void Server::disconnected_client_from_game_session(std::shared_ptr<networking::C
         return;
     }
 
+    std::shared_ptr<networking::ClientConnection> remote_connection;
+
     if (iter->second.connection1.lock() == connection) {
-        if (const auto connection2 {iter->second.connection2.lock()}) {
-            server_remote_quit_game_session(connection2);
-        }
+        remote_connection = iter->second.connection2.lock();
     } else if (iter->second.connection2.lock() == connection) {
-        if (const auto connection1 {iter->second.connection1.lock()}) {
-            server_remote_quit_game_session(connection1);
-        }
+        remote_connection = iter->second.connection1.lock();
     } else {
         m_server.get_logger()->warn("Client {} not active in session {}", connection->get_id(), session_id);
+    }
+
+    if (remote_connection) {
+        // Cannot send messages inside on_client_disconnected
+        m_task_manager.add_immediate([this, remote_connection]() {
+            server_remote_quit_game_session(remote_connection);
+
+            return Task::Result::Done;
+        });
     }
 }
 
@@ -100,6 +110,9 @@ void Server::handle_message(std::shared_ptr<networking::ClientConnection> connec
                 break;
             case protocol::message::Client_PlayMove:
                 client_play_move(connection, message);
+                break;
+            case protocol::message::Client_Resign:
+                client_resign(connection, message);
                 break;
         }
     } catch (const networking::SerializationError& e) {
@@ -313,6 +326,39 @@ void Server::server_remote_played_move(std::shared_ptr<networking::ClientConnect
 
     networking::Message message {protocol::message::Server_RemotePlayedMove};
     message.write(payload);
+
+    m_server.send_message(connection, message);
+}
+
+void Server::client_resign(std::shared_ptr<networking::ClientConnection> connection, const networking::Message& message) {
+    protocol::Client_Resign payload;
+    message.read(payload);
+
+    const auto iter {m_game_sessions.find(payload.session_id)};
+
+    if (iter == m_game_sessions.end()) {
+        m_server.get_logger()->warn("Session {} reported by client {} doesn't exist", connection->get_id(), payload.session_id);
+        return;
+    }
+
+    std::shared_ptr<networking::ClientConnection> remote_connection;
+
+    if (iter->second.connection1.lock() == connection) {
+        remote_connection = iter->second.connection2.lock();
+    } else if (iter->second.connection2.lock() == connection) {
+        remote_connection = iter->second.connection1.lock();
+    } else {
+        m_server.get_logger()->warn("Client {} resigned in session {} in which it wasn't active", connection->get_id(), payload.session_id);
+        return;
+    }
+
+    if (remote_connection) {
+        server_remote_resigned(remote_connection);
+    }
+}
+
+void Server::server_remote_resigned(std::shared_ptr<networking::ClientConnection> connection) {
+    networking::Message message {protocol::message::Server_RemoteResigned};
 
     m_server.send_message(connection, message);
 }

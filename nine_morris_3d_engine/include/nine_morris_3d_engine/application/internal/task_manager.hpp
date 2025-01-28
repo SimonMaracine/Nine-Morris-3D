@@ -11,10 +11,10 @@ namespace sm::internal {
 
     class TaskManager {
     public:
-        void add_immediate(const Task::Function& function);
-        void add_delayed(const Task::Function& function, double delay);
-        void add_deffered(const Task::Function& function);
-        void add_async(const AsyncTask::Function& function);
+        void add_immediate(Task::Function&& function);
+        void add_delayed(Task::Function&& function, double delay);
+        void add_deffered(Task::Function&& function);
+        void add_async(AsyncTask::Function&& function);
 
         void update();
         void wait_async();
@@ -22,8 +22,8 @@ namespace sm::internal {
         void update_tasks();
         void update_async_tasks();
 
-        std::vector<Task> m_tasks_active;
-        std::vector<Task> m_tasks_next;
+        std::vector<Task> m_tasks_active;  // Front list
+        std::vector<Task> m_tasks_next;  // Back list
         std::mutex m_mutex;
 
         std::vector<std::unique_ptr<AsyncTask>> m_async_tasks;
