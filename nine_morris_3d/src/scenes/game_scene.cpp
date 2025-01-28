@@ -313,6 +313,31 @@ void GameScene::client_resign() {
     }
 }
 
+void GameScene::client_send_message(const std::string& message_) {
+    assert(m_game_session);
+
+    protocol::Client_SendMessage payload;
+    payload.session_id = m_game_session->get_session_id();
+    payload.message = message_;
+
+    networking::Message message {protocol::message::Client_SendMessage};
+
+    try {
+        message.write(payload);
+    } catch (const networking::SerializationError& e) {
+        serialization_error(e);
+        return;
+    }
+
+    auto& g {ctx.global<Global>()};
+
+    try {
+        g.client.send_message(message);
+    } catch (const networking::ConnectionError& e) {
+        connection_error(e);
+    }
+}
+
 void GameScene::on_window_resized(const sm::WindowResizedEvent& event) {
     m_camera.set_projection(event.width, event.height, LENS_FOV, LENS_NEAR, LENS_FAR);
     m_camera_2d.set_projection(0, event.width, 0, event.height);
@@ -692,6 +717,9 @@ void GameScene::handle_message(const networking::Message& message) {
         case protocol::message::Server_RemoteResigned:
             server_remote_resigned(message);
             break;
+        case protocol::message::Server_RemoteSentMessage:
+            server_remote_sent_message(message);
+            break;
     }
 }
 
@@ -774,6 +802,7 @@ void GameScene::server_accept_join_game_session(const networking::Message& messa
 
     m_game_session = GameSession(payload.session_id);
     m_game_session->remote_join(payload.remote_player_name);
+    m_game_session->set_messages(payload.messages);
 
     m_game_options.online.remote_color = PlayerColor(payload.remote_player_type);
 
@@ -860,4 +889,22 @@ void GameScene::server_remote_resigned(const networking::Message&) {
     }
 
     resign(PlayerColor(m_game_options.online.remote_color));
+}
+
+void GameScene::server_remote_sent_message(const networking::Message& message) {
+    // The user may have quit the session in the meantime
+    if (!m_game_session) {
+        return;
+    }
+
+    protocol::Server_RemoteSentMessage payload;
+
+    try {
+        message.read(payload);
+    } catch (const networking::SerializationError& e) {
+        serialization_error(e);
+        return;
+    }
+
+    m_game_session->remote_sent_message(payload.message);
 }

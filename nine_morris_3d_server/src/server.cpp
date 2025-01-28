@@ -114,6 +114,9 @@ void Server::handle_message(std::shared_ptr<networking::ClientConnection> connec
             case protocol::message::Client_Resign:
                 client_resign(connection, message);
                 break;
+            case protocol::message::Client_SendMessage:
+                client_send_message(connection, message);
+                break;
         }
     } catch (const networking::SerializationError& e) {
         m_server.get_logger()->error("Serialization error: {}", e.what());
@@ -206,6 +209,7 @@ void Server::client_request_join_game_session(std::shared_ptr<networking::Client
     protocol::Server_AcceptJoinGameSession payload_accept;
     payload_accept.session_id = payload.session_id;
     payload_accept.moves = iter->second.moves;
+    payload_accept.messages = iter->second.messages;
 
     if (iter->second.connection1.expired()) {
         iter->second.connection1 = connection;
@@ -360,6 +364,48 @@ void Server::client_resign(std::shared_ptr<networking::ClientConnection> connect
 
 void Server::server_remote_resigned(std::shared_ptr<networking::ClientConnection> connection) {
     networking::Message message {protocol::message::Server_RemoteResigned};
+
+    m_server.send_message(connection, message);
+}
+
+void Server::client_send_message(std::shared_ptr<networking::ClientConnection> connection, const networking::Message& message) {
+    protocol::Client_SendMessage payload;
+    message.read(payload);
+
+    const auto iter {m_game_sessions.find(payload.session_id)};
+
+    if (iter == m_game_sessions.end()) {
+        m_server.get_logger()->warn("Session {} reported by client {} doesn't exist", connection->get_id(), payload.session_id);
+        return;
+    }
+
+    std::shared_ptr<networking::ClientConnection> remote_connection;
+    std::string_view name;
+
+    if (iter->second.connection1.lock() == connection) {
+        remote_connection = iter->second.connection2.lock();
+        name = iter->second.name1;
+    } else if (iter->second.connection2.lock() == connection) {
+        remote_connection = iter->second.connection1.lock();
+        name = iter->second.name2;
+    } else {
+        m_server.get_logger()->warn("Client {} sent message in session {} in which it wasn't active", connection->get_id(), payload.session_id);
+        return;
+    }
+
+    iter->second.messages.emplace_back(name, payload.message);
+
+    if (remote_connection) {
+        server_remote_sent_message(remote_connection, payload.message);
+    }
+}
+
+void Server::server_remote_sent_message(std::shared_ptr<networking::ClientConnection> connection, const std::string& message_) {
+    protocol::Server_RemoteSentMessage payload;
+    payload.message = message_;
+
+    networking::Message message {protocol::message::Server_RemoteSentMessage};
+    message.write(payload);
 
     m_server.send_message(connection, message);
 }

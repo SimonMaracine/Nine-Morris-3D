@@ -2,6 +2,8 @@
 
 #include <nine_morris_3d_engine/external/imgui.h++>
 
+#include "ui.hpp"
+
 void MoveList::push(const std::string& string) {
     m_moves.push_back(string);
 }
@@ -55,7 +57,7 @@ void MoveList::moves_window() const {
             ImGui::EndTable();
         }
 
-        if (ImGui::GetScrollY() >= ImGui::GetScrollMaxY() - 6.0f) {
+        if (ImGui::GetScrollY() >= ImGui::GetScrollMaxY() - Ui::rem(0.3f)) {
             ImGui::SetScrollHereY(1.0f);
         }
     }

@@ -88,6 +88,7 @@ public:
     void client_request_join_game_session(const std::string& session_id);
     void client_play_move(const std::string& move);
     void client_resign();
+    void client_send_message(const std::string& message_);
 protected:
     void on_window_resized(const sm::WindowResizedEvent& event);
     void on_key_released(const sm::KeyReleasedEvent& event);
@@ -120,6 +121,7 @@ protected:
     void server_remote_quit_game_session(const networking::Message& message);
     void server_remote_played_move(const networking::Message& message);
     void server_remote_resigned(const networking::Message& message);
+    void server_remote_sent_message(const networking::Message& message);
 
     sm::Camera m_camera;
     sm::Camera2D m_camera_2d;

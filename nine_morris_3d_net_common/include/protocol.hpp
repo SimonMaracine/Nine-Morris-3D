@@ -9,6 +9,7 @@
 #include <cereal/types/string.hpp>
 #include <cereal/types/vector.hpp>
 #include <cereal/types/chrono.hpp>
+#include <cereal/types/utility.hpp>
 
 namespace protocol {
     /*
@@ -81,6 +82,12 @@ namespace protocol {
         Server_Rematch
             After a game is over (server acknowledged game over), the server acknowledges that both clients want
             a rematch. It sends this message to both. Both clients unblock and the game is ready.
+
+        Client_SendMessage
+            The client sends a message.
+
+        Server_RemoteSentMessage
+            The server informs the client that the remote has sent a message.
     */
 
     namespace message {
@@ -116,7 +123,10 @@ namespace protocol {
             // Server_AcknowledgeGameOver,  // Server has acknowledged that both clients have acknowledged game over
 
             Client_Rematch,  // Client has pressed the rematch button (server has already acknowledged game over)
-            Server_Rematch  // Both clients have pressed the rematch button (game is ready)
+            Server_Rematch,  // Both clients have pressed the rematch button (game is ready)
+
+            Client_SendMessage,  // Client has sent a message
+            Server_RemoteSentMessage  // Remote client has sent a message
         };
     }
 
@@ -224,11 +234,12 @@ namespace protocol {
         SessionId session_id {};  // Not really needed, but simplifies implementation
         Player remote_player_type {};
         std::vector<std::string> moves;
+        Messages messages;
         std::string remote_player_name;
 
         template<typename Archive>
         void serialize(Archive& archive) {
-            archive(session_id, remote_player_type, moves, remote_player_name);
+            archive(session_id, remote_player_type, moves, messages, remote_player_name);
         }
     };
 
@@ -317,6 +328,26 @@ namespace protocol {
         template<typename Archive>
         void serialize(Archive& archive) {
             archive(remote_player_type);
+        }
+    };
+
+    struct Client_SendMessage {
+        SessionId session_id {};
+        std::string message;
+
+        template<typename Archive>
+        void serialize(Archive& archive) {
+            archive(session_id, message);
+        }
+    };
+
+
+    struct Server_RemoteSentMessage {
+        std::string message;
+
+        template<typename Archive>
+        void serialize(Archive& archive) {
+            archive(message);
         }
     };
 }

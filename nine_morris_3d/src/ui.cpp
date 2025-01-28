@@ -67,7 +67,7 @@ void Ui::update(sm::Ctx& ctx, GameScene& game_scene) {
 
     // This way the session window is visible only when the use is in a session
     if (game_scene.get_game_session()) {
-        game_scene.get_game_session()->session_window(game_scene);
+        game_scene.get_game_session()->session_window(game_scene, ctx.global<Global>());
     }
 
     if (!m_popup_window_queue.empty()) {
@@ -404,7 +404,7 @@ void Ui::main_menu_bar(sm::Ctx& ctx, GameScene& game_scene) {
             }
             if (ImGui::BeginMenu("Session")) {
                 if (ImGui::BeginMenu("Code", static_cast<bool>(game_scene.get_game_session()))) {
-                    ImGui::Text("%u", game_scene.get_game_session()->get_session_id());
+                    ImGui::Text("%.5u", game_scene.get_game_session()->get_session_id());
 
                     ImGui::EndMenu();
                 }
@@ -415,7 +415,7 @@ void Ui::main_menu_bar(sm::Ctx& ctx, GameScene& game_scene) {
                 }
                 ImGui::PopItemWidth();
 
-                if (ImGui::IsItemHovered()) {
+                if (ImGui::IsItemHovered(ImGuiHoveredFlags_DelayNormal)) {
                     ImGui::SetTooltip("Your name appears to other players.");
                 }
 
@@ -468,7 +468,7 @@ void Ui::main_menu_bar(sm::Ctx& ctx, GameScene& game_scene) {
             if (ImGui::MenuItem("Log Information")) {
                 sm::utils::write_file(ctx.path_logs("information.txt"), ctx.get_information(), true);
             }
-            if (ImGui::IsItemHovered()) {
+            if (ImGui::IsItemHovered(ImGuiHoveredFlags_DelayNormal)) {
                 ImGui::SetTooltip("%s", ctx.path_logs("information.txt").string().c_str());
             }
 

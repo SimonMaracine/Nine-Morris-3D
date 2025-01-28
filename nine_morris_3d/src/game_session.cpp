@@ -17,7 +17,11 @@ void GameSession::remote_quit() {
     m_remote_player_name.clear();
 }
 
-void GameSession::session_window(GameScene& game_scene) {
+void GameSession::remote_sent_message(const std::string& message) {
+    m_messages.emplace_back(m_remote_player_name, message);
+}
+
+void GameSession::session_window(GameScene& game_scene, const Global& g) {
     if (ImGui::Begin("Session")) {
         if (m_remote_joined) {
             ImGui::TextWrapped("Playing against %s.", m_remote_player_name.empty() ? "an unnamed opponnent" : m_remote_player_name.c_str());
@@ -48,7 +52,7 @@ void GameSession::session_window(GameScene& game_scene) {
                 }
             }
 
-            if (ImGui::GetScrollY() >= ImGui::GetScrollMaxY() - 6.0f) {
+            if (ImGui::GetScrollY() >= ImGui::GetScrollMaxY() - Ui::rem(0.3f)) {
                 ImGui::SetScrollHereY(1.0f);
             }
         }
@@ -60,18 +64,28 @@ void GameSession::session_window(GameScene& game_scene) {
         const ImGuiInputTextFlags flags {ImGuiInputTextFlags_CtrlEnterForNewLine | ImGuiInputTextFlags_EnterReturnsTrue};
 
         if (ImGui::InputTextMultiline("##", m_message_buffer, sizeof(m_message_buffer), size, flags)) {
-            // TODO
-            std::memset(m_message_buffer, 0, sizeof(m_message_buffer));
-            ImGui::SetKeyboardFocusHere(-1);
+            if (!message_empty()) {
+                game_scene.client_send_message(m_message_buffer);
+                m_messages.emplace_back(g.options.name, m_message_buffer);
+                std::memset(m_message_buffer, 0, sizeof(m_message_buffer));
+                ImGui::SetKeyboardFocusHere(-1);
+            }
         }
 
         ImGui::SameLine();
 
+        ImGui::BeginDisabled(message_empty());
         if (ImGui::Button("Send", ImGui::GetContentRegionAvail())) {
-            // TODO
+            game_scene.client_send_message(m_message_buffer);
+            m_messages.emplace_back(g.options.name, m_message_buffer);
             std::memset(m_message_buffer, 0, sizeof(m_message_buffer));
         }
+        ImGui::EndDisabled();
     }
 
     ImGui::End();
+}
+
+bool GameSession::message_empty() const {
+    return m_message_buffer[0] == 0;
 }
