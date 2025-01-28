@@ -4,6 +4,7 @@
 #include <vector>
 #include <chrono>
 #include <cstdint>
+#include <cstddef>
 
 #include <cereal/types/string.hpp>
 #include <cereal/types/vector.hpp>
@@ -123,6 +124,9 @@ namespace protocol {
 
     using TimePoint = std::chrono::system_clock::time_point;
 
+    using Messages = std::vector<std::pair<std::string, std::string>>;
+    inline constexpr std::size_t MAX_MESSAGE_SIZE {128};
+
     enum class Player {
         White = 0,
         Black = 1
@@ -217,13 +221,14 @@ namespace protocol {
     };
 
     struct Server_AcceptJoinGameSession {
+        SessionId session_id {};  // Not really needed, but simplifies implementation
+        Player remote_player_type {};
         std::vector<std::string> moves;
         std::string remote_player_name;
-        Player remote_player_type {};
 
         template<typename Archive>
         void serialize(Archive& archive) {
-            archive(moves, remote_player_name, remote_player_type);
+            archive(session_id, remote_player_type, moves, remote_player_name);
         }
     };
 

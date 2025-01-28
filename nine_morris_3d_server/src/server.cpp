@@ -204,22 +204,23 @@ void Server::client_request_join_game_session(std::shared_ptr<networking::Client
     std::shared_ptr<networking::ClientConnection> remote_connection;
 
     protocol::Server_AcceptJoinGameSession payload_accept;
+    payload_accept.session_id = payload.session_id;
     payload_accept.moves = iter->second.moves;
 
     if (iter->second.connection1.expired()) {
         iter->second.connection1 = connection;
         iter->second.name1 = payload.player_name;
 
-        payload_accept.remote_player_name = iter->second.name2;
         payload_accept.remote_player_type = protocol::opponent(iter->second.player1);
+        payload_accept.remote_player_name = iter->second.name2;
 
         remote_connection = iter->second.connection2.lock();
     } else if (iter->second.connection2.expired()) {
         iter->second.connection2 = connection;
         iter->second.name2 = payload.player_name;
 
-        payload_accept.remote_player_name = iter->second.name1;
         payload_accept.remote_player_type = iter->second.player1;
+        payload_accept.remote_player_name = iter->second.name1;
 
         remote_connection = iter->second.connection1.lock();
     } else {

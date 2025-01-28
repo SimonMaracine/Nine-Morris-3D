@@ -199,8 +199,6 @@ void GameScene::client_request_game_session() {
         return;
     }
 
-    m_game_session = GameSession();
-
     LOG_DEBUG("Requested a new game session");
     m_ui.push_popup_window(PopupWindow::WaitServerAcceptGameSession);
 }
@@ -209,7 +207,7 @@ void GameScene::client_quit_game_session() {
     assert(m_game_session);
 
     protocol::Client_QuitGameSession payload;
-    payload.session_id = m_game_session->session_id;
+    payload.session_id = m_game_session->get_session_id();
 
     networking::Message message {protocol::message::Client_QuitGameSession};
 
@@ -262,9 +260,6 @@ void GameScene::client_request_join_game_session(const std::string& session_id) 
         return;
     }
 
-    m_game_session = GameSession();
-    m_game_session->session_id = payload.session_id;
-
     LOG_DEBUG("Requested to join a game session");
     m_ui.push_popup_window(PopupWindow::WaitServerAcceptJoinGameSession);
 }
@@ -273,7 +268,7 @@ void GameScene::client_play_move(const std::string& move) {
     assert(m_game_session);
 
     protocol::Client_PlayMove payload;
-    payload.session_id = m_game_session->session_id;
+    payload.session_id = m_game_session->get_session_id();
     payload.move = move;
 
     networking::Message message {protocol::message::Client_PlayMove};
@@ -298,7 +293,7 @@ void GameScene::client_resign() {
     assert(m_game_session);
 
     protocol::Client_Resign payload;
-    payload.session_id = m_game_session->session_id;
+    payload.session_id = m_game_session->get_session_id();
 
     networking::Message message {protocol::message::Client_Resign};
 
@@ -736,8 +731,6 @@ void GameScene::server_ping(const networking::Message& message) {
 }
 
 void GameScene::server_accept_game_session(const networking::Message& message) {
-    assert(m_game_session);
-
     protocol::Server_AcceptGameSession payload;
 
     try {
@@ -747,18 +740,13 @@ void GameScene::server_accept_game_session(const networking::Message& message) {
         return;
     }
 
-    m_game_session->active = true;
-    m_game_session->session_id = payload.session_id;
+    m_game_session = GameSession(payload.session_id);
 
     m_ui.clear_popup_window();
     m_ui.push_popup_window(PopupWindow::WaitRemoteJoinGameSession);
 }
 
 void GameScene::server_deny_game_session(const networking::Message& message) {
-    assert(m_game_session);
-
-    m_game_session.reset();
-
     protocol::Server_DenyGameSession payload;
 
     try{
@@ -773,8 +761,6 @@ void GameScene::server_deny_game_session(const networking::Message& message) {
 }
 
 void GameScene::server_accept_join_game_session(const networking::Message& message) {
-    assert(m_game_session);
-
     protocol::Server_AcceptJoinGameSession payload;
 
     try {
@@ -786,9 +772,8 @@ void GameScene::server_accept_join_game_session(const networking::Message& messa
 
     reset(payload.moves);
 
-    m_game_session->active = true;
-    m_game_session->remote_active = true;
-    m_game_session->remote_player_name = payload.remote_player_name;
+    m_game_session = GameSession(payload.session_id);
+    m_game_session->remote_join(payload.remote_player_name);
 
     m_game_options.online.remote_color = PlayerColor(payload.remote_player_type);
 
@@ -828,8 +813,7 @@ void GameScene::server_remote_joined_game_session(const networking::Message& mes
         return;
     }
 
-    m_game_session->remote_active = true;
-    m_game_session->remote_player_name = payload.remote_player_name;
+    m_game_session->remote_join(payload.remote_player_name);
 
     // Prevent from clearing unwanted popup windows
     if (m_ui.get_popup_window() == PopupWindow::WaitRemoteJoinGameSession) {
@@ -846,8 +830,7 @@ void GameScene::server_remote_quit_game_session(const networking::Message&) {
         return;
     }
 
-    m_game_session->remote_active = false;
-    m_game_session->remote_player_name.clear();
+    m_game_session->remote_quit();
 }
 
 void GameScene::server_remote_played_move(const networking::Message& message) {

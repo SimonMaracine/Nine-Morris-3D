@@ -33,6 +33,8 @@ public:
     void clear_popup_window();
     PopupWindow get_popup_window() const;
 
+    static float rem(float size);
+
     void set_loading_skybox_done() { m_loading_skybox = false; }
     bool get_show_information() const { return m_show_information; }
 private:
@@ -64,7 +66,6 @@ private:
     static void set_anisotropic_filtering_task(sm::Ctx& ctx, GameScene& game_scene);
     static void create_font(sm::Ctx& ctx, int scale);
     static void set_style();
-    static float rem(float size);
 
     // Multiple modal windows may request attention at a time; put them in a queue
     std::deque<std::pair<PopupWindow, std::string>> m_popup_window_queue;

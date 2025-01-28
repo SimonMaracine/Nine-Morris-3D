@@ -2,6 +2,7 @@
 
 #include <utility>
 #include <algorithm>
+#include <iterator>
 #include <cstring>
 #include <cassert>
 
@@ -64,6 +65,11 @@ void Ui::update(sm::Ctx& ctx, GameScene& game_scene) {
     main_menu_bar(ctx, game_scene);
     game_window(ctx, game_scene);
 
+    // This way the session window is visible only when the use is in a session
+    if (game_scene.get_game_session()) {
+        game_scene.get_game_session()->session_window(game_scene);
+    }
+
     if (!m_popup_window_queue.empty()) {
         const auto& [popup_window, string] {m_popup_window_queue.front()};
 
@@ -123,18 +129,25 @@ PopupWindow Ui::get_popup_window() const {
     return PopupWindow::None;
 }
 
+float Ui::rem(float size) {
+    return ImGui::GetFontSize() * size;
+}
+
 void Ui::main_menu_bar(sm::Ctx& ctx, GameScene& game_scene) {
     auto& g {ctx.global<Global>()};
 
     if (ImGui::BeginMainMenuBar()) {
         if (ImGui::BeginMenu("Game")) {
             if (ImGui::MenuItem("New Game")) {
-                game_scene.client_resign();
                 game_scene.reset();
+
+                if (resign_available(game_scene)) {
+                    game_scene.client_resign();
+                }
             }
             if (ImGui::MenuItem("Resign", nullptr, nullptr, resign_available(game_scene))) {
-                game_scene.client_resign();
                 game_scene.resign(resign_player(game_scene));
+                game_scene.client_resign();
             }
             if (ImGui::MenuItem("Accept Draw Offer", nullptr, nullptr, accept_draw_offer_available(game_scene))) {
                 game_scene.accept_draw_offer();
@@ -390,8 +403,8 @@ void Ui::main_menu_bar(sm::Ctx& ctx, GameScene& game_scene) {
                 ImGui::EndMenu();
             }
             if (ImGui::BeginMenu("Session")) {
-                if (ImGui::BeginMenu("Status")) {
-                    ImGui::Text("%s", game_scene.get_game_session().value_or(GameSession()).active ? "Active" : "Inactive");
+                if (ImGui::BeginMenu("Code", static_cast<bool>(game_scene.get_game_session()))) {
+                    ImGui::Text("%u", game_scene.get_game_session()->get_session_id());
 
                     ImGui::EndMenu();
                 }
@@ -580,16 +593,6 @@ void Ui::before_game_online_window(sm::Ctx& ctx, GameScene& game_scene) {
 }
 
 void Ui::during_game_window(GameScene& game_scene) {
-    if (game_scene.get_game_options().game_type == GameTypeOnline) {
-        if (game_scene.get_game_session()->remote_active) {
-            ImGui::TextWrapped("Playing against %s.", game_scene.get_game_session()->remote_player_name.c_str());
-        } else {
-            ImGui::TextWrapped("The opponent has left the session. You may wait for them to rejoin.");
-        }
-
-        ImGui::Separator();
-    }
-
     {
         ImGui::Text("B");
         ImGui::SameLine();
@@ -717,9 +720,11 @@ void Ui::wait_server_accept_game_session_window(GameScene&) {
 }
 
 void Ui::wait_remote_join_game_session_window(GameScene& game_scene) {
+    assert(game_scene.get_game_session());
+
     generic_window("Waiting For Player To Join", [&game_scene]() {
         ImGui::Text("An online game has been created.");
-        ImGui::Text("Send your opponent the following code: %.5u", game_scene.get_game_session()->session_id);
+        ImGui::Text("Send your opponent the following code: %.5u", game_scene.get_game_session()->get_session_id());
 
         if (ImGui::Button("Cancel Game")) {
             game_scene.client_quit_game_session();
@@ -902,8 +907,4 @@ void Ui::set_style() {
     style.DisplaySafeAreaPadding = ImVec2(4.0f, 4.0f);
 
     // TODO other?
-}
-
-float Ui::rem(float size) {
-    return ImGui::GetFontSize() * size;
 }

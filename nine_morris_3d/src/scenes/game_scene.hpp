@@ -13,6 +13,7 @@
 #include "ui.hpp"
 #include "clock.hpp"
 #include "move_list.hpp"
+#include "game_session.hpp"
 #include "game_options.hpp"
 
 enum class GameState {
@@ -33,13 +34,6 @@ enum class GamePlayer {
     Human,
     Computer,
     Remote
-};
-
-struct GameSession {
-    bool active {false};
-    bool remote_active {false};
-    std::uint16_t session_id {};
-    std::string remote_player_name;
 };
 
 // Base class for scenes representing games
