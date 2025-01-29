@@ -25,7 +25,7 @@ public:
 
     void session_window(GameScene& game_scene, const Global& g);
 private:
-    bool message_empty() const;
+    bool send_message_available() const;
 
     protocol::SessionId m_session_id {};
     bool m_remote_joined {false};

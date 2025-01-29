@@ -46,8 +46,7 @@ namespace protocol {
             The server informs the client that the remote has joined. The client unblocks and the game is ready.
 
         Client_QuitGameSession
-            The client either presses the cancel game button, the quit session button, starts a new session,
-            or starts a new local game.
+            The client either presses the cancel game button, the leave session button, or starts a new local game.
 
         Server_RemoteQuitGameSession
             The server informs the client that the remote has either voluntarily quit the session, or disconnected.
@@ -68,20 +67,20 @@ namespace protocol {
         Server_RemoteResigned
             The server informs the client that the remote has resigned.
 
-        Client_AcknowledgeGameOver
-            The client acknowledges that the game is over. When both players acknowledge this fact, the server
-            acknowledges it too.
-
-        Server_AcknowledgeGameOver
-            The server acknowledges that both clients know that the game is over. It sends this message to both.
-
         Client_Rematch
-            After a game is over (server acknowledged game over), the client presses the rematch button and blocks
-            in a modal window, waiting for the remote to do the same.
+            After a game is over, the client presses the rematch button and blocks in a modal window, waiting
+            for the remote to do the same.
 
         Server_Rematch
-            After a game is over (server acknowledged game over), the server acknowledges that both clients want
+            After a game is over, the server acknowledges that both clients want
             a rematch. It sends this message to both. Both clients unblock and the game is ready.
+
+        Client_CancelRematch
+            While the client is waiting for the rematch, it presses the cancel rematch button. It then waits for
+            the server to either confirm the cancel, or to start the rematch anyway.
+
+        Server_CancelRematch
+            The server approves the client's cancellation.
 
         Client_SendMessage
             The client sends a message.
@@ -119,11 +118,11 @@ namespace protocol {
             Client_Resign,  // Client has pressed the resign button or the new game button
             Server_RemoteResigned,  // Remote client has pressed the resign button or the new game button
 
-            // Client_AcknowledgeGameOver,  // Client has acknowledged that the game is over on their side
-            // Server_AcknowledgeGameOver,  // Server has acknowledged that both clients have acknowledged game over
-
-            Client_Rematch,  // Client has pressed the rematch button (server has already acknowledged game over)
+            Client_Rematch,  // Client has pressed the rematch button
             Server_Rematch,  // Both clients have pressed the rematch button (game is ready)
+
+            Client_CancelRematch,  // Client has pressed the cancel rematch button
+            Server_CancelRematch,  // Server confirms that the client wants to cancel the rematch
 
             Client_SendMessage,  // Client has sent a message
             Server_RemoteSentMessage  // Remote client has sent a message
@@ -331,6 +330,17 @@ namespace protocol {
         }
     };
 
+    struct Client_CancelRematch {
+        SessionId session_id {};
+
+        template<typename Archive>
+        void serialize(Archive& archive) {
+            archive(session_id);
+        }
+    };
+
+    struct Server_CancelRematch {};
+
     struct Client_SendMessage {
         SessionId session_id {};
         std::string message;
@@ -340,7 +350,6 @@ namespace protocol {
             archive(session_id, message);
         }
     };
-
 
     struct Server_RemoteSentMessage {
         std::string message;

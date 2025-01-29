@@ -313,6 +313,57 @@ void GameScene::client_resign() {
     }
 }
 
+void GameScene::client_rematch() {
+    assert(m_game_session);
+
+    protocol::Client_Rematch payload;
+    payload.session_id = m_game_session->get_session_id();
+
+    networking::Message message {protocol::message::Client_Rematch};
+
+    try {
+        message.write(payload);
+    } catch (const networking::SerializationError& e) {
+        serialization_error(e);
+        return;
+    }
+
+    auto& g {ctx.global<Global>()};
+
+    try {
+        g.client.send_message(message);
+    } catch (const networking::ConnectionError& e) {
+        connection_error(e);
+        return;
+    }
+
+    m_ui.push_popup_window(PopupWindow::WaitRemoteRematch);
+}
+
+void GameScene::client_cancel_rematch() {
+    assert(m_game_session);
+
+    protocol::Client_CancelRematch payload;
+    payload.session_id = m_game_session->get_session_id();
+
+    networking::Message message {protocol::message::Client_CancelRematch};
+
+    try {
+        message.write(payload);
+    } catch (const networking::SerializationError& e) {
+        serialization_error(e);
+        return;
+    }
+
+    auto& g {ctx.global<Global>()};
+
+    try {
+        g.client.send_message(message);
+    } catch (const networking::ConnectionError& e) {
+        connection_error(e);
+    }
+}
+
 void GameScene::client_send_message(const std::string& message_) {
     assert(m_game_session);
 
@@ -649,16 +700,23 @@ void GameScene::disconnect() {
 
     m_game_session.reset();
     g.connection_state = ConnectionState::Disconnected;
+
     g.client.disconnect();
     LOG_DIST_INFO("Disconnected from server");
+
+    m_ui.clear_popup_window();  // The user may already be blocked in a popup window
+    m_ui.push_popup_window(PopupWindow::ConnectionError);
 }
 
 void GameScene::connection_error(const networking::ConnectionError& e) {
     auto& g {ctx.global<Global>()};
 
     LOG_DIST_ERROR("Connection error: {}", e.what());
+
     m_game_session.reset();
     g.connection_state = ConnectionState::Disconnected;
+
+    m_ui.clear_popup_window();  // The user may already be blocked in a popup window
     m_ui.push_popup_window(PopupWindow::ConnectionError);
 }
 
@@ -716,6 +774,12 @@ void GameScene::handle_message(const networking::Message& message) {
             break;
         case protocol::message::Server_RemoteResigned:
             server_remote_resigned(message);
+            break;
+        case protocol::message::Server_Rematch:
+            server_rematch(message);
+            break;
+        case protocol::message::Server_CancelRematch:
+            server_cancel_rematch(message);
             break;
         case protocol::message::Server_RemoteSentMessage:
             server_remote_sent_message(message);
@@ -813,8 +877,6 @@ void GameScene::server_accept_join_game_session(const networking::Message& messa
 }
 
 void GameScene::server_deny_join_game_session(const networking::Message& message) {
-    assert(m_game_session);
-
     m_game_session.reset();
 
     protocol::Server_DenyJoinGameSession payload;
@@ -907,4 +969,41 @@ void GameScene::server_remote_sent_message(const networking::Message& message) {
     }
 
     m_game_session->remote_sent_message(payload.message);
+}
+
+void GameScene::server_rematch(const networking::Message& message) {
+    // The user may have quit the session in the meantime
+    if (!m_game_session) {
+        return;
+    }
+
+    protocol::Server_Rematch payload;
+
+    try {
+        message.read(payload);
+    } catch (const networking::SerializationError& e) {
+        serialization_error(e);
+        return;
+    }
+
+    m_game_options.online.remote_color = PlayerColor(payload.remote_player_type);
+
+    m_game_state = GameState::Start;
+
+    assert(m_ui.get_popup_window() == PopupWindow::WaitRemoteRematch);
+
+    // Unblock from waiting
+    m_ui.clear_popup_window();
+}
+
+void GameScene::server_cancel_rematch(const networking::Message&) {
+    // The user may have quit the session in the meantime
+    if (!m_game_session) {
+        return;
+    }
+
+    assert(m_ui.get_popup_window() == PopupWindow::WaitRemoteRematch);
+
+    // Unblock from waiting
+    m_ui.clear_popup_window();
 }

@@ -6,6 +6,7 @@
 
 #include <nine_morris_3d_engine/nine_morris_3d.hpp>
 
+#include "game/board.hpp"
 #include "options.hpp"
 
 class GameScene;
@@ -22,6 +23,7 @@ enum class PopupWindow {
     WaitServerAcceptGameSession,
     WaitRemoteJoinGameSession,
     WaitServerAcceptJoinGameSession,
+    WaitRemoteRematch,
     RulesNineMensMorris
 };
 
@@ -54,6 +56,7 @@ private:
     void wait_server_accept_game_session_window(GameScene& game_scene);
     void wait_remote_join_game_session_window(GameScene& game_scene);
     void wait_server_accept_join_game_session_window(GameScene& game_scene);
+    void wait_remote_rematch_window(GameScene& game_scene);
     void rules_nine_mens_morris_window();
     void wrapped_text_window(const char* title, const char* text);
     void generic_window_ok(const char* title, std::function<void()>&& contents, std::function<void()>&& on_ok = []() {});
@@ -66,6 +69,12 @@ private:
     static void set_anisotropic_filtering_task(sm::Ctx& ctx, GameScene& game_scene);
     static void create_font(sm::Ctx& ctx, int scale);
     static void set_style();
+
+    static bool resign_available(GameScene& game_scene);
+    static PlayerColor resign_player(GameScene& game_scene);
+    static bool offer_draw_available(GameScene& game_scene);
+    static bool accept_draw_offer_available(GameScene& game_scene);
+    bool join_game_available(GameScene& game_scene);
 
     // Multiple modal windows may request attention at a time; put them in a queue
     std::deque<std::pair<PopupWindow, std::string>> m_popup_window_queue;

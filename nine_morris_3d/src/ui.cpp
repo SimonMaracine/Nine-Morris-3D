@@ -16,39 +16,6 @@
 #include "ver.hpp"
 #include "default_address.hpp"
 
-static bool resign_available(GameScene& game_scene) {
-    return (
-        game_scene.get_game_state() != GameState::Ready &&
-        game_scene.get_game_state() != GameState::Over &&
-        game_scene.get_game_options().game_type == GameTypeOnline
-    );
-}
-
-static PlayerColor resign_player(GameScene& game_scene) {
-    const GameOptions& options {game_scene.get_game_options()};
-
-    assert(options.game_type == GameTypeOnline);
-
-    return BoardObj::player_color_opponent(PlayerColor(options.online.remote_color));
-}
-
-static bool offer_draw_available(GameScene& game_scene) {
-    return (
-        game_scene.get_game_state() != GameState::Ready &&
-        game_scene.get_game_state() != GameState::Over &&
-        game_scene.get_game_options().game_type == GameTypeOnline
-    );
-}
-
-static bool accept_draw_offer_available(GameScene& game_scene) {
-    return (
-        game_scene.get_game_state() != GameState::Ready &&
-        game_scene.get_game_state() != GameState::Over &&
-        game_scene.get_game_options().game_type == GameTypeOnline &&
-        game_scene.get_draw_offered_by_remote()
-    );
-}
-
 void Ui::initialize(sm::Ctx& ctx) {
     const auto& g {ctx.global<Global>()};
 
@@ -106,6 +73,9 @@ void Ui::update(sm::Ctx& ctx, GameScene& game_scene) {
             case PopupWindow::WaitServerAcceptJoinGameSession:
                 wait_server_accept_join_game_session_window(game_scene);
                 break;
+            case PopupWindow::WaitRemoteRematch:
+                wait_remote_rematch_window(game_scene);
+                break;
             case PopupWindow::RulesNineMensMorris:
                 rules_nine_mens_morris_window();
                 break;
@@ -138,7 +108,7 @@ void Ui::main_menu_bar(sm::Ctx& ctx, GameScene& game_scene) {
 
     if (ImGui::BeginMainMenuBar()) {
         if (ImGui::BeginMenu("Game")) {
-            if (ImGui::MenuItem("New Game")) {
+            if (ImGui::MenuItem("New Game")) {  // FIXME didn't seem to work
                 game_scene.reset();
 
                 if (resign_available(game_scene)) {
@@ -419,6 +389,18 @@ void Ui::main_menu_bar(sm::Ctx& ctx, GameScene& game_scene) {
                     ImGui::SetTooltip("Your name appears to other players.");
                 }
 
+                if (ImGui::MenuItem("Leave", nullptr, nullptr, static_cast<bool>(game_scene.get_game_session()))) {
+                    // Voluntarily leaving the session means a resign
+                    game_scene.resign(resign_player(game_scene));
+
+                    if (resign_available(game_scene)) {
+                        game_scene.client_resign();
+                    }
+
+                    // Resigning needs the session; this destroys it
+                    game_scene.client_quit_game_session();
+                }
+
                 ImGui::EndMenu();
             }
             if (ImGui::BeginMenu("Address")) {
@@ -546,23 +528,22 @@ void Ui::before_game_online_window(sm::Ctx& ctx, GameScene& game_scene) {
     // The connection may be down, so don't allow play
     ImGui::BeginDisabled(g.connection_state == ConnectionState::Disconnected);
 
+    ImGui::BeginDisabled(static_cast<bool>(game_scene.get_game_session()));
     if (ImGui::Button("Start Game")) {
-        if (game_scene.get_game_session()) {
-            game_scene.client_quit_game_session();
-        }
-
         game_scene.client_request_game_session();
     }
+    ImGui::EndDisabled();
 
     ImGui::SameLine();
 
+    ImGui::BeginDisabled(!game_scene.get_game_session());
     if (ImGui::Button("Rematch")) {
-        // TODO
+        game_scene.client_rematch();
     }
+    ImGui::EndDisabled();
 
     // The user must enter 5 digits
-    ImGui::BeginDisabled(std::any_of(std::cbegin(m_session_id), std::prev(std::cend(m_session_id)), [](char c) { return c == 0; }));
-
+    ImGui::BeginDisabled(!join_game_available(game_scene));
     if (ImGui::Button("Join Game")) {
         if (game_scene.get_game_session()) {
             game_scene.client_quit_game_session();
@@ -570,7 +551,6 @@ void Ui::before_game_online_window(sm::Ctx& ctx, GameScene& game_scene) {
 
         game_scene.client_request_join_game_session(m_session_id);
     }
-
     ImGui::EndDisabled();
 
     ImGui::SameLine();
@@ -670,8 +650,13 @@ void Ui::game_options_window(GameScene& game_scene) {
                 ImGui::RadioButton("black", &options.local_human_vs_computer.computer_color, PlayerColorBlack);
                 break;
             case GameTypeOnline:
-                ImGui::RadioButton("white", &options.online.remote_color, PlayerColorWhite);
-                ImGui::RadioButton("black", &options.online.remote_color, PlayerColorBlack);
+                if (game_scene.get_game_session()) {
+                    ImGui::RadioButton("white", false);
+                    ImGui::RadioButton("black", false);
+                } else {
+                    ImGui::RadioButton("white", &options.online.remote_color, PlayerColorWhite);
+                    ImGui::RadioButton("black", &options.online.remote_color, PlayerColorBlack);
+                }
                 break;
         }
 
@@ -739,6 +724,21 @@ void Ui::wait_remote_join_game_session_window(GameScene& game_scene) {
 void Ui::wait_server_accept_join_game_session_window(GameScene&) {
     generic_window("Waiting For Server To Accept", []() {
         ImGui::Text("The server should reply any time soon.");
+
+        return false;
+    });
+}
+
+void Ui::wait_remote_rematch_window(GameScene& game_scene) {
+    assert(game_scene.get_game_session());
+
+    generic_window("Waiting For Player", [&game_scene]() {
+        ImGui::Text("For another game to begin, the opponent has to accept a rematch as well.");
+        ImGui::Text("Once the opponnent has accepted the rematch, it cannot be canceled.");
+
+        if (ImGui::Button("Cancel Rematch")) {
+            game_scene.client_cancel_rematch();
+        }
 
         return false;
     });
@@ -907,4 +907,44 @@ void Ui::set_style() {
     style.DisplaySafeAreaPadding = ImVec2(4.0f, 4.0f);
 
     // TODO other?
+}
+
+bool Ui::resign_available(GameScene& game_scene) {
+    return (
+        game_scene.get_game_state() != GameState::Ready &&
+        game_scene.get_game_state() != GameState::Over &&
+        game_scene.get_game_options().game_type == GameTypeOnline
+    );
+}
+
+PlayerColor Ui::resign_player(GameScene& game_scene) {
+    const GameOptions& options {game_scene.get_game_options()};
+
+    assert(options.game_type == GameTypeOnline);
+
+    return BoardObj::player_color_opponent(PlayerColor(options.online.remote_color));
+}
+
+bool Ui::offer_draw_available(GameScene& game_scene) {
+    return (
+        game_scene.get_game_state() != GameState::Ready &&
+        game_scene.get_game_state() != GameState::Over &&
+        game_scene.get_game_options().game_type == GameTypeOnline
+    );
+}
+
+bool Ui::accept_draw_offer_available(GameScene& game_scene) {
+    return (
+        game_scene.get_game_state() != GameState::Ready &&
+        game_scene.get_game_state() != GameState::Over &&
+        game_scene.get_game_options().game_type == GameTypeOnline &&
+        game_scene.get_draw_offered_by_remote()
+    );
+}
+
+bool Ui::join_game_available(GameScene& game_scene) {
+    return (
+        !game_scene.get_game_session() &&
+        std::any_of(std::cbegin(m_session_id), std::prev(std::cend(m_session_id)), [](char c) { return c != 0; })
+    );
 }

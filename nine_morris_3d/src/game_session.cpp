@@ -64,7 +64,7 @@ void GameSession::session_window(GameScene& game_scene, const Global& g) {
         const ImGuiInputTextFlags flags {ImGuiInputTextFlags_CtrlEnterForNewLine | ImGuiInputTextFlags_EnterReturnsTrue};
 
         if (ImGui::InputTextMultiline("##", m_message_buffer, sizeof(m_message_buffer), size, flags)) {
-            if (!message_empty()) {
+            if (send_message_available()) {
                 game_scene.client_send_message(m_message_buffer);
                 m_messages.emplace_back(g.options.name, m_message_buffer);
                 std::memset(m_message_buffer, 0, sizeof(m_message_buffer));
@@ -74,7 +74,7 @@ void GameSession::session_window(GameScene& game_scene, const Global& g) {
 
         ImGui::SameLine();
 
-        ImGui::BeginDisabled(message_empty());
+        ImGui::BeginDisabled(!send_message_available());
         if (ImGui::Button("Send", ImGui::GetContentRegionAvail())) {
             game_scene.client_send_message(m_message_buffer);
             m_messages.emplace_back(g.options.name, m_message_buffer);
@@ -86,6 +86,6 @@ void GameSession::session_window(GameScene& game_scene, const Global& g) {
     ImGui::End();
 }
 
-bool GameSession::message_empty() const {
-    return m_message_buffer[0] == 0;
+bool GameSession::send_message_available() const {
+    return m_message_buffer[0] != 0;
 }
