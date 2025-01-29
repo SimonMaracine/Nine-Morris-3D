@@ -118,11 +118,11 @@ namespace protocol {
             Client_Resign,  // Client has pressed the resign button or the new game button
             Server_RemoteResigned,  // Remote client has pressed the resign button or the new game button
 
-            Client_Rematch,  // Client has pressed the rematch button
-            Server_Rematch,  // Both clients have pressed the rematch button (game is ready)
+            // Client_Rematch,  // Client has pressed the rematch button
+            // Server_Rematch,  // Both clients have pressed the rematch button (game is ready)
 
-            Client_CancelRematch,  // Client has pressed the cancel rematch button
-            Server_CancelRematch,  // Server confirms that the client wants to cancel the rematch
+            // Client_CancelRematch,  // Client has pressed the cancel rematch button
+            // Server_CancelRematch,  // Server confirms that the client wants to cancel the rematch
 
             Client_SendMessage,  // Client has sent a message
             Server_RemoteSentMessage  // Remote client has sent a message
@@ -321,25 +321,25 @@ namespace protocol {
         }
     };
 
-    struct Server_Rematch {
-        Player remote_player_type {};
+    // struct Server_Rematch {
+    //     Player remote_player_type {};
 
-        template<typename Archive>
-        void serialize(Archive& archive) {
-            archive(remote_player_type);
-        }
-    };
+    //     template<typename Archive>
+    //     void serialize(Archive& archive) {
+    //         archive(remote_player_type);
+    //     }
+    // };
 
-    struct Client_CancelRematch {
-        SessionId session_id {};
+    // struct Client_CancelRematch {
+    //     SessionId session_id {};
 
-        template<typename Archive>
-        void serialize(Archive& archive) {
-            archive(session_id);
-        }
-    };
+    //     template<typename Archive>
+    //     void serialize(Archive& archive) {
+    //         archive(session_id);
+    //     }
+    // };
 
-    struct Server_CancelRematch {};
+    // struct Server_CancelRematch {};
 
     struct Client_SendMessage {
         SessionId session_id {};

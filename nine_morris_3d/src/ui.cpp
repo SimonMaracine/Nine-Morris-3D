@@ -73,9 +73,9 @@ void Ui::update(sm::Ctx& ctx, GameScene& game_scene) {
             case PopupWindow::WaitServerAcceptJoinGameSession:
                 wait_server_accept_join_game_session_window(game_scene);
                 break;
-            case PopupWindow::WaitRemoteRematch:
-                wait_remote_rematch_window(game_scene);
-                break;
+            // case PopupWindow::WaitRemoteRematch:
+            //     wait_remote_rematch_window(game_scene);
+            //     break;
             case PopupWindow::RulesNineMensMorris:
                 rules_nine_mens_morris_window();
                 break;
@@ -114,12 +114,17 @@ void Ui::main_menu_bar(sm::Ctx& ctx, GameScene& game_scene) {
                     game_scene.client_resign();
                 }
 
+                if (game_scene.get_game_session()) {
+                    game_scene.client_quit_game_session();
+                }
+
                 // Cannot display the resign game over popup
                 game_scene.reset();
             }
             if (ImGui::MenuItem("Resign", nullptr, nullptr, resign_available(game_scene))) {
                 game_scene.resign(resign_player(game_scene));
                 game_scene.client_resign();
+                game_scene.client_quit_game_session();
             }
             if (ImGui::MenuItem("Accept Draw Offer", nullptr, nullptr, accept_draw_offer_available(game_scene))) {
                 game_scene.accept_draw_offer();
@@ -391,17 +396,6 @@ void Ui::main_menu_bar(sm::Ctx& ctx, GameScene& game_scene) {
                     ImGui::SetTooltip("Your name appears to other players.");
                 }
 
-                if (ImGui::MenuItem("Leave", nullptr, nullptr, static_cast<bool>(game_scene.get_game_session()))) {
-                    // Must resign first
-                    if (resign_available(game_scene)) {
-                        game_scene.resign(resign_player(game_scene));
-                        game_scene.client_resign();
-                    }
-
-                    // Resigning needs the session; this destroys it
-                    game_scene.client_quit_game_session();
-                }
-
                 ImGui::EndMenu();
             }
             if (ImGui::BeginMenu("Address")) {
@@ -535,21 +529,17 @@ void Ui::before_game_online_window(sm::Ctx& ctx, GameScene& game_scene) {
     }
     ImGui::EndDisabled();
 
-    ImGui::SameLine();
+    // ImGui::SameLine();
 
-    ImGui::BeginDisabled(!game_scene.get_game_session() || game_scene.get_game_session() && !game_scene.get_game_session()->get_remote_joined());
-    if (ImGui::Button("Rematch")) {
-        game_scene.client_rematch();
-    }
-    ImGui::EndDisabled();
+    // ImGui::BeginDisabled(!game_scene.get_game_session() || game_scene.get_game_session() && !game_scene.get_game_session()->get_remote_joined());
+    // if (ImGui::Button("Rematch")) {
+    //     game_scene.client_rematch();
+    // }
+    // ImGui::EndDisabled();
 
     // The user must enter 5 digits
     ImGui::BeginDisabled(!join_game_available(game_scene));
     if (ImGui::Button("Join Game")) {
-        if (game_scene.get_game_session()) {
-            game_scene.client_quit_game_session();
-        }
-
         game_scene.client_request_join_game_session(m_session_id);
     }
     ImGui::EndDisabled();
@@ -651,13 +641,8 @@ void Ui::game_options_window(GameScene& game_scene) {
                 ImGui::RadioButton("black", &options.local_human_vs_computer.computer_color, PlayerColorBlack);
                 break;
             case GameTypeOnline:
-                if (game_scene.get_game_session()) {
-                    ImGui::RadioButton("white", false);
-                    ImGui::RadioButton("black", false);
-                } else {
-                    ImGui::RadioButton("white", &options.online.remote_color, PlayerColorWhite);
-                    ImGui::RadioButton("black", &options.online.remote_color, PlayerColorBlack);
-                }
+                ImGui::RadioButton("white", &options.online.remote_color, PlayerColorWhite);
+                ImGui::RadioButton("black", &options.online.remote_color, PlayerColorBlack);
                 break;
         }
 
@@ -730,20 +715,20 @@ void Ui::wait_server_accept_join_game_session_window(GameScene&) {
     });
 }
 
-void Ui::wait_remote_rematch_window(GameScene& game_scene) {
-    assert(game_scene.get_game_session());
+// void Ui::wait_remote_rematch_window(GameScene& game_scene) {
+//     assert(game_scene.get_game_session());
 
-    generic_window("Waiting For Player", [&game_scene]() {
-        ImGui::Text("For another game to begin, the opponent has to accept a rematch as well.");
-        ImGui::Text("Once the opponnent has accepted the rematch, it cannot be canceled.");
+//     generic_window("Waiting For Player", [&game_scene]() {
+//         ImGui::Text("For another game to begin, the opponent has to accept a rematch as well.");
+//         ImGui::Text("Once the opponnent has accepted the rematch, it cannot be canceled.");
 
-        if (ImGui::Button("Cancel Rematch")) {
-            game_scene.client_cancel_rematch();
-        }
+//         if (ImGui::Button("Cancel Rematch")) {
+//             game_scene.client_cancel_rematch();
+//         }
 
-        return false;
-    });
-}
+//         return false;
+//     });
+// }
 
 void Ui::rules_nine_mens_morris_window() {
     const char* text {

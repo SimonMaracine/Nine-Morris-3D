@@ -37,10 +37,10 @@ private:
     void server_remote_played_move(std::shared_ptr<networking::ClientConnection> connection, const std::string& move);
     void client_resign(std::shared_ptr<networking::ClientConnection> connection, const networking::Message& message);
     void server_remote_resigned(std::shared_ptr<networking::ClientConnection> connection);
-    void client_rematch(std::shared_ptr<networking::ClientConnection> connection, const networking::Message& message);
-    void server_rematch(std::shared_ptr<networking::ClientConnection> connection, protocol::Player remote_player_type);
-    void client_cancel_rematch(std::shared_ptr<networking::ClientConnection> connection, const networking::Message& message);
-    void server_cancel_rematch(std::shared_ptr<networking::ClientConnection> connection);
+    // void client_rematch(std::shared_ptr<networking::ClientConnection> connection, const networking::Message& message);
+    // void server_rematch(std::shared_ptr<networking::ClientConnection> connection, protocol::Player remote_player_type);
+    // void client_cancel_rematch(std::shared_ptr<networking::ClientConnection> connection, const networking::Message& message);
+    // void server_cancel_rematch(std::shared_ptr<networking::ClientConnection> connection);
     void client_send_message(std::shared_ptr<networking::ClientConnection> connection, const networking::Message& message);
     void server_remote_sent_message(std::shared_ptr<networking::ClientConnection> connection, const std::string& message_);
 

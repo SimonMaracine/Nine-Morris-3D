@@ -23,7 +23,7 @@ enum class PopupWindow {
     WaitServerAcceptGameSession,
     WaitRemoteJoinGameSession,
     WaitServerAcceptJoinGameSession,
-    WaitRemoteRematch,
+    // WaitRemoteRematch,
     RulesNineMensMorris
 };
 
@@ -56,7 +56,7 @@ private:
     void wait_server_accept_game_session_window(GameScene& game_scene);
     void wait_remote_join_game_session_window(GameScene& game_scene);
     void wait_server_accept_join_game_session_window(GameScene& game_scene);
-    void wait_remote_rematch_window(GameScene& game_scene);
+    // void wait_remote_rematch_window(GameScene& game_scene);
     void rules_nine_mens_morris_window();
     void wrapped_text_window(const char* title, const char* text);
     void generic_window_ok(const char* title, std::function<void()>&& contents, std::function<void()>&& on_ok = []() {});

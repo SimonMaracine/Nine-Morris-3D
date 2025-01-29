@@ -114,12 +114,12 @@ void Server::handle_message(std::shared_ptr<networking::ClientConnection> connec
             case protocol::message::Client_Resign:
                 client_resign(connection, message);
                 break;
-            case protocol::message::Client_Rematch:
-                client_rematch(connection, message);
-                break;
-            case protocol::message::Client_CancelRematch:
-                client_cancel_rematch(connection, message);
-                break;
+            // case protocol::message::Client_Rematch:
+            //     client_rematch(connection, message);
+            //     break;
+            // case protocol::message::Client_CancelRematch:
+            //     client_cancel_rematch(connection, message);
+            //     break;
             case protocol::message::Client_SendMessage:
                 client_send_message(connection, message);
                 break;
@@ -206,7 +206,14 @@ void Server::client_request_join_game_session(std::shared_ptr<networking::Client
     }
 
     if (iter->second.connection1.expired() && iter->second.connection2.expired()) {
+        server_deny_join_game_session(connection, protocol::ErrorCode::SessionOccupied);
         m_server.get_logger()->warn("Client {} requested to join empty session {}", connection->get_id(), payload.session_id);
+        return;
+    }
+
+    if (iter->second.game_over) {
+        server_deny_join_game_session(connection, protocol::ErrorCode::SessionOccupied);
+        m_server.get_logger()->warn("Client {} requested to join game over session {}", connection->get_id(), payload.session_id);
         return;
     }
 
@@ -300,6 +307,8 @@ void Server::client_quit_game_session(std::shared_ptr<networking::ClientConnecti
         return;
     }
 
+    iter->second.game_over = true;
+
     if (remote_connection) {
         server_remote_quit_game_session(remote_connection);
     }
@@ -383,93 +392,93 @@ void Server::server_remote_resigned(std::shared_ptr<networking::ClientConnection
     m_server.send_message(connection, message);
 }
 
-void Server::client_rematch(std::shared_ptr<networking::ClientConnection> connection, const networking::Message& message) {
-    protocol::Client_Rematch payload;
-    message.read(payload);
+// void Server::client_rematch(std::shared_ptr<networking::ClientConnection> connection, const networking::Message& message) {
+//     protocol::Client_Rematch payload;
+//     message.read(payload);
 
-    const auto iter {m_game_sessions.find(payload.session_id)};
+//     const auto iter {m_game_sessions.find(payload.session_id)};
 
-    if (iter == m_game_sessions.end()) {
-        m_server.get_logger()->warn("Session {} reported by client {} doesn't exist", connection->get_id(), payload.session_id);
-        return;
-    }
+//     if (iter == m_game_sessions.end()) {
+//         m_server.get_logger()->warn("Session {} reported by client {} doesn't exist", connection->get_id(), payload.session_id);
+//         return;
+//     }
 
-    bool rematch_both {false};
+//     bool rematch_both {false};
 
-    if (iter->second.connection1.lock() == connection) {
-        iter->second.rematch1 = true;
-        rematch_both = iter->second.rematch2;
-    } else if (iter->second.connection2.lock() == connection) {
-        iter->second.rematch2 = true;
-        rematch_both = iter->second.rematch1;
-    } else {
-        m_server.get_logger()->warn("Client {} wanted rematch in session {} in which it wasn't active", connection->get_id(), payload.session_id);
-        return;
-    }
+//     if (iter->second.connection1.lock() == connection) {
+//         iter->second.rematch1 = true;
+//         rematch_both = iter->second.rematch2;
+//     } else if (iter->second.connection2.lock() == connection) {
+//         iter->second.rematch2 = true;
+//         rematch_both = iter->second.rematch1;
+//     } else {
+//         m_server.get_logger()->warn("Client {} wanted rematch in session {} in which it wasn't active", connection->get_id(), payload.session_id);
+//         return;
+//     }
 
-    if (rematch_both) {
-        // Switch sides
-        iter->second.player1 = protocol::opponent(iter->second.player1);  // FIXME didn't seem to work
+//     if (rematch_both) {
+//         // Switch sides
+//         iter->second.player1 = protocol::opponent(iter->second.player1);  // FIXME didn't seem to work
 
-        // Restart game
-        iter->second.moves.clear();  // FIXME clearing should be done as soon as both players have game over
+//         // Restart game
+//         iter->second.moves.clear();  // FIXME clearing should be done as soon as both players have game over
 
-        iter->second.rematch1 = false;
-        iter->second.rematch2 = false;
+//         iter->second.rematch1 = false;
+//         iter->second.rematch2 = false;
 
-        if (auto connection1 {iter->second.connection1.lock()}) {
-            server_rematch(connection1, iter->second.player1);
-        }
+//         if (auto connection1 {iter->second.connection1.lock()}) {
+//             server_rematch(connection1, iter->second.player1);
+//         }
 
-        if (auto connection2 {iter->second.connection2.lock()}) {
-            server_rematch(connection2, protocol::opponent(iter->second.player1));
-        }
-    }
-}
+//         if (auto connection2 {iter->second.connection2.lock()}) {
+//             server_rematch(connection2, protocol::opponent(iter->second.player1));
+//         }
+//     }
+// }
 
-void Server::server_rematch(std::shared_ptr<networking::ClientConnection> connection, protocol::Player remote_player_type) {
-    protocol::Server_Rematch payload;
-    payload.remote_player_type = remote_player_type;
+// void Server::server_rematch(std::shared_ptr<networking::ClientConnection> connection, protocol::Player remote_player_type) {
+//     protocol::Server_Rematch payload;
+//     payload.remote_player_type = remote_player_type;
 
-    networking::Message message {protocol::message::Server_Rematch};
-    message.write(payload);
+//     networking::Message message {protocol::message::Server_Rematch};
+//     message.write(payload);
 
-    m_server.send_message(connection, message);
-}
+//     m_server.send_message(connection, message);
+// }
 
-void Server::client_cancel_rematch(std::shared_ptr<networking::ClientConnection> connection, const networking::Message& message) {
-    protocol::Client_CancelRematch payload;
-    message.read(payload);
+// void Server::client_cancel_rematch(std::shared_ptr<networking::ClientConnection> connection, const networking::Message& message) {
+//     protocol::Client_CancelRematch payload;
+//     message.read(payload);
 
-    const auto iter {m_game_sessions.find(payload.session_id)};
+//     const auto iter {m_game_sessions.find(payload.session_id)};
 
-    if (iter == m_game_sessions.end()) {
-        m_server.get_logger()->warn("Session {} reported by client {} doesn't exist", connection->get_id(), payload.session_id);
-        return;
-    }
+//     if (iter == m_game_sessions.end()) {
+//         m_server.get_logger()->warn("Session {} reported by client {} doesn't exist", connection->get_id(), payload.session_id);
+//         return;
+//     }
 
-    if (iter->second.rematch1 && iter->second.rematch2) {
-        // Reject the cancellation; both clients already agreed
-        return;
-    }
+//     if (iter->second.rematch1 && iter->second.rematch2) {
+//         // Reject the cancellation; both clients already agreed
+//         return;
+//     }
 
-    if (iter->second.connection1.lock() == connection) {
-        iter->second.rematch1 = false;
-    } else if (iter->second.connection2.lock() == connection) {
-        iter->second.rematch2 = false;
-    } else {
-        m_server.get_logger()->warn("Client {} wanted rematch in session {} in which it wasn't active", connection->get_id(), payload.session_id);
-        return;
-    }
+//     if (iter->second.connection1.lock() == connection) {
+//         iter->second.rematch1 = false;
+//     } else if (iter->second.connection2.lock() == connection) {
+//         iter->second.rematch2 = false;
+//     } else {
+//         m_server.get_logger()->warn("Client {} wanted rematch in session {} in which it wasn't active", connection->get_id(), payload.session_id);
+//         return;
+//     }
 
-    server_cancel_rematch(connection);
-}
+//     server_cancel_rematch(connection);
+// }
 
-void Server::server_cancel_rematch(std::shared_ptr<networking::ClientConnection> connection) {
-    networking::Message message {protocol::message::Server_CancelRematch};
+// void Server::server_cancel_rematch(std::shared_ptr<networking::ClientConnection> connection) {
+//     networking::Message message {protocol::message::Server_CancelRematch};
 
-    m_server.send_message(connection, message);
-}
+//     m_server.send_message(connection, message);
+// }
 
 void Server::client_send_message(std::shared_ptr<networking::ClientConnection> connection, const networking::Message& message) {
     protocol::Client_SendMessage payload;
