@@ -1,6 +1,6 @@
 #! /bin/bash
 
-./build.sh nine_morris_3d_server
+./build.sh
 
 if [ "$?" -ne 0 ]; then
     exit 1

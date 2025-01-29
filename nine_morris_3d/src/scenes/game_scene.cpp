@@ -152,6 +152,9 @@ void GameScene::connect(const std::string& address, std::uint16_t port, bool rec
         return;
     }
 
+    // To prevent bad states and desynchronizations
+    reset_session_and_game();
+
     g.client.disconnect();
 
     try {
@@ -169,11 +172,6 @@ void GameScene::connect(const std::string& address, const std::string& port, boo
     } catch (const sm::OtherError& e) {
         LOG_DIST_ERROR("Invalid port: {}", e.what());
     }
-}
-
-void GameScene::serialization_error(const networking::SerializationError& e) {
-    LOG_DIST_CRITICAL("Serialization error: {}", e.what());
-    disconnect();
 }
 
 void GameScene::client_request_game_session() {
@@ -695,10 +693,28 @@ std::shared_ptr<sm::GlTextureCubemap> GameScene::load_skybox_texture_cubemap(boo
     return {};
 }
 
-void GameScene::disconnect() {
+void GameScene::connection_error(const networking::ConnectionError& e) {
     auto& g {ctx.global<Global>()};
 
-    m_game_session.reset();
+    LOG_DIST_ERROR("Connection error: {}", e.what());
+
+    // To prevent bad states and desynchronizations
+    reset_session_and_game();
+
+    g.connection_state = ConnectionState::Disconnected;
+
+    m_ui.clear_popup_window();  // The user may already be blocked in a popup window
+    m_ui.push_popup_window(PopupWindow::ConnectionError);
+}
+
+void GameScene::serialization_error(const networking::SerializationError& e) {
+    auto& g {ctx.global<Global>()};
+
+    LOG_DIST_CRITICAL("Serialization error: {}", e.what());
+
+    // To prevent bad states and desynchronizations
+    reset_session_and_game();
+
     g.connection_state = ConnectionState::Disconnected;
 
     g.client.disconnect();
@@ -708,16 +724,11 @@ void GameScene::disconnect() {
     m_ui.push_popup_window(PopupWindow::ConnectionError);
 }
 
-void GameScene::connection_error(const networking::ConnectionError& e) {
-    auto& g {ctx.global<Global>()};
-
-    LOG_DIST_ERROR("Connection error: {}", e.what());
-
-    m_game_session.reset();
-    g.connection_state = ConnectionState::Disconnected;
-
-    m_ui.clear_popup_window();  // The user may already be blocked in a popup window
-    m_ui.push_popup_window(PopupWindow::ConnectionError);
+void GameScene::reset_session_and_game() {
+    if (m_game_session) {
+        m_game_session.reset();
+        reset();
+    }
 }
 
 void GameScene::update_connection_state() {
@@ -877,8 +888,6 @@ void GameScene::server_accept_join_game_session(const networking::Message& messa
 }
 
 void GameScene::server_deny_join_game_session(const networking::Message& message) {
-    m_game_session.reset();
-
     protocol::Server_DenyJoinGameSession payload;
 
     try {
@@ -893,7 +902,10 @@ void GameScene::server_deny_join_game_session(const networking::Message& message
 }
 
 void GameScene::server_remote_joined_game_session(const networking::Message& message) {
-    assert(m_game_session);
+    // The user may have quit the session in the meantime
+    if (!m_game_session) {
+        return;
+    }
 
     protocol::Server_RemoteJoinedGameSession payload;
 

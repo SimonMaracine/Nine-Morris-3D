@@ -79,10 +79,9 @@ public:
     void reload_and_set_textures();
 
     virtual void start_engine() = 0;
+
     void connect(const std::string& address, std::uint16_t port, bool reconnect = false);
     void connect(const std::string& address, const std::string& port, bool reconnect = false);
-
-    void serialization_error(const networking::SerializationError& e);
     void client_request_game_session();
     void client_quit_game_session();
     void client_request_join_game_session(const std::string& session_id);
@@ -109,8 +108,9 @@ protected:
     void reload_skybox_texture_data() const;
     std::shared_ptr<sm::GlTextureCubemap> load_skybox_texture_cubemap(bool reload = false) const;
 
-    void disconnect();
     void connection_error(const networking::ConnectionError& e);
+    void serialization_error(const networking::SerializationError& e);
+    void reset_session_and_game();
     void update_connection_state();
     void handle_message(const networking::Message& message);
     void client_ping();

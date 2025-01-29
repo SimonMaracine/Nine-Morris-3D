@@ -16,6 +16,7 @@ public:
         : m_session_id(session_id) {}
 
     protocol::SessionId get_session_id() const { return m_session_id; }
+    bool get_remote_joined() const { return m_remote_joined; }
     void set_messages(const protocol::Messages& messages) { m_messages = messages; }
 
     void remote_join(const std::string& player_name);

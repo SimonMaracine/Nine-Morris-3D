@@ -186,12 +186,22 @@ namespace sm {
         std::shared_ptr<AlBuffer> load_buffer(Id id, std::shared_ptr<SoundData> sound_data);
 
         template<typename T>
-        T& global() {
+        T& global() noexcept {
+            return *static_cast<T*>(m_global_data.get());
+        }
+
+        template<typename T>
+        const T& global() const noexcept {
             return *static_cast<T*>(m_global_data.get());
         }
 
         template<typename T>
         T& user() noexcept {
+            return *static_cast<T*>(m_user_data);
+        }
+
+        template<typename T>
+        const T& user() const noexcept {
             return *static_cast<T*>(m_user_data);
         }
 

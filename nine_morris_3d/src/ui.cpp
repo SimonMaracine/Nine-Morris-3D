@@ -108,12 +108,14 @@ void Ui::main_menu_bar(sm::Ctx& ctx, GameScene& game_scene) {
 
     if (ImGui::BeginMainMenuBar()) {
         if (ImGui::BeginMenu("Game")) {
-            if (ImGui::MenuItem("New Game")) {  // FIXME didn't seem to work
-                game_scene.reset();
-
+            if (ImGui::MenuItem("New Game")) {
+                // Must resign first
                 if (resign_available(game_scene)) {
                     game_scene.client_resign();
                 }
+
+                // Cannot display the resign game over popup
+                game_scene.reset();
             }
             if (ImGui::MenuItem("Resign", nullptr, nullptr, resign_available(game_scene))) {
                 game_scene.resign(resign_player(game_scene));
@@ -390,10 +392,9 @@ void Ui::main_menu_bar(sm::Ctx& ctx, GameScene& game_scene) {
                 }
 
                 if (ImGui::MenuItem("Leave", nullptr, nullptr, static_cast<bool>(game_scene.get_game_session()))) {
-                    // Voluntarily leaving the session means a resign
-                    game_scene.resign(resign_player(game_scene));
-
+                    // Must resign first
                     if (resign_available(game_scene)) {
+                        game_scene.resign(resign_player(game_scene));
                         game_scene.client_resign();
                     }
 
@@ -536,7 +537,7 @@ void Ui::before_game_online_window(sm::Ctx& ctx, GameScene& game_scene) {
 
     ImGui::SameLine();
 
-    ImGui::BeginDisabled(!game_scene.get_game_session());
+    ImGui::BeginDisabled(!game_scene.get_game_session() || game_scene.get_game_session() && !game_scene.get_game_session()->get_remote_joined());
     if (ImGui::Button("Rematch")) {
         game_scene.client_rematch();
     }
@@ -913,7 +914,8 @@ bool Ui::resign_available(GameScene& game_scene) {
     return (
         game_scene.get_game_state() != GameState::Ready &&
         game_scene.get_game_state() != GameState::Over &&
-        game_scene.get_game_options().game_type == GameTypeOnline
+        game_scene.get_game_session() &&
+        game_scene.get_game_session()->get_remote_joined()
     );
 }
 
@@ -921,6 +923,7 @@ PlayerColor Ui::resign_player(GameScene& game_scene) {
     const GameOptions& options {game_scene.get_game_options()};
 
     assert(options.game_type == GameTypeOnline);
+    assert(game_scene.get_game_session());
 
     return BoardObj::player_color_opponent(PlayerColor(options.online.remote_color));
 }
@@ -929,7 +932,8 @@ bool Ui::offer_draw_available(GameScene& game_scene) {
     return (
         game_scene.get_game_state() != GameState::Ready &&
         game_scene.get_game_state() != GameState::Over &&
-        game_scene.get_game_options().game_type == GameTypeOnline
+        game_scene.get_game_session() &&
+        game_scene.get_game_session()->get_remote_joined()
     );
 }
 
@@ -937,7 +941,8 @@ bool Ui::accept_draw_offer_available(GameScene& game_scene) {
     return (
         game_scene.get_game_state() != GameState::Ready &&
         game_scene.get_game_state() != GameState::Over &&
-        game_scene.get_game_options().game_type == GameTypeOnline &&
+        game_scene.get_game_session() &&
+        game_scene.get_game_session()->get_remote_joined() &&
         game_scene.get_draw_offered_by_remote()
     );
 }
@@ -945,6 +950,6 @@ bool Ui::accept_draw_offer_available(GameScene& game_scene) {
 bool Ui::join_game_available(GameScene& game_scene) {
     return (
         !game_scene.get_game_session() &&
-        std::any_of(std::cbegin(m_session_id), std::prev(std::cend(m_session_id)), [](char c) { return c != 0; })
+        !std::any_of(std::cbegin(m_session_id), std::prev(std::cend(m_session_id)), [](char c) { return c == 0; })
     );
 }
