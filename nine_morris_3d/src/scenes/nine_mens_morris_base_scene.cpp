@@ -158,7 +158,6 @@ void NineMensMorrisBaseScene::timeout(PlayerColor color) {
             break;
     }
 
-    m_ui.push_popup_window(PopupWindow::GameOver);
     m_game_state = GameState::Stop;
 }
 
@@ -172,14 +171,12 @@ void NineMensMorrisBaseScene::resign(PlayerColor color) {
             break;
     }
 
-    m_ui.push_popup_window(PopupWindow::GameOver);
     m_game_state = GameState::Stop;
 }
 
 void NineMensMorrisBaseScene::accept_draw_offer() {
     m_board.accept_draw_offer();
 
-    m_ui.push_popup_window(PopupWindow::GameOver);
     m_game_state = GameState::Stop;
 }
 
@@ -550,7 +547,10 @@ NineMensMorrisBoard NineMensMorrisBaseScene::setup_renderables() {
         setup_black_pieces(),
         [this](const NineMensMorrisBoard::Move& move) {
             if (get_player_type() == GamePlayer::Remote) {
-                client_play_move(NineMensMorrisBoard::move_to_string(move));
+                client_play_move(
+                    m_board.if_player_white(m_clock.get_black_time(), m_clock.get_white_time()),
+                    NineMensMorrisBoard::move_to_string(move)
+                );
             }
 
             m_move_list.push(NineMensMorrisBoard::move_to_string(move));
@@ -558,3 +558,4 @@ NineMensMorrisBoard NineMensMorrisBaseScene::setup_renderables() {
         }
     );
 }
+;

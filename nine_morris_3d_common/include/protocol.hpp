@@ -170,8 +170,8 @@ namespace protocol {
     }
 
     using SessionId = std::uint16_t;
-
     using TimePoint = std::chrono::system_clock::time_point;
+    using ClockTime = unsigned int;
 
     using Messages = std::vector<std::pair<std::string, std::string>>;
     inline constexpr std::size_t MAX_MESSAGE_SIZE {128};
@@ -190,6 +190,7 @@ namespace protocol {
         TooManySessions,
         InvalidSessionId,
         SessionOccupied,
+        SessionExpired,
         SessionDifferentGame
     };
 
@@ -205,6 +206,9 @@ namespace protocol {
                 break;
             case ErrorCode::SessionOccupied:
                 string = "The session is occupied";
+                break;
+            case ErrorCode::SessionExpired:
+                string = "The session has expired";
                 break;
             case ErrorCode::SessionDifferentGame:
                 string = "The session has a different game than the one requested";
@@ -324,20 +328,22 @@ namespace protocol {
 
     struct Client_PlayMove {
         SessionId session_id {};
+        ClockTime time {};  // Time on the clock after player's turn
         std::string move;
 
         template<typename Archive>
         void serialize(Archive& archive) {
-            archive(session_id, move);
+            archive(session_id, time, move);
         }
     };
 
     struct Server_RemotePlayedMove {
+        ClockTime time {};
         std::string move;
 
         template<typename Archive>
         void serialize(Archive& archive) {
-            archive(move);
+            archive(time, move);
         }
     };
 

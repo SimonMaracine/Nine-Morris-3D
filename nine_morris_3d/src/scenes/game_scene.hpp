@@ -79,14 +79,12 @@ public:
 
     virtual void start_engine() = 0;
 
-    
-
     void connect(const std::string& address, std::uint16_t port, bool reconnect = false);
     void connect(const std::string& address, const std::string& port, bool reconnect = false);
     void client_request_game_session();
     void client_leave_game_session();
     void client_request_join_game_session(const std::string& session_id);
-    void client_play_move(const std::string& move);
+    void client_play_move(protocol::ClockTime time, const std::string& move);
     void client_resign();
     void client_offer_draw();
     void client_accept_draw_offer();
@@ -99,17 +97,17 @@ protected:
     void on_mouse_button_pressed(const sm::MouseButtonPressedEvent& event);
     void on_mouse_button_released(const sm::MouseButtonReleasedEvent& event);
 
-    void stop_engine();
-    void engine_error(const EngineError& e);
-    void assert_engine_game_over();
-    void update_game_state();
-
     void setup_camera();
     void setup_skybox(bool reload = false);
     void setup_lights();
 
     void reload_skybox_texture_data() const;
     std::shared_ptr<sm::GlTextureCubemap> load_skybox_texture_cubemap(bool reload = false) const;
+
+    void update_game_state();
+    void engine_error(const EngineError& e);
+    void stop_engine();
+    void assert_engine_game_over();
 
     void connection_error(const networking::ConnectionError& e);
     void serialization_error(const networking::SerializationError& e);

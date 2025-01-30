@@ -1,6 +1,7 @@
 #include "nine_morris_3d_engine/other/utilities.hpp"
 
 #include <fstream>
+#include <limits>
 #include <cstddef>
 #include <cassert>
 

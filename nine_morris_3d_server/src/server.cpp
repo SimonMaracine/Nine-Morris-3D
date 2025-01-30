@@ -213,7 +213,7 @@ void Server::client_request_join_game_session(std::shared_ptr<networking::Client
     }
 
     if (iter->second.connection1.expired() && iter->second.connection2.expired()) {
-        server_reject_join_game_session(connection, protocol::ErrorCode::SessionOccupied);
+        server_reject_join_game_session(connection, protocol::ErrorCode::SessionExpired);
         m_server.get_logger()->warn("Client {} requested to join empty session {}", connection->get_id(), payload.session_id);
         return;
     }
@@ -350,12 +350,13 @@ void Server::client_play_move(std::shared_ptr<networking::ClientConnection> conn
     }
 
     if (remote_connection) {
-        server_remote_played_move(remote_connection, payload.move);
+        server_remote_played_move(remote_connection, payload.time, payload.move);
     }
 }
 
-void Server::server_remote_played_move(std::shared_ptr<networking::ClientConnection> connection, const std::string& move) {
+void Server::server_remote_played_move(std::shared_ptr<networking::ClientConnection> connection, protocol::ClockTime time, const std::string& move) {
     protocol::Server_RemotePlayedMove payload;
+    payload.time = time;
     payload.move = move;
 
     networking::Message message {protocol::message::Server_RemotePlayedMove};

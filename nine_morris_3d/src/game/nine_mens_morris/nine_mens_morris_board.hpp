@@ -195,7 +195,7 @@ private:
     Position m_setup_position;
     std::vector<Move> m_legal_moves;
     std::vector<Move> m_candidate_moves;
-    std::function<void(const Move&)> m_move_callback;
+    std::function<void(const Move&)> m_move_callback;  // Called after the turn has finished
 
     // Objects
     sm::Renderable m_board_renderable;

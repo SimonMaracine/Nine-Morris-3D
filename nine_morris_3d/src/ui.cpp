@@ -571,7 +571,11 @@ void Ui::before_game_online_window(sm::Ctx& ctx, GameScene& game_scene) {
     ImGui::SameLine();
 
     ImGui::PushItemWidth(rem(3.0f));
-    ImGui::InputText("Code", m_session_id, sizeof(m_session_id));
+    if (ImGui::InputText("Code", m_session_id, sizeof(m_session_id), ImGuiInputTextFlags_EnterReturnsTrue)) {
+        if (join_game_available(game_scene)) {
+            game_scene.client_request_join_game_session(m_session_id);
+        }
+    }
     ImGui::PopItemWidth();
 
     ImGui::EndDisabled();

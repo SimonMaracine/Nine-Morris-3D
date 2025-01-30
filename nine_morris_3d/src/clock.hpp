@@ -13,6 +13,8 @@ public:
 
     unsigned int get_white_time() const { return m_white_time; }
     unsigned int get_black_time() const { return m_black_time; }
+    void set_white_time(unsigned int white_time) { m_white_time = white_time; }
+    void set_black_time(unsigned int black_time) { m_black_time = black_time; }
 
     static std::tuple<unsigned int, unsigned int, unsigned int> split_time(unsigned int time);
     static unsigned int as_centiseconds(unsigned int minutes);
