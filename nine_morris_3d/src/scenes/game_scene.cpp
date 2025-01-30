@@ -41,6 +41,14 @@ void GameScene::on_start() {
 }
 
 void GameScene::on_stop() {
+    if (m_game_session) {
+        if (m_game_session->get_remote_joined()) {
+            client_resign();
+        }
+
+        client_leave_game_session();
+    }
+
     stop_engine();
 
     m_camera_controller.disconnect_events(ctx);
@@ -142,6 +150,25 @@ void GameScene::reload_and_set_textures() {
 
         task.set_done();
     });
+}
+
+bool GameScene::resign_available() const {
+    return m_game_session && m_game_session->get_remote_joined();
+}
+
+PlayerColor GameScene::resign_player() const {
+    assert(m_game_options.game_type == GameTypeOnline);
+    assert(m_game_session);
+
+    return BoardObj::player_color_opponent(PlayerColor(m_game_options.online.remote_color));
+}
+
+bool GameScene::offer_draw_available() const {
+    return m_game_session && m_game_session->get_remote_joined();
+}
+
+bool GameScene::accept_draw_offer_available() const {
+    return m_game_session && m_game_session->get_remote_joined() && m_game_session->get_remote_offered_draw();
 }
 
 void GameScene::connect(const std::string& address, std::uint16_t port, bool reconnect) {

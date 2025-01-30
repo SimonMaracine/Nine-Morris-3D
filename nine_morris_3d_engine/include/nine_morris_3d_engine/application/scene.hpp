@@ -18,7 +18,7 @@ namespace sm {
 
         virtual const char* get_name() const noexcept = 0;
         virtual void on_start() {}  // Called when the scene is entered
-        virtual void on_stop() {}  // Called when the scene is exited
+        virtual void on_stop() {}  // Called when the scene is exited, except when an exception is thrown
         virtual void on_update() {}  // Called every frame
         virtual void on_fixed_update() {}  // Called once every 50 milliseconds
         virtual void on_imgui_update() {}  // Called every frame for Dear ImGui only

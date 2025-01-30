@@ -69,8 +69,9 @@ namespace protocol {
 
         Client_LeaveGameSession
             Voluntarily leave the session. It is called when the client presses the new game button, or the
-            cancel game button while waiting for the remote. The remote is notified about the forfeit in any case,
-            with Server_RemoteLeaveGameSession.
+            cancel game button while waiting for the remote, or when changing the game, or quitting the application.
+            It is not sent when the application crashes or it disconnects from the server.
+            The remote is notified about the forfeit in any case, with Server_RemoteLeaveGameSession.
 
         Server_RemoteLeaveGameSession
             Notify the client that the remote has either voluntarily, or involuntarily left the session.
