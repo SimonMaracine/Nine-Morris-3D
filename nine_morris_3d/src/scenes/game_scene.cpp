@@ -32,7 +32,11 @@ void GameScene::on_start() {
     }
 
     ctx.add_task_delayed([this]() {
-        client_ping();
+        const auto& g {ctx.global<Global>()};
+
+        if (g.connection_state == ConnectionState::Connected) {
+            client_ping();
+        }
 
         return sm::Task::Result::Repeat;
     }, 5.0);
