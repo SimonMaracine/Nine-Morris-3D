@@ -50,7 +50,7 @@ void Ui::update(sm::Ctx& ctx, GameScene& game_scene) {
                 game_over_window(game_scene);
                 break;
             case PopupWindow::GameOptions:
-                game_options_window(game_scene);
+                game_options_window(ctx, game_scene);
                 break;
             case PopupWindow::EngineError:
                 engine_error_window();
@@ -110,7 +110,7 @@ void Ui::main_menu_bar(sm::Ctx& ctx, GameScene& game_scene) {
         if (ImGui::BeginMenu("Game")) {
             if (ImGui::MenuItem("New Game")) {
                 // Must resign first
-                if (game_scene.resign_available()) {
+                if (resign_available(game_scene)) {
                     // Cannot display the resign game over popup
                     game_scene.client_resign();
                 }
@@ -121,17 +121,17 @@ void Ui::main_menu_bar(sm::Ctx& ctx, GameScene& game_scene) {
 
                 game_scene.reset();
             }
-            if (ImGui::MenuItem("Resign", nullptr, nullptr, game_scene.resign_available())) {
-                game_scene.resign(game_scene.resign_player());
+            if (ImGui::MenuItem("Resign", nullptr, nullptr, resign_available(game_scene))) {
+                game_scene.resign(resign_player(game_scene));
                 game_scene.client_resign();
                 game_scene.client_leave_game_session();
             }
-            if (ImGui::MenuItem("Accept Draw Offer", nullptr, nullptr, game_scene.accept_draw_offer_available())) {
+            if (ImGui::MenuItem("Accept Draw Offer", nullptr, nullptr, accept_draw_offer_available(game_scene))) {
                 game_scene.accept_draw_offer();
                 game_scene.client_accept_draw_offer();
                 game_scene.client_leave_game_session();
             }
-            if (ImGui::MenuItem("Offer Draw", nullptr, nullptr, game_scene.offer_draw_available())) {
+            if (ImGui::MenuItem("Offer Draw", nullptr, nullptr, offer_draw_available(game_scene))) {
                 game_scene.client_offer_draw();
             }
             if (ImGui::MenuItem("Game Options")) {
@@ -155,7 +155,7 @@ void Ui::main_menu_bar(sm::Ctx& ctx, GameScene& game_scene) {
 
                 if (reset) {
                     // Must resign first
-                    if (game_scene.resign_available()) {
+                    if (resign_available(game_scene)) {
                         // Cannot display the resign game over popup
                         game_scene.client_resign();
                     }
@@ -487,7 +487,9 @@ void Ui::game_window(sm::Ctx& ctx, GameScene& game_scene) {
 }
 
 void Ui::before_game_window(sm::Ctx& ctx, GameScene& game_scene) {
-    switch (game_scene.get_game_options().game_type) {
+    const auto& g {ctx.global<Global>()};
+
+    switch (g.options.game_type) {
         case GameTypeLocalHumanVsHuman:
         case GameTypeLocalHumanVsComputer:
             before_game_local_window(ctx, game_scene);
@@ -506,9 +508,11 @@ void Ui::before_game_window(sm::Ctx& ctx, GameScene& game_scene) {
     }
 }
 
-void Ui::before_game_local_window(sm::Ctx&, GameScene& game_scene) {
+void Ui::before_game_local_window(sm::Ctx& ctx, GameScene& game_scene) {
+    const auto& g {ctx.global<Global>()};
+
     // The engine may be down, so don't allow play
-    ImGui::BeginDisabled(game_scene.get_game_options().game_type == GameTypeLocalHumanVsComputer && !game_scene.get_engine());
+    ImGui::BeginDisabled(g.options.game_type == GameTypeLocalHumanVsComputer && !game_scene.get_engine());
 
     if (ImGui::Button("Start Game")) {
         game_scene.get_game_state() = GameState::Start;
@@ -518,7 +522,7 @@ void Ui::before_game_local_window(sm::Ctx&, GameScene& game_scene) {
 
     ImGui::Separator();
 
-    switch (game_scene.get_game_options().game_type) {
+    switch (g.options.game_type) {
         case GameTypeLocalHumanVsHuman:
             ImGui::TextWrapped("Local game between two human players");
             break;
@@ -526,7 +530,7 @@ void Ui::before_game_local_window(sm::Ctx&, GameScene& game_scene) {
             ImGui::TextWrapped("Local game between human and computer player");
             ImGui::TextWrapped(
                 "Computer plays as %s",
-                BoardObj::player_color_to_string(static_cast<PlayerColor>(game_scene.get_game_options().local_human_vs_computer.computer_color))
+                BoardObj::player_color_to_string(static_cast<PlayerColor>(game_scene.get_game_options().computer_color))
             );
             break;
         case GameTypeOnline:
@@ -537,6 +541,8 @@ void Ui::before_game_local_window(sm::Ctx&, GameScene& game_scene) {
 
 void Ui::before_game_online_window(sm::Ctx& ctx, GameScene& game_scene) {
     const auto& g {ctx.global<Global>()};
+
+    assert(g.options.game_type == GameTypeOnline);
 
     // The connection may be down, so don't allow play
     ImGui::BeginDisabled(g.connection_state == ConnectionState::Disconnected);
@@ -572,12 +578,10 @@ void Ui::before_game_online_window(sm::Ctx& ctx, GameScene& game_scene) {
 
     ImGui::Separator();
 
-    assert(game_scene.get_game_options().game_type == GameTypeOnline);
-
     ImGui::TextWrapped("Online game between two human players");
     ImGui::TextWrapped(
         "Remote plays as %s",
-        BoardObj::player_color_to_string(static_cast<PlayerColor>(game_scene.get_game_options().online.remote_color))
+        BoardObj::player_color_to_string(static_cast<PlayerColor>(game_scene.get_game_options().remote_color))
     );
 }
 
@@ -639,28 +643,29 @@ void Ui::game_over_window(GameScene& game_scene) {
     });
 }
 
-void Ui::game_options_window(GameScene& game_scene) {
+void Ui::game_options_window(sm::Ctx& ctx, GameScene& game_scene) {
     generic_window_ok("Game Options", [&]() {
-        GameOptions& options {game_scene.get_game_options()};
+        auto& g {ctx.global<Global>()};
+        GameOptions& game_options {game_scene.get_game_options()};
 
         ImGui::BeginDisabled(game_scene.get_game_state() != GameState::Ready);
 
-        ImGui::RadioButton("Local", &options.game_type, GameTypeLocalHumanVsHuman);
-        ImGui::RadioButton("Local vs Computer", &options.game_type, GameTypeLocalHumanVsComputer);
-        ImGui::RadioButton("Online", &options.game_type, GameTypeOnline);
+        ImGui::RadioButton("Local", &g.options.game_type, GameTypeLocalHumanVsHuman);
+        ImGui::RadioButton("Local vs Computer", &g.options.game_type, GameTypeLocalHumanVsComputer);
+        ImGui::RadioButton("Online", &g.options.game_type, GameTypeOnline);
 
         ImGui::Separator();
 
-        switch (options.game_type) {
+        switch (g.options.game_type) {
             case GameTypeLocalHumanVsHuman:
                 break;
             case GameTypeLocalHumanVsComputer:
-                ImGui::RadioButton("white", &options.local_human_vs_computer.computer_color, PlayerColorWhite);
-                ImGui::RadioButton("black", &options.local_human_vs_computer.computer_color, PlayerColorBlack);
+                ImGui::RadioButton("white", &game_options.computer_color, PlayerColorWhite);
+                ImGui::RadioButton("black", &game_options.computer_color, PlayerColorBlack);
                 break;
             case GameTypeOnline:
-                ImGui::RadioButton("white", &options.online.remote_color, PlayerColorWhite);
-                ImGui::RadioButton("black", &options.online.remote_color, PlayerColorBlack);
+                ImGui::RadioButton("white", &game_options.remote_color, PlayerColorWhite);
+                ImGui::RadioButton("black", &game_options.remote_color, PlayerColorBlack);
                 break;
         }
 
@@ -912,6 +917,28 @@ void Ui::set_style() {
     style.DisplaySafeAreaPadding = ImVec2(4.0f, 4.0f);
 
     // TODO other?
+}
+
+bool Ui::resign_available(GameScene& game_scene) {
+    return game_scene.get_game_session() && game_scene.get_game_session()->get_remote_joined();
+}
+
+PlayerColor Ui::resign_player(GameScene& game_scene) {
+    assert(game_scene.get_game_session());
+
+    return BoardObj::player_color_opponent(PlayerColor(game_scene.get_game_options().remote_color));
+}
+
+bool Ui::offer_draw_available(GameScene& game_scene) {
+    return game_scene.get_game_session() && game_scene.get_game_session()->get_remote_joined();
+}
+
+bool Ui::accept_draw_offer_available(GameScene& game_scene) {
+    return (
+        game_scene.get_game_session() &&
+        game_scene.get_game_session()->get_remote_joined() &&
+        game_scene.get_game_session()->get_remote_offered_draw()
+    );
 }
 
 bool Ui::join_game_available(GameScene& game_scene) {

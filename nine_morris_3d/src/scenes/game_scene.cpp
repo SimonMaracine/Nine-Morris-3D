@@ -152,25 +152,6 @@ void GameScene::reload_and_set_textures() {
     });
 }
 
-bool GameScene::resign_available() const {
-    return m_game_session && m_game_session->get_remote_joined();
-}
-
-PlayerColor GameScene::resign_player() const {
-    assert(m_game_options.game_type == GameTypeOnline);
-    assert(m_game_session);
-
-    return BoardObj::player_color_opponent(PlayerColor(m_game_options.online.remote_color));
-}
-
-bool GameScene::offer_draw_available() const {
-    return m_game_session && m_game_session->get_remote_joined();
-}
-
-bool GameScene::accept_draw_offer_available() const {
-    return m_game_session && m_game_session->get_remote_joined() && m_game_session->get_remote_offered_draw();
-}
-
 void GameScene::connect(const std::string& address, std::uint16_t port, bool reconnect) {
     auto& g {ctx.global<Global>()};
 
@@ -206,7 +187,7 @@ void GameScene::client_request_game_session() {
 
     protocol::Client_RequestGameSession payload;
     payload.player_name = g.options.name;
-    payload.remote_player_type = protocol::Player(m_game_options.online.remote_color);
+    payload.remote_player_type = protocol::Player(m_game_options.remote_color);
     payload.game_mode = protocol::GameMode(g.options.game_mode);
 
     networking::Message message {protocol::message::Client_RequestGameSession};
@@ -543,6 +524,8 @@ void GameScene::engine_error(const EngineError& e) {
 }
 
 void GameScene::update_game_state() {
+    const auto& g {ctx.global<Global>()};
+
     switch (m_game_state) {
         case GameState::Ready:
             break;
@@ -632,13 +615,16 @@ void GameScene::update_game_state() {
 
             break;
         case GameState::Stop:
-            if (m_game_options.game_type == GameTypeLocalHumanVsComputer) {
-                assert_engine_game_over();
-            } else if (m_game_options.game_type == GameTypeOnline) {
-                // The session might have been already destroyed
-                if (m_game_session) {
-                    client_leave_game_session();
-                }
+            switch (g.options.game_type) {
+                case GameTypeLocalHumanVsComputer:
+                    assert_engine_game_over();
+                    break;
+                case GameTypeOnline:
+                    // The session might have been already destroyed
+                    if (m_game_session) {
+                        client_leave_game_session();
+                    }
+                    break;
             }
 
             m_clock.stop();
@@ -974,7 +960,7 @@ void GameScene::server_accept_join_game_session(const networking::Message& messa
     m_game_session->remote_joined(payload.remote_player_name);
     m_game_session->set_messages(payload.messages);
 
-    m_game_options.online.remote_color = PlayerColor(payload.remote_player_type);
+    m_game_options.remote_color = PlayerColor(payload.remote_player_type);
 
     // Unblock from waiting
     m_ui.clear_popup_window();
@@ -1057,7 +1043,7 @@ void GameScene::server_remote_resigned(const networking::Message&) {
         return;
     }
 
-    resign(PlayerColor(m_game_options.online.remote_color));
+    resign(PlayerColor(m_game_options.remote_color));
 }
 
 void GameScene::server_remote_offered_draw(const networking::Message&) {

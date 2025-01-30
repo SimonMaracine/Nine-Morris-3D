@@ -9,6 +9,7 @@
 #include <nine_morris_3d_engine/nine_morris_3d.hpp>
 
 #include "hoverable.hpp"
+#include "player_color.hpp"
 
 // Type that keeps track of the state and result of a game
 class GameOver {
@@ -31,12 +32,6 @@ public:
 private:
     Type m_type {None};
     std::string m_reason;
-};
-
-// Generic player type
-enum PlayerColor : int {
-    PlayerColorWhite,
-    PlayerColorBlack
 };
 
 // Generic board object representing a game with its data and rules

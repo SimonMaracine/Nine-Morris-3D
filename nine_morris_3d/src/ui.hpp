@@ -7,6 +7,7 @@
 #include <nine_morris_3d_engine/nine_morris_3d.hpp>
 
 #include "options.hpp"
+#include "player_color.hpp"
 
 class GameScene;
 
@@ -47,7 +48,7 @@ private:
     void during_game_window(GameScene& game_scene);
     void about_window();
     void game_over_window(GameScene& game_scene);
-    void game_options_window(GameScene& game_scene);
+    void game_options_window(sm::Ctx& ctx, GameScene& game_scene);
     void engine_error_window();
     void connection_error_window();
     void new_game_session_error_window(const std::string& string);
@@ -69,6 +70,10 @@ private:
     static void create_font(sm::Ctx& ctx, int scale);
     static void set_style();
 
+    static bool resign_available(GameScene& game_scene);
+    static PlayerColor resign_player(GameScene& game_scene);
+    static bool offer_draw_available(GameScene& game_scene);
+    static bool accept_draw_offer_available(GameScene& game_scene);
     bool join_game_available(GameScene& game_scene);
 
     // Multiple modal windows may request attention at a time; put them in a queue

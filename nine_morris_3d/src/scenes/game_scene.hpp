@@ -79,10 +79,7 @@ public:
 
     virtual void start_engine() = 0;
 
-    bool resign_available() const;
-    PlayerColor resign_player() const;
-    bool offer_draw_available() const;
-    bool accept_draw_offer_available() const;
+    
 
     void connect(const std::string& address, std::uint16_t port, bool reconnect = false);
     void connect(const std::string& address, const std::string& port, bool reconnect = false);

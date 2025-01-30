@@ -37,15 +37,17 @@ BoardObj& NineMensMorrisBaseScene::get_board() {
 }
 
 GamePlayer NineMensMorrisBaseScene::get_player_type() const {
+    const auto& g {ctx.global<Global>()};
+
     GamePlayer player {};
 
-    switch (m_game_options.game_type) {
+    switch (g.options.game_type) {
         case GameTypeLocalHumanVsHuman:
             player = GamePlayer::Human;
             break;
         case GameTypeLocalHumanVsComputer:
             player = (
-                m_game_options.local_human_vs_computer.computer_color == m_board.if_player_white(PlayerColorWhite, PlayerColorBlack)
+                m_game_options.computer_color == m_board.if_player_white(PlayerColorWhite, PlayerColorBlack)
                 ?
                 GamePlayer::Computer
                 :
@@ -54,7 +56,7 @@ GamePlayer NineMensMorrisBaseScene::get_player_type() const {
             break;
         case GameTypeOnline:
             player = (
-                m_game_options.online.remote_color == m_board.if_player_white(PlayerColorWhite, PlayerColorBlack)
+                m_game_options.remote_color == m_board.if_player_white(PlayerColorWhite, PlayerColorBlack)
                 ?
                 GamePlayer::Remote
                 :

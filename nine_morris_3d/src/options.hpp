@@ -10,6 +10,12 @@
 
 inline constexpr const char* OPTIONS_FILE_NAME {"options.dat"};
 
+enum GameType : int {
+    GameTypeLocalHumanVsHuman,
+    GameTypeLocalHumanVsComputer,
+    GameTypeOnline
+};
+
 enum GameMode : int {
     GameModeNineMensMorris,
     GameModeTwelveMensMorris
@@ -50,6 +56,7 @@ enum Scale : int {
 
 // Structure representing data saved and loaded from disk
 struct Options {
+    int game_type {GameTypeLocalHumanVsHuman};
     int game_mode {GameModeNineMensMorris};
     float master_volume {1.0f};
     float music_volume {0.7f};
@@ -71,6 +78,7 @@ struct Options {
     template<typename Archive>
     void serialize(Archive& archive, const std::uint32_t) {
         archive(
+            game_type,
             game_mode,
             master_volume,
             music_volume,
