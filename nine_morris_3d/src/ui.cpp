@@ -115,7 +115,7 @@ void Ui::main_menu_bar(sm::Ctx& ctx, GameScene& game_scene) {
                 }
 
                 if (game_scene.get_game_session()) {
-                    game_scene.client_quit_game_session();
+                    game_scene.client_leave_game_session();
                 }
 
                 // Cannot display the resign game over popup
@@ -124,7 +124,7 @@ void Ui::main_menu_bar(sm::Ctx& ctx, GameScene& game_scene) {
             if (ImGui::MenuItem("Resign", nullptr, nullptr, resign_available(game_scene))) {
                 game_scene.resign(resign_player(game_scene));
                 game_scene.client_resign();
-                game_scene.client_quit_game_session();
+                game_scene.client_leave_game_session();
             }
             if (ImGui::MenuItem("Accept Draw Offer", nullptr, nullptr, accept_draw_offer_available(game_scene))) {
                 game_scene.accept_draw_offer();
@@ -698,7 +698,8 @@ void Ui::wait_remote_join_game_session_window(GameScene& game_scene) {
         ImGui::Text("Send your opponent the following code: %.5u", game_scene.get_game_session()->get_session_id());
 
         if (ImGui::Button("Cancel Game")) {
-            game_scene.client_quit_game_session();
+            // If the other user has already joined, it will still be notified by our forfeit
+            game_scene.client_leave_game_session();
 
             return true;
         }

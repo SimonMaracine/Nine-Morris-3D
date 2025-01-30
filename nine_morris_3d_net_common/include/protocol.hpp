@@ -13,59 +13,83 @@
 
 namespace protocol {
     /*
+        When a client has game over, it immediately destroys its session and sends Client_LeaveGameSession.
+
+        Leaving a session is either voluntarily or involuntarily.
+
+        When a client voluntarily leaves the session, it sends Client_LeaveGameSession.
+        Voluntarily leaving a session means resigning, except if the other client has already left the session,
+        or it hasn't even joined the session.
+
+        Involuntarily leaving the session lets the client rejoin and continue the game.
+
+        When a client leaves the session, the other client is notified with Server_RemoteLeaveGameSession.
+    */
+
+    /*
         Client_Ping
-            The client tests if the server is still alive. The server sends back a reply with the same data.
+            Test if the server is still alive. The server sends back a reply with the same data, with
+            Server_Ping.
 
         Server_Ping
-            The server replies to a client ping.
+            Reply a Client_Ping message.
 
         Client_RequestGameSession
-            The client presses the start new game button. The server accepts or denies the request. The client then
-            blocks in a modal window, waiting for the server to respond. It may stop waiting and quit the session by
-            pressing the cancel game button.
+            Request a new game session. Block in a modal window, waiting for a reply from the server.
+            A game session means just one round of game. The server accepts or rejects the request, with
+            Server_AcceptGameSession and Server_RejectGameSession. Client_RequestGameSession is called
+            when the client presses the start game button.
+
+            A session is destroyed by the server when the last client leaves the session.
 
         Server_AcceptGameSession
-            The server creates a new session. The client then blocks in a modal window, waiting
-            for the remote to join. It may stop waiting and quit the session by pressing the cancel game button.
+            Create a new session. The client then creates the session as well and blocks in a modal window,
+            waiting for the remote to join. It may stop waiting and leave the session by pressing the
+            cancel game button, sending Client_LeaveGameSession.
 
-        Server_DenyGameSession
-            The server fails to create a new session.
+        Server_RejectGameSession
+            Fail to create a new session. Send an error code.
 
         Client_RequestJoinGameSession
-            The client presses the join game button with a specific ID. It then blocks in modal window, waiting for
-            the server to respond. The server may deny the request, or accept it.
+            Request to join a game session. Block in a modal window, waiting for a reply from the server.
+            The server accepts or rejects the request, with Server_AcceptJoinGameSession and Server_RejectJoinGameSession.
+            It is called when the client presses the join game button.
 
         Server_AcceptJoinGameSession
-            The server acknowledges a game session with that specific ID. The client unblocks and the game is ready.
-            The client receives the played moves so far, enabling it to continue an interrupted game.
+            Acknowledge a game session with that specific ID. The client unblocks and the game is ready to start.
+            The client receives the played moves so far, enabling it to continue an interrupted game. It also
+            receives the messages. An involuntarily disconnected client may rejoin the session.
 
-        Server_DenyJoinGameSession
-            The server fails to find a session with that specific ID.
+        Server_RejectJoinGameSession
+            Fail to find a session with that specific ID. Send an error code.
 
         Server_RemoteJoinedGameSession
-            The server informs the client that the remote has joined. The client unblocks and the game is ready.
+            Inform the client that the remote has joined the session. The client unblocks and the game is ready
+            to start.
 
-        Client_QuitGameSession
-            The client either presses the cancel game button, the leave session button, or starts a new local game.
+        Client_LeaveGameSession
+            Voluntarily leave the session. It is called when the client presses the new game button, or the
+            cancel game button while waiting for the remote. The remote is notified about the forfeit in any case,
+            with Server_RemoteLeaveGameSession.
 
-        Server_RemoteQuitGameSession
-            The server informs the client that the remote has either voluntarily quit the session, or disconnected.
-            The client blocks in a modal window, either waiting for the remote to rejoin the session, or to quit
-            the session as well. If the remote rejoins, the client is informed.
-
-            When the last client quits a session, it gets destroyed by the server.
+        Server_RemoteLeaveGameSession
+            Inform the client that the remote has either voluntarily, or involuntarily left the session.
+            If the remote rejoins, the client is notified.
 
         Client_PlayMove
-            The client plays a move on the board. The server remembers the played move.
+            Play a move on the board. The server remembers the played move and notifies the remote with
+            Server_RemotePlayedMove.
 
         Server_RemotePlayedMove
-            The server informs the client that the remote has played a move.
+            Inform the client that the remote has played a move.
 
         Client_Resign
-            The client wants to end the game by losing. It either presses the resign button, or the new game button.
+            End the game by losing. It is called when the client presses the resign button, or when it voluntarily
+            leaves the session while the remote is still present in the session. The server notifies the remote
+            witn Server_RemoteResigned.
 
         Server_RemoteResigned
-            The server informs the client that the remote has resigned.
+            Inform the client that the remote has resigned.
 
         Client_Rematch
             After a game is over, the client presses the rematch button and blocks in a modal window, waiting
@@ -83,49 +107,49 @@ namespace protocol {
             The server approves the client's cancellation.
 
         Client_SendMessage
-            The client sends a message.
+            Sends a message. The server notifies the remote with Server_RemoteSentMessage.
 
         Server_RemoteSentMessage
-            The server informs the client that the remote has sent a message.
+            Inform the client that the remote has sent a message.
     */
 
     namespace message {
         enum MessageType : std::uint16_t {
-            Client_Ping,  // Client wanted to know if the server is alive
-            Server_Ping,  // Server has responded back
+            Client_Ping,
+            Server_Ping,
 
-            Client_RequestGameSession,  // Client has pressed the start new game button
-            Server_AcceptGameSession,  // Server has accepted and started a new session
-            Server_DenyGameSession,  // Server has denied the new session
+            Client_RequestGameSession,
+            Server_AcceptGameSession,
+            Server_RejectGameSession,
 
-            Client_RequestJoinGameSession,  // Client has pressed the join game button
-            Server_AcceptJoinGameSession,  // Server has accepted the join (game is ready)
-            Server_DenyJoinGameSession,  // Server has denied the join
+            Client_RequestJoinGameSession,
+            Server_AcceptJoinGameSession,
+            Server_RejectJoinGameSession,
 
-            Server_RemoteJoinedGameSession,  // Remote client has pressed the join game button (game is ready)
+            Server_RemoteJoinedGameSession,
 
-            Client_QuitGameSession,  // Client has quit the session
-            Server_RemoteQuitGameSession,  // Remote client has quit the session
+            Client_LeaveGameSession,
+            Server_RemoteLeaveGameSession,
 
-            Client_PlayMove,  // Client has played a move
-            Server_RemotePlayedMove,  // Remote client has played a move
+            Client_PlayMove,
+            Server_RemotePlayedMove,
 
-            // Client_OfferDraw,  // Client has pressed the offer draw button
-            // Server_RemoteOfferedDraw,  // Remote client has pressed the offer draw button
-            // Client_AcceptDrawOffer,  // Client has pressed the accept draw offer button
-            // Server_RemoteAcceptedDrawOffer,  // Remote client has pressed the accept draw offer button
+            // Client_OfferDraw,
+            // Server_RemoteOfferedDraw,
+            // Client_AcceptDrawOffer,
+            // Server_RemoteAcceptedDrawOffer,
 
-            Client_Resign,  // Client has pressed the resign button or the new game button
-            Server_RemoteResigned,  // Remote client has pressed the resign button or the new game button
+            Client_Resign,
+            Server_RemoteResigned,
 
-            // Client_Rematch,  // Client has pressed the rematch button
-            // Server_Rematch,  // Both clients have pressed the rematch button (game is ready)
+            // Client_Rematch,
+            // Server_Rematch,
 
-            // Client_CancelRematch,  // Client has pressed the cancel rematch button
-            // Server_CancelRematch,  // Server confirms that the client wants to cancel the rematch
+            // Client_CancelRematch,
+            // Server_CancelRematch,
 
-            Client_SendMessage,  // Client has sent a message
-            Server_RemoteSentMessage  // Remote client has sent a message
+            Client_SendMessage,
+            Server_RemoteSentMessage
         };
     }
 
@@ -210,7 +234,7 @@ namespace protocol {
         }
     };
 
-    struct Server_DenyGameSession {
+    struct Server_RejectGameSession {
         ErrorCode error_code {};
 
         template<typename Archive>
@@ -242,7 +266,7 @@ namespace protocol {
         }
     };
 
-    struct Server_DenyJoinGameSession {
+    struct Server_RejectJoinGameSession {
         ErrorCode error_code {};
 
         template<typename Archive>
@@ -260,7 +284,7 @@ namespace protocol {
         }
     };
 
-    struct Client_QuitGameSession {
+    struct Client_LeaveGameSession {
         SessionId session_id {};
 
         template<typename Archive>
@@ -269,7 +293,7 @@ namespace protocol {
         }
     };
 
-    struct Server_RemoteQuitGameSession {};
+    struct Server_RemoteLeaveGameSession {};
 
     struct Client_PlayMove {
         SessionId session_id {};

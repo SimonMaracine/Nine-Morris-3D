@@ -7,12 +7,12 @@
 #include "scenes/game_scene.hpp"
 #include "ui.hpp"
 
-void GameSession::remote_join(const std::string& player_name) {
+void GameSession::remote_joined(const std::string& player_name) {
     m_remote_joined = true;
     m_remote_player_name = player_name;
 }
 
-void GameSession::remote_quit() {
+void GameSession::remote_left() {
     m_remote_joined = false;
     m_remote_player_name.clear();
 }

@@ -83,7 +83,7 @@ public:
     void connect(const std::string& address, std::uint16_t port, bool reconnect = false);
     void connect(const std::string& address, const std::string& port, bool reconnect = false);
     void client_request_game_session();
-    void client_quit_game_session();
+    void client_leave_game_session();
     void client_request_join_game_session(const std::string& session_id);
     void client_play_move(const std::string& move);
     void client_resign();
@@ -116,11 +116,11 @@ protected:
     void client_ping();
     void server_ping(const networking::Message& message);
     void server_accept_game_session(const networking::Message& message);
-    void server_deny_game_session(const networking::Message& message);
+    void server_reject_game_session(const networking::Message& message);
     void server_accept_join_game_session(const networking::Message& message);
-    void server_deny_join_game_session(const networking::Message& message);
+    void server_reject_join_game_session(const networking::Message& message);
     void server_remote_joined_game_session(const networking::Message& message);
-    void server_remote_quit_game_session(const networking::Message& message);
+    void server_remote_left_game_session(const networking::Message& message);
     void server_remote_played_move(const networking::Message& message);
     void server_remote_resigned(const networking::Message& message);
     // void server_rematch(const networking::Message& message);

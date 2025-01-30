@@ -26,13 +26,13 @@ private:
     void server_ping(std::shared_ptr<networking::ClientConnection> connection, protocol::TimePoint time);
     void client_request_game_session(std::shared_ptr<networking::ClientConnection> connection, const networking::Message& message);
     void server_accept_game_session(std::shared_ptr<networking::ClientConnection> connection, protocol::SessionId session_id);
-    void server_deny_game_session(std::shared_ptr<networking::ClientConnection> connection);
+    void server_reject_game_session(std::shared_ptr<networking::ClientConnection> connection);
     void client_request_join_game_session(std::shared_ptr<networking::ClientConnection> connection, const networking::Message& message);
     void server_accept_join_game_session(std::shared_ptr<networking::ClientConnection> connection, protocol::Server_AcceptJoinGameSession&& payload);
-    void server_deny_join_game_session(std::shared_ptr<networking::ClientConnection> connection, protocol::ErrorCode error_code);
+    void server_reject_join_game_session(std::shared_ptr<networking::ClientConnection> connection, protocol::ErrorCode error_code);
     void server_remote_joined_game_session(std::shared_ptr<networking::ClientConnection> connection, const std::string& remote_player_name);
-    void client_quit_game_session(std::shared_ptr<networking::ClientConnection> connection, const networking::Message& message);
-    void server_remote_quit_game_session(std::shared_ptr<networking::ClientConnection> connection);
+    void client_leave_game_session(std::shared_ptr<networking::ClientConnection> connection, const networking::Message& message);
+    void server_remote_left_game_session(std::shared_ptr<networking::ClientConnection> connection);
     void client_play_move(std::shared_ptr<networking::ClientConnection> connection, const networking::Message& message);
     void server_remote_played_move(std::shared_ptr<networking::ClientConnection> connection, const std::string& move);
     void client_resign(std::shared_ptr<networking::ClientConnection> connection, const networking::Message& message);

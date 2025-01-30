@@ -14,7 +14,6 @@ struct GameSession {
     std::vector<std::string> moves;
     protocol::Player player1;
     protocol::Messages messages;
-    bool game_over {false};
     // bool rematch1 {false};
     // bool rematch2 {false};
 

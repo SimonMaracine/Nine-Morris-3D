@@ -201,13 +201,13 @@ void GameScene::client_request_game_session() {
     m_ui.push_popup_window(PopupWindow::WaitServerAcceptGameSession);
 }
 
-void GameScene::client_quit_game_session() {
+void GameScene::client_leave_game_session() {
     assert(m_game_session);
 
-    protocol::Client_QuitGameSession payload;
+    protocol::Client_LeaveGameSession payload;
     payload.session_id = m_game_session->get_session_id();
 
-    networking::Message message {protocol::message::Client_QuitGameSession};
+    networking::Message message {protocol::message::Client_LeaveGameSession};
 
     try {
         message.write(payload);
@@ -555,7 +555,7 @@ void GameScene::update_game_state() {
             } else if (m_game_options.game_type == GameTypeOnline) {
                 // The session might have been already destroyed
                 if (get_game_session()) {
-                    client_quit_game_session();
+                    client_leave_game_session();
                 }
             }
 
@@ -772,20 +772,20 @@ void GameScene::handle_message(const networking::Message& message) {
         case protocol::message::Server_AcceptGameSession:
             server_accept_game_session(message);
             break;
-        case protocol::message::Server_DenyGameSession:
-            server_deny_game_session(message);
+        case protocol::message::Server_RejectGameSession:
+            server_reject_game_session(message);
             break;
         case protocol::message::Server_AcceptJoinGameSession:
             server_accept_join_game_session(message);
             break;
-        case protocol::message::Server_DenyJoinGameSession:
-            server_deny_join_game_session(message);
+        case protocol::message::Server_RejectJoinGameSession:
+            server_reject_join_game_session(message);
             break;
         case protocol::message::Server_RemoteJoinedGameSession:
             server_remote_joined_game_session(message);
             break;
-        case protocol::message::Server_RemoteQuitGameSession:
-            server_remote_quit_game_session(message);
+        case protocol::message::Server_RemoteLeaveGameSession:
+            server_remote_left_game_session(message);
             break;
         case protocol::message::Server_RemotePlayedMove:
             server_remote_played_move(message);
@@ -856,8 +856,8 @@ void GameScene::server_accept_game_session(const networking::Message& message) {
     m_ui.push_popup_window(PopupWindow::WaitRemoteJoinGameSession);
 }
 
-void GameScene::server_deny_game_session(const networking::Message& message) {
-    protocol::Server_DenyGameSession payload;
+void GameScene::server_reject_game_session(const networking::Message& message) {
+    protocol::Server_RejectGameSession payload;
 
     try{
         message.read(payload);
@@ -883,7 +883,7 @@ void GameScene::server_accept_join_game_session(const networking::Message& messa
     reset(payload.moves);
 
     m_game_session = GameSession(payload.session_id);
-    m_game_session->remote_join(payload.remote_player_name);
+    m_game_session->remote_joined(payload.remote_player_name);
     m_game_session->set_messages(payload.messages);
 
     m_game_options.online.remote_color = PlayerColor(payload.remote_player_type);
@@ -894,8 +894,8 @@ void GameScene::server_accept_join_game_session(const networking::Message& messa
     m_game_state = GameState::Start;
 }
 
-void GameScene::server_deny_join_game_session(const networking::Message& message) {
-    protocol::Server_DenyJoinGameSession payload;
+void GameScene::server_reject_join_game_session(const networking::Message& message) {
+    protocol::Server_RejectJoinGameSession payload;
 
     try {
         message.read(payload);
@@ -909,7 +909,7 @@ void GameScene::server_deny_join_game_session(const networking::Message& message
 }
 
 void GameScene::server_remote_joined_game_session(const networking::Message& message) {
-    // The user may have quit the session in the meantime
+    // The user may have left the session in the meantime
     if (!m_game_session) {
         return;
     }
@@ -923,7 +923,7 @@ void GameScene::server_remote_joined_game_session(const networking::Message& mes
         return;
     }
 
-    m_game_session->remote_join(payload.remote_player_name);
+    m_game_session->remote_joined(payload.remote_player_name);
 
     // Prevent from clearing unwanted popup windows
     if (m_ui.get_popup_window() == PopupWindow::WaitRemoteJoinGameSession) {
@@ -934,17 +934,17 @@ void GameScene::server_remote_joined_game_session(const networking::Message& mes
     m_game_state = GameState::Start;
 }
 
-void GameScene::server_remote_quit_game_session(const networking::Message&) {
-    // The user may have quit the session in the meantime
+void GameScene::server_remote_left_game_session(const networking::Message&) {
+    // The user may have left the session in the meantime
     if (!m_game_session) {
         return;
     }
 
-    m_game_session->remote_quit();
+    m_game_session->remote_left();
 }
 
 void GameScene::server_remote_played_move(const networking::Message& message) {
-    // The user may have quit the session in the meantime
+    // The user may have left the session in the meantime
     if (!m_game_session) {
         return;
     }
@@ -964,7 +964,7 @@ void GameScene::server_remote_played_move(const networking::Message& message) {
 }
 
 void GameScene::server_remote_resigned(const networking::Message&) {
-    // The user may have quit the session in the meantime
+    // The user may have left the session in the meantime
     if (!m_game_session) {
         return;
     }
@@ -1010,7 +1010,7 @@ void GameScene::server_remote_resigned(const networking::Message&) {
 // }
 
 void GameScene::server_remote_sent_message(const networking::Message& message) {
-    // The user may have quit the session in the meantime
+    // The user may have left the session in the meantime
     if (!m_game_session) {
         return;
     }

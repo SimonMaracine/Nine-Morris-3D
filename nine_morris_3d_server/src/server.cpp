@@ -86,7 +86,7 @@ void Server::disconnected_client_from_game_session(std::shared_ptr<networking::C
     if (remote_connection) {
         // Cannot send messages inside on_client_disconnected
         m_task_manager.add_immediate([this, remote_connection]() {
-            server_remote_quit_game_session(remote_connection);
+            server_remote_left_game_session(remote_connection);
 
             return Task::Result::Done;
         });
@@ -105,8 +105,8 @@ void Server::handle_message(std::shared_ptr<networking::ClientConnection> connec
             case protocol::message::Client_RequestJoinGameSession:
                 client_request_join_game_session(connection, message);
                 break;
-            case protocol::message::Client_QuitGameSession:
-                client_quit_game_session(connection, message);
+            case protocol::message::Client_LeaveGameSession:
+                client_leave_game_session(connection, message);
                 break;
             case protocol::message::Client_PlayMove:
                 client_play_move(connection, message);
@@ -156,7 +156,7 @@ void Server::client_request_game_session(std::shared_ptr<networking::ClientConne
     const auto session_id {m_session_pool.alloc_session_id()};
 
     if (!session_id) {
-        server_deny_game_session(connection);
+        server_reject_game_session(connection);
         m_server.get_logger()->debug("Denied new session to client {}", connection->get_id());
         return;
     }
@@ -183,11 +183,11 @@ void Server::server_accept_game_session(std::shared_ptr<networking::ClientConnec
     m_server.send_message(connection, message);
 }
 
-void Server::server_deny_game_session(std::shared_ptr<networking::ClientConnection> connection) {
-    protocol::Server_DenyGameSession payload;
+void Server::server_reject_game_session(std::shared_ptr<networking::ClientConnection> connection) {
+    protocol::Server_RejectGameSession payload;
     payload.error_code = protocol::ErrorCode::TooManySessions;
 
-    networking::Message message {protocol::message::Server_DenyGameSession};
+    networking::Message message {protocol::message::Server_RejectGameSession};
     message.write(payload);
 
     m_server.send_message(connection, message);
@@ -200,20 +200,14 @@ void Server::client_request_join_game_session(std::shared_ptr<networking::Client
     const auto iter {m_game_sessions.find(payload.session_id)};
 
     if (iter == m_game_sessions.end()) {
-        server_deny_join_game_session(connection, protocol::ErrorCode::InvalidSessionId);
+        server_reject_join_game_session(connection, protocol::ErrorCode::InvalidSessionId);
         m_server.get_logger()->debug("Denied join session to client {}", connection->get_id());
         return;
     }
 
     if (iter->second.connection1.expired() && iter->second.connection2.expired()) {
-        server_deny_join_game_session(connection, protocol::ErrorCode::SessionOccupied);
+        server_reject_join_game_session(connection, protocol::ErrorCode::SessionOccupied);
         m_server.get_logger()->warn("Client {} requested to join empty session {}", connection->get_id(), payload.session_id);
-        return;
-    }
-
-    if (iter->second.game_over) {
-        server_deny_join_game_session(connection, protocol::ErrorCode::SessionOccupied);
-        m_server.get_logger()->warn("Client {} requested to join game over session {}", connection->get_id(), payload.session_id);
         return;
     }
 
@@ -241,7 +235,7 @@ void Server::client_request_join_game_session(std::shared_ptr<networking::Client
 
         remote_connection = iter->second.connection1.lock();
     } else {
-        server_deny_join_game_session(connection, protocol::ErrorCode::SessionOccupied);
+        server_reject_join_game_session(connection, protocol::ErrorCode::SessionOccupied);
         m_server.get_logger()->warn("Client {} requested to join occupied session {}", connection->get_id(), payload.session_id);
         return;
     }
@@ -261,11 +255,11 @@ void Server::server_accept_join_game_session(std::shared_ptr<networking::ClientC
     m_server.send_message(connection, message);
 }
 
-void Server::server_deny_join_game_session(std::shared_ptr<networking::ClientConnection> connection, protocol::ErrorCode error_code) {
-    protocol::Server_DenyJoinGameSession payload;
+void Server::server_reject_join_game_session(std::shared_ptr<networking::ClientConnection> connection, protocol::ErrorCode error_code) {
+    protocol::Server_RejectJoinGameSession payload;
     payload.error_code = error_code;
 
-    networking::Message message {protocol::message::Server_DenyJoinGameSession};
+    networking::Message message {protocol::message::Server_RejectJoinGameSession};
     message.write(payload);
 
     m_server.send_message(connection, message);
@@ -281,8 +275,8 @@ void Server::server_remote_joined_game_session(std::shared_ptr<networking::Clien
     m_server.send_message(connection, message);
 }
 
-void Server::client_quit_game_session(std::shared_ptr<networking::ClientConnection> connection, const networking::Message& message) {
-    protocol::Client_QuitGameSession payload;
+void Server::client_leave_game_session(std::shared_ptr<networking::ClientConnection> connection, const networking::Message& message) {
+    protocol::Client_LeaveGameSession payload;
     message.read(payload);
 
     auto iter {m_game_sessions.find(payload.session_id)};
@@ -303,19 +297,17 @@ void Server::client_quit_game_session(std::shared_ptr<networking::ClientConnecti
         m_clients_sessions.erase(connection->get_id());
         remote_connection = iter->second.connection1.lock();
     } else {
-        m_server.get_logger()->warn("Client {} quit session {} in which it wasn't active", connection->get_id(), payload.session_id);
+        m_server.get_logger()->warn("Client {} left session {} in which it wasn't active", connection->get_id(), payload.session_id);
         return;
     }
 
-    iter->second.game_over = true;
-
     if (remote_connection) {
-        server_remote_quit_game_session(remote_connection);
+        server_remote_left_game_session(remote_connection);
     }
 }
 
-void Server::server_remote_quit_game_session(std::shared_ptr<networking::ClientConnection> connection) {
-    networking::Message message {protocol::message::Server_RemoteQuitGameSession};
+void Server::server_remote_left_game_session(std::shared_ptr<networking::ClientConnection> connection) {
+    networking::Message message {protocol::message::Server_RemoteLeaveGameSession};
 
     m_server.send_message(connection, message);
 }

@@ -19,8 +19,8 @@ public:
     bool get_remote_joined() const { return m_remote_joined; }
     void set_messages(const protocol::Messages& messages) { m_messages = messages; }
 
-    void remote_join(const std::string& player_name);
-    void remote_quit();
+    void remote_joined(const std::string& player_name);
+    void remote_left();
 
     void remote_sent_message(const std::string& message);
 
