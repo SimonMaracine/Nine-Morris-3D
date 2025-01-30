@@ -88,8 +88,6 @@ public:
     void client_resign();
     void client_offer_draw();
     void client_accept_draw_offer();
-    // void client_rematch();
-    // void client_cancel_rematch();
     void client_send_message(const std::string& message_);
 protected:
     void on_window_resized(const sm::WindowResizedEvent& event);
@@ -126,8 +124,6 @@ protected:
     void server_remote_resigned(const networking::Message& message);
     void server_remote_offered_draw(const networking::Message& message);
     void server_remote_accepted_draw_offer(const networking::Message& message);
-    // void server_rematch(const networking::Message& message);
-    // void server_cancel_rematch(const networking::Message& message);
     void server_remote_sent_message(const networking::Message& message);
 
     sm::Camera m_camera;

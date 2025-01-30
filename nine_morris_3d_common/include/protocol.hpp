@@ -107,21 +107,6 @@ namespace protocol {
         Server_RemoteAcceptedDrawOffer
             Notify the client that the remote has accepted the draw offer. The game is over.
 
-        Client_Rematch
-            After a game is over, the client presses the rematch button and blocks in a modal window, waiting
-            for the remote to do the same.
-
-        Server_Rematch
-            After a game is over, the server acknowledges that both clients want
-            a rematch. It sends this message to both. Both clients unblock and the game is ready.
-
-        Client_CancelRematch
-            While the client is waiting for the rematch, it presses the cancel rematch button. It then waits for
-            the server to either confirm the cancel, or to start the rematch anyway.
-
-        Server_CancelRematch
-            The server approves the client's cancellation.
-
         Client_SendMessage
             Sends a message. The server notifies the remote with Server_RemoteSentMessage.
 
@@ -157,12 +142,6 @@ namespace protocol {
             Server_RemoteOfferedDraw,
             Client_AcceptDrawOffer,
             Server_RemoteAcceptedDrawOffer,
-
-            // Client_Rematch,
-            // Server_Rematch,
-
-            // Client_CancelRematch,
-            // Server_CancelRematch,
 
             Client_SendMessage,
             Server_RemoteSentMessage
@@ -399,26 +378,6 @@ namespace protocol {
             archive(session_id);
         }
     };
-
-    // struct Server_Rematch {
-    //     Player remote_player_type {};
-
-    //     template<typename Archive>
-    //     void serialize(Archive& archive) {
-    //         archive(remote_player_type);
-    //     }
-    // };
-
-    // struct Client_CancelRematch {
-    //     SessionId session_id {};
-
-    //     template<typename Archive>
-    //     void serialize(Archive& archive) {
-    //         archive(session_id);
-    //     }
-    // };
-
-    // struct Server_CancelRematch {};
 
     struct Client_SendMessage {
         SessionId session_id {};
