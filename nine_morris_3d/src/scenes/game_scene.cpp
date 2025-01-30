@@ -62,8 +62,6 @@ void GameScene::on_start() {
 
         client_update_turn_time(get_board().get_player_color() == PlayerColorWhite ? m_clock.get_white_time() : m_clock.get_black_time());
 
-        LOG_DEBUG("update time {}", get_board().get_player_color() == PlayerColorWhite ? m_clock.get_white_time() : m_clock.get_black_time());
-
         return sm::Task::Result::Repeat;
     }, 3.0);
 }
@@ -218,8 +216,6 @@ void GameScene::client_request_game_session() {
     payload.remote_player = protocol::Player(m_game_options.remote_color);
     payload.time = m_clock.get_white_time();  // Players have equal time
     payload.game_mode = protocol::GameMode(g.options.game_mode);
-
-    LOG_DEBUG("{}", payload.time);
 
     networking::Message message {protocol::message::Client_RequestGameSession};
 
@@ -973,8 +969,6 @@ void GameScene::server_accept_join_game_session(const networking::Message& messa
             m_clock.set_white_time(payload.time);
             break;
     }
-
-    LOG_DEBUG("remote_time {}  time {}", payload.remote_time, payload.time);
 
     // Unblock from waiting
     m_ui.clear_popup_window();
