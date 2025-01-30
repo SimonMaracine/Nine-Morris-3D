@@ -85,6 +85,7 @@ public:
     void client_leave_game_session();
     void client_request_join_game_session(const std::string& session_id);
     void client_play_move(protocol::ClockTime time, const std::string& move);
+    void client_update_turn_time(protocol::ClockTime time);
     void client_resign();
     void client_offer_draw();
     void client_accept_draw_offer();

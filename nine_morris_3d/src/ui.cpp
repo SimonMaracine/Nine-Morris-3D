@@ -73,9 +73,6 @@ void Ui::update(sm::Ctx& ctx, GameScene& game_scene) {
             case PopupWindow::WaitServerAcceptJoinGameSession:
                 wait_server_accept_join_game_session_window(game_scene);
                 break;
-            // case PopupWindow::WaitRemoteRematch:
-            //     wait_remote_rematch_window(game_scene);
-            //     break;
             case PopupWindow::RulesNineMensMorris:
                 rules_nine_mens_morris_window();
                 break;
@@ -530,7 +527,7 @@ void Ui::before_game_local_window(sm::Ctx& ctx, GameScene& game_scene) {
             ImGui::TextWrapped("Local game between human and computer player");
             ImGui::TextWrapped(
                 "Computer plays as %s",
-                BoardObj::player_color_to_string(static_cast<PlayerColor>(game_scene.get_game_options().computer_color))
+                to_string(static_cast<PlayerColor>(game_scene.get_game_options().computer_color))
             );
             break;
         case GameTypeOnline:
@@ -552,14 +549,6 @@ void Ui::before_game_online_window(sm::Ctx& ctx, GameScene& game_scene) {
         game_scene.client_request_game_session();
     }
     ImGui::EndDisabled();
-
-    // ImGui::SameLine();
-
-    // ImGui::BeginDisabled(!game_scene.get_game_session() || game_scene.get_game_session() && !game_scene.get_game_session()->get_remote_joined());
-    // if (ImGui::Button("Rematch")) {
-    //     game_scene.client_rematch();
-    // }
-    // ImGui::EndDisabled();
 
     // The user must enter 5 digits
     ImGui::BeginDisabled(!join_game_available(game_scene));
@@ -585,7 +574,7 @@ void Ui::before_game_online_window(sm::Ctx& ctx, GameScene& game_scene) {
     ImGui::TextWrapped("Online game between two human players");
     ImGui::TextWrapped(
         "Remote plays as %s",
-        BoardObj::player_color_to_string(static_cast<PlayerColor>(game_scene.get_game_options().remote_color))
+        to_string(static_cast<PlayerColor>(game_scene.get_game_options().remote_color))
     );
 }
 
@@ -742,21 +731,6 @@ void Ui::wait_server_accept_join_game_session_window(GameScene&) {
         return false;
     });
 }
-
-// void Ui::wait_remote_rematch_window(GameScene& game_scene) {
-//     assert(game_scene.get_game_session());
-
-//     generic_window("Waiting For Player", [&game_scene]() {
-//         ImGui::Text("For another game to begin, the opponent has to accept a rematch as well.");
-//         ImGui::Text("Once the opponnent has accepted the rematch, it cannot be canceled.");
-
-//         if (ImGui::Button("Cancel Rematch")) {
-//             game_scene.client_cancel_rematch();
-//         }
-
-//         return false;
-//     });
-// }
 
 void Ui::rules_nine_mens_morris_window() {
     const char* text {
@@ -930,7 +904,7 @@ bool Ui::resign_available(GameScene& game_scene) {
 PlayerColor Ui::resign_player(GameScene& game_scene) {
     assert(game_scene.get_game_session());
 
-    return BoardObj::player_color_opponent(PlayerColor(game_scene.get_game_options().remote_color));
+    return opponent(static_cast<PlayerColor>(game_scene.get_game_options().remote_color));
 }
 
 bool Ui::offer_draw_available(GameScene& game_scene) {

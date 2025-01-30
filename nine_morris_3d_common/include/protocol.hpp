@@ -79,10 +79,18 @@ namespace protocol {
 
         Client_PlayMove
             Play a move on the board. The server remembers the played move and notifies the remote with
-            Server_RemotePlayedMove.
+            Server_RemotePlayedMove. The player's whose turn just ended synchronizes remote's clock with its own
+            clock. The time on the clock is also remembered by the server.
 
         Server_RemotePlayedMove
             Notify the client that the remote has played a move.
+
+        Client_UpdateTurnTime
+            Update the running clock of the turn on the server. It is called only by the client that has the turn,
+            i.e. that has the clock running. The other client's clock, being stopped, is already correct on the
+            server, but the running clock isn't. If the client having the turn disconnected, the server could
+            have lost the time, and when it rejoined, it would have extra time. This protocol assures that the
+            clocks on the server are almost correct.
 
         Client_Resign
             End the game by losing. It is called when the client presses the resign button, or when it voluntarily
@@ -134,6 +142,8 @@ namespace protocol {
 
             Client_PlayMove,
             Server_RemotePlayedMove,
+
+            Client_UpdateTurnTime,
 
             Client_Resign,
             Server_RemoteResigned,
@@ -225,12 +235,13 @@ namespace protocol {
 
     struct Client_RequestGameSession {
         std::string player_name;
-        Player remote_player_type {};
+        Player remote_player {};
+        ClockTime time {};  // Both players' times
         protocol::GameMode game_mode {};
 
         template<typename Archive>
         void serialize(Archive& archive) {
-            archive(player_name, remote_player_type, game_mode);
+            archive(player_name, remote_player, time, game_mode);
         }
     };
 
@@ -265,14 +276,16 @@ namespace protocol {
 
     struct Server_AcceptJoinGameSession {
         SessionId session_id {};  // Not really needed, but simplifies implementation
-        Player remote_player_type {};
+        Player remote_player {};
+        ClockTime remote_time {};
+        ClockTime time {};
         std::vector<std::string> moves;
         Messages messages;
-        std::string remote_player_name;
+        std::string remote_name;
 
         template<typename Archive>
         void serialize(Archive& archive) {
-            archive(session_id, remote_player_type, moves, messages, remote_player_name);
+            archive(session_id, remote_player, remote_time, time, moves, messages, remote_name);
         }
     };
 
@@ -286,11 +299,11 @@ namespace protocol {
     };
 
     struct Server_RemoteJoinedGameSession {
-        std::string remote_player_name;
+        std::string remote_name;
 
         template<typename Archive>
         void serialize(Archive& archive) {
-            archive(remote_player_name);
+            archive(remote_name);
         }
     };
 
@@ -307,7 +320,7 @@ namespace protocol {
 
     struct Client_PlayMove {
         SessionId session_id {};
-        ClockTime time {};  // Time on the clock after player's turn
+        ClockTime time {};  // After player's turn
         std::string move;
 
         template<typename Archive>
@@ -317,12 +330,22 @@ namespace protocol {
     };
 
     struct Server_RemotePlayedMove {
-        ClockTime time {};
+        ClockTime time {};  // After player's turn
         std::string move;
 
         template<typename Archive>
         void serialize(Archive& archive) {
             archive(time, move);
+        }
+    };
+
+    struct Client_UpdateTurnTime {
+        SessionId session_id {};
+        ClockTime time {};
+
+        template<typename Archive>
+        void serialize(Archive& archive) {
+            archive(session_id, time);
         }
     };
 

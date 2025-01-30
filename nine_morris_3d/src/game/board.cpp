@@ -69,22 +69,6 @@ void BoardObj::enable_move_callback(bool enable) {
     m_enable_move_callback = enable;
 }
 
-PlayerColor BoardObj::player_color_opponent(PlayerColor color) {
-    if (color == PlayerColorWhite) {
-        return PlayerColorBlack;
-    } else {
-        return PlayerColorWhite;
-    }
-}
-
-const char* BoardObj::player_color_to_string(PlayerColor color) {
-    if (color == PlayerColorWhite) {
-        return "white";
-    } else {
-        return "black";
-    }
-}
-
 void BoardObj::update_hover_id(glm::vec3 ray, glm::vec3 camera, std::function<std::vector<HoverableObj>()>&& get_hoverables) {
     if (camera.y < 0.0f) {
         m_hover_id = -1;

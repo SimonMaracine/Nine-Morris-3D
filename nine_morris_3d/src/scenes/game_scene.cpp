@@ -40,6 +40,32 @@ void GameScene::on_start() {
 
         return sm::Task::Result::Repeat;
     }, 5.0);
+
+    ctx.add_task_delayed([this]() {
+        const auto& g {ctx.global<Global>()};
+
+        if (g.connection_state != ConnectionState::Connected) {
+            return sm::Task::Result::Repeat;
+        }
+
+        if (!m_game_session) {
+            return sm::Task::Result::Repeat;
+        }
+
+        if (m_game_state == GameState::Ready || m_game_state == GameState::Over) {
+            return sm::Task::Result::Repeat;
+        }
+
+        if (get_board().get_player_color() == static_cast<PlayerColor>(m_game_options.remote_color)) {
+            return sm::Task::Result::Repeat;
+        }
+
+        client_update_turn_time(get_board().get_player_color() == PlayerColorWhite ? m_clock.get_white_time() : m_clock.get_black_time());
+
+        LOG_DEBUG("update time {}", get_board().get_player_color() == PlayerColorWhite ? m_clock.get_white_time() : m_clock.get_black_time());
+
+        return sm::Task::Result::Repeat;
+    }, 3.0);
 }
 
 void GameScene::on_stop() {
@@ -189,8 +215,11 @@ void GameScene::client_request_game_session() {
 
     protocol::Client_RequestGameSession payload;
     payload.player_name = g.options.name;
-    payload.remote_player_type = protocol::Player(m_game_options.remote_color);
+    payload.remote_player = protocol::Player(m_game_options.remote_color);
+    payload.time = m_clock.get_white_time();  // Players have equal time
     payload.game_mode = protocol::GameMode(g.options.game_mode);
+
+    LOG_DEBUG("{}", payload.time);
 
     networking::Message message {protocol::message::Client_RequestGameSession};
 
@@ -284,6 +313,31 @@ void GameScene::client_play_move(protocol::ClockTime time, const std::string& mo
     payload.move = move;
 
     networking::Message message {protocol::message::Client_PlayMove};
+
+    try {
+        message.write(payload);
+    } catch (const networking::SerializationError& e) {
+        serialization_error(e);
+        return;
+    }
+
+    auto& g {ctx.global<Global>()};
+
+    try {
+        g.client.send_message(message);
+    } catch (const networking::ConnectionError& e) {
+        connection_error(e);
+    }
+}
+
+void GameScene::client_update_turn_time(protocol::ClockTime time) {
+    assert(m_game_session);
+
+    protocol::Client_UpdateTurnTime payload;
+    payload.session_id = m_game_session->get_session_id();
+    payload.time = time;
+
+    networking::Message message {protocol::message::Client_UpdateTurnTime};
 
     try {
         message.write(payload);
@@ -904,10 +958,23 @@ void GameScene::server_accept_join_game_session(const networking::Message& messa
     reset(payload.moves);
 
     m_game_session = GameSession(payload.session_id);
-    m_game_session->remote_joined(payload.remote_player_name);
+    m_game_session->remote_joined(payload.remote_name);
     m_game_session->set_messages(payload.messages);
 
-    m_game_options.remote_color = PlayerColor(payload.remote_player_type);
+    m_game_options.remote_color = PlayerColor(payload.remote_player);
+
+    switch (PlayerColor(payload.remote_player)) {
+        case PlayerColorWhite:
+            m_clock.set_white_time(payload.remote_time);
+            m_clock.set_black_time(payload.time);
+            break;
+        case PlayerColorBlack:
+            m_clock.set_black_time(payload.remote_time);
+            m_clock.set_white_time(payload.time);
+            break;
+    }
+
+    LOG_DEBUG("remote_time {}  time {}", payload.remote_time, payload.time);
 
     // Unblock from waiting
     m_ui.clear_popup_window();
@@ -944,7 +1011,7 @@ void GameScene::server_remote_joined_game_session(const networking::Message& mes
         return;
     }
 
-    m_game_session->remote_joined(payload.remote_player_name);
+    m_game_session->remote_joined(payload.remote_name);
 
     // Prevent from clearing unwanted popup windows
     if (m_ui.get_popup_window() == PopupWindow::WaitRemoteJoinGameSession) {

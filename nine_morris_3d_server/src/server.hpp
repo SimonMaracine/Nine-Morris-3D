@@ -35,6 +35,7 @@ private:
     void server_remote_left_game_session(std::shared_ptr<networking::ClientConnection> connection);
     void client_play_move(std::shared_ptr<networking::ClientConnection> connection, const networking::Message& message);
     void server_remote_played_move(std::shared_ptr<networking::ClientConnection> connection, protocol::ClockTime time, const std::string& move);
+    void client_update_turn_time(std::shared_ptr<networking::ClientConnection> connection, const networking::Message& message);
     void client_resign(std::shared_ptr<networking::ClientConnection> connection, const networking::Message& message);
     void server_remote_resigned(std::shared_ptr<networking::ClientConnection> connection);
     void client_offer_draw(std::shared_ptr<networking::ClientConnection> connection, const networking::Message& message);

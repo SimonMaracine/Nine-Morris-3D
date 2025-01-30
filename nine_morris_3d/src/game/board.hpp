@@ -53,9 +53,6 @@ public:
     void user_click_press();
     void user_click_release();
     void enable_move_callback(bool enable);
-
-    static PlayerColor player_color_opponent(PlayerColor color);
-    static const char* player_color_to_string(PlayerColor color);
 protected:
     void update_hover_id(glm::vec3 ray, glm::vec3 camera, std::function<std::vector<HoverableObj>()>&& get_hoverables);
 

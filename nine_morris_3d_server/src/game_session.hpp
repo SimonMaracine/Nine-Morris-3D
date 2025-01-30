@@ -14,7 +14,7 @@ struct GameSession {
     std::vector<std::string> moves;
     protocol::Messages messages;
     protocol::Player player1 {};
+    protocol::ClockTime time1 {};
+    protocol::ClockTime time2 {};
     protocol::GameMode game_mode {};
-    // bool rematch1 {false};
-    // bool rematch2 {false};
 };

@@ -111,6 +111,9 @@ void Server::handle_message(std::shared_ptr<networking::ClientConnection> connec
             case protocol::message::Client_PlayMove:
                 client_play_move(connection, message);
                 break;
+            case protocol::message::Client_UpdateTurnTime:
+                client_update_turn_time(connection, message);
+                break;
             case protocol::message::Client_Resign:
                 client_resign(connection, message);
                 break;
@@ -164,7 +167,9 @@ void Server::client_request_game_session(std::shared_ptr<networking::ClientConne
     GameSession& game_session {m_game_sessions[*session_id]};
     game_session.connection1 = connection;
     game_session.name1 = payload.player_name;
-    game_session.player1 = protocol::opponent(payload.remote_player_type);
+    game_session.player1 = protocol::opponent(payload.remote_player);
+    game_session.time1 = payload.time;
+    game_session.time2 = payload.time;
     game_session.game_mode = payload.game_mode;
 
     m_clients_sessions[connection->get_id()] = *session_id;
@@ -229,16 +234,20 @@ void Server::client_request_join_game_session(std::shared_ptr<networking::Client
         iter->second.connection1 = connection;
         iter->second.name1 = payload.player_name;
 
-        payload_accept.remote_player_type = protocol::opponent(iter->second.player1);
-        payload_accept.remote_player_name = iter->second.name2;
+        payload_accept.remote_player = protocol::opponent(iter->second.player1);
+        payload_accept.remote_time = iter->second.time2;
+        payload_accept.time = iter->second.time1;
+        payload_accept.remote_name = iter->second.name2;
 
         remote_connection = iter->second.connection2.lock();
     } else if (iter->second.connection2.expired()) {
         iter->second.connection2 = connection;
         iter->second.name2 = payload.player_name;
 
-        payload_accept.remote_player_type = iter->second.player1;
-        payload_accept.remote_player_name = iter->second.name1;
+        payload_accept.remote_player = iter->second.player1;
+        payload_accept.remote_time = iter->second.time1;
+        payload_accept.time = iter->second.time2;
+        payload_accept.remote_name = iter->second.name1;
 
         remote_connection = iter->second.connection1.lock();
     } else {
@@ -274,7 +283,7 @@ void Server::server_reject_join_game_session(std::shared_ptr<networking::ClientC
 
 void Server::server_remote_joined_game_session(std::shared_ptr<networking::ClientConnection> connection, const std::string& remote_player_name) {
     protocol::Server_RemoteJoinedGameSession payload;
-    payload.remote_player_name = remote_player_name;
+    payload.remote_name = remote_player_name;
 
     networking::Message message {protocol::message::Server_RemoteJoinedGameSession};
     message.write(payload);
@@ -335,8 +344,10 @@ void Server::client_play_move(std::shared_ptr<networking::ClientConnection> conn
     iter->second.moves.push_back(payload.move);
 
     if (iter->second.connection1.lock() == connection) {
+        iter->second.time1 = payload.time;
         remote_connection = iter->second.connection2.lock();
     } else if (iter->second.connection2.lock() == connection) {
+        iter->second.time2 = payload.time;
         remote_connection = iter->second.connection1.lock();
     } else {
         m_server.get_logger()->warn("Client {} played a move in session {} in which it wasn't active", connection->get_id(), payload.session_id);
@@ -357,6 +368,26 @@ void Server::server_remote_played_move(std::shared_ptr<networking::ClientConnect
     message.write(payload);
 
     m_server.send_message(connection, message);
+}
+
+void Server::client_update_turn_time(std::shared_ptr<networking::ClientConnection> connection, const networking::Message& message) {
+    protocol::Client_UpdateTurnTime payload;
+    message.read(payload);
+
+    const auto iter {m_game_sessions.find(payload.session_id)};
+
+    if (iter == m_game_sessions.end()) {
+        m_server.get_logger()->warn("Session {} reported by client {} doesn't exist", connection->get_id(), payload.session_id);
+        return;
+    }
+
+    if (iter->second.connection1.lock() == connection) {
+        iter->second.time1 = payload.time;
+    } else if (iter->second.connection2.lock() == connection) {
+        iter->second.time2 = payload.time;
+    } else {
+        m_server.get_logger()->warn("Client {} updated time in session {} in which it wasn't active", connection->get_id(), payload.session_id);
+    }
 }
 
 void Server::client_resign(std::shared_ptr<networking::ClientConnection> connection, const networking::Message& message) {
