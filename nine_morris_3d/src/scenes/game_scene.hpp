@@ -71,7 +71,6 @@ public:
     const Clock& get_clock() const { return m_clock; }
     const MoveList& get_move_list() const { return m_move_list; }
     const std::unique_ptr<Engine>& get_engine() const { return m_engine; }
-    bool& get_draw_offered_by_remote() { return m_draw_offered_by_remote; }
 
     virtual void reload_scene_texture_data() const = 0;
     virtual void reload_and_set_scene_textures() = 0;
@@ -87,6 +86,8 @@ public:
     void client_request_join_game_session(const std::string& session_id);
     void client_play_move(const std::string& move);
     void client_resign();
+    void client_offer_draw();
+    void client_accept_draw_offer();
     // void client_rematch();
     // void client_cancel_rematch();
     void client_send_message(const std::string& message_);
@@ -123,6 +124,8 @@ protected:
     void server_remote_left_game_session(const networking::Message& message);
     void server_remote_played_move(const networking::Message& message);
     void server_remote_resigned(const networking::Message& message);
+    void server_remote_offered_draw(const networking::Message& message);
+    void server_remote_accepted_draw_offer(const networking::Message& message);
     // void server_rematch(const networking::Message& message);
     // void server_cancel_rematch(const networking::Message& message);
     void server_remote_sent_message(const networking::Message& message);
@@ -136,7 +139,6 @@ protected:
     PointCameraController m_camera_controller;
     Ui m_ui;
 
-    bool m_draw_offered_by_remote {false};
     GameState m_game_state {GameState::Ready};
     glm::vec3 m_default_camera_position {};
     std::optional<GameSession> m_game_session;

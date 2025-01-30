@@ -64,7 +64,7 @@ namespace protocol {
             Fail to find a session with that specific ID. Send an error code.
 
         Server_RemoteJoinedGameSession
-            Inform the client that the remote has joined the session. The client unblocks and the game is ready
+            Notify the client that the remote has joined the session. The client unblocks and the game is ready
             to start.
 
         Client_LeaveGameSession
@@ -73,7 +73,7 @@ namespace protocol {
             with Server_RemoteLeaveGameSession.
 
         Server_RemoteLeaveGameSession
-            Inform the client that the remote has either voluntarily, or involuntarily left the session.
+            Notify the client that the remote has either voluntarily, or involuntarily left the session.
             If the remote rejoins, the client is notified.
 
         Client_PlayMove
@@ -81,7 +81,22 @@ namespace protocol {
             Server_RemotePlayedMove.
 
         Server_RemotePlayedMove
-            Inform the client that the remote has played a move.
+            Notify the client that the remote has played a move.
+
+        Client_OfferDraw
+            Offer a draw. It is called only when the client presses the offer draw button. The server notifies
+            the remote with Server_RemoteOfferedDraw.
+
+        Server_RemoteOfferedDraw
+            Notify the client that the remote has offered a draw. The client then has the opportunity to
+            accept the offer by pressing the accept offer button. It loses the opportunity by playing a move.
+
+        Client_AcceptDrawOffer
+            Accept the draw offer by pressing the accept draw offer button. The game is over.
+            The server notifies the remote with Server_RemoteAcceptedDrawOffer.
+
+        Server_RemoteAcceptedDrawOffer
+            Notify the client that the remote has accepted the draw offer. The game is over.
 
         Client_Resign
             End the game by losing. It is called when the client presses the resign button, or when it voluntarily
@@ -89,7 +104,7 @@ namespace protocol {
             witn Server_RemoteResigned.
 
         Server_RemoteResigned
-            Inform the client that the remote has resigned.
+            Notify the client that the remote has resigned.
 
         Client_Rematch
             After a game is over, the client presses the rematch button and blocks in a modal window, waiting
@@ -110,7 +125,7 @@ namespace protocol {
             Sends a message. The server notifies the remote with Server_RemoteSentMessage.
 
         Server_RemoteSentMessage
-            Inform the client that the remote has sent a message.
+            Notify the client that the remote has sent a message.
     */
 
     namespace message {
@@ -134,13 +149,13 @@ namespace protocol {
             Client_PlayMove,
             Server_RemotePlayedMove,
 
-            // Client_OfferDraw,
-            // Server_RemoteOfferedDraw,
-            // Client_AcceptDrawOffer,
-            // Server_RemoteAcceptedDrawOffer,
-
             Client_Resign,
             Server_RemoteResigned,
+
+            Client_OfferDraw,
+            Server_RemoteOfferedDraw,
+            Client_AcceptDrawOffer,
+            Server_RemoteAcceptedDrawOffer,
 
             // Client_Rematch,
             // Server_Rematch,
@@ -324,6 +339,28 @@ namespace protocol {
     };
 
     struct Server_RemoteResigned {};
+
+    struct Client_OfferDraw {
+        SessionId session_id {};
+
+        template<typename Archive>
+        void serialize(Archive& archive) {
+            archive(session_id);
+        }
+    };
+
+    struct Server_RemoteOfferedDraw {};
+
+    struct Client_AcceptDrawOffer {
+        SessionId session_id {};
+
+        template<typename Archive>
+        void serialize(Archive& archive) {
+            archive(session_id);
+        }
+    };
+
+    struct Server_RemoteAcceptedDrawOffer {};
 
     struct Client_AcknowledgeGameOver {
         SessionId session_id {};

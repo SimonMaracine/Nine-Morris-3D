@@ -311,6 +311,54 @@ void GameScene::client_resign() {
     }
 }
 
+void GameScene::client_offer_draw() {
+    assert(m_game_session);
+
+    protocol::Client_OfferDraw payload;
+    payload.session_id = m_game_session->get_session_id();
+
+    networking::Message message {protocol::message::Client_OfferDraw};
+
+    try {
+        message.write(payload);
+    } catch (const networking::SerializationError& e) {
+        serialization_error(e);
+        return;
+    }
+
+    auto& g {ctx.global<Global>()};
+
+    try {
+        g.client.send_message(message);
+    } catch (const networking::ConnectionError& e) {
+        connection_error(e);
+    }
+}
+
+void GameScene::client_accept_draw_offer() {
+    assert(m_game_session);
+
+    protocol::Client_AcceptDrawOffer payload;
+    payload.session_id = m_game_session->get_session_id();
+
+    networking::Message message {protocol::message::Client_AcceptDrawOffer};
+
+    try {
+        message.write(payload);
+    } catch (const networking::SerializationError& e) {
+        serialization_error(e);
+        return;
+    }
+
+    auto& g {ctx.global<Global>()};
+
+    try {
+        g.client.send_message(message);
+    } catch (const networking::ConnectionError& e) {
+        connection_error(e);
+    }
+}
+
 // void GameScene::client_rematch() {
 //     assert(m_game_session);
 
@@ -541,6 +589,10 @@ void GameScene::update_game_state() {
             if (get_board().is_turn_finished()) {
                 m_clock.switch_turn();
 
+                if (m_game_session) {
+                    m_game_session->set_remote_offered_draw(false);
+                }
+
                 if (get_board().get_game_over() != GameOver::None) {
                     m_game_state = GameState::Stop;
                 } else {
@@ -554,7 +606,7 @@ void GameScene::update_game_state() {
                 assert_engine_game_over();
             } else if (m_game_options.game_type == GameTypeOnline) {
                 // The session might have been already destroyed
-                if (get_game_session()) {
+                if (m_game_session) {
                     client_leave_game_session();
                 }
             }
@@ -793,6 +845,12 @@ void GameScene::handle_message(const networking::Message& message) {
         case protocol::message::Server_RemoteResigned:
             server_remote_resigned(message);
             break;
+        case protocol::message::Server_RemoteOfferedDraw:
+            server_remote_offered_draw(message);
+            break;
+        case protocol::message::Server_RemoteAcceptedDrawOffer:
+            server_remote_accepted_draw_offer(message);
+            break;
         // case protocol::message::Server_Rematch:
         //     server_rematch(message);
         //     break;
@@ -970,6 +1028,25 @@ void GameScene::server_remote_resigned(const networking::Message&) {
     }
 
     resign(PlayerColor(m_game_options.online.remote_color));
+}
+
+void GameScene::server_remote_offered_draw(const networking::Message&) {
+    // The user may have left the session in the meantime
+    if (!m_game_session) {
+        return;
+    }
+
+    m_game_session->set_remote_offered_draw(true);
+}
+
+void GameScene::server_remote_accepted_draw_offer(const networking::Message&) {
+    // The user may have left the session in the meantime
+    if (!m_game_session) {
+        return;
+    }
+
+    // The remote has accepted our offer, so we "accept" it again
+    accept_draw_offer();
 }
 
 // void GameScene::server_rematch(const networking::Message& message) {

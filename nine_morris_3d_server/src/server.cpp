@@ -114,6 +114,12 @@ void Server::handle_message(std::shared_ptr<networking::ClientConnection> connec
             case protocol::message::Client_Resign:
                 client_resign(connection, message);
                 break;
+            case protocol::message::Client_OfferDraw:
+                client_offer_draw(connection, message);
+                break;
+            case protocol::message::Client_AcceptDrawOffer:
+                client_accept_draw_offer(connection, message);
+                break;
             // case protocol::message::Client_Rematch:
             //     client_rematch(connection, message);
             //     break;
@@ -380,6 +386,72 @@ void Server::client_resign(std::shared_ptr<networking::ClientConnection> connect
 
 void Server::server_remote_resigned(std::shared_ptr<networking::ClientConnection> connection) {
     networking::Message message {protocol::message::Server_RemoteResigned};
+
+    m_server.send_message(connection, message);
+}
+
+void Server::client_offer_draw(std::shared_ptr<networking::ClientConnection> connection, const networking::Message& message) {
+    protocol::Client_OfferDraw payload;
+    message.read(payload);
+
+    const auto iter {m_game_sessions.find(payload.session_id)};
+
+    if (iter == m_game_sessions.end()) {
+        m_server.get_logger()->warn("Session {} reported by client {} doesn't exist", connection->get_id(), payload.session_id);
+        return;
+    }
+
+    std::shared_ptr<networking::ClientConnection> remote_connection;
+
+    if (iter->second.connection1.lock() == connection) {
+        remote_connection = iter->second.connection2.lock();
+    } else if (iter->second.connection2.lock() == connection) {
+        remote_connection = iter->second.connection1.lock();
+    } else {
+        m_server.get_logger()->warn("Client {} offered draw in session {} in which it wasn't active", connection->get_id(), payload.session_id);
+        return;
+    }
+
+    if (remote_connection) {
+        server_remote_offered_draw(remote_connection);
+    }
+}
+
+void Server::server_remote_offered_draw(std::shared_ptr<networking::ClientConnection> connection) {
+    networking::Message message {protocol::message::Server_RemoteOfferedDraw};
+
+    m_server.send_message(connection, message);
+}
+
+void Server::client_accept_draw_offer(std::shared_ptr<networking::ClientConnection> connection, const networking::Message& message) {
+    protocol::Client_AcceptDrawOffer payload;
+    message.read(payload);
+
+    const auto iter {m_game_sessions.find(payload.session_id)};
+
+    if (iter == m_game_sessions.end()) {
+        m_server.get_logger()->warn("Session {} reported by client {} doesn't exist", connection->get_id(), payload.session_id);
+        return;
+    }
+
+    std::shared_ptr<networking::ClientConnection> remote_connection;
+
+    if (iter->second.connection1.lock() == connection) {
+        remote_connection = iter->second.connection2.lock();
+    } else if (iter->second.connection2.lock() == connection) {
+        remote_connection = iter->second.connection1.lock();
+    } else {
+        m_server.get_logger()->warn("Client {} accepted draw offer in session {} in which it wasn't active", connection->get_id(), payload.session_id);
+        return;
+    }
+
+    if (remote_connection) {
+        server_remote_accepted_draw_offer(remote_connection);
+    }
+}
+
+void Server::server_remote_accepted_draw_offer(std::shared_ptr<networking::ClientConnection> connection) {
+    networking::Message message {protocol::message::Server_RemoteAcceptedDrawOffer};
 
     m_server.send_message(connection, message);
 }

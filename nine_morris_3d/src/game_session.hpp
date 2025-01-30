@@ -17,6 +17,8 @@ public:
 
     protocol::SessionId get_session_id() const { return m_session_id; }
     bool get_remote_joined() const { return m_remote_joined; }
+    bool get_remote_offered_draw() const { return m_remote_offered_draw; }
+    bool set_remote_offered_draw(bool remote_offered_draw) { return m_remote_offered_draw = remote_offered_draw; }
     void set_messages(const protocol::Messages& messages) { m_messages = messages; }
 
     void remote_joined(const std::string& player_name);
@@ -30,6 +32,7 @@ private:
 
     protocol::SessionId m_session_id {};
     bool m_remote_joined {false};
+    bool m_remote_offered_draw {false};
     std::string m_remote_player_name;
     protocol::Messages m_messages;
     char m_message_buffer[protocol::MAX_MESSAGE_SIZE] {};

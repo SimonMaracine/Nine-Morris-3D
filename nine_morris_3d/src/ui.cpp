@@ -128,9 +128,11 @@ void Ui::main_menu_bar(sm::Ctx& ctx, GameScene& game_scene) {
             }
             if (ImGui::MenuItem("Accept Draw Offer", nullptr, nullptr, accept_draw_offer_available(game_scene))) {
                 game_scene.accept_draw_offer();
+                game_scene.client_accept_draw_offer();
+                game_scene.client_leave_game_session();
             }
             if (ImGui::MenuItem("Offer Draw", nullptr, nullptr, offer_draw_available(game_scene))) {
-                // TODO
+                game_scene.client_offer_draw();
             }
             if (ImGui::MenuItem("Game Options")) {
                 push_popup_window(PopupWindow::GameOptions);
@@ -929,7 +931,7 @@ bool Ui::accept_draw_offer_available(GameScene& game_scene) {
         game_scene.get_game_state() != GameState::Over &&
         game_scene.get_game_session() &&
         game_scene.get_game_session()->get_remote_joined() &&
-        game_scene.get_draw_offered_by_remote()
+        game_scene.get_game_session()->get_remote_offered_draw()
     );
 }
 
