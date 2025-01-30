@@ -83,6 +83,14 @@ namespace protocol {
         Server_RemotePlayedMove
             Notify the client that the remote has played a move.
 
+        Client_Resign
+            End the game by losing. It is called when the client presses the resign button, or when it voluntarily
+            leaves the session while the remote is still present in the session. The server notifies the remote
+            with Server_RemoteResigned.
+
+        Server_RemoteResigned
+            Notify the client that the remote has resigned.
+
         Client_OfferDraw
             Offer a draw. It is called only when the client presses the offer draw button. The server notifies
             the remote with Server_RemoteOfferedDraw.
@@ -97,14 +105,6 @@ namespace protocol {
 
         Server_RemoteAcceptedDrawOffer
             Notify the client that the remote has accepted the draw offer. The game is over.
-
-        Client_Resign
-            End the game by losing. It is called when the client presses the resign button, or when it voluntarily
-            leaves the session while the remote is still present in the session. The server notifies the remote
-            witn Server_RemoteResigned.
-
-        Server_RemoteResigned
-            Notify the client that the remote has resigned.
 
         Client_Rematch
             After a game is over, the client presses the rematch button and blocks in a modal window, waiting
@@ -176,14 +176,20 @@ namespace protocol {
     inline constexpr std::size_t MAX_MESSAGE_SIZE {128};
 
     enum class Player {
-        White = 0,
-        Black = 1
+        White,
+        Black
+    };
+
+    enum class GameMode {
+        NineMensMorris,
+        TwelveMensMorris
     };
 
     enum class ErrorCode {
         TooManySessions,
         InvalidSessionId,
-        SessionOccupied
+        SessionOccupied,
+        SessionDifferentGame
     };
 
     inline const char* error_code_string(ErrorCode error_code) {
@@ -198,6 +204,9 @@ namespace protocol {
                 break;
             case ErrorCode::SessionOccupied:
                 string = "The session is occupied";
+                break;
+            case ErrorCode::SessionDifferentGame:
+                string = "The session has a different game than the one requested";
                 break;
         }
 
@@ -233,10 +242,11 @@ namespace protocol {
     struct Client_RequestGameSession {
         std::string player_name;
         Player remote_player_type {};
+        protocol::GameMode game_mode {};
 
         template<typename Archive>
         void serialize(Archive& archive) {
-            archive(player_name, remote_player_type);
+            archive(player_name, remote_player_type, game_mode);
         }
     };
 
@@ -261,10 +271,11 @@ namespace protocol {
     struct Client_RequestJoinGameSession {
         SessionId session_id {};
         std::string player_name;
+        protocol::GameMode game_mode {};
 
         template<typename Archive>
         void serialize(Archive& archive) {
-            archive(session_id, player_name);
+            archive(session_id, player_name, game_mode);
         }
     };
 

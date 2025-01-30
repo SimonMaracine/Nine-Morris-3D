@@ -27,7 +27,7 @@ void Server::start() {
         }
 
         return Task::Result::Repeat;
-    }, 12s);
+    }, 15s);
 
     m_task_manager.add_delayed([this]() {
         m_server.get_logger()->debug("Checking connections...");
@@ -163,7 +163,7 @@ void Server::client_request_game_session(std::shared_ptr<networking::ClientConne
 
     if (!session_id) {
         server_reject_game_session(connection);
-        m_server.get_logger()->debug("Denied new session to client {}", connection->get_id());
+        m_server.get_logger()->debug("Rejected new session to client {}", connection->get_id());
         return;
     }
 
@@ -171,6 +171,7 @@ void Server::client_request_game_session(std::shared_ptr<networking::ClientConne
     game_session.connection1 = connection;
     game_session.name1 = payload.player_name;
     game_session.player1 = protocol::opponent(payload.remote_player_type);
+    game_session.game_mode = payload.game_mode;
 
     m_clients_sessions[connection->get_id()] = *session_id;
 
@@ -207,13 +208,19 @@ void Server::client_request_join_game_session(std::shared_ptr<networking::Client
 
     if (iter == m_game_sessions.end()) {
         server_reject_join_game_session(connection, protocol::ErrorCode::InvalidSessionId);
-        m_server.get_logger()->debug("Denied join session to client {}", connection->get_id());
+        m_server.get_logger()->debug("Client {} requested to join and invalid session", connection->get_id());
         return;
     }
 
     if (iter->second.connection1.expired() && iter->second.connection2.expired()) {
         server_reject_join_game_session(connection, protocol::ErrorCode::SessionOccupied);
         m_server.get_logger()->warn("Client {} requested to join empty session {}", connection->get_id(), payload.session_id);
+        return;
+    }
+
+    if (iter->second.game_mode != payload.game_mode) {
+        server_reject_join_game_session(connection, protocol::ErrorCode::SessionDifferentGame);
+        m_server.get_logger()->debug("Client {} requested to join session {} with a different game", connection->get_id(), payload.session_id);
         return;
     }
 

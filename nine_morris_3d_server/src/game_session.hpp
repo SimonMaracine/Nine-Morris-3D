@@ -12,10 +12,9 @@ struct GameSession {
     std::string name1;
     std::string name2;
     std::vector<std::string> moves;
-    protocol::Player player1;
     protocol::Messages messages;
+    protocol::Player player1 {};
+    protocol::GameMode game_mode {};
     // bool rematch1 {false};
     // bool rematch2 {false};
-
-    // TODO time-related data
 };

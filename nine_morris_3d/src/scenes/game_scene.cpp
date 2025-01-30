@@ -37,7 +37,7 @@ void GameScene::on_start() {
         client_ping();
 
         return sm::Task::Result::Repeat;
-    }, 3.0);
+    }, 5.0);
 }
 
 void GameScene::on_stop() {
@@ -180,6 +180,7 @@ void GameScene::client_request_game_session() {
     protocol::Client_RequestGameSession payload;
     payload.player_name = g.options.name;
     payload.remote_player_type = protocol::Player(m_game_options.online.remote_color);
+    payload.game_mode = protocol::GameMode(g.options.game_mode);
 
     networking::Message message {protocol::message::Client_RequestGameSession};
 
@@ -235,12 +236,14 @@ void GameScene::client_request_join_game_session(const std::string& session_id) 
 
     try {
         payload.session_id = sm::utils::string_to_unsigned_short(session_id);
-        payload.player_name = g.options.name;
     } catch (const sm::OtherError& e) {
         LOG_DIST_ERROR("Invalid code: {}", e.what());
         m_ui.push_popup_window(PopupWindow::JoinGameSessionError, "Invalid code");
         return;
     }
+
+    payload.player_name = g.options.name;
+    payload.game_mode = protocol::GameMode(g.options.game_mode);
 
     networking::Message message {protocol::message::Client_RequestJoinGameSession};
 

@@ -111,6 +111,7 @@ void Ui::main_menu_bar(sm::Ctx& ctx, GameScene& game_scene) {
             if (ImGui::MenuItem("New Game")) {
                 // Must resign first
                 if (resign_available(game_scene)) {
+                    // Cannot display the resign game over popup
                     game_scene.client_resign();
                 }
 
@@ -118,7 +119,6 @@ void Ui::main_menu_bar(sm::Ctx& ctx, GameScene& game_scene) {
                     game_scene.client_leave_game_session();
                 }
 
-                // Cannot display the resign game over popup
                 game_scene.reset();
             }
             if (ImGui::MenuItem("Resign", nullptr, nullptr, resign_available(game_scene))) {
@@ -138,14 +138,30 @@ void Ui::main_menu_bar(sm::Ctx& ctx, GameScene& game_scene) {
                 push_popup_window(PopupWindow::GameOptions);
             }
             if (ImGui::BeginMenu("Game Mode")) {
+                bool reset {false};
+
                 if (ImGui::RadioButton("Nine Men's Morris", &m_options.game_mode, GameModeNineMensMorris)) {
                     if (std::exchange(g.options.game_mode, m_options.game_mode) != GameModeNineMensMorris) {
                         ctx.change_scene("nine_mens_morris"_H);
+                        reset = true;
                     }
                 }
                 if (ImGui::RadioButton("Twelve Men's Morris", &m_options.game_mode, GameModeTwelveMensMorris)) {
                     if (std::exchange(g.options.game_mode, m_options.game_mode) != GameModeTwelveMensMorris) {
                         ctx.change_scene("twelve_mens_morris"_H);
+                        reset = true;
+                    }
+                }
+
+                if (reset) {
+                    // Must resign first
+                    if (resign_available(game_scene)) {
+                        // Cannot display the resign game over popup
+                        game_scene.client_resign();
+                    }
+
+                    if (game_scene.get_game_session()) {
+                        game_scene.client_leave_game_session();
                     }
                 }
 

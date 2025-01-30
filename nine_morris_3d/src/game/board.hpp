@@ -35,8 +35,8 @@ private:
 
 // Generic player type
 enum PlayerColor : int {
-    PlayerColorWhite = 0,
-    PlayerColorBlack = 1
+    PlayerColorWhite,
+    PlayerColorBlack
 };
 
 // Generic board object representing a game with its data and rules
