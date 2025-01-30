@@ -14,7 +14,7 @@ add_executable(NineMorris3D ${GUI_EXECUTABLE_WINDOWS} ${NM3D_SOURCES} ${NM3D_HEA
 
 target_include_directories(NineMorris3D PRIVATE "src")
 
-target_link_libraries(NineMorris3D PRIVATE nine_morris_3d_engine Boost::process networking_client nine_morris_3d_net_common)
+target_link_libraries(NineMorris3D PRIVATE nine_morris_3d_engine Boost::process networking_client nine_morris_3d_common)
 
 enable_warnings(NineMorris3D)
 enable_sanitizers_debug_linux(NineMorris3D)

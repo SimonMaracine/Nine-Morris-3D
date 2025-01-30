@@ -13,7 +13,7 @@ add_executable(nine_morris_3d_server
 
 target_include_directories(nine_morris_3d_server PUBLIC "src")
 
-target_link_libraries(nine_morris_3d_server PRIVATE networking_server nine_morris_3d_net_common)
+target_link_libraries(nine_morris_3d_server PRIVATE networking_server nine_morris_3d_common)
 
 enable_warnings(nine_morris_3d_server)
 enable_sanitizers_debug_linux(nine_morris_3d_server)

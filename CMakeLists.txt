@@ -47,7 +47,7 @@ add_subdirectory(extern/spdlog)
 add_subdirectory(networking)
 
 # Add the networking common
-add_subdirectory(nine_morris_3d_net_common)
+add_subdirectory(nine_morris_3d_common)
 
 # Build the server
 add_subdirectory(nine_morris_3d_server)
