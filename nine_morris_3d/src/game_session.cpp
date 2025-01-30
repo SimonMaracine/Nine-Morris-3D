@@ -25,8 +25,10 @@ void GameSession::session_window(GameScene& game_scene, const Global& g) {
     if (ImGui::Begin("Session")) {
         if (m_remote_joined) {
             ImGui::TextWrapped("Playing against %s.", m_remote_player_name.empty() ? "an unnamed opponnent" : m_remote_player_name.c_str());
+        } else if (game_scene.get_game_state() != GameState::Ready) {
+            ImGui::TextWrapped("The opponent has disconnected. You may wait for them to rejoin.");
         } else {
-            ImGui::TextWrapped("The opponent has left the session. You may wait for them to rejoin.");
+            ImGui::TextWrapped("Waiting for the opponent.");
         }
 
         ImGui::Separator();
