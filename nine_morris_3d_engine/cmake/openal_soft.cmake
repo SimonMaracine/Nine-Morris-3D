@@ -11,3 +11,9 @@ set(ALSOFT_UPDATE_BUILD_VERSION OFF)
 set(LIBTYPE "STATIC")
 
 add_subdirectory(extern/openal_soft)  # TODO be sure that system packages are available when building
+
+# https://github.com/kcat/openal-soft/issues/1095
+
+if(UNIX)
+    target_compile_options(OpenAL PRIVATE "-Wno-inline")
+endif()
