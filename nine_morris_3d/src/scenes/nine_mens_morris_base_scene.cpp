@@ -12,7 +12,7 @@
 
 void NineMensMorrisBaseScene::scene_setup() {
     m_board = setup_renderables();
-    m_game_options.time = NineMensMorrisTime10min;
+    m_game_options.time_enum = NineMensMorrisTime10min;
 }
 
 void NineMensMorrisBaseScene::scene_update() {
@@ -94,10 +94,10 @@ void NineMensMorrisBaseScene::reset(const std::string& string, const std::vector
         SM_THROW_ERROR(sm::ApplicationError, "Invalid input: {}", e.what());  // TODO fail gracefully
     }
 
-    const auto clock_time {[](int time) -> unsigned int {
+    const auto clock_time {[this](int time_enum) -> unsigned int {
         unsigned int time_centiseconds {};
 
-        switch (time) {
+        switch (time_enum) {
             case NineMensMorrisTime1min:
                 time_centiseconds = Clock::as_centiseconds(1);
                 break;
@@ -111,7 +111,7 @@ void NineMensMorrisBaseScene::reset(const std::string& string, const std::vector
                 time_centiseconds = Clock::as_centiseconds(60);
                 break;
             case NineMensMorrisTimeCustom:
-                // FIXME
+                time_centiseconds = Clock::as_centiseconds(m_game_options.custom_time);
                 break;
         }
 
@@ -119,7 +119,7 @@ void NineMensMorrisBaseScene::reset(const std::string& string, const std::vector
     }};
 
     m_game_state = GameState::Ready;
-    m_clock.reset(clock_time(m_game_options.time));
+    m_clock.reset(clock_time(m_game_options.time_enum));
     m_move_list.clear();
 
     if (m_board.get_setup_position().player == NineMensMorrisBoard::Player::Black) {
@@ -181,30 +181,35 @@ void NineMensMorrisBaseScene::accept_draw_offer() {
 }
 
 void NineMensMorrisBaseScene::time_control_options_window() {
-    if (ImGui::RadioButton("1 min", &m_game_options.time, NineMensMorrisTime1min)) {
+    if (ImGui::RadioButton("1 min", &m_game_options.time_enum, NineMensMorrisTime1min)) {
         m_clock.reset(Clock::as_centiseconds(1));
     }
 
     ImGui::SameLine();
 
-    if (ImGui::RadioButton("3 min", &m_game_options.time, NineMensMorrisTime3min)) {
+    if (ImGui::RadioButton("3 min", &m_game_options.time_enum, NineMensMorrisTime3min)) {
         m_clock.reset(Clock::as_centiseconds(3));
     }
 
-    if (ImGui::RadioButton("10 min", &m_game_options.time, NineMensMorrisTime10min)) {
+    if (ImGui::RadioButton("10 min", &m_game_options.time_enum, NineMensMorrisTime10min)) {
         m_clock.reset(Clock::as_centiseconds(10));
     }
 
     ImGui::SameLine();
 
-    if (ImGui::RadioButton("60 min", &m_game_options.time, NineMensMorrisTime60min)) {
+    if (ImGui::RadioButton("60 min", &m_game_options.time_enum, NineMensMorrisTime60min)) {
         m_clock.reset(Clock::as_centiseconds(60));
     }
 
-    ImGui::RadioButton("Custom", &m_game_options.time, NineMensMorrisTimeCustom);
+    ImGui::RadioButton("Custom", &m_game_options.time_enum, NineMensMorrisTimeCustom);
 
-    if (m_game_options.time == NineMensMorrisTimeCustom) {
-        // TODO
+    if (m_game_options.time_enum == NineMensMorrisTimeCustom) {
+        ImGui::PushItemWidth(Ui::rem(6.0f));
+        if (ImGui::InputInt("##", &m_game_options.custom_time)) {
+            m_game_options.custom_time = std::clamp(m_game_options.custom_time, 0, 999);
+            m_clock.reset(Clock::as_centiseconds(m_game_options.custom_time));
+        }
+        ImGui::PopItemWidth();
     }
 }
 

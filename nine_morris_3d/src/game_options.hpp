@@ -7,5 +7,6 @@
 struct GameOptions {
     int computer_color {PlayerColorBlack};
     int remote_color {PlayerColorBlack};
-    int time {};  // This needs to be initialized with the corresponding enum
+    int time_enum {};  // This needs to be initialized with the corresponding enum
+    int custom_time {10};  // Actual time in minutes
 };
