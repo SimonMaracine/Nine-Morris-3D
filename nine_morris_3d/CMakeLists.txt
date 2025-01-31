@@ -10,14 +10,14 @@ if(WIN32)
     endif()
 endif()
 
-add_executable(NineMorris3D ${GUI_EXECUTABLE_WINDOWS} ${NM3D_SOURCES} ${NM3D_HEADERS})
+add_executable(nine_morris_3d ${GUI_EXECUTABLE_WINDOWS} ${NM3D_SOURCES} ${NM3D_HEADERS})
 
-target_include_directories(NineMorris3D PRIVATE "src")
+target_include_directories(nine_morris_3d PRIVATE "src")
 
-target_link_libraries(NineMorris3D PRIVATE nine_morris_3d_engine Boost::process networking_client nine_morris_3d_common)
+target_link_libraries(nine_morris_3d PRIVATE nine_morris_3d_engine Boost::process networking_client nine_morris_3d_common)
 
-enable_warnings(NineMorris3D)
-enable_sanitizers_debug_linux(NineMorris3D)
+enable_warnings(nine_morris_3d)
+enable_sanitizers_debug_linux(nine_morris_3d)
 
 # On Windows set Visual Studio working directory
-set_property(TARGET NineMorris3D PROPERTY VS_DEBUGGER_WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}")
+set_property(TARGET nine_morris_3d PROPERTY VS_DEBUGGER_WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}")

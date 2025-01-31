@@ -64,4 +64,4 @@ message(STATUS "Nine-Morris-3D: Building for distribution: ${NM3D_DISTRIBUTION_M
 message(STATUS "Nine-Morris-3D: Building with sanitizers: ${NM3D_ASAN}")
 
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
-set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT NineMorris3D)  # Not working :P
+set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT nine_morris_3d)  # Not working :P

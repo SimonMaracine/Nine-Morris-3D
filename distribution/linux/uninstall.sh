@@ -1,7 +1,7 @@
 #! /bin/bash
 
-rm -v /usr/local/bin/NineMorris3D
-rm -v -r /usr/local/bin/engines
-rm -v -r /usr/local/share/applications/ninemorris3d.desktop
-rm -v -r /usr/local/share/icons/hicolor/*/apps/ninemorris3d.png
-rm -v -r /usr/local/share/ninemorris3d
+rm -vf /usr/local/bin/nine_morris_3d
+rm -vf /usr/local/bin/nine_morris_3d_engine_*
+rm -vrf /usr/local/share/applications/ninemorris3d.desktop
+rm -vrf /usr/local/share/icons/hicolor/*/apps/ninemorris3d.png
+rm -vrf /usr/local/share/ninemorris3d

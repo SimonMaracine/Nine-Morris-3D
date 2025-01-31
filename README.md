@@ -41,7 +41,7 @@ cd scripts
 
 ```txt
 cd scripts
-./create_source_archive.sh ../build_dist/ X.Y.Z ../build_dist/nine_morris_3d/NineMorris3D ../ ../build_dist/assets/icons/ ../distribution/linux/ninemorris3d.desktop ../build_dist/assets/ ../build_dist/assets_engine/
+./create_source_archive.sh ../build_dist/ X.Y.Z ../build_dist/nine_morris_3d/nine_morris_3d ../ ../build_dist/assets/icons/ ../distribution/linux/ninemorris3d.desktop ../build_dist/assets/ ../build_dist/assets_engine/
 ```
 
 - Create a new directory called `Nine-Morris-3D-X.Y.Z-Linux`

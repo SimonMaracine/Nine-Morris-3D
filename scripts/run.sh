@@ -7,4 +7,4 @@ if [ "$?" -ne 0 ]; then
 fi
 
 cd ..
-build/nine_morris_3d/NineMorris3D
+build/nine_morris_3d/nine_morris_3d
