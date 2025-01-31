@@ -668,7 +668,8 @@ std::string NineMensMorrisBoard::position_to_string(const Position& position) {
     return result;
 }
 
-void NineMensMorrisBoard::debug() {
+void NineMensMorrisBoard::debug_window() {
+#ifndef SM_BUILD_DISTRIBUTION
     if (ImGui::Begin("Debug Board")) {
         ImGui::Text("player: %s", if_player_white("white", "black"));
         ImGui::Text("game_over: %s", m_game_over.to_string());
@@ -683,6 +684,7 @@ void NineMensMorrisBoard::debug() {
     }
 
     ImGui::End();
+#endif
 }
 
 void NineMensMorrisBoard::initialize_objects(const NodeRenderables& nodes, const PieceRenderables& white_pieces, const PieceRenderables& black_pieces) {

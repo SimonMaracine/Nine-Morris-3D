@@ -124,7 +124,7 @@ public:
     static Position position_from_string(const std::string& string);
     static std::string position_to_string(const Position& position);
 
-    void debug();
+    void debug_window();
 
     template<typename T>
     T if_player_white(T value_if_white, T value_if_black) const {

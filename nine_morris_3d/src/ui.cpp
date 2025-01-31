@@ -41,39 +41,39 @@ void Ui::update(sm::Ctx& ctx, GameScene& game_scene) {
         const auto& [popup_window, string] {m_popup_window_queue.front()};
 
         switch (popup_window) {
-            case PopupWindow::None:
+            case PopupWindowNone:
                 break;
-            case PopupWindow::About:
+            case PopupWindowAbout:
                 about_window();
                 break;
-            case PopupWindow::GameOver:
+            case PopupWindowGameOver:
                 game_over_window(game_scene);
                 break;
-            case PopupWindow::GameOptions:
+            case PopupWindowGameOptions:
                 game_options_window(ctx, game_scene);
                 break;
-            case PopupWindow::EngineError:
+            case PopupWindowEngineError:
                 engine_error_window();
                 break;
-            case PopupWindow::ConnectionError:
+            case PopupWindowConnectionError:
                 connection_error_window();
                 break;
-            case PopupWindow::NewGameSessionError:
+            case PopupWindowNewGameSessionError:
                 new_game_session_error_window(string);
                 break;
-            case PopupWindow::JoinGameSessionError:
+            case PopupWindowJoinGameSessionError:
                 join_game_session_error_window(string);
                 break;
-            case PopupWindow::WaitServerAcceptGameSession:
+            case PopupWindowWaitServerAcceptGameSession:
                 wait_server_accept_game_session_window(game_scene);
                 break;
-            case PopupWindow::WaitRemoteJoinGameSession:
+            case PopupWindowWaitRemoteJoinGameSession:
                 wait_remote_join_game_session_window(game_scene);
                 break;
-            case PopupWindow::WaitServerAcceptJoinGameSession:
+            case PopupWindowWaitServerAcceptJoinGameSession:
                 wait_server_accept_join_game_session_window(game_scene);
                 break;
-            case PopupWindow::RulesNineMensMorris:
+            case PopupWindowRulesNineMensMorris:
                 rules_nine_mens_morris_window();
                 break;
         }
@@ -88,12 +88,18 @@ void Ui::clear_popup_window() {
     m_popup_window_queue.clear();
 }
 
+void Ui::clear_popup_window(unsigned int windows) {
+    m_popup_window_queue.erase(std::remove_if(m_popup_window_queue.begin(), m_popup_window_queue.end(), [=](auto window) {
+        return windows & static_cast<unsigned int>(window.first);
+    }), m_popup_window_queue.end());
+}
+
 PopupWindow Ui::get_popup_window() const {
     if (!m_popup_window_queue.empty()) {
         return m_popup_window_queue.front().first;
     }
 
-    return PopupWindow::None;
+    return PopupWindowNone;
 }
 
 float Ui::rem(float size) {
@@ -132,7 +138,7 @@ void Ui::main_menu_bar(sm::Ctx& ctx, GameScene& game_scene) {
                 game_scene.client_offer_draw();
             }
             if (ImGui::MenuItem("Game Options")) {
-                push_popup_window(PopupWindow::GameOptions);
+                push_popup_window(PopupWindowGameOptions);
             }
             if (ImGui::BeginMenu("Game Mode")) {
                 bool reset {false};
@@ -448,11 +454,11 @@ void Ui::main_menu_bar(sm::Ctx& ctx, GameScene& game_scene) {
         }
         if (ImGui::BeginMenu("Help")) {
             if (ImGui::MenuItem("About")) {
-                push_popup_window(PopupWindow::About);
+                push_popup_window(PopupWindowAbout);
             }
             if (ImGui::BeginMenu("Game Rules")) {
                 if (ImGui::MenuItem("Nine Men's Morris")) {
-                    push_popup_window(PopupWindow::RulesNineMensMorris);
+                    push_popup_window(PopupWindowRulesNineMensMorris);
                 }
 
                 ImGui::EndMenu();
@@ -863,12 +869,18 @@ void Ui::create_font(sm::Ctx& ctx, int scale) {
     ImVector<ImWchar> ranges;
     builder.BuildRanges(&ranges);
 
+    const auto file_path {ctx.path_assets("fonts/OpenSans/OpenSans-Semibold.ttf")};
+
     const auto font {io.Fonts->AddFontFromFileTTF(
-        ctx.path_assets("fonts/OpenSans/OpenSans-Semibold.ttf").string().c_str(),
+        file_path.string().c_str(),
         font_size,
         nullptr,
         ranges.Data
     )};
+
+    if (font == nullptr) {
+        SM_THROW_ERROR(sm::ResourceError, "Could not load font: `{}`", file_path.string());
+    }
 
     io.FontDefault = font;
     io.Fonts->Build();

@@ -57,7 +57,7 @@ def create_new_assets_directory(assets_directory_path: str, output_path: str, ma
         os.makedirs(os.path.join(new_directory, os.path.dirname(file_path)), exist_ok=True)
 
         try:
-            shutil.copyfile(
+            shutil.copy(
                 os.path.join(assets_directory_path, file_path),
                 os.path.join(new_directory, file_path)
             )

@@ -1,5 +1,9 @@
-engines/muhle_intelligence
-fonts/OpenSans/OpenSans-Regular.ttf
+fonts/OpenSans/OpenSans-Semibold.ttf
+icons/32x32/ninemorris3d.png
+icons/64x64/ninemorris3d.png
+icons/128x128/ninemorris3d.png
+icons/256x256/ninemorris3d.png
+icons/512x512/ninemorris3d.png
 models/board/board.obj
 models/board/paint.obj
 models/node/node.obj

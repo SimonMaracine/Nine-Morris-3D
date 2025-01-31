@@ -11,19 +11,19 @@
 
 class GameScene;
 
-enum class PopupWindow {
-    None,
-    About,
-    GameOver,
-    GameOptions,
-    EngineError,
-    ConnectionError,
-    NewGameSessionError,
-    JoinGameSessionError,
-    WaitServerAcceptGameSession,
-    WaitRemoteJoinGameSession,
-    WaitServerAcceptJoinGameSession,
-    RulesNineMensMorris
+enum PopupWindow : unsigned int {
+    PopupWindowNone = 0,
+    PopupWindowAbout = 1 << 0,
+    PopupWindowGameOver = 1 << 1,
+    PopupWindowGameOptions = 1 << 2,
+    PopupWindowEngineError = 1 << 3,
+    PopupWindowConnectionError = 1 << 4,
+    PopupWindowNewGameSessionError = 1 << 5,
+    PopupWindowJoinGameSessionError = 1 << 6,
+    PopupWindowWaitServerAcceptGameSession = 1 << 7,
+    PopupWindowWaitRemoteJoinGameSession = 1 << 8,
+    PopupWindowWaitServerAcceptJoinGameSession = 1 << 9,
+    PopupWindowRulesNineMensMorris = 1 << 10
 };
 
 class Ui {
@@ -32,6 +32,7 @@ public:
     void update(sm::Ctx& ctx, GameScene& game_scene);
     void push_popup_window(PopupWindow window, const std::string& string = {});
     void clear_popup_window();
+    void clear_popup_window(unsigned int windows);
     PopupWindow get_popup_window() const;
 
     static float rem(float size);

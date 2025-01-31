@@ -29,7 +29,7 @@ void NineMensMorrisBaseScene::scene_fixed_update() {
 }
 
 void NineMensMorrisBaseScene::scene_imgui_update() {
-    m_board.debug();
+    m_board.debug_window();
 }
 
 BoardObj& NineMensMorrisBaseScene::get_board() {
@@ -307,7 +307,7 @@ void NineMensMorrisBaseScene::start_engine() {
 #endif
 
     try {
-        m_engine->initialize(ctx.path_assets("engines/muhle_intelligence").string());
+        m_engine->initialize("nine_morris_3d_engine_muhle_intelligence");
 #ifndef SM_BUILD_DISTRIBUTION
         m_engine->set_debug(true);
 #endif

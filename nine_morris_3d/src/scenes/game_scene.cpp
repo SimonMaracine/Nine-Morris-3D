@@ -234,7 +234,7 @@ void GameScene::client_request_game_session() {
     }
 
     LOG_DEBUG("Requested a new game session");
-    m_ui.push_popup_window(PopupWindow::WaitServerAcceptGameSession);
+    m_ui.push_popup_window(PopupWindowWaitServerAcceptGameSession);
 }
 
 void GameScene::client_leave_game_session() {
@@ -273,7 +273,7 @@ void GameScene::client_request_join_game_session(const std::string& session_id) 
         payload.session_id = sm::utils::string_to_unsigned_short(session_id);
     } catch (const sm::OtherError& e) {
         LOG_DIST_ERROR("Invalid code: {}", e.what());
-        m_ui.push_popup_window(PopupWindow::JoinGameSessionError, "Invalid code");
+        m_ui.push_popup_window(PopupWindowJoinGameSessionError, "Invalid code");
         return;
     }
 
@@ -297,7 +297,7 @@ void GameScene::client_request_join_game_session(const std::string& session_id) 
     }
 
     LOG_DEBUG("Requested to join a game session");
-    m_ui.push_popup_window(PopupWindow::WaitServerAcceptJoinGameSession);
+    m_ui.push_popup_window(PopupWindowWaitServerAcceptJoinGameSession);
 }
 
 void GameScene::client_play_move(protocol::ClockTime time, const std::string& move) {
@@ -711,7 +711,7 @@ void GameScene::update_game_state() {
                     break;
             }
 
-            m_ui.push_popup_window(PopupWindow::GameOver);
+            m_ui.push_popup_window(PopupWindowGameOver);
             m_clock.stop();
             m_game_state = GameState::Over;
 
@@ -724,7 +724,7 @@ void GameScene::update_game_state() {
 void GameScene::engine_error(const EngineError& e) {
     LOG_DIST_ERROR("Engine error: {}", e.what());
     m_engine.reset();
-    m_ui.push_popup_window(PopupWindow::EngineError);
+    m_ui.push_popup_window(PopupWindowEngineError);
 }
 
 void GameScene::stop_engine() {
@@ -781,8 +781,12 @@ void GameScene::connection_error(const networking::ConnectionError& e) {
 
     g.connection_state = ConnectionState::Disconnected;
 
-    m_ui.clear_popup_window();  // The user may already be blocked in a popup window
-    m_ui.push_popup_window(PopupWindow::ConnectionError);
+    m_ui.clear_popup_window(  // The user may already be blocked in a popup window
+        PopupWindowWaitServerAcceptGameSession |
+        PopupWindowWaitRemoteJoinGameSession |
+        PopupWindowWaitServerAcceptJoinGameSession
+    );
+    m_ui.push_popup_window(PopupWindowConnectionError);
 }
 
 void GameScene::serialization_error(const networking::SerializationError& e) {
@@ -798,8 +802,12 @@ void GameScene::serialization_error(const networking::SerializationError& e) {
     g.client.disconnect();
     LOG_DIST_INFO("Disconnected from server");
 
-    m_ui.clear_popup_window();  // The user may already be blocked in a popup window
-    m_ui.push_popup_window(PopupWindow::ConnectionError);
+    m_ui.clear_popup_window(  // The user may already be blocked in a popup window
+        PopupWindowWaitServerAcceptGameSession |
+        PopupWindowWaitRemoteJoinGameSession |
+        PopupWindowWaitServerAcceptJoinGameSession
+    );
+    m_ui.push_popup_window(PopupWindowConnectionError);
 }
 
 void GameScene::reset_session_and_game() {
@@ -923,8 +931,8 @@ void GameScene::server_accept_game_session(const networking::Message& message) {
 
     m_game_session = GameSession(payload.session_id);
 
-    m_ui.clear_popup_window();
-    m_ui.push_popup_window(PopupWindow::WaitRemoteJoinGameSession);
+    m_ui.clear_popup_window(PopupWindowWaitServerAcceptGameSession);
+    m_ui.push_popup_window(PopupWindowWaitRemoteJoinGameSession);
 }
 
 void GameScene::server_reject_game_session(const networking::Message& message) {
@@ -937,8 +945,8 @@ void GameScene::server_reject_game_session(const networking::Message& message) {
         return;
     }
 
-    m_ui.clear_popup_window();
-    m_ui.push_popup_window(PopupWindow::NewGameSessionError, protocol::error_code_string(payload.error_code));
+    m_ui.clear_popup_window(PopupWindowWaitServerAcceptGameSession);
+    m_ui.push_popup_window(PopupWindowNewGameSessionError, protocol::error_code_string(payload.error_code));
 }
 
 void GameScene::server_accept_join_game_session(const networking::Message& message) {
@@ -971,7 +979,7 @@ void GameScene::server_accept_join_game_session(const networking::Message& messa
     }
 
     // Unblock from waiting
-    m_ui.clear_popup_window();
+    m_ui.clear_popup_window(PopupWindowWaitServerAcceptJoinGameSession);
 
     m_game_state = GameState::Start;
 }
@@ -986,8 +994,8 @@ void GameScene::server_reject_join_game_session(const networking::Message& messa
         return;
     }
 
-    m_ui.clear_popup_window();
-    m_ui.push_popup_window(PopupWindow::JoinGameSessionError, protocol::error_code_string(payload.error_code));
+    m_ui.clear_popup_window(PopupWindowWaitServerAcceptJoinGameSession);
+    m_ui.push_popup_window(PopupWindowJoinGameSessionError, protocol::error_code_string(payload.error_code));
 }
 
 void GameScene::server_remote_joined_game_session(const networking::Message& message) {
@@ -1007,11 +1015,8 @@ void GameScene::server_remote_joined_game_session(const networking::Message& mes
 
     m_game_session->remote_joined(payload.remote_name);
 
-    // Prevent from clearing unwanted popup windows
-    if (m_ui.get_popup_window() == PopupWindow::WaitRemoteJoinGameSession) {
-        // Unblock from waiting
-        m_ui.clear_popup_window();
-    }
+    // Unblock from waiting
+    m_ui.clear_popup_window(PopupWindowWaitRemoteJoinGameSession);
 
     m_game_state = GameState::Start;
 }

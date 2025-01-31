@@ -32,7 +32,7 @@ def main(args: list[str]) -> int:
         ),
         comm.CpCommand(
             f"nine_morris_3d/extern/muhle_intelligence/muhle_intelligence/target/{build_type}/muhle_intelligence",
-            "assets/engines/muhle_intelligence"
+            "nine_morris_3d_engine_muhle_intelligence"
         )
     )
 
