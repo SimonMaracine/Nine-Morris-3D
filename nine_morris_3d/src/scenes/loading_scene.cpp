@@ -5,6 +5,10 @@
 #include "global.hpp"
 
 void LoadingScene::on_start() {
+    ctx.connect_event<sm::WindowResizedEvent, &LoadingScene::on_window_resized>(this);
+
+    m_camera_2d.set_projection(0, ctx.get_window_width(), 0, ctx.get_window_height());
+
     ctx.add_task_async([this](sm::AsyncTask& task) {
         try {
             load_assets();
@@ -15,13 +19,19 @@ void LoadingScene::on_start() {
 
         task.set_done();
     });
+
+    load_splash_screen();
 }
 
 void LoadingScene::on_stop() {
-
+    ctx.disconnect_events(this);
 }
 
 void LoadingScene::on_update() {
+    ctx.capture(m_camera_2d);
+
+    update_splash_screen();
+
     if (m_done) {
         const auto& g {ctx.global<Global>()};
 
@@ -34,6 +44,37 @@ void LoadingScene::on_update() {
                 break;
         }
     }
+}
+
+void LoadingScene::on_window_resized(const sm::WindowResizedEvent& event) {
+    m_camera_2d.set_projection(0, event.width, 0, event.height);
+}
+
+void LoadingScene::update_splash_screen() {
+    float x, y, width, height;
+    sm::utils::center_image(
+        static_cast<float>(ctx.get_window_width()),
+        static_cast<float>(ctx.get_window_height()),
+        static_cast<float>(m_splash_screen->get_width()),
+        static_cast<float>(m_splash_screen->get_height()),
+        x, y, width, height
+    );
+
+    sm::Quad splash_screen;
+    splash_screen.texture = m_splash_screen;
+    splash_screen.position = glm::vec2(x, y);
+    splash_screen.scale = glm::vec2(width / static_cast<float>(m_splash_screen->get_width()), height / static_cast<float>(m_splash_screen->get_height()));
+
+    ctx.add_quad(splash_screen);
+}
+
+void LoadingScene::load_splash_screen() {
+    sm::TexturePostProcessing post_processing;
+    const auto texture_data {ctx.load_texture_data(ctx.path_assets("textures/splash_screen/splash_screen.png"), post_processing)};
+
+    sm::TextureSpecification specification;
+    specification.format = sm::TextureFormat::Rgba8;
+    m_splash_screen = ctx.load_texture("splash_screen"_H, texture_data, specification);
 }
 
 void LoadingScene::load_assets() {

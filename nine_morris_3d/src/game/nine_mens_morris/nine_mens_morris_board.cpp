@@ -951,7 +951,7 @@ void NineMensMorrisBoard::try_move(int source_index, int destination_index) {
 }
 
 void NineMensMorrisBoard::try_capture(int capture_index) {
-    const auto iter {std::find_if(m_candidate_moves.cbegin(), m_candidate_moves.cend(), [=](const Move& move) {
+    const auto iter {std::find_if(m_candidate_moves.cbegin(), m_candidate_moves.cend(), [=](const Move& move) -> bool {
         switch (move.type) {
             case MoveType::PlaceCapture:
                 return move.place_capture.capture_index == capture_index;
@@ -961,6 +961,8 @@ void NineMensMorrisBoard::try_capture(int capture_index) {
                 assert(false);
                 break;
         }
+
+        return {};
     })};
 
     if (iter == m_candidate_moves.cend()) {
@@ -1161,6 +1163,7 @@ int NineMensMorrisBoard::new_piece_to_place(PieceType type) {
     }
 
     assert(false);
+    return {};
 }
 
 bool NineMensMorrisBoard::is_node_id(int id) {

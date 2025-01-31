@@ -1,17 +1,21 @@
 #! /bin/bash
 
-SOURCE="ninemorris3d-*.*.*.tar.gz"
+SOURCE=ninemorris3d-*.*.*.tar.gz
 
 if [[ ! -z "$1" ]]; then
     SOURCE="$1"
 fi
 
-tar -xzf "$SOURCE" -C /tmp
+tar -xzf $SOURCE -C /tmp/
+
+if [[ "$?" -ne 0 ]]; then
+    exit 1
+fi
 
 BASE=$(basename $SOURCE)
 
-cp -v -r /tmp/${BASE%.*.*}/usr/local/bin/* /usr/local/bin
-cp -v -r /tmp/${BASE%.*.*}/usr/local/share/* /usr/local/share
+cp -v -r /tmp/${BASE%.*.*}/usr/local/bin/* /usr/local/bin/
+cp -v -r /tmp/${BASE%.*.*}/usr/local/share/* /usr/local/share/
 
 if [[ -x "$(command -v gtk-update-icon-cache)" ]]; then
     gtk-update-icon-cache --force --ignore-theme-index /usr/local/share/icons/hicolor/
