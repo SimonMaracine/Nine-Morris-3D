@@ -106,9 +106,9 @@ void load_options(Options& options, const std::filesystem::path& file_path);  //
 void save_options(const Options& options, const std::filesystem::path& file_path);
 
 // Error thrown by load and save operations
-struct OptionsFileError : std::runtime_error {
-    explicit OptionsFileError(const char* message)
+struct OptionsError : std::runtime_error {
+    explicit OptionsError(const char* message)
         : std::runtime_error(message) {}
-    explicit OptionsFileError(const std::string& message)
+    explicit OptionsError(const std::string& message)
         : std::runtime_error(message) {}
 };
