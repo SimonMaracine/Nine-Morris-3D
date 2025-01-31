@@ -14,7 +14,7 @@
 <!-- FIXME update these -->
 
 - GCC: ?
-- X11: libXcursor-devel libXi-devel libXinerama-devel libXrandr-devel
+- X11: libXcursor-devel libXi-devel libXinerama-devel libXrandr-devel libXext-devel libXfixes-devel libXrender-devel
 - Wayland: wayland-devel libxkbcommon-devel wayland-protocols-devel extra-cmake-modules
 - PipeWire: pipewire-devel.x86_64
 - OpenGL: mesa-libGL-devel.x86_64
