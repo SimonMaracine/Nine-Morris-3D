@@ -8,12 +8,13 @@
 #include "game_session.hpp"
 #include "task_manager.hpp"
 #include "session_pool.hpp"
+#include "configuration.hpp"
 
 class Server {
 public:
     Server();
 
-    void start();
+    void start(const Configuration& configuration);
     void update();
 private:
     void on_client_connected(std::shared_ptr<networking::ClientConnection> connection);

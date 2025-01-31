@@ -8,4 +8,5 @@ __pycache__
 *.aup3-wal
 bitmap_*.png
 information.txt
+config.json
 imgui.ini

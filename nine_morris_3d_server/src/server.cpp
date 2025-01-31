@@ -1,15 +1,15 @@
 #include "server.hpp"
 
-#include <cassert>
-
 Server::Server()
     : m_server(
         [this](std::shared_ptr<networking::ClientConnection> connection) { on_client_connected(connection); },
         [this](std::shared_ptr<networking::ClientConnection> connection) { on_client_disconnected(connection); }
     ) {}
 
-void Server::start() {
-    m_server.start(7915);
+void Server::start(const Configuration& configuration) {
+    m_server.get_logger()->set_level(spdlog::level::from_str(configuration.log_level));
+
+    m_server.start(configuration.port, configuration.max_clients);
 
     using namespace std::chrono_literals;
 
@@ -27,7 +27,7 @@ void Server::start() {
         }
 
         return Task::Result::Repeat;
-    }, 15s);
+    }, configuration.session_collect_period);
 
     m_task_manager.add_delayed([this]() {
         m_server.get_logger()->debug("Checking connections...");
@@ -35,7 +35,7 @@ void Server::start() {
         m_server.check_connections();
 
         return Task::Result::Repeat;
-    }, 10s);
+    }, configuration.connection_check_period);
 }
 
 void Server::update() {
@@ -260,7 +260,6 @@ void Server::client_request_join_game_session(std::shared_ptr<networking::Client
 
     server_accept_join_game_session(connection, std::move(payload_accept));
 
-    assert(remote_connection);
     server_remote_joined_game_session(remote_connection, payload.player_name);
 }
 

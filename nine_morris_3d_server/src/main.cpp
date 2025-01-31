@@ -17,10 +17,24 @@ int main() {
         return 1;
     }
 
+    Configuration configuration;
+
+    try {
+        load_configuration(configuration, "config.json");
+    } catch (const ConfigurationError& e) {
+        std::cerr << "Could not load configuration file: " << e.what() << '\n';
+
+        try {
+            save_configuration(configuration, "config.json");
+        } catch (const ConfigurationError& e) {
+            std::cerr << "Could not save configuration file: " << e.what() << '\n';
+        }
+    }
+
     Server server;
 
     try {
-        server.start();
+        server.start(configuration);
 
         while (g_running) {
             server.update();
