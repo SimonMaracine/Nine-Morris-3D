@@ -20,6 +20,8 @@ namespace sm {
         const char* title {"Nine Morris 3D Engine"};
         const char* log_file {"nine_morris_3d_engine.log"};
         const char* assets_directory {"assets"};
+        const char* build_date {"unknown"};
+        const char* build_time {"unknown"};
         std::string path_logs {""};
         std::string path_saved_data {""};
         std::string path_assets {""};

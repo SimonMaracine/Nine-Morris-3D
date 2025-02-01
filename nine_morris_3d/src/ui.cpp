@@ -464,10 +464,10 @@ void Ui::main_menu_bar(sm::Ctx& ctx, GameScene& game_scene) {
                 ImGui::EndMenu();
             }
             if (ImGui::MenuItem("Log Information")) {
-                sm::utils::write_file(ctx.path_logs("information.txt"), ctx.get_information(), true);
+                sm::utils::write_file(ctx.path_logs("nine_morris_3d.txt"), ctx.get_information(), true);
             }
             if (ImGui::IsItemHovered(ImGuiHoveredFlags_DelayNormal)) {
-                ImGui::SetTooltip("%s", ctx.path_logs("information.txt").string().c_str());
+                ImGui::SetTooltip("%s", ctx.path_logs("nine_morris_3d.txt").string().c_str());
             }
 
             ImGui::EndMenu();

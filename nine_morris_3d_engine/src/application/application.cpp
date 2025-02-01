@@ -29,7 +29,7 @@ namespace sm {
         }
 
 #ifndef SM_BUILD_DISTRIBUTION
-        LOG_INFO("{}", Ctx::get_information());
+        LOG_INFO("\n{}", m_ctx.get_information());
 #endif
 
         m_ctx.m_evt.connect<WindowClosedEvent, &Application::on_window_closed>(this);

@@ -13,7 +13,9 @@
 
 namespace sm {
     Ctx::Ctx(const ApplicationProperties& properties)
-        : m_fs(properties.path_logs, properties.path_saved_data, properties.path_assets, properties.assets_directory),
+        : m_build_date(properties.build_date),
+        m_build_time(properties.build_time),
+        m_fs(properties.path_logs, properties.path_saved_data, properties.path_assets, properties.assets_directory),
         m_log(properties.log_file, m_fs),
         m_shd({m_fs.path_engine_assets().string(), m_fs.path_assets().string()}),
         m_win(properties, m_evt),
@@ -278,7 +280,7 @@ namespace sm {
         information_text += std::string(reinterpret_cast<const char*>(opengl_debug::get_vendor())) + '\n';
         information_text += std::to_string(static_cast<int>(m_fps)) + " FPS ";
         information_text += std::to_string(static_cast<int>(m_delta * 1000.0f)) + " ms\n";
-        information_text += std::string("build ") + __DATE__ + " " + __TIME__;
+        information_text += std::string("build ") + m_build_date + " " + m_build_time;
 #ifndef SM_BUILD_DISTRIBUTION
         information_text += " dev";
 #endif
@@ -300,9 +302,16 @@ namespace sm {
         return m_fps;
     }
 
-    std::string Ctx::get_information() {
+    std::string Ctx::get_information() const {
+#ifndef SM_BUILD_DISTRIBUTION
+        const char* SUFFIX {" dev"};
+#else
+        const char* SUFFIX {""};
+#endif
+
         std::string result;
-        result += '\n';
+        result += "*** Build ***\n";
+        result += std::string(m_build_date) + " " + m_build_time + SUFFIX + '\n';
         result += openal_debug::get_information();
         result += opengl_debug::get_information();
         result += dependencies::get_information();

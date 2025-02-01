@@ -161,7 +161,7 @@ namespace sm {
         void show_information_text();
         float get_delta() const noexcept;
         float get_fps() const noexcept;
-        static std::string get_information();
+        std::string get_information() const;
 
         std::shared_ptr<Mesh> get_mesh(Id id) const;
         std::shared_ptr<Mesh> load_mesh(Id id, const std::filesystem::path& file_path, const std::string& mesh_name, Mesh::Type type, bool flip_winding = false);
@@ -208,6 +208,9 @@ namespace sm {
         bool running {true};
         int exit_code {};
     private:
+        const char* m_build_date {};
+        const char* m_build_time {};
+
         // The order of these members matters
 
         internal::FileSystem m_fs;

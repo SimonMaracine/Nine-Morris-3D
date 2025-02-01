@@ -78,13 +78,15 @@ int application_main() {
         properties.min_width = MIN_WIDTH;
         properties.min_height = MIN_HEIGHT;
         properties.title = "Nine Morris 3D";
-        properties.log_file = "log.txt";
+        properties.log_file = "nine_morris_3d.log";
         properties.version_major = VERSION_MAJOR;
         properties.version_minor = VERSION_MINOR;
         properties.version_patch = VERSION_PATCH;
         properties.path_logs = paths.logs;
         properties.path_saved_data = paths.saved_data;
         properties.path_assets = paths.assets;
+        properties.build_date = __DATE__;
+        properties.build_time = __TIME__;
         properties.default_renderer_parameters = false;
         // properties.audio = true;  // TODO
 
