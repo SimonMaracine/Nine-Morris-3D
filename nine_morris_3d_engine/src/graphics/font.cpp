@@ -248,6 +248,6 @@ namespace sm {
         if (!stbi_write_png(file_name.c_str(), size, size, 1, bitmap, 0)) {
             LOG_ERROR("Failed to create bitmap png file `{}`", file_name);
         }
-    }
 #endif
+    }
 }
