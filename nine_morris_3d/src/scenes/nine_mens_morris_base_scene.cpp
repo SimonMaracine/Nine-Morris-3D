@@ -310,7 +310,11 @@ void NineMensMorrisBaseScene::start_engine() {
 #ifdef SM_PLATFORM_WINDOWS
         m_engine->initialize("nine_morris_3d_engine_muhle_intelligence.exe");
 #else
+    #ifdef SM_BUILD_DISTRIBUTION
+        m_engine->initialize("nine_morris_3d_engine_muhle_intelligence", true);
+    #else
         m_engine->initialize("nine_morris_3d_engine_muhle_intelligence");
+    #endif
 #endif
 #ifndef SM_BUILD_DISTRIBUTION
         m_engine->set_debug(true);

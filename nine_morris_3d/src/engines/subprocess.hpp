@@ -42,7 +42,7 @@ public:
     Subprocess(Subprocess&&) = delete;
     Subprocess& operator=(Subprocess&&) = delete;
 
-    void open(const std::string& file_path);
+    void open(boost::filesystem::path file_path, bool search_executable = false);
     void wait();
     bool alive();
     std::string read_line();

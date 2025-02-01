@@ -20,16 +20,23 @@ Subprocess::~Subprocess() {
     }
 }
 
-void Subprocess::open(const std::string& file_path) {
+void Subprocess::open(boost::filesystem::path file_path, bool search_executable) {
     if (m_context.stopped()) {
         m_context.restart();
     }
 
+    if (search_executable) {
+        file_path = boost_process::environment::find_executable(file_path);
+
+        if (file_path.empty()) {
+            throw SubprocessError("Could not find executable");
+        }
+    }
+
     try {
 #ifdef SM_PLATFORM_LINUX
-        const auto path {boost_process::environment::find_executable(file_path)};
         auto launcher {boost_process::posix::vfork_launcher()};
-        m_process = launcher(m_context, path, std::vector<std::string>{}, boost_process::process_stdio{m_in, m_out, nullptr});
+        m_process = launcher(m_context, file_path, std::vector<std::string>{}, boost_process::process_stdio{m_in, m_out, nullptr});
 #else
         m_process = boost_process::process(m_context, file_path, {}, boost_process::process_stdio{m_in, m_out, nullptr});
 #endif
