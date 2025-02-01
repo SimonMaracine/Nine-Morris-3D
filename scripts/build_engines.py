@@ -28,10 +28,10 @@ def main(args: list[str]) -> int:
         comm.CdCommand(".."),
         comm.SubprocessCommand(
             ["cargo", "build", "--release"] if build_type == "release" else ["cargo", "build"],
-            "nine_morris_3d/extern/muhle_intelligence/muhle_intelligence"
+            "nine_morris_3d/extern/muhle_intelligence/"
         ),
         comm.CpCommand(
-            f"nine_morris_3d/extern/muhle_intelligence/muhle_intelligence/target/{build_type}/muhle_intelligence",
+            f"nine_morris_3d/extern/muhle_intelligence//target/{build_type}/muhle_intelligence",
             "nine_morris_3d_engine_muhle_intelligence"
         )
     )
