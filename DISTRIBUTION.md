@@ -24,7 +24,7 @@ cd scripts
 ```
 
 - Create a new directory called `Nine-Morris-3D-X.Y.Z-Linux`
-- Copy the archive into the directory
+- Copy the archive from `build_dist/` into the directory
 - Copy `README.txt` from root into the directory
 - Copy `install.sh` and `uninstall.sh` from `distribution/linux/` into the directory
 - Archive the directory
