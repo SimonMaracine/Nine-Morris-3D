@@ -7,6 +7,7 @@
 #include <variant>
 #include <fstream>
 #include <stdexcept>
+#include <filesystem>
 
 #include "engines/subprocess.hpp"
 
@@ -44,7 +45,7 @@ public:
 
     virtual ~Engine() = default;
 
-    virtual void initialize(const std::string& file_path) = 0;
+    virtual void initialize(const std::filesystem::path& file_path, bool search_executable = false) = 0;
     virtual void set_debug(bool active) = 0;
     virtual void synchronize() = 0;
     virtual void set_option(const std::string& name, const std::optional<std::string>& value) = 0;

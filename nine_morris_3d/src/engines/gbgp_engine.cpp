@@ -8,9 +8,9 @@
 using namespace std::string_literals;
 using namespace std::chrono_literals;
 
-void GbgpEngine::initialize(const std::string& file_path) {
+void GbgpEngine::initialize(const std::filesystem::path& file_path, bool search_executable) {
     try {
-        m_subprocess.open(file_path);
+        m_subprocess.open(boost::filesystem::path(file_path.string()), search_executable);
     } catch (const SubprocessError& e) {
         throw EngineError("Could not start subprocess: "s + e.what());
     }

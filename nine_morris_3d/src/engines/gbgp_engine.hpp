@@ -19,7 +19,7 @@ public:
         std::optional<std::vector<std::string>> pv;
     };
 
-    void initialize(const std::string& file_path) override;
+    void initialize(const std::filesystem::path& file_path, bool search_executable = false) override;
     void set_debug(bool active) override;
     void synchronize() override;
     void set_option(const std::string& name, const std::optional<std::string>& value) override;

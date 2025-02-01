@@ -241,7 +241,7 @@ namespace sm {
         quad->t1 = aligned_quad.t1;
     }
 
-    void Font::write_bitmap_to_file(const char* name, const unsigned char* bitmap, int size) {
+    void Font::write_bitmap_to_file([[maybe_unused]] const char* name, [[maybe_unused]] const unsigned char* bitmap, [[maybe_unused]] int size) {
 #ifndef SM_BUILD_DISTRIBUTION
         const auto file_name {"bitmap_" + std::string(name) + ".png"};
 
