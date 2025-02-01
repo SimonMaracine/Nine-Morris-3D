@@ -31,7 +31,7 @@ namespace sm {
 
         // Baking API
         void begin_baking();
-        void end_baking(const char* name = "");
+        void end_baking(const char* name = nullptr);
         void bake_characters(int begin_codepoint, int end_codepoint);
         void bake_ascii();
 

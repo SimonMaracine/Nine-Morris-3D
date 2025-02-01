@@ -72,7 +72,7 @@ namespace sm {
         m_bitmap_texture.reset();
     }
 
-    void Font::end_baking([[maybe_unused]] const char* name) {
+    void Font::end_baking(const char* name) {
         stbtt_PackEnd(m_pack_context);
         delete m_pack_context;
 
@@ -82,9 +82,9 @@ namespace sm {
 
         m_bitmap_texture = std::make_unique<GlTexture>(m_bitmap_size, m_bitmap_size, m_bitmap.get(), specification);
 
-#ifndef SM_BUILD_DISTRIBUTION
-        write_bitmap_to_file(name, m_bitmap.get(), m_bitmap_size);
-#endif
+        if (name != nullptr) {
+            write_bitmap_to_file(name, m_bitmap.get(), m_bitmap_size);
+        }
 
         m_bitmap.reset();
 
@@ -242,10 +242,12 @@ namespace sm {
     }
 
     void Font::write_bitmap_to_file(const char* name, const unsigned char* bitmap, int size) {
+#ifndef SM_BUILD_DISTRIBUTION
         const auto file_name {"bitmap_" + std::string(name) + ".png"};
 
         if (!stbi_write_png(file_name.c_str(), size, size, 1, bitmap, 0)) {
             LOG_ERROR("Failed to create bitmap png file `{}`", file_name);
         }
     }
+#endif
 }

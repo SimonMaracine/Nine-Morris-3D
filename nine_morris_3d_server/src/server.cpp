@@ -1,5 +1,9 @@
 #include "server.hpp"
 
+static constexpr unsigned int VERSION_MAJOR {0};
+static constexpr unsigned int VERSION_MINOR {1};
+static constexpr unsigned int VERSION_PATCH {0};
+
 Server::Server()
     : m_server(
         [this](std::shared_ptr<networking::ClientConnection> connection) { on_client_connected(connection); },
@@ -8,6 +12,8 @@ Server::Server()
 
 void Server::start(const Configuration& configuration) {
     m_server.get_logger()->set_level(spdlog::level::from_str(configuration.log_level));
+
+    m_server.get_logger()->info("Server version {}.{}.{}", VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH);
 
     m_server.start(configuration.port, configuration.max_clients);
 

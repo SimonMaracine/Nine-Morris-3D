@@ -908,7 +908,7 @@ namespace sm::internal {
 
         m_storage.default_font->begin_baking();
         m_storage.default_font->bake_ascii();
-        m_storage.default_font->end_baking("default");
+        m_storage.default_font->end_baking();
     }
 
     std::shared_ptr<GlIndexBuffer> Renderer::initialize_quads_index_buffer() {
