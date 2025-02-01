@@ -9,17 +9,7 @@
 #include <spdlog/version.h>
 #include <cereal/version.hpp>
 #include <resmanager/resmanager.hpp>
-
-#ifdef __GNUG__
-    #pragma GCC diagnostic push
-    #pragma GCC diagnostic ignored "-Wconversion"
-#endif
-
-#include <entt/entt.hpp>
-
-#ifdef __GNUG__
-    #pragma GCC diagnostic pop
-#endif
+#include <entt/config/version.h>
 
 #include "nine_morris_3d_engine/application/platform.hpp"
 

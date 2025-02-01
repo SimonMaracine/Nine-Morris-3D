@@ -72,7 +72,7 @@ cd scripts
 cd scripts
 python setup.py
 cd ..\build
-cmake --build . --config Debug -j8
+cmake --build . --config Debug -j10
 :: Or open in Visual Studio and build from there
 ```
 
@@ -82,6 +82,6 @@ cmake --build . --config Debug -j8
 cd scripts
 python setup.py dist
 cd ..\build
-cmake --build . --config Release -j8
+cmake --build . --config Release -j10
 :: Or open in Visual Studio, change to Release mode and build from there
 ```

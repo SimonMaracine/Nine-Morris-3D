@@ -40,10 +40,9 @@ function(enable_sanitizers_debug_linux target)
 endfunction()
 
 include(cmake/cereal.cmake)
+include(cmake/boost.cmake)
 
-add_subdirectory(extern/boost EXCLUDE_FROM_ALL)
 add_subdirectory(extern/spdlog)
-
 add_subdirectory(networking)
 
 # Add the networking common

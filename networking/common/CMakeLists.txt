@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.20)
 
-add_library(networking_common
+add_library(networking_common STATIC
     "include/networking/internal/connection.hpp"
     "include/networking/internal/error.hpp"
     "include/networking/internal/message.hpp"

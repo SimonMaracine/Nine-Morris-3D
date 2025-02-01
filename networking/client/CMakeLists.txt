@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.20)
 
-add_library(networking_client
+add_library(networking_client STATIC
     "include/networking/internal/server_connection.hpp"
     "include/networking/client.hpp"
     "src/client.cpp"
