@@ -24,12 +24,21 @@ def main(args: list[str]) -> int:
     except IndexError:
         pass
 
+    build_command = ["cargo", "build"]
+
+    if build_type == "release":
+        build_command.append("--release")
+
+    if sys.platform == "win32":
+        build_command.append("--features")
+        build_command.append("muhle_intelligence_windows")
+
     exe_suffix = ".exe" if sys.platform == "win32" else ""
 
     commands = (
         comm.CdCommand(".."),
         comm.SubprocessCommand(
-            ["cargo", "build", "--release"] if build_type == "release" else ["cargo", "build"],
+            build_command,
             "nine_morris_3d/extern/muhle_intelligence/"
         ),
         comm.CpCommand(

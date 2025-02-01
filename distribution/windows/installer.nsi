@@ -1,3 +1,5 @@
+; https://nsis.sourceforge.io/Docs/Contents.html
+
 ; Include Modern UI
 
 !include "MUI2.nsh"
