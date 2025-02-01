@@ -7,7 +7,7 @@ __pycache__
 *.blend1
 *.aup3-wal
 bitmap_*.png
-nine_morris_3d_*
+nine_morris_3d_engine_*
 information.txt
 config.json
 imgui.ini
