@@ -194,21 +194,21 @@ namespace sm::internal {
 
     void DebugUi::frame_time(Ctx& ctx) {
         const float time {ctx.get_delta() * 1000.0f};
-        frames[index] = time;
+        m_frames[m_index] = time;
 
-        if (index < FRAMES_SIZE) {
-            index++;
-            frames.push_back(time);
+        if (m_index < FRAMES_SIZE) {
+            m_index++;
+            m_frames.push_back(time);
         } else {
-            frames.push_back(time);
-            frames.erase(frames.cbegin());
+            m_frames.push_back(time);
+            m_frames.erase(m_frames.cbegin());
         }
 
         char text[32] {};
         std::snprintf(text, sizeof(text), "%.3f", time);
 
         if (ImGui::Begin("Frame Time")) {
-            ImGui::PlotLines("time (ms)", frames.data(), FRAMES_SIZE, 0, text, 0.0f, 50.0f, ImVec2(200, 60));
+            ImGui::PlotLines("time (ms)", m_frames.data(), FRAMES_SIZE, 0, text, 0.0f, 50.0f, ImVec2(200, 60));
         }
 
         ImGui::End();

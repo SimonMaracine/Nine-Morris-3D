@@ -10,3 +10,6 @@ add_library(networking_client
 target_include_directories(networking_client PUBLIC "include")
 
 target_link_libraries(networking_client PUBLIC networking_common)
+
+target_compile_features(networking_client PRIVATE cxx_std_17)
+set_target_properties(networking_client PROPERTIES CXX_EXTENSIONS OFF)

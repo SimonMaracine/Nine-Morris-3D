@@ -24,6 +24,8 @@ def main(args: list[str]) -> int:
     except IndexError:
         pass
 
+    exe_suffix = ".exe" if sys.platform == "win32" else ""
+
     commands = (
         comm.CdCommand(".."),
         comm.SubprocessCommand(
@@ -31,8 +33,8 @@ def main(args: list[str]) -> int:
             "nine_morris_3d/extern/muhle_intelligence/"
         ),
         comm.CpCommand(
-            f"nine_morris_3d/extern/muhle_intelligence//target/{build_type}/muhle_intelligence",
-            "nine_morris_3d_engine_muhle_intelligence"
+            f"nine_morris_3d/extern/muhle_intelligence/target/{build_type}/muhle_intelligence{exe_suffix}",
+            f"nine_morris_3d_engine_muhle_intelligence{exe_suffix}"
         )
     )
 

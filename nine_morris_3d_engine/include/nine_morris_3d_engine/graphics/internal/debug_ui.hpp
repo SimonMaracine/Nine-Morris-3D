@@ -48,8 +48,8 @@ namespace sm::internal {
         bool m_frame_time {false};
 
         static constexpr std::size_t FRAMES_SIZE {100};
-        std::vector<float> frames {FRAMES_SIZE};
-        std::size_t index {0};
+        std::vector<float> m_frames {FRAMES_SIZE};
+        std::size_t m_index {0};
     };
 #else
     class DebugUi {};

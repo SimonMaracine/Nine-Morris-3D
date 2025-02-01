@@ -13,9 +13,11 @@
     #pragma GCC diagnostic ignored "-Wunused-parameter"
 #endif
 
+// https://github.com/chriskohlhoff/asio/issues/1441
+
+#include <boost/asio.hpp>
 #define BOOST_PROCESS_VERSION 2
 #include <boost/process.hpp>
-#include <boost/asio.hpp>
 
 #ifdef __GNUG__
     #pragma GCC diagnostic pop
