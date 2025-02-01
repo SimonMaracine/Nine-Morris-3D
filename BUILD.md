@@ -2,14 +2,14 @@
 
 ## Requirements
 
-- Git
-- CMake
+- Git (downloading dependencies)
+- Python (meta build system)
+- CMake (build system)
+- Rust (building engines)
+- Visual Studio (build environment - Windows only)
+- Packages (dependencies - Linux only)
 
-### Windows
-
-- Visual Studio
-
-### Linux (dnf)
+### Linux packages - dnf
 
 <!-- FIXME update these -->
 
@@ -20,7 +20,7 @@
 - OpenGL: mesa-libGL-devel.x86_64
 - Asan: libasan libubsan
 
-### Linux (apt)
+### Linux packages - apt
 
 - GCC: build-essential
 - X11: xorg-dev
@@ -29,6 +29,17 @@
 - OpenGL: libopengl-dev | libegl1-mesa-dev | mesa-common-dev (one of these)
 - zlib: zlib1g-dev
 - package-config: pkgconf
+
+## Testing
+
+For building it is usually used the latest toolchain available for the platform.
+
+<!-- TODO -->
+- Building was last tested on GCC `14.2`, MSVC `` and Rust `1.82`.
+- Build system was last tested on CMake `3.30` (and requires at least `3.20`).
+- Scripts were last tested on Python `3.13`.
+- The actual game was last tested on `Fedora Linux 41 (GNOME)`, `Ubuntu Linux 24.08 (GNOME)` and `Windows 10`
+- On Linux, currently, only X11 is supported.
 
 ## Downloading
 
@@ -54,6 +65,7 @@ python download_dependencies.py
 
 ```txt
 cd scripts
+./build_engines.py
 ./setup.py
 ./build.sh
 ```
@@ -62,6 +74,7 @@ cd scripts
 
 ```txt
 cd scripts
+./build_engines.py dist
 ./setup.py dist
 ./build.sh dist
 ```
@@ -70,6 +83,7 @@ cd scripts
 
 ```txt
 cd scripts
+python build_engines.py
 python setup.py
 cd ..\build
 cmake --build . --config Debug -j10
@@ -80,10 +94,11 @@ cmake --build . --config Debug -j10
 
 ```txt
 cd scripts
+python build_engines.py dist
 python setup.py dist
 cd ..\build
 cmake --build . --config Release -j10
 :: Or open in Visual Studio, change to Release mode and build from there
 ```
 
-Note: you have to rerun setup.py in order to change from development to distribution and back.
+Note: on Windows, you have to rerun setup.py in order to change from development to distribution and back.
