@@ -50,8 +50,8 @@ static Paths get_paths() {
     const std::string username {get_environment_variable("USERNAME")};
 
     return {
-        "C:\\Users\\" + username + "\\Documents\\NineMorris3D",
-        "C:\\Users\\" + username + "\\Documents\\NineMorris3D",
+        "C:\\Users\\" + username + "\\Documents\\Nine Morris 3D",
+        "C:\\Users\\" + username + "\\Documents\\Nine Morris 3D",
         ""
     };
 #endif

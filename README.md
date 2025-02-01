@@ -65,7 +65,8 @@ python export_assets.py ..\build ..\assets ..\assets_engine
 ```
 
 - Create a new folder called whatever
-- Copy the binary from `build\nine_morris_3d\Release` into the folder
+- Copy the game binary from `build\nine_morris_3d\Release` into the folder
+- Copy the engine binaries from root into the folder
 - Copy the assets directories from `build` into the folder
 - Copy `README.txt` from root into the folder
 - Copy `installer.nsi` from `distribution\windows` into the folder
