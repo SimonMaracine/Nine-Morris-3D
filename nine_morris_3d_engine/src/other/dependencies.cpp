@@ -18,6 +18,16 @@ namespace sm::dependencies {
         char buffer[128] {};
         std::string result;
 
+        result += "*** Build ***\n";
+
+#ifndef SM_BUILD_DISTRIBUTION
+        const char* SUFFIX {" dev"};
+#else
+        const char* SUFFIX {""};
+#endif
+        std::snprintf(buffer, sizeof(buffer), "%s %s%s\n", __DATE__, __TIME__, SUFFIX);
+        result += buffer;
+
         result += "*** Compiler ***\n";
 
 #if defined(SM_PLATFORM_LINUX)

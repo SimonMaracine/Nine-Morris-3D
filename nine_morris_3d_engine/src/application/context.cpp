@@ -277,9 +277,10 @@ namespace sm {
         information_text += std::string(reinterpret_cast<const char*>(opengl_debug::get_renderer())) + '\n';
         information_text += std::string(reinterpret_cast<const char*>(opengl_debug::get_vendor())) + '\n';
         information_text += std::to_string(static_cast<int>(m_fps)) + " FPS ";
-        information_text += std::to_string(static_cast<int>(m_delta * 1000.0f)) + " ms";
+        information_text += std::to_string(static_cast<int>(m_delta * 1000.0f)) + " ms\n";
+        information_text += std::string("build ") + __DATE__ + " " + __TIME__;
 #ifndef SM_BUILD_DISTRIBUTION
-        information_text += " dev build";
+        information_text += " dev";
 #endif
 
         Text text;
