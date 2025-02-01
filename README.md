@@ -1,8 +1,6 @@
 # Nine Morris 3D
 
-## A nine men's morris implementation in 3D
-
-### Description
+## Description
 
 It is a free casual board game with 3D graphics. You can play against the computer
 or another person locally or over the internet. It implements two variants:
@@ -12,7 +10,7 @@ or another person locally or over the internet. It implements two variants:
 
 The game runs on Linux and Windows.
 
-### Tags
+## Tags
 
 - Casual
 - Board
