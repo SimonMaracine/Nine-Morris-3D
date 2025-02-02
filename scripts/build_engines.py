@@ -28,7 +28,7 @@ def main(args: list[str]) -> int:
     build_command = comm.SubprocessCommand(
         ["cargo", "build"],
         "nine_morris_3d/extern/muhle_intelligence/"
-    ),
+    )
 
     if build_type == "release":
         build_command.append("--release")
