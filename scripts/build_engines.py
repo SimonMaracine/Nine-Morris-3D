@@ -6,7 +6,7 @@ import _common as comm
 
 
 def print_help():
-    print("Usage: build_engines.py [dist]", file=sys.stderr)
+    print("Usage: build_engines.py [dev | dist]", file=sys.stderr)
 
 
 def main(args: list[str]) -> int:
@@ -14,6 +14,8 @@ def main(args: list[str]) -> int:
 
     try:
         match args[1]:
+            case "dev":
+                pass
             case "dist":
                 build_type = "release"
             case invalid:

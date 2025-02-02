@@ -6,19 +6,19 @@ import _common as comm
 
 
 def print_help():
-    print("Usage: setup.py [rel | dist]", file=sys.stderr)
+    print("Usage: setup.py [dev | dist]", file=sys.stderr)
 
 
 def main(args: list[str]) -> int:
     build_type = "Debug"
     distribution_mode = "OFF"
-    asan = "OFF"
     build_directory = "build"
+    asan = "OFF"
 
     try:
         match args[1]:
-            case "rel":
-                build_type = "Release"
+            case "dev":
+                pass
             case "dist":
                 build_type = "Release"
                 distribution_mode = "ON"

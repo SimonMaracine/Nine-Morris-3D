@@ -59,6 +59,12 @@ python download_dependencies.py
 
 ## Building
 
+There are two types of builds:
+
+- Development, where the game is compiled with debug or release mode and it is run within the project;
+- Distribution, where the game is compiled with release mode, any additional debug code is stripped and it is
+  run from clients' systems (after installation).
+
 ### Linux development
 
 ```txt

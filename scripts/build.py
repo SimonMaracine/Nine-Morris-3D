@@ -10,18 +10,19 @@ def print_help():
 
 
 def main(args: list[str]) -> int:
+    config = "Debug"
     build_directory = "build"
     target = "all"
-    config = "Debug"
 
     try:
         match args[1]:
             case "dev":
                 pass
             case "dist":
+                config = "Release"
+
                 if sys.platform == "linux":
                     build_directory = "build_dist"
-                config = "Release"
             case invalid:
                 print(f"Invalid argument: {invalid}", file=sys.stderr)
                 print_help()
