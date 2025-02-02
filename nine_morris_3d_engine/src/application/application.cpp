@@ -22,7 +22,7 @@ namespace sm {
         LOG_DIST_INFO("Working directory: {}", internal::FileSystem::current_working_directory().string());
 
         const auto [version_major, version_minor] {opengl_debug::get_version_number()};
-        LOG_DIST_INFO("GL version {}.{}", version_major, version_minor);
+        LOG_INFO("GL version {}.{}", version_major, version_minor);
 
         if (!capabilities::is_srgb_capable()) {
             LOG_DIST_WARNING("Default GL framebuffer is not sRGB capable");

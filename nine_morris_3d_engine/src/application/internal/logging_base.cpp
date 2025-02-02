@@ -12,7 +12,7 @@
 
 [[maybe_unused]] static const char* LOG_PATTERN_DEVELOPMENT {"%^[%l] [%t] [%H:%M:%S]%$ %v"};
 static const char* LOG_PATTERN_DISTRIBUTION {"%^[%l] [%t] [%!:%#] [%c]%$ %v"};
-static constexpr std::size_t FILE_SIZE {1048576 * 1};  // 1 MiB
+static constexpr std::size_t FILE_SIZE {1024 * 1024 * 1};  // 1 MiB
 static constexpr std::size_t ROTATING_FILES {2};  // 3 total log files
 
 namespace sm::internal {
