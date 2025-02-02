@@ -40,13 +40,17 @@ namespace sm {
         m_fixed_update.previous_seconds = internal::Window::get_time();
     }
 
-    // Destructor is called before all member variables
     Application::~Application() {
         internal::imgui_context::uninitialize();
 
         LOG_INFO("Waiting for other threads...");
 
-        m_ctx.m_tsk.wait_async();
+        // Cannot let exceptions escape destructors
+        try {
+            m_ctx.m_tsk.wait_async();
+        } catch (...) {
+            LOG_DIST_WARNING("Exception thrown inside application destructor is ignored");
+        }
 
         // The global data is destroyed soon together with the context
         // From this point on, no user logic code should execute

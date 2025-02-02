@@ -46,10 +46,6 @@ namespace sm::internal {
         return g_logger.get();
     }
 
-    void Logging::abort() noexcept {
-        std::abort();
-    }
-
     void Logging::set_fallback_logger_distribution(const char* error_message) {
         g_logger = spdlog::stdout_color_mt("Distribution Logger Fallback [Console]");
         g_logger->set_pattern(LOG_PATTERN_DISTRIBUTION);

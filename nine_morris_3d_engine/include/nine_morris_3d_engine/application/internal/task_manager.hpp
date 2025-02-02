@@ -11,12 +11,22 @@ namespace sm::internal {
 
     class TaskManager {
     public:
+        // Enqueue a normal task
         void add_immediate(Task::Function&& function);
+
+        // Enqueue a delayed task
         void add_delayed(Task::Function&& function, double delay);
+
+        // Enqueue a deffered task (by one frame)
         void add_deffered(Task::Function&& function);
+
+        // Enqueue an asynchronous task (running in a thread)
         void add_async(AsyncTask::Function&& function);
 
+        // Main update
         void update();
+
+        // Join asynchronous tasks; throw the last exception (if any)
         void wait_async();
     private:
         void update_tasks();

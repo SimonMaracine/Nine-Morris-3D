@@ -16,7 +16,7 @@
 
     Use LOG_DIST_CRITICAL only right before aborting or throwing.
 
-    LOG_* macros are exception-safe.
+    LOG_* macros are not exception-safe, but they may still be used in development.
 */
 
 #ifdef SM_BUILD_DISTRIBUTION
@@ -26,11 +26,11 @@
     #define LOG_ERROR(...) static_cast<void>(0)
     #define LOG_CRITICAL(...) static_cast<void>(0)
 #else
-    #define LOG_DEBUG(...) do { try { sm::internal::Logging::get_global_logger()->debug(__VA_ARGS__); } catch (...) { sm::internal::Logging::abort(); } } while (false)
-    #define LOG_INFO(...) do { try { sm::internal::Logging::get_global_logger()->info(__VA_ARGS__); } catch (...) { sm::internal::Logging::abort(); } } while (false)
-    #define LOG_WARNING(...) do { try { sm::internal::Logging::get_global_logger()->warn(__VA_ARGS__); } catch (...) { sm::internal::Logging::abort(); } } while (false)
-    #define LOG_ERROR(...) do { try { sm::internal::Logging::get_global_logger()->error(__VA_ARGS__); } catch (...) { sm::internal::Logging::abort(); } } while (false)
-    #define LOG_CRITICAL(...) do { try { sm::internal::Logging::get_global_logger()->critical(__VA_ARGS__); } catch (...) { sm::internal::Logging::abort(); } } while (false)
+    #define LOG_DEBUG(...) sm::internal::Logging::get_global_logger()->debug(__VA_ARGS__)
+    #define LOG_INFO(...) sm::internal::Logging::get_global_logger()->info(__VA_ARGS__)
+    #define LOG_WARNING(...) sm::internal::Logging::get_global_logger()->warn(__VA_ARGS__)
+    #define LOG_ERROR(...) sm::internal::Logging::get_global_logger()->error(__VA_ARGS__)
+    #define LOG_CRITICAL(...) sm::internal::Logging::get_global_logger()->critical(__VA_ARGS__)
 #endif
 
 #define LOG_DIST_DEBUG(...) SPDLOG_LOGGER_DEBUG(sm::internal::Logging::get_global_logger(), __VA_ARGS__)
