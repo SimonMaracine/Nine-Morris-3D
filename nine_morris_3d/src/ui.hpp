@@ -13,17 +13,17 @@ class GameScene;
 
 enum PopupWindow : unsigned int {
     PopupWindowNone = 0,
-    PopupWindowAbout = 1 << 0,
-    PopupWindowGameOver = 1 << 1,
-    PopupWindowGameOptions = 1 << 2,
-    PopupWindowEngineError = 1 << 3,
-    PopupWindowConnectionError = 1 << 4,
-    PopupWindowNewGameSessionError = 1 << 5,
-    PopupWindowJoinGameSessionError = 1 << 6,
-    PopupWindowWaitServerAcceptGameSession = 1 << 7,
-    PopupWindowWaitRemoteJoinGameSession = 1 << 8,
-    PopupWindowWaitServerAcceptJoinGameSession = 1 << 9,
-    PopupWindowRulesNineMensMorris = 1 << 10
+    PopupWindowAbout = 1u << 0,
+    PopupWindowGameOver = 1u << 1,
+    PopupWindowGameOptions = 1u << 2,
+    PopupWindowEngineError = 1u << 3,
+    PopupWindowConnectionError = 1u << 4,
+    PopupWindowNewGameSessionError = 1u << 5,
+    PopupWindowJoinGameSessionError = 1u << 6,
+    PopupWindowWaitServerAcceptGameSession = 1u << 7,
+    PopupWindowWaitRemoteJoinGameSession = 1u << 8,
+    PopupWindowWaitServerAcceptJoinGameSession = 1u << 9,
+    PopupWindowRulesNineMensMorris = 1u << 10
 };
 
 class Ui {

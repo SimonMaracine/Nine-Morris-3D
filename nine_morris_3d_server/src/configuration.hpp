@@ -15,6 +15,7 @@ struct Configuration {
     std::uint32_t max_clients {std::numeric_limits<std::uint16_t>::max()};
     std::chrono::seconds session_collect_period {std::chrono::seconds(15)};
     std::chrono::seconds connection_check_period {std::chrono::seconds(10)};
+    std::string log_target {"both"};
     std::string log_level {"info"};
 
     template<typename Archive>
@@ -24,6 +25,7 @@ struct Configuration {
             CEREAL_NVP(max_clients),
             CEREAL_NVP(session_collect_period),
             CEREAL_NVP(connection_check_period),
+            CEREAL_NVP(log_target),
             CEREAL_NVP(log_level)
         );
     }

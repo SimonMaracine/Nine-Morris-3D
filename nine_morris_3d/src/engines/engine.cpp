@@ -6,7 +6,7 @@ void Engine::set_info_callback(std::function<void(const Info&)>&& info_callback)
     m_info_callback = std::move(info_callback);
 }
 
-void Engine::set_log_output(bool enable, const std::string& file_path) {
+void Engine::set_log_output(bool enable, const std::filesystem::path& file_path) {
     if (enable) {
         m_log_output_stream.open(file_path, std::ios::app);
     } else {

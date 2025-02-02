@@ -1,13 +1,14 @@
 #include "server.hpp"
 
 static constexpr unsigned int VERSION_MAJOR {0};
-static constexpr unsigned int VERSION_MINOR {1};
-static constexpr unsigned int VERSION_PATCH {1};
+static constexpr unsigned int VERSION_MINOR {2};
+static constexpr unsigned int VERSION_PATCH {0};
 
-Server::Server()
+Server::Server(const Configuration& configuration)
     : m_server(
         [this](std::shared_ptr<networking::ClientConnection> connection) { on_client_connected(connection); },
-        [this](std::shared_ptr<networking::ClientConnection> connection) { on_client_disconnected(connection); }
+        [this](std::shared_ptr<networking::ClientConnection> connection) { on_client_disconnected(connection); },
+        log_target_from_str(configuration.log_target)
     ) {}
 
 void Server::start(const Configuration& configuration) {
@@ -535,4 +536,18 @@ void Server::server_remote_sent_message(std::shared_ptr<networking::ClientConnec
     message.write(payload);
 
     m_server.send_message(connection, message);
+}
+
+unsigned int Server::log_target_from_str(const std::string& string) {
+    if (string == "none") {
+        return networking::LogTarget::LogTargetNone;
+    } else if (string == "console") {
+        return networking::LogTarget::LogTargetConsole;
+    } else if (string == "file") {
+        return networking::LogTarget::LogTargetFile;
+    } else if (string == "both") {
+        return networking::LogTarget::LogTargetConsole | networking::LogTarget::LogTargetFile;
+    }
+
+    return networking::LogTarget::LogTargetNone;
 }

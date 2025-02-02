@@ -20,20 +20,19 @@ int main() {
     Configuration configuration;
 
     try {
-        load_configuration(configuration, "config.json");
+        load_configuration(configuration, "nine_morris_3d_config.json");
     } catch (const ConfigurationError& e) {
         std::cerr << "Could not load configuration file: " << e.what() << '\n';
 
         try {
-            save_configuration(configuration, "config.json");
+            save_configuration(configuration, "nine_morris_3d_config.json");
         } catch (const ConfigurationError& e) {
             std::cerr << "Could not save configuration file: " << e.what() << '\n';
         }
     }
 
-    Server server;
-
     try {
+        Server server {configuration};
         server.start(configuration);
 
         while (g_running) {
@@ -41,6 +40,9 @@ int main() {
         }
     } catch (const networking::ConnectionError&) {
         std::cerr << "A fatal error occurred\n";
+        return 1;
+    } catch (const networking::ServerError& e) {
+        std::cerr << "A fatal error occurred: " << e.what() << '\n';
         return 1;
     }
 

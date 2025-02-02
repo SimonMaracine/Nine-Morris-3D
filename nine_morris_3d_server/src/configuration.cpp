@@ -11,6 +11,13 @@ using namespace std::string_literals;
 using namespace std::chrono_literals;
 using namespace std::string_view_literals;
 
+static constexpr std::array LOG_TARGETS {
+    "none"sv,
+    "console"sv,
+    "file"sv,
+    "both"sv
+};
+
 static constexpr std::array LOG_LEVELS {
     "trace"sv,
     "debug"sv,
@@ -24,6 +31,10 @@ static constexpr std::array LOG_LEVELS {
 static void validate(Configuration& configuration) {
     configuration.session_collect_period = std::clamp(configuration.session_collect_period, 1s, 60s);
     configuration.connection_check_period = std::clamp(configuration.session_collect_period, 1s, 60s);
+
+    if (std::find(LOG_TARGETS.begin(), LOG_TARGETS.end(), configuration.log_target) == LOG_TARGETS.end()) {
+        configuration.log_level = "both";
+    }
 
     if (std::find(LOG_LEVELS.begin(), LOG_LEVELS.end(), configuration.log_level) == LOG_LEVELS.end()) {
         configuration.log_level = "info";

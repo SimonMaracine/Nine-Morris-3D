@@ -9,5 +9,5 @@ __pycache__
 bitmap_*.png
 nine_morris_3d_engine_*
 nine_morris_3d.txt
-config.json
+nine_morris_3d_config.json
 imgui.ini

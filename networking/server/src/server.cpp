@@ -4,16 +4,15 @@
 #include <stdexcept>
 #include <cassert>
 
-#include <spdlog/sinks/stdout_color_sinks.h>
-
 namespace networking {
     Server::Server(
         std::function<void(std::shared_ptr<ClientConnection>)> on_client_connected,
-        std::function<void(std::shared_ptr<ClientConnection>)> on_client_disconnected
+        std::function<void(std::shared_ptr<ClientConnection>)> on_client_disconnected,
+        unsigned int log_target
     )
         : m_acceptor(m_context), m_on_client_connected(std::move(on_client_connected)),
         m_on_client_disconnected(std::move(on_client_disconnected)) {
-        initialize_logging();
+        initialize_logging(log_target);
     }
 
     Server::~Server() {
@@ -259,9 +258,30 @@ namespace networking {
         m_pool.free_id(connection->get_id());
     }
 
-    void Server::initialize_logging() {
-        m_logger = spdlog::stdout_color_mt("Console");
-        m_logger->set_pattern("%^[%l] [%H:%M:%S]%$ %v");
-        m_logger->set_level(spdlog::level::trace);
+    void Server::initialize_logging(unsigned int log_target) {
+        m_logger = std::make_shared<spdlog::logger>("ServerLogger");
+
+        try {
+            if (log_target & LogTargetConsole) {
+                m_console_sink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
+                m_console_sink->set_pattern("%^[%l] [%H:%M:%S]%$ %v");
+                m_console_sink->set_level(spdlog::level::trace);
+
+                m_logger->sinks().push_back(m_console_sink);
+            }
+
+            if (log_target & LogTargetFile) {
+                static constexpr int MAX_SIZE {1024 * 1024 * 5};
+                static constexpr int MAX_FILES {5};
+
+                m_rotating_file_sink = std::make_shared<spdlog::sinks::rotating_file_sink_mt>("logs/rotating.log", MAX_SIZE, MAX_FILES);
+                m_rotating_file_sink->set_pattern("%^[%l] [%H:%M:%S]%$ %v");
+                m_rotating_file_sink->set_level(spdlog::level::trace);
+
+                m_logger->sinks().push_back(m_rotating_file_sink);
+            }
+        } catch (const spdlog::spdlog_ex& e) {
+            throw ServerError("Could not initialize logging: " + std::string(e.what()));
+        }
     }
 }

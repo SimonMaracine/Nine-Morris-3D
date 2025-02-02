@@ -12,7 +12,7 @@
 
 class Server {
 public:
-    Server();
+    Server(const Configuration& configuration);
 
     void start(const Configuration& configuration);
     void update();
@@ -45,6 +45,8 @@ private:
     void server_remote_accepted_draw_offer(std::shared_ptr<networking::ClientConnection> connection);
     void client_send_message(std::shared_ptr<networking::ClientConnection> connection, const networking::Message& message);
     void server_remote_sent_message(std::shared_ptr<networking::ClientConnection> connection, const std::string& message_);
+
+    static unsigned int log_target_from_str(const std::string& string);
 
     networking::Server m_server;
 

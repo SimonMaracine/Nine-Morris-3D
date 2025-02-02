@@ -8,8 +8,11 @@
 #include <utility>
 #include <functional>
 #include <exception>
+#include <stdexcept>
 
 #include <spdlog/spdlog.h>
+#include <spdlog/sinks/stdout_color_sinks.h>
+#include <spdlog/sinks/rotating_file_sink.h>
 
 #include "networking/internal/client_connection.hpp"
 #include "networking/internal/queue.hpp"
@@ -26,13 +29,22 @@ namespace networking {
     using SerializationError = internal::SerializationError;
     using ClientId = internal::ClientId;
 
+    // Used to specify where logs are emitted
+    enum LogTarget : unsigned int {
+        LogTargetNone = 0,
+        LogTargetConsole = 1u << 0,
+        LogTargetFile = 1u << 1
+    };
+
     // Main class for the server program
     class Server final {
     public:
         // Sending messages or calling check_connections is prohibited in on_client_disconnected
+        // Throws server errors
         Server(
             std::function<void(std::shared_ptr<ClientConnection>)> on_client_connected,
-            std::function<void(std::shared_ptr<ClientConnection>)> on_client_disconnected
+            std::function<void(std::shared_ptr<ClientConnection>)> on_client_disconnected,
+            unsigned int log_target
         );
 
         ~Server();
@@ -45,7 +57,7 @@ namespace networking {
         // Start the internal event loop and start accepting connection requests
         // You may call this only once in the beginning or after calling stop()
         // Specify the port number on which to listen and the maximum amount of clients allowed
-        // Throws connection errors
+        // Throws connection
         void start(std::uint16_t port, std::uint32_t max_clients = std::numeric_limits<std::uint16_t>::max());
 
         // Disconnect from all the clients and stop the internal event loop
@@ -92,7 +104,7 @@ namespace networking {
         void task_accept_connection();
         void maybe_client_disconnected(std::shared_ptr<ClientConnection> connection);
         void maybe_client_disconnected(std::shared_ptr<ClientConnection> connection, ConnectionsIter& iter, ConnectionsIter before_iter);
-        void initialize_logging();
+        void initialize_logging(unsigned int log_target);
 
         std::forward_list<std::shared_ptr<ClientConnection>> m_connections;
         internal::SyncQueue<std::shared_ptr<ClientConnection>> m_new_connections;
@@ -108,6 +120,16 @@ namespace networking {
         internal::Pool m_pool;
         std::exception_ptr m_error;
         std::shared_ptr<spdlog::logger> m_logger;
+        std::shared_ptr<spdlog::sinks::stdout_color_sink_mt> m_console_sink;
+        std::shared_ptr<spdlog::sinks::rotating_file_sink_mt> m_rotating_file_sink;
         bool m_running {false};
+    };
+
+    // Generic error thrown by the server
+    struct ServerError : std::runtime_error {
+        explicit ServerError(const char* message)
+            : std::runtime_error(message) {}
+        explicit ServerError(const std::string& message)
+            : std::runtime_error(message) {}
     };
 }

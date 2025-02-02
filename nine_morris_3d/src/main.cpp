@@ -26,11 +26,11 @@ static Paths get_paths() {
 #else
 
 #if defined(SM_PLATFORM_LINUX)
-    const std::filesystem::path home_directory {sm::utils::get_environment_variable("HOME")};
+    const std::filesystem::path home {sm::utils::get_environment_variable("HOME")};
 
     return {
-        home_directory / ".ninemorris3d",
-        home_directory / ".ninemorris3d",
+        home / ".ninemorris3d",
+        home / ".ninemorris3d",
         "/usr/local/share/ninemorris3d"
     };
 #elif defined(SM_PLATFORM_WINDOWS)

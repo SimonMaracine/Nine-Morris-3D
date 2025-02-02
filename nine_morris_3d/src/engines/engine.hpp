@@ -64,7 +64,7 @@ public:
     virtual bool is_null_move(const std::string& move) const = 0;
 
     void set_info_callback(std::function<void(const Info&)>&& info_callback);
-    void set_log_output(bool enable, const std::string& file_path);
+    void set_log_output(bool enable, const std::filesystem::path& file_path);
     const std::string& get_name() const { return m_name; }
     const std::string& get_author() const { return m_author; }
     const std::vector<Option>& get_options() const { return m_options; }
