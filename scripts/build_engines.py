@@ -1,7 +1,6 @@
 #! /usr/bin/env python3
 
 import sys
-import subprocess
 
 import _common as comm
 
@@ -24,7 +23,10 @@ def main(args: list[str]) -> int:
     except IndexError:
         pass
 
-    build_command = ["cargo", "build"]
+    build_command = comm.SubprocessCommand(
+        ["cargo", "build"],
+        "nine_morris_3d/extern/muhle_intelligence/"
+    ),
 
     if build_type == "release":
         build_command.append("--release")
@@ -35,31 +37,14 @@ def main(args: list[str]) -> int:
 
     exe_suffix = ".exe" if sys.platform == "win32" else ""
 
-    commands = (
+    return comm.execute((
         comm.CdCommand(".."),
-        comm.SubprocessCommand(
-            build_command,
-            "nine_morris_3d/extern/muhle_intelligence/"
-        ),
+        build_command,
         comm.CpCommand(
             f"nine_morris_3d/extern/muhle_intelligence/target/{build_type}/muhle_intelligence{exe_suffix}",
             f"nine_morris_3d_engine_muhle_intelligence{exe_suffix}"
         )
-    )
-
-    try:
-        for command in commands:
-            print(command)
-            command.execute()
-    except subprocess.CalledProcessError as err:
-        print(f"An error occurred: {err}", file=sys.stderr)
-        return 1
-    except KeyboardInterrupt:
-        print()
-        return 1
-    except Exception as err:
-        print(f"An unexpected error occurred: {err}", file=sys.stderr)
-        return 1
+    ))
 
 
 if __name__ == "__main__":

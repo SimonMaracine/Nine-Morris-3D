@@ -66,7 +66,7 @@ python download_dependencies.py
 cd scripts
 ./build_engines.py
 ./setup.py
-./build.sh
+./build.py
 ```
 
 ### Linux distribution
@@ -75,7 +75,7 @@ cd scripts
 cd scripts
 ./build_engines.py dist
 ./setup.py dist
-./build.sh dist
+./build.py dist
 ```
 
 ### Windows development
@@ -84,8 +84,7 @@ cd scripts
 cd scripts
 python build_engines.py
 python setup.py
-cd ..\build
-cmake --build . --config Debug -j10
+python build.py
 :: Or open in Visual Studio and build from there
 ```
 
@@ -95,8 +94,7 @@ cmake --build . --config Debug -j10
 cd scripts
 python build_engines.py dist
 python setup.py dist
-cd ..\build
-cmake --build . --config Release -j10
+python build.py dist
 :: Or open in Visual Studio, change to Release mode and build from there
 ```
 

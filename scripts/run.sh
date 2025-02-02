@@ -1,6 +1,6 @@
 #! /bin/bash
 
-./build.sh
+./build.py dev nine_morris_3d
 
 if [ "$?" -ne 0 ]; then
     exit 1

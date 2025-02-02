@@ -1,7 +1,6 @@
 #! /usr/bin/env python3
 
 import sys
-import subprocess
 
 import _common as comm
 
@@ -65,25 +64,11 @@ def main(args: list[str]) -> int:
         "libs/winapi"
     )
 
-    commands = (
+    return comm.execute((
         comm.CdCommand(".."),
         comm.SubprocessCommand(["git", "submodule", "update", "--init"]),
         comm.SubprocessCommand(["git", "submodule", "update", "--init", *submodules], "extern/boost")
-    )
-
-    try:
-        for command in commands:
-            print(command)
-            command.execute()
-    except subprocess.CalledProcessError as err:
-        print(f"An error occurred: {err}", file=sys.stderr)
-        return 1
-    except KeyboardInterrupt:
-        print()
-        return 1
-    except Exception as err:
-        print(f"An unexpected error occurred: {err}", file=sys.stderr)
-        return 1
+    ))
 
 
 if __name__ == "__main__":

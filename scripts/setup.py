@@ -1,8 +1,8 @@
 #! /usr/bin/env python3
 
 import sys
-import os
-import subprocess
+
+import _common as comm
 
 
 def print_help():
@@ -32,34 +32,26 @@ def main(args: list[str]) -> int:
     except IndexError:
         pass
 
-    cmake_command = [
-        "cmake",
-        "..",
-        f"-DCMAKE_BUILD_TYPE={build_type}",
-        f"-DNM3D_DISTRIBUTION_MODE={distribution_mode}",
-        f"-DNM3D_ASAN={asan}"
-    ]
+    cmake_command = comm.SubprocessCommand(
+        [
+            "cmake",
+            "..",
+            f"-DCMAKE_BUILD_TYPE={build_type}",
+            f"-DNM3D_DISTRIBUTION_MODE={distribution_mode}",
+            f"-DNM3D_ASAN={asan}"
+        ],
+        build_directory
+    )
 
-    if sys.platform.startswith("win32"):
+    if sys.platform == "win32":
         cmake_command.append("-A")
         cmake_command.append("x64")
 
-    try:
-        os.chdir("..")
-        os.makedirs(build_directory, exist_ok=True)
-        os.chdir(build_directory)
-        subprocess.run(cmake_command).check_returncode()
-    except subprocess.CalledProcessError as err:
-        print(f"An error occurred: {err}", file=sys.stderr)
-        return 1
-    except KeyboardInterrupt:
-        print()
-        return 1
-    except Exception as err:
-        print(f"An unexpected error occurred: {err}", file=sys.stderr)
-        return 1
-
-    return 0
+    return comm.execute((
+        comm.CdCommand(".."),
+        comm.MakeDirsCommand(build_directory, True),
+        cmake_command
+    ))
 
 
 if __name__ == "__main__":
