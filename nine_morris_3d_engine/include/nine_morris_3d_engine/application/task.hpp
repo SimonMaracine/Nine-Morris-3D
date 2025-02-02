@@ -54,15 +54,21 @@ namespace sm {
         AsyncTask(AsyncTask&&) = delete;
         AsyncTask& operator=(AsyncTask&&) = delete;
 
+        // Signal that this task has finished successfully
+        // Must be called
         void set_done() noexcept {
             m_done.store(true);
         }
 
+        // Signal that this task has finished with an error
+        // Must be called
         void set_done(std::exception_ptr exception) noexcept {
             m_exception = exception;
             m_done.store(true);
         }
 
+        // Find out if the application wants to stop this task (ex: the application is closing)
+        // Used by the user to prematurely stop a task, if possible, in order to avoid stalling the application
         bool stop_requested() const noexcept {
             return m_stop.load();
         }

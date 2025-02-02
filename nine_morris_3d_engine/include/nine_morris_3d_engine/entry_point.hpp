@@ -5,15 +5,15 @@
 /*
     Define a pseudo main function with this declaration:
 
-    int application_main();
+    int sm_application_main();
 
     Include this entry_point.hpp header file once into your main compilation unit.
 */
-int application_main();
+int sm_application_main();
 
 #if defined(SM_PLATFORM_LINUX)
     int main(int, char**) {
-        return application_main();
+        return sm_application_main();
     }
 #elif defined(SM_PLATFORM_WINDOWS)
     #define WIN32_LEAN_AND_MEAN
@@ -22,11 +22,11 @@ int application_main();
 
     #if defined(SM_BUILD_DISTRIBUTION)
         INT WINAPI WinMain(HINSTANCE, HINSTANCE, PSTR, INT) {
-            return application_main();
+            return sm_application_main();
         }
     #else
         int main(int, char**) {
-            return application_main();
+            return sm_application_main();
         }
     #endif
 #endif

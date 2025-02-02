@@ -9,6 +9,7 @@
 namespace sm::internal {
     class DebugUi;
 
+    // Thread safe tasks API
     class TaskManager {
     public:
         // Enqueue a normal task
@@ -23,7 +24,7 @@ namespace sm::internal {
         // Enqueue an asynchronous task (running in a thread)
         void add_async(AsyncTask::Function&& function);
 
-        // Main update
+        // Execute tasks
         void update();
 
         // Join asynchronous tasks; throw the last exception (if any)

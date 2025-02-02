@@ -14,12 +14,14 @@ namespace sm {
     class ApplicationScene;
     class Window;
 
+    // Application initialization/uninitialization callbacks
     struct UserFunctions {
         // Not called when an exception is thrown
         std::function<void(Ctx&)> start {[](Ctx&) {}};
         std::function<void(Ctx&)> stop {[](Ctx&) {}};
     };
 
+    // Main class storing all other components
     class Application final {
     public:
         explicit Application(const ApplicationProperties& properties);

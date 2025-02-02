@@ -46,7 +46,7 @@ static Paths get_paths() {
 #endif  // SM_BUILD_DISTRIBUTION
 }
 
-int application_main() {
+int sm_application_main() {
     Paths paths;
 
     try {

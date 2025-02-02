@@ -10,6 +10,8 @@ namespace sm {
         class Window;
     }
 
+    // Query display monitors
+    // Returned by the window
     class Monitors {
     public:
         std::pair<int, int> get_resolution(std::size_t index) const;

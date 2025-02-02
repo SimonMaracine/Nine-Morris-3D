@@ -1,5 +1,7 @@
 #pragma once
 
+// GLFW's mouse and keyboard input codes
+
 namespace sm {
     enum class Key {
         Unknown =             -1,

@@ -4,6 +4,8 @@
 
 #include "nine_morris_3d_engine/application/internal/input.hpp"
 
+// Application-level events
+
 namespace sm {
     struct WindowClosedEvent {};
 

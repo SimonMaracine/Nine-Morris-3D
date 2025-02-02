@@ -16,6 +16,7 @@ namespace sm::internal {
         Logging(const std::string& log_file, const FileSystem& fs);
         ~Logging();
 
+        // Retrieve the global logger, which is available as long as an instance of this class is alive
         static spdlog::logger* get_global_logger() noexcept;
     private:
         static void set_fallback_logger_distribution(const char* error_message);

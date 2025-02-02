@@ -5,7 +5,7 @@
 #include "nine_morris_3d_engine/application/platform.hpp"
 #include "nine_morris_3d_engine/application/internal/logging_base.hpp"
 
-// Never include this header file in another header file!
+// Never include this in another header file!
 
 /*
     Use LOG_* macros for messages to be printed only in non-distribution mode.

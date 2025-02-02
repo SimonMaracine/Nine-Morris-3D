@@ -21,7 +21,7 @@
 #endif
 
 // Check for 64-bit architecture
-#if SIZE_MAX != 0xFFFFFFFFFFFFFFFF
+#if SIZE_MAX != 0xFFFFFFFFFFFFFFFFul
     #error "No support for 32-bit"
 #endif
 

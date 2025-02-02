@@ -51,6 +51,7 @@ namespace sm {
     using RendererSpecification = internal::RendererSpecification;
 
     // Wrapper around functionality exposed to the user, i.e. the API
+    // Scenes contain references to the context instance
     class Ctx {
     private:
         explicit Ctx(const ApplicationProperties& properties);
@@ -162,7 +163,6 @@ namespace sm {
         float get_delta() const noexcept;
         float get_fps() const noexcept;
         std::string get_information() const;
-
         std::shared_ptr<Mesh> get_mesh(Id id) const;
         std::shared_ptr<Mesh> load_mesh(Id id, const std::filesystem::path& file_path, const std::string& mesh_name, Mesh::Type type, bool flip_winding = false);
         std::shared_ptr<Mesh> load_mesh(const std::filesystem::path& file_path, const std::string& mesh_name, Mesh::Type type, bool flip_winding = false);
@@ -185,27 +185,36 @@ namespace sm {
         std::shared_ptr<AlSource> load_source(Id id);
         std::shared_ptr<AlBuffer> load_buffer(Id id, std::shared_ptr<SoundData> sound_data);
 
+        // Retrieve shared data
         template<typename T>
         T& global() noexcept {
             return *static_cast<T*>(m_global_data.get());
         }
 
+        // Retrieve shared data
         template<typename T>
         const T& global() const noexcept {
             return *static_cast<T*>(m_global_data.get());
         }
 
+        // Retrieve user data
         template<typename T>
         T& user() noexcept {
             return *static_cast<T*>(m_user_data);
         }
 
+        // Retrieve user data
         template<typename T>
         const T& user() const noexcept {
             return *static_cast<T*>(m_user_data);
         }
 
+        // Read/write flag
+        // Set to false to close the application
         bool running {true};
+
+        // Read/write code
+        // Returned by application run()
         int exit_code {};
     private:
         const char* m_build_date {};
