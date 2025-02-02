@@ -892,21 +892,29 @@ void Ui::create_font(sm::Ctx& ctx, int scale) {
 void Ui::set_style() {
     ImGuiStyle& style {ImGui::GetStyle()};
 
-    style = {};
+    style = ImGuiStyle();
+    ImGui::StyleColorsClassic();
+
+    style.WindowBorderSize = 0.0f;
+    style.ChildBorderSize = 0.0f;
+    style.PopupBorderSize = 0.0f;
+    style.FrameBorderSize = 0.0f;
+    style.TabBorderSize = 0.0f;
+    style.TabBarBorderSize = 0.0f;
+
+    style.WindowPadding = ImVec2(12.0f, 12.0f);
+    style.WindowRounding = 8.0f;
+    style.ChildRounding = 8.0f;
+    style.FrameRounding = 8.0f;
+    style.PopupRounding = 8.0f;
+    style.ScrollbarRounding = 8.0f;
+    style.GrabRounding = 8.0f;
+    style.TabRounding = 8.0f;
 
     style.WindowTitleAlign = ImVec2(0.5f, 0.5f);
-    style.WindowPadding = ImVec2(12.0f, 12.0f);
-    style.WindowRounding = 10.0f;
-    style.ChildRounding = 10.0f;
-    style.FrameRounding = 10.0f;
-    style.PopupRounding = 10.0f;
-    style.ScrollbarRounding = 10.0f;
-    style.GrabRounding = 10.0f;
-    style.TabRounding = 10.0f;
-    style.DisplayWindowPadding = ImVec2(20.0f, 20.0f);
-    style.DisplaySafeAreaPadding = ImVec2(4.0f, 4.0f);
 
-    // TODO other?
+    style.DisplayWindowPadding = ImVec2(30.0f, 30.0f);
+    style.DisplaySafeAreaPadding = ImVec2(4.0f, 4.0f);
 }
 
 bool Ui::resign_available(GameScene& game_scene) {
