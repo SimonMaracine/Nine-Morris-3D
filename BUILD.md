@@ -38,7 +38,6 @@ For building it is usually used the latest toolchain available for the platform.
 - Build system was last tested on CMake `3.30` (and requires at least `3.20`).
 - Scripts were last tested on Python `3.13`.
 - The actual game was last tested on `Fedora Linux 41 (GNOME)`, `Ubuntu Linux 24.10 (GNOME)` and `Windows 10`.
-- On Linux, currently, only X11 is supported.
 
 ## Downloading
 
@@ -99,3 +98,27 @@ python build.py dist
 ```
 
 Note: on Windows, you have to rerun setup.py in order to change from development to distribution and back.
+
+## Running
+
+### Linux development
+
+```txt
+cd scripts
+./run.sh
+./run_server.sh
+```
+
+### Windows development
+
+From within Visual Studio.
+
+## Caveats
+
+During build there may be warnings emitted.
+
+Running the game is supposed to work only through the scripts on Linux development and only within Visual Studio
+on Windows development. Similarly, in distribution, the game is supposed to be installed in the system in order
+to work. The reason for this is that it expects the assets and the engines to be in very specific locations.
+
+On Linux, currently, only the X11 protocol is supported.
