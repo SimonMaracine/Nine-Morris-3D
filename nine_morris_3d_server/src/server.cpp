@@ -2,7 +2,7 @@
 
 static constexpr unsigned int VERSION_MAJOR {0};
 static constexpr unsigned int VERSION_MINOR {1};
-static constexpr unsigned int VERSION_PATCH {0};
+static constexpr unsigned int VERSION_PATCH {1};
 
 Server::Server()
     : m_server(
@@ -26,6 +26,7 @@ void Server::start(const Configuration& configuration) {
             if (iter->second.connection1.expired() && iter->second.connection2.expired()) {
                 const auto session_id {iter->first};
                 iter = m_game_sessions.erase(iter);
+                m_session_pool.free_session_id(session_id);
                 m_server.get_logger()->debug("Collected session {}", session_id);
             } else {
                 iter++;
