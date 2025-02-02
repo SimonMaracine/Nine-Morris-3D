@@ -1,6 +1,6 @@
 #pragma once
 
-#include <string>
+#include <filesystem>
 
 namespace sm {
     // Initialization application properties
@@ -22,9 +22,9 @@ namespace sm {
         const char* assets_directory {"assets"};
         const char* build_date {"unknown"};
         const char* build_time {"unknown"};
-        std::string path_logs {""};
-        std::string path_saved_data {""};
-        std::string path_assets {""};
+        std::filesystem::path path_logs;
+        std::filesystem::path path_saved_data;
+        std::filesystem::path path_assets;
         void* user_data {};
     };
 }

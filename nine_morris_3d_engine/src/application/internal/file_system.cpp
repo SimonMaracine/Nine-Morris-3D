@@ -1,14 +1,16 @@
 #include "nine_morris_3d_engine/application/internal/file_system.hpp"
 
+#include <utility>
+
 #include "nine_morris_3d_engine/application/platform.hpp"
 #include "nine_morris_3d_engine/application/error.hpp"
 
 namespace sm::internal {
     FileSystem::FileSystem(
-        const std::string& path_logs,
-        const std::string& path_saved_data,
-        const std::string& path_assets,
-        const std::string& assets_directory
+        const std::filesystem::path& path_logs,
+        const std::filesystem::path& path_saved_data,
+        const std::filesystem::path& path_assets,
+        const std::filesystem::path& assets_directory
     )
         : m_path_logs(path_logs),
         m_path_saved_data(path_saved_data),
@@ -19,45 +21,45 @@ namespace sm::internal {
 #endif
     }
 
-    bool FileSystem::file_exists(const std::string& path) {
+    bool FileSystem::file_exists(const std::filesystem::path& path) {
         std::error_code ec;
         const bool result {std::filesystem::exists(path, ec)};
 
         if (ec) {
-            throw OtherError("Could not check if file `" + path + "` exists: " + ec.message());
+            throw OtherError("Could not check if file `" + path.string() + "` exists: " + ec.message());
         }
 
         return result;
     }
 
-    bool FileSystem::is_directory(const std::string& path) {
+    bool FileSystem::is_directory(const std::filesystem::path& path) {
         std::error_code ec;
         const bool result {std::filesystem::is_directory(path, ec)};
 
         if (ec) {
-            throw OtherError("Could not check if file `" + path + "` is a directory: " + ec.message());
+            throw OtherError("Could not check if file `" + path.string() + "` is a directory: " + ec.message());
         }
 
         return result;
     }
 
-    bool FileSystem::create_directory(const std::string& path) {
+    bool FileSystem::create_directory(const std::filesystem::path& path) {
         std::error_code ec;
         const bool result {std::filesystem::create_directory(path, ec)};
 
         if (ec) {
-            throw OtherError("Could not create directory `" + path + "`: " + ec.message());
+            throw OtherError("Could not create directory `" + path.string() + "`: " + ec.message());
         }
 
         return result;
     }
 
-    bool FileSystem::delete_file(const std::string& path) {
+    bool FileSystem::delete_file(const std::filesystem::path& path) {
         std::error_code ec;
         const bool result {std::filesystem::remove(path, ec)};
 
         if (ec) {
-            throw OtherError("Could not remove file or directory `" + path + "`: " + ec.message());
+            throw OtherError("Could not remove file or directory `" + path.string() + "`: " + ec.message());
         }
 
         return result;
@@ -83,26 +85,26 @@ namespace sm::internal {
     }
 
     std::filesystem::path FileSystem::path_assets() const {
-        return std::filesystem::path(m_path_assets) / m_assets_directory;
+        return m_path_assets / m_assets_directory;
     }
 
     std::filesystem::path FileSystem::path_engine_assets() const {
-        return std::filesystem::path(m_path_assets) / "assets_engine";
+        return m_path_assets / "assets_engine";
     }
 
-    std::filesystem::path FileSystem::path_logs(const std::string& path) const {
+    std::filesystem::path FileSystem::path_logs(const std::filesystem::path& path) const {
         return path_logs() / path;
     }
 
-    std::filesystem::path FileSystem::path_saved_data(const std::string& path) const {
+    std::filesystem::path FileSystem::path_saved_data(const std::filesystem::path& path) const {
         return path_saved_data() / path;
     }
 
-    std::filesystem::path FileSystem::path_assets(const std::string& path) const {
+    std::filesystem::path FileSystem::path_assets(const std::filesystem::path& path) const {
         return path_assets() / path;
     }
 
-    std::filesystem::path FileSystem::path_engine_assets(const std::string& path) const {
+    std::filesystem::path FileSystem::path_engine_assets(const std::filesystem::path& path) const {
         return path_engine_assets() / path;
     }
 
@@ -111,16 +113,16 @@ namespace sm::internal {
         check_directory(m_path_saved_data);
     }
 
-    const std::string& FileSystem::get_error_string() const noexcept {
-        return m_error_string;
+    std::string FileSystem::get_error_string() const {
+        return std::exchange(m_error_string, "");
     }
 
-    void FileSystem::check_directory(const std::string& path) const {
+    void FileSystem::check_directory(const std::filesystem::path& path) const {
         if (no_directory(path)) {
-            m_error_string = "Directory `" + path + "` doesn't exist, creating it...";
+            m_error_string = "Directory `" + path.string() + "` doesn't exist, creating it...";
 
             if (!create_directory(path)) {
-                throw InitializationError("Could not create directory `" + path + "`");
+                throw InitializationError("Could not create directory `" + path.string() + "`");
             }
         }
     }
@@ -130,7 +132,7 @@ namespace sm::internal {
     #pragma GCC diagnostic ignored "-Wparentheses"
 #endif
 
-    bool FileSystem::no_directory(const std::string& path) {
+    bool FileSystem::no_directory(const std::filesystem::path& path) {
         return !file_exists(path) || file_exists(path) && !is_directory(path);
     }
 

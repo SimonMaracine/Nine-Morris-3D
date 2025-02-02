@@ -101,7 +101,7 @@ namespace sm::opengl_debug {
     std::string get_information() {
         std::string result;
 
-        result += "*** OpenGL Version And Driver ***\n";
+        result += "*** OpenGL Driver ***\n";
 
         {
             char buffer[256] {};  // Should be enough

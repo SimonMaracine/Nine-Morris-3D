@@ -42,7 +42,7 @@ namespace sm::openal_debug {
     std::string get_information() {
         std::string result;
 
-        result += "*** OpenAL Version And Driver ***\n";
+        result += "*** OpenAL Driver ***\n";
 
         char buffer[256] {};  // Should be enough
 

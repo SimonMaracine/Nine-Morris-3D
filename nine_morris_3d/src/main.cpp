@@ -1,7 +1,4 @@
 #include <iostream>
-#include <string>
-#include <cstdlib>
-#include <stdexcept>
 #include <filesystem>
 
 // Include entry point first as it includes Windows.h
@@ -18,20 +15,10 @@
 #include "ver.hpp"
 
 struct Paths {
-    std::string logs;
-    std::string saved_data;
-    std::string assets;
+    std::filesystem::path logs;
+    std::filesystem::path saved_data;
+    std::filesystem::path assets;
 };
-
-[[maybe_unused]] static const char* get_environment_variable(const char* variable) {
-    const char* value {std::getenv(variable)};
-
-    if (value == nullptr) {
-        throw std::runtime_error("Could not get `" + std::string(variable) + "` environment variable");
-    }
-
-    return value;
-}
 
 static Paths get_paths() {
 #ifndef SM_BUILD_DISTRIBUTION
@@ -39,19 +26,19 @@ static Paths get_paths() {
 #else
 
 #if defined(SM_PLATFORM_LINUX)
-    const std::filesystem::path home_directory {get_environment_variable("HOME")};
+    const std::filesystem::path home_directory {sm::utils::get_environment_variable("HOME")};
 
     return {
-        (home_directory / ".ninemorris3d").string(),
-        (home_directory / ".ninemorris3d").string(),
+        home_directory / ".ninemorris3d",
+        home_directory / ".ninemorris3d",
         "/usr/local/share/ninemorris3d"
     };
 #elif defined(SM_PLATFORM_WINDOWS)
-    const std::string username {get_environment_variable("USERNAME")};
+    const std::filesystem::path username {sm::utils::get_environment_variable("USERNAME")};
 
     return {
-        "C:\\Users\\" + username + "\\Documents\\Nine Morris 3D",
-        "C:\\Users\\" + username + "\\Documents\\Nine Morris 3D",
+        "C:\\Users" / username / "Documents\\Nine Morris 3D",
+        "C:\\Users" / username / "Documents\\Nine Morris 3D",
         ""
     };
 #endif
@@ -64,7 +51,7 @@ int application_main() {
 
     try {
         paths = get_paths();
-    } catch (const std::runtime_error& e) {
+    } catch (const sm::RuntimeError& e) {
         std::cerr << "Error initializing paths: " << e.what() << '\n';
         return 1;
     }

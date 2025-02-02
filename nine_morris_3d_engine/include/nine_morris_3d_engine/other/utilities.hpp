@@ -34,18 +34,15 @@ namespace sm::utils {
         float& height
     ) noexcept;
 
+    const char* get_environment_variable(const std::string& variable);
+
     std::string file_name(const std::filesystem::path& file_path);
-    std::string file_name(const std::string& file_path);
 
     std::string read_file_ex(const std::filesystem::path& file_path, bool text = false);
-    std::string read_file_ex(const std::string& file_path, bool text = false);
     std::string read_file(const std::filesystem::path& file_path, bool text = false);
-    std::string read_file(const std::string& file_path, bool text = false);
 
     void write_file_ex(const std::filesystem::path& file_path, const std::string& buffer, bool text = false);
-    void write_file_ex(const std::string& file_path, const std::string& buffer, bool text = false);
     void write_file(const std::filesystem::path& file_path, const std::string& buffer, bool text = false);
-    void write_file(const std::string& file_path, const std::string& buffer, bool text = false);
 
     template<typename T>
     T map(T x, T in_min, T in_max, T out_min, T out_max) noexcept {

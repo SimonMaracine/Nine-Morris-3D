@@ -2,6 +2,7 @@
 
 #include <fstream>
 #include <limits>
+#include <cstdlib>
 #include <cstddef>
 #include <cassert>
 
@@ -64,14 +65,20 @@ namespace sm::utils {
         }
     }
 
+    const char* get_environment_variable(const std::string& variable) {
+        const char* value {std::getenv(variable.c_str())};
+
+        if (value == nullptr) {
+            throw OtherError("Could not get `" + variable + "` environment variable");
+        }
+
+        return value;
+    }
+
     std::string file_name(const std::filesystem::path& file_path) {
         assert(file_path.has_filename());
 
         return file_path.filename().string();
-    }
-
-    std::string file_name(const std::string& file_path) {
-        return file_name(std::filesystem::path(file_path));
     }
 
     std::string read_file_ex(const std::filesystem::path& file_path, bool text) {
@@ -97,10 +104,6 @@ namespace sm::utils {
         return buffer;
     }
 
-    std::string read_file_ex(const std::string& file_path, bool text) {
-        return read_file_ex(std::filesystem::path(file_path), text);
-    }
-
     std::string read_file(const std::filesystem::path& file_path, bool text) {
         LOG_DEBUG("Reading file `{}`...", file_path.string());
 
@@ -109,10 +112,6 @@ namespace sm::utils {
         } catch (const ResourceError& e) {
             SM_THROW_ERROR(ResourceError, "Could not read file `{}`: {}", file_path.string(), e.what());
         }
-    }
-
-    std::string read_file(const std::string& file_path, bool text) {
-        return read_file(std::filesystem::path(file_path), text);
     }
 
     void write_file_ex(const std::filesystem::path& file_path, const std::string& buffer, bool text) {
@@ -129,10 +128,6 @@ namespace sm::utils {
         }
     }
 
-    void write_file_ex(const std::string& file_path, const std::string& buffer, bool text) {
-        write_file_ex(std::filesystem::path(file_path), buffer, text);
-    }
-
     void write_file(const std::filesystem::path& file_path, const std::string& buffer, bool text) {
         LOG_DEBUG("Writing file `{}`...", file_path.string());
 
@@ -141,9 +136,5 @@ namespace sm::utils {
         } catch (const ResourceError& e) {
             SM_THROW_ERROR(ResourceError, "Could not write file `{}`: {}", file_path.string(), e.what());
         }
-    }
-
-    void write_file(const std::string& file_path, const std::string& buffer, bool text) {
-        write_file(std::filesystem::path(file_path), buffer, text);
     }
 }
