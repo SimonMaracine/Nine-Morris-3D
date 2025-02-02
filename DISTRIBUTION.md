@@ -25,7 +25,7 @@ cd scripts
 
 - Create a new directory called `Nine-Morris-3D-X.Y.Z-Linux`
 - Copy the archive from `build_dist/` into the directory
-- Copy `README.txt` from root into the directory
+- Copy `README.txt` from `distribution/` into the directory
 - Copy `install.sh` and `uninstall.sh` from `distribution/linux/` into the directory
 - Archive the directory
 
@@ -35,7 +35,7 @@ tar -czf Nine-Morris-3D-X.Y.Z-Linux.tar.gz Nine-Morris-3D-X.Y.Z-Linux
 
 ## Windows
 
-- Build the binary as per `BUILD.md`
+- Build the binaries as per `BUILD.md`
 - Export the assets
 
 ```txt
@@ -47,14 +47,13 @@ python export_assets.py ..\build ..\assets ..\assets_engine
 - Copy the game binary from `build\nine_morris_3d\Release` into the folder
 - Copy the engine binaries from root into the folder
 - Copy the assets directories from `build` into the folder
-- Copy `README.txt` from root into the folder
+- Copy `README.txt` from `distribution` into the folder
 - Copy `installer.nsi` from `distribution\windows` into the folder
 - Create an NSIS installer called `Nine-Morris-3D-X.Y.Z-Windows` using the installer script
 
 ## Update the version
 
 - main.cpp
-- README.txt
 - ninemorris3d.desktop
 - installer.nsi
 
