@@ -2,6 +2,7 @@
 build
 build_dist
 __pycache__
+logs
 *.log
 *.dat
 *.blend1
