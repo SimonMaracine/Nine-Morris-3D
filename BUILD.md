@@ -34,7 +34,7 @@
 
 For building it is usually used the latest toolchain available for the platform.
 
-- Building was last tested on GCC `14.2`, MSVC `19.42` and Rust `1.82`.
+- Building was last tested on GCC `14.2`, MSVC `19.42` and Rust `1.82`. Support for `C++20` is required.
 - Build system was last tested on CMake `3.30` (and requires at least `3.20`).
 - Scripts were last tested on Python `3.13`.
 - The actual game was last tested on `Fedora Linux 41 (GNOME)`, `Ubuntu Linux 24.10 (GNOME)` and `Windows 10`.
