@@ -35,72 +35,72 @@ void Ui::update(sm::Ctx& ctx, GameScene& game_scene) {
 
     // This way the session window is visible only when the use is in a session
     if (game_scene.get_game_session()) {
-        game_scene.get_game_session()->session_window(game_scene, ctx.global<Global>());
+        game_scene.get_game_session()->session_window(ctx, game_scene);
     }
 
-    if (!m_popup_window_queue.empty()) {
-        const auto& [popup_window, string] {m_popup_window_queue.front()};
+    if (!m_modal_window_queue.empty()) {
+        const auto& [modal_window, string] {m_modal_window_queue.front()};
 
-        switch (popup_window) {
-            case PopupWindowNone:
+        switch (modal_window) {
+            case ModalWindowNone:
                 break;
-            case PopupWindowAbout:
+            case ModalWindowAbout:
                 about_window();
                 break;
-            case PopupWindowGameOver:
+            case ModalWindowGameOver:
                 game_over_window(game_scene);
                 break;
-            case PopupWindowGameOptions:
+            case ModalWindowGameOptions:
                 game_options_window(ctx, game_scene);
                 break;
-            case PopupWindowEngineError:
+            case ModalWindowEngineError:
                 engine_error_window();
                 break;
-            case PopupWindowConnectionError:
+            case ModalWindowConnectionError:
                 connection_error_window();
                 break;
-            case PopupWindowNewGameSessionError:
+            case ModalWindowNewGameSessionError:
                 new_game_session_error_window(string);
                 break;
-            case PopupWindowJoinGameSessionError:
+            case ModalWindowJoinGameSessionError:
                 join_game_session_error_window(string);
                 break;
-            case PopupWindowWaitServerAcceptGameSession:
+            case ModalWindowWaitServerAcceptGameSession:
                 wait_server_accept_game_session_window(game_scene);
                 break;
-            case PopupWindowWaitRemoteJoinGameSession:
+            case ModalWindowWaitRemoteJoinGameSession:
                 wait_remote_join_game_session_window(game_scene);
                 break;
-            case PopupWindowWaitServerAcceptJoinGameSession:
+            case ModalWindowWaitServerAcceptJoinGameSession:
                 wait_server_accept_join_game_session_window(game_scene);
                 break;
-            case PopupWindowRulesNineMensMorris:
+            case ModalWindowRulesNineMensMorris:
                 rules_nine_mens_morris_window();
                 break;
         }
     }
 }
 
-void Ui::push_popup_window(PopupWindow window, const std::string& string) {
-    m_popup_window_queue.emplace_back(window, string);
+void Ui::push_modal_window(ModalWindow window, const std::string& string) {
+    m_modal_window_queue.emplace_back(window, string);
 }
 
-void Ui::clear_popup_window() {
-    m_popup_window_queue.clear();
+void Ui::clear_modal_window() {
+    m_modal_window_queue.clear();
 }
 
-void Ui::clear_popup_window(unsigned int windows) {
-    m_popup_window_queue.erase(std::remove_if(m_popup_window_queue.begin(), m_popup_window_queue.end(), [=](auto window) {
+void Ui::clear_modal_window(unsigned int windows) {
+    m_modal_window_queue.erase(std::remove_if(m_modal_window_queue.begin(), m_modal_window_queue.end(), [=](auto window) {
         return windows & static_cast<unsigned int>(window.first);
-    }), m_popup_window_queue.end());
+    }), m_modal_window_queue.end());
 }
 
-PopupWindow Ui::get_popup_window() const {
-    if (!m_popup_window_queue.empty()) {
-        return m_popup_window_queue.front().first;
+ModalWindow Ui::get_modal_window() const {
+    if (!m_modal_window_queue.empty()) {
+        return m_modal_window_queue.front().first;
     }
 
-    return PopupWindowNone;
+    return ModalWindowNone;
 }
 
 float Ui::rem(float size) {
@@ -139,7 +139,7 @@ void Ui::main_menu_bar(sm::Ctx& ctx, GameScene& game_scene) {
                 game_scene.client_offer_draw();
             }
             if (ImGui::MenuItem("Game Options")) {
-                push_popup_window(PopupWindowGameOptions);
+                push_modal_window(ModalWindowGameOptions);
             }
             if (ImGui::BeginMenu("Game Mode")) {
                 bool reset {false};
@@ -455,11 +455,11 @@ void Ui::main_menu_bar(sm::Ctx& ctx, GameScene& game_scene) {
         }
         if (ImGui::BeginMenu("Help")) {
             if (ImGui::MenuItem("About")) {
-                push_popup_window(PopupWindowAbout);
+                push_modal_window(ModalWindowAbout);
             }
             if (ImGui::BeginMenu("Game Rules")) {
                 if (ImGui::MenuItem("Nine Men's Morris")) {
-                    push_popup_window(PopupWindowRulesNineMensMorris);
+                    push_modal_window(ModalWindowRulesNineMensMorris);
                 }
 
                 ImGui::EndMenu();
@@ -502,7 +502,7 @@ void Ui::game_window(sm::Ctx& ctx, GameScene& game_scene) {
         static_cast<float>(MIN_WIDTH),
         static_cast<float>(MAX_WIDTH),
         rem(1.0f),
-        rem(4.0f)
+        rem(2.0f)
     )};
 
     const float height {static_cast<float>(ctx.get_window_height()) - height_offset};
@@ -623,14 +623,12 @@ void Ui::before_game_online_window(sm::Ctx& ctx, GameScene& game_scene) {
 
 void Ui::during_game_window(GameScene& game_scene) {
     {
-        // ImGui::Text("B");
         ImGui::Image(game_scene.get_icon_black()->get_id(), ImVec2(rem(1.0f), rem(1.0f)));
         ImGui::SameLine();
         const auto [minutes, seconds, centiseconds] {Clock::split_time(game_scene.get_clock().get_black_time())};
         ImGui::Text("%u:%02u.%02u", minutes, seconds, centiseconds);
     }
     {
-        // ImGui::Text("W");
         ImGui::Image(game_scene.get_icon_white()->get_id(), ImVec2(rem(1.0f), rem(1.0f)));
         ImGui::SameLine();
         const auto [minutes, seconds, centiseconds] {Clock::split_time(game_scene.get_clock().get_white_time())};
@@ -643,7 +641,7 @@ void Ui::during_game_window(GameScene& game_scene) {
 }
 
 void Ui::about_window() {
-    generic_window_ok("About Nine Morris 3D", []() {
+    generic_modal_window_ok("About Nine Morris 3D", []() {
         ImGui::Text("A 3D implementation of the board game nine men's morris");
         ImGui::Text("Version %u.%u.%u", VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH);
         ImGui::Separator();
@@ -653,7 +651,7 @@ void Ui::about_window() {
 }
 
 void Ui::game_over_window(GameScene& game_scene) {
-    generic_window_ok("Game Over", [&]() {
+    generic_modal_window_ok("Game Over", [&]() {
         const char* message {};
 
         switch (game_scene.get_board().get_game_over()) {
@@ -682,69 +680,80 @@ void Ui::game_over_window(GameScene& game_scene) {
 }
 
 void Ui::game_options_window(sm::Ctx& ctx, GameScene& game_scene) {
-    generic_window_ok("Game Options", [&]() {
-        auto& g {ctx.global<Global>()};
-        GameOptions& game_options {game_scene.get_game_options()};
+    generic_modal_window_ok(
+        "Game Options",
+        [&]() {
+            auto& g {ctx.global<Global>()};
+            GameOptions& game_options {game_scene.get_game_options()};
 
-        ImGui::BeginDisabled(game_scene.get_game_state() != GameState::Ready);
+            ImGui::BeginDisabled(game_scene.get_game_state() != GameState::Ready);
 
-        ImGui::RadioButton("Local", &g.options.game_type, GameTypeLocalHumanVsHuman);
-        ImGui::RadioButton("Local vs Computer", &g.options.game_type, GameTypeLocalHumanVsComputer);
-        ImGui::RadioButton("Online", &g.options.game_type, GameTypeOnline);
+            ImGui::SeparatorText("Game Type");
+            ImGui::RadioButton("Local", &g.options.game_type, GameTypeLocalHumanVsHuman);
+            ImGui::SameLine();
+            ImGui::RadioButton("Local vs Computer", &g.options.game_type, GameTypeLocalHumanVsComputer);
+            ImGui::RadioButton("Online", &g.options.game_type, GameTypeOnline);
+            ImGui::Dummy(ImVec2(0.0f, rem(0.5f)));
 
-        ImGui::Separator();
+            switch (g.options.game_type) {
+                case GameTypeLocalHumanVsHuman:
+                    break;
+                case GameTypeLocalHumanVsComputer:
+                    ImGui::SeparatorText("Computer Plays As");
+                    ImGui::RadioButton("white", &game_options.computer_color, PlayerColorWhite);
+                    ImGui::SameLine();
+                    ImGui::RadioButton("black", &game_options.computer_color, PlayerColorBlack);
+                    ImGui::Dummy(ImVec2(0.0f, rem(0.5f)));
+                    break;
+                case GameTypeOnline:
+                    ImGui::SeparatorText("Remote Plays As");
+                    ImGui::RadioButton("white", &game_options.remote_color, PlayerColorWhite);
+                    ImGui::SameLine();
+                    ImGui::RadioButton("black", &game_options.remote_color, PlayerColorBlack);
+                    ImGui::Dummy(ImVec2(0.0f, rem(0.5f)));
+                    break;
+            }
 
-        switch (g.options.game_type) {
-            case GameTypeLocalHumanVsHuman:
-                break;
-            case GameTypeLocalHumanVsComputer:
-                ImGui::RadioButton("white", &game_options.computer_color, PlayerColorWhite);
-                ImGui::RadioButton("black", &game_options.computer_color, PlayerColorBlack);
-                break;
-            case GameTypeOnline:
-                ImGui::RadioButton("white", &game_options.remote_color, PlayerColorWhite);
-                ImGui::RadioButton("black", &game_options.remote_color, PlayerColorBlack);
-                break;
-        }
+            ImGui::SeparatorText("Time Control");
+            game_scene.time_control_options_window();
 
-        ImGui::Separator();
-
-        game_scene.time_control_options_window();
-
-        ImGui::EndDisabled();
-    });
+            ImGui::EndDisabled();
+        },
+        []() {},
+        glm::vec2(rem(15.0f), 0.0f)
+    );
 }
 
 void Ui::engine_error_window() {
-    generic_window_ok("Engine Error", []() {
+    generic_modal_window_ok("Engine Error", []() {
         ImGui::Text("An error occurred with the engine. It has probably crashed.");
         ImGui::Text("You may want to restart it.");
     });
 }
 
 void Ui::connection_error_window() {
-    generic_window_ok("Connection Error", []() {
+    generic_modal_window_ok("Connection Error", []() {
         ImGui::Text("An error occurred with the connection to the server.");
         ImGui::Text("You may want to reconnect.");
     });
 }
 
 void Ui::new_game_session_error_window(const std::string& string) {
-    generic_window_ok("New Online Game Error", [&string]() {
+    generic_modal_window_ok("New Online Game Error", [&string]() {
         ImGui::Text("Could not start a new online game.");
         ImGui::Text("%s.", string.c_str());
     });
 }
 
 void Ui::join_game_session_error_window(const std::string& string) {
-    generic_window_ok("Join Online Game Error", [&string]() {
+    generic_modal_window_ok("Join Online Game Error", [&string]() {
         ImGui::Text("Could not join the online game.");
         ImGui::Text("%s.", string.c_str());
     });
 }
 
 void Ui::wait_server_accept_game_session_window(GameScene&) {
-    generic_window("Waiting For Server To Accept", []() {
+    generic_modal_window("Waiting For Server To Accept", []() {
         ImGui::Text("The server should reply any time soon.");
 
         return false;
@@ -754,9 +763,11 @@ void Ui::wait_server_accept_game_session_window(GameScene&) {
 void Ui::wait_remote_join_game_session_window(GameScene& game_scene) {
     assert(game_scene.get_game_session());
 
-    generic_window("Waiting For Player To Join", [&game_scene]() {
+    generic_modal_window("Waiting For Player To Join", [&game_scene]() {
         ImGui::Text("An online game has been created.");
         ImGui::Text("Send your opponent the following code: %.5u", game_scene.get_game_session()->get_session_id());
+
+        ImGui::Dummy(ImVec2(0.0f, rem(0.5f)));
 
         if (ImGui::Button("Cancel Game")) {
             // If the other user has already joined, it will still be notified by our forfeit
@@ -770,7 +781,7 @@ void Ui::wait_remote_join_game_session_window(GameScene& game_scene) {
 }
 
 void Ui::wait_server_accept_join_game_session_window(GameScene&) {
-    generic_window("Waiting For Server To Accept", []() {
+    generic_modal_window("Waiting For Server To Accept", []() {
         ImGui::Text("The server should reply any time soon.");
 
         return false;
@@ -787,14 +798,14 @@ The game ends with a draw when fifty turns take place without any mill.
 The game ends with a draw when the same position happens three times.)"
     };
 
-    wrapped_text_window("Nine Men's Morris Rules", text);
+    wrapped_text_modal_window("Nine Men's Morris Rules", text);
 }
 
-void Ui::wrapped_text_window(const char* title, const char* text) {
+void Ui::wrapped_text_modal_window(const char* title, const char* text) {
     const auto viewport_size {ImGui::GetMainViewport()->WorkSize};
     const bool wrapped {viewport_size.x < ImGui::CalcTextSize(text).x + ImGui::GetStyle().WindowPadding.x * 2.0f};
 
-    generic_window_ok(title, [=]() {
+    generic_modal_window_ok(title, [=]() {
         if (wrapped) {
             ImGui::TextWrapped("%s", text);  // FIXME
         } else {
@@ -803,11 +814,11 @@ void Ui::wrapped_text_window(const char* title, const char* text) {
     });
 }
 
-void Ui::generic_window_ok(const char* title, std::function<void()>&& contents, std::function<void()>&& on_ok) {
+void Ui::generic_modal_window_ok(const char* title, std::function<void()>&& contents, std::function<void()>&& on_ok, glm::vec2 size) {
     ImGui::OpenPopup(title);
 
-    const ImVec2 center {ImGui::GetMainViewport()->GetWorkCenter()};
-    ImGui::SetNextWindowPos(center, 0, ImVec2(0.5f, 0.5f));
+    ImGui::SetNextWindowPos(ImGui::GetMainViewport()->GetWorkCenter(), ImGuiCond_Always, ImVec2(0.5f, 0.5f));
+    ImGui::SetNextWindowSize(ImVec2(size.x, size.y), ImGuiCond_Always);
 
     const auto flags {ImGuiWindowFlags_NoResize | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoCollapse};
 
@@ -816,12 +827,12 @@ void Ui::generic_window_ok(const char* title, std::function<void()>&& contents, 
 
         ImGui::Dummy(ImVec2(rem(8.0f), rem(0.5f)));
 
-        const float ok_button_width {rem(7.0f)};
+        const float ok_button_width {rem(6.0f)};
         ImGui::SetCursorPosX((ImGui::GetWindowWidth() - ok_button_width) * 0.5f);
 
         if (ImGui::Button("Ok", ImVec2(ok_button_width, 0.0f))) {
             ImGui::CloseCurrentPopup();
-            m_popup_window_queue.pop_front();
+            m_modal_window_queue.pop_front();
 
             on_ok();
         }
@@ -832,18 +843,17 @@ void Ui::generic_window_ok(const char* title, std::function<void()>&& contents, 
     }
 }
 
-void Ui::generic_window(const char* title, std::function<bool()>&& contents) {
+void Ui::generic_modal_window(const char* title, std::function<bool()>&& contents) {
     ImGui::OpenPopup(title);
 
-    const ImVec2 center {ImGui::GetMainViewport()->GetWorkCenter()};
-    ImGui::SetNextWindowPos(center, 0, ImVec2(0.5f, 0.5f));
+    ImGui::SetNextWindowPos(ImGui::GetMainViewport()->GetWorkCenter(), 0, ImVec2(0.5f, 0.5f));
 
     const auto flags {ImGuiWindowFlags_NoResize | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoCollapse};
 
     if (ImGui::BeginPopupModal(title, nullptr, flags)) {
         if (contents()) {
             ImGui::CloseCurrentPopup();
-            m_popup_window_queue.pop_front();
+            m_modal_window_queue.pop_front();
         }
 
         ImGui::Dummy(ImVec2(0.0f, rem(0.5f)));
@@ -934,6 +944,7 @@ void Ui::set_style() {
     style = ImGuiStyle();
     ImGui::StyleColorsClassic();
 
+    style.FramePadding = ImVec2(8.0f, 4.0f);
     style.WindowBorderSize = 0.0f;
     style.ChildBorderSize = 0.0f;
     style.PopupBorderSize = 0.0f;

@@ -11,29 +11,29 @@
 
 class GameScene;
 
-enum PopupWindow : unsigned int {
-    PopupWindowNone = 0,
-    PopupWindowAbout = 1u << 0,
-    PopupWindowGameOver = 1u << 1,
-    PopupWindowGameOptions = 1u << 2,
-    PopupWindowEngineError = 1u << 3,
-    PopupWindowConnectionError = 1u << 4,
-    PopupWindowNewGameSessionError = 1u << 5,
-    PopupWindowJoinGameSessionError = 1u << 6,
-    PopupWindowWaitServerAcceptGameSession = 1u << 7,
-    PopupWindowWaitRemoteJoinGameSession = 1u << 8,
-    PopupWindowWaitServerAcceptJoinGameSession = 1u << 9,
-    PopupWindowRulesNineMensMorris = 1u << 10
+enum ModalWindow : unsigned int {
+    ModalWindowNone = 0,
+    ModalWindowAbout = 1u << 0,
+    ModalWindowGameOver = 1u << 1,
+    ModalWindowGameOptions = 1u << 2,
+    ModalWindowEngineError = 1u << 3,
+    ModalWindowConnectionError = 1u << 4,
+    ModalWindowNewGameSessionError = 1u << 5,
+    ModalWindowJoinGameSessionError = 1u << 6,
+    ModalWindowWaitServerAcceptGameSession = 1u << 7,
+    ModalWindowWaitRemoteJoinGameSession = 1u << 8,
+    ModalWindowWaitServerAcceptJoinGameSession = 1u << 9,
+    ModalWindowRulesNineMensMorris = 1u << 10
 };
 
 class Ui {
 public:
     void initialize(sm::Ctx& ctx);
     void update(sm::Ctx& ctx, GameScene& game_scene);
-    void push_popup_window(PopupWindow window, const std::string& string = {});
-    void clear_popup_window();
-    void clear_popup_window(unsigned int windows);
-    PopupWindow get_popup_window() const;
+    void push_modal_window(ModalWindow window, const std::string& string = {});
+    void clear_modal_window();
+    void clear_modal_window(unsigned int windows);
+    ModalWindow get_modal_window() const;
 
     static float rem(float size);
 
@@ -57,9 +57,14 @@ private:
     void wait_remote_join_game_session_window(GameScene& game_scene);
     void wait_server_accept_join_game_session_window(GameScene& game_scene);
     void rules_nine_mens_morris_window();
-    void wrapped_text_window(const char* title, const char* text);
-    void generic_window_ok(const char* title, std::function<void()>&& contents, std::function<void()>&& on_ok = []() {});
-    void generic_window(const char* title, std::function<bool()>&& contents);
+    void wrapped_text_modal_window(const char* title, const char* text);
+    void generic_modal_window_ok(
+        const char* title,
+        std::function<void()>&& contents,
+        std::function<void()>&& on_ok = []() {},
+        glm::vec2 size = {}
+    );
+    void generic_modal_window(const char* title, std::function<bool()>&& contents);
 
     static void set_scale(sm::Ctx& ctx, int scale);
     static void set_scale_task(sm::Ctx& ctx, int scale);
@@ -76,7 +81,7 @@ private:
     bool join_game_available(GameScene& game_scene);
 
     // Multiple modal windows may request attention at a time; put them in a queue
-    std::deque<std::pair<PopupWindow, std::string>> m_popup_window_queue;
+    std::deque<std::pair<ModalWindow, std::string>> m_modal_window_queue;
 
     // Local options data
     // When changed, update the options from the global data

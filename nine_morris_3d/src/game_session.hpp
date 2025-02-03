@@ -4,9 +4,8 @@
 #include <vector>
 #include <cstdint>
 
+#include <nine_morris_3d_engine/nine_morris_3d.hpp>
 #include <protocol.hpp>
-
-#include "global.hpp"
 
 class GameScene;
 
@@ -23,10 +22,9 @@ public:
 
     void remote_joined(const std::string& player_name);
     void remote_left();
-
     void remote_sent_message(const std::string& message);
 
-    void session_window(GameScene& game_scene, const Global& g);
+    void session_window(sm::Ctx& ctx, GameScene& game_scene);
 private:
     bool send_message_available() const;
 

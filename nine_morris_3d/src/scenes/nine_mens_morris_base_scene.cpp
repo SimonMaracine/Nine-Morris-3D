@@ -191,17 +191,22 @@ void NineMensMorrisBaseScene::time_control_options_window() {
         m_clock.reset(Clock::as_centiseconds(3));
     }
 
+    ImGui::SameLine();
+
     if (ImGui::RadioButton("10 min", &m_game_options.time_enum, NineMensMorrisTime10min)) {
         m_clock.reset(Clock::as_centiseconds(10));
     }
-
-    ImGui::SameLine();
 
     if (ImGui::RadioButton("60 min", &m_game_options.time_enum, NineMensMorrisTime60min)) {
         m_clock.reset(Clock::as_centiseconds(60));
     }
 
-    ImGui::RadioButton("Custom", &m_game_options.time_enum, NineMensMorrisTimeCustom);
+    ImGui::SameLine();
+
+    if (ImGui::RadioButton("Custom", &m_game_options.time_enum, NineMensMorrisTimeCustom)) {
+        m_game_options.custom_time = std::clamp(m_game_options.custom_time, 0, 999);
+        m_clock.reset(Clock::as_centiseconds(m_game_options.custom_time));
+    }
 
     if (m_game_options.time_enum == NineMensMorrisTimeCustom) {
         ImGui::PushItemWidth(Ui::rem(6.0f));

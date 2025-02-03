@@ -6,6 +6,8 @@
 
 #include "scenes/game_scene.hpp"
 #include "ui.hpp"
+#include "global.hpp"
+#include "window_size.hpp"
 
 void GameSession::remote_joined(const std::string& player_name) {
     m_remote_joined = true;
@@ -21,14 +23,56 @@ void GameSession::remote_sent_message(const std::string& message) {
     m_messages.emplace_back(m_remote_player_name, message);
 }
 
-void GameSession::session_window(GameScene& game_scene, const Global& g) {
-    if (ImGui::Begin("Session")) {
+void GameSession::session_window(sm::Ctx& ctx, GameScene& game_scene) {
+    const auto flags {ImGuiWindowFlags_NoDecoration};
+
+    const float width {sm::utils::map(
+        static_cast<float>(ctx.get_window_width()),
+        static_cast<float>(MIN_WIDTH),
+        static_cast<float>(MAX_WIDTH),
+        Ui::rem(11.0f),
+        Ui::rem(15.0f)
+    )};
+
+    const float height {sm::utils::map(
+        static_cast<float>(ctx.get_window_height()),
+        static_cast<float>(MIN_HEIGHT),
+        static_cast<float>(MAX_HEIGHT),
+        Ui::rem(9.0f),
+        Ui::rem(13.0f)
+    )};
+
+    const float left_offset {sm::utils::map(
+        static_cast<float>(ctx.get_window_width()),
+        static_cast<float>(MIN_WIDTH),
+        static_cast<float>(MAX_WIDTH),
+        Ui::rem(1.0f),
+        Ui::rem(2.0f)
+    )};
+
+    const float down_offset {sm::utils::map(
+        static_cast<float>(ctx.get_window_height()),
+        static_cast<float>(MIN_HEIGHT),
+        static_cast<float>(MAX_HEIGHT),
+        Ui::rem(1.0f),
+        Ui::rem(2.0f)
+    )};
+
+    ImGui::SetNextWindowPos(
+        ImVec2(left_offset, static_cast<float>(ctx.get_window_height()) - down_offset),
+        ImGuiCond_Always,
+        ImVec2(0.0f, 1.0f)
+    );
+
+    ImGui::SetNextWindowSize(ImVec2(width, height), ImGuiCond_Always);
+
+    if (ImGui::Begin("Session", nullptr, flags)) {
         if (m_remote_joined) {
             ImGui::TextWrapped("Playing against %s.", m_remote_player_name.empty() ? "an unnamed opponnent" : m_remote_player_name.c_str());
         } else if (game_scene.get_game_state() != GameState::Ready) {
             ImGui::TextWrapped("The opponent has disconnected. You may wait for them to rejoin.");
         } else {
-            ImGui::TextWrapped("Waiting for the opponent.");
+            ImGui::TextWrapped("Waiting for the opponent...");
         }
 
         ImGui::Separator();
@@ -61,9 +105,11 @@ void GameSession::session_window(GameScene& game_scene, const Global& g) {
 
         ImGui::EndChild();
 
+        const auto& g {ctx.global<Global>()};
+
         const float button_width {Ui::rem(3.0f)};
         const auto size {ImVec2(ImGui::GetContentRegionAvail().x - button_width, ImGui::GetContentRegionAvail().y)};
-        const ImGuiInputTextFlags flags {ImGuiInputTextFlags_CtrlEnterForNewLine | ImGuiInputTextFlags_EnterReturnsTrue};
+        const auto flags {ImGuiInputTextFlags_CtrlEnterForNewLine | ImGuiInputTextFlags_EnterReturnsTrue};
 
         if (ImGui::InputTextMultiline("##", m_message_buffer, sizeof(m_message_buffer), size, flags)) {
             if (send_message_available()) {
