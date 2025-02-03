@@ -553,14 +553,14 @@ void Ui::before_game_local_window(sm::Ctx& ctx, GameScene& game_scene) {
 
     // The engine may be down, so don't allow play
     ImGui::BeginDisabled(g.options.game_type == GameTypeLocalHumanVsComputer && !game_scene.get_engine());
-
     if (ImGui::Button("Start Game")) {
         game_scene.get_game_state() = GameState::Start;
     }
-
     ImGui::EndDisabled();
 
+    ImGui::Dummy(ImVec2(0.0f, rem(0.1f)));
     ImGui::Separator();
+    ImGui::Dummy(ImVec2(0.0f, rem(0.1f)));
 
     switch (g.options.game_type) {
         case GameTypeLocalHumanVsHuman:
@@ -612,7 +612,9 @@ void Ui::before_game_online_window(sm::Ctx& ctx, GameScene& game_scene) {
 
     ImGui::EndDisabled();
 
+    ImGui::Dummy(ImVec2(0.0f, rem(0.1f)));
     ImGui::Separator();
+    ImGui::Dummy(ImVec2(0.0f, rem(0.1f)));
 
     ImGui::TextWrapped("Online game between two human players");
     ImGui::TextWrapped(
@@ -635,7 +637,9 @@ void Ui::during_game_window(GameScene& game_scene) {
         ImGui::Text("%u:%02u.%02u", minutes, seconds, centiseconds);
     }
 
+    ImGui::Dummy(ImVec2(0.0f, rem(0.1f)));
     ImGui::Separator();
+    ImGui::Dummy(ImVec2(0.0f, rem(0.1f)));
 
     game_scene.get_move_list().moves_window();
 }
@@ -693,7 +697,7 @@ void Ui::game_options_window(sm::Ctx& ctx, GameScene& game_scene) {
             ImGui::SameLine();
             ImGui::RadioButton("Local vs Computer", &g.options.game_type, GameTypeLocalHumanVsComputer);
             ImGui::RadioButton("Online", &g.options.game_type, GameTypeOnline);
-            ImGui::Dummy(ImVec2(0.0f, rem(0.5f)));
+            ImGui::Dummy(ImVec2(0.0f, rem(0.4f)));
 
             switch (g.options.game_type) {
                 case GameTypeLocalHumanVsHuman:
@@ -703,14 +707,14 @@ void Ui::game_options_window(sm::Ctx& ctx, GameScene& game_scene) {
                     ImGui::RadioButton("White", &game_options.computer_color, PlayerColorWhite);
                     ImGui::SameLine();
                     ImGui::RadioButton("Black", &game_options.computer_color, PlayerColorBlack);
-                    ImGui::Dummy(ImVec2(0.0f, rem(0.5f)));
+                    ImGui::Dummy(ImVec2(0.0f, rem(0.4f)));
                     break;
                 case GameTypeOnline:
                     ImGui::SeparatorText("Remote Plays As");
                     ImGui::RadioButton("White", &game_options.remote_color, PlayerColorWhite);
                     ImGui::SameLine();
                     ImGui::RadioButton("Black", &game_options.remote_color, PlayerColorBlack);
-                    ImGui::Dummy(ImVec2(0.0f, rem(0.5f)));
+                    ImGui::Dummy(ImVec2(0.0f, rem(0.4f)));
                     break;
             }
 

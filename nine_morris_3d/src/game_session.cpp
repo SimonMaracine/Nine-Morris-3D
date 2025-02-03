@@ -75,7 +75,9 @@ void GameSession::session_window(sm::Ctx& ctx, GameScene& game_scene) {
             ImGui::TextWrapped("Waiting for the opponent...");
         }
 
+        ImGui::Dummy(ImVec2(0.0f, Ui::rem(0.1f)));
         ImGui::Separator();
+        ImGui::Dummy(ImVec2(0.0f, Ui::rem(0.1f)));
 
         const float chat_height {Ui::rem(2.5f)};
 

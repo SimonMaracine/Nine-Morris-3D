@@ -20,6 +20,8 @@ void MoveList::skip_first(bool skip) {
 void MoveList::moves_window() const {
     if (ImGui::BeginChild("Move List")) {
         if (ImGui::BeginTable("Move Table", 3)) {
+            ImGui::TableSetupColumn("Move", ImGuiTableColumnFlags_WidthFixed, Ui::rem(2.0f));
+
             if (m_skip_first) {
                 ImGui::TableNextRow();
                 ImGui::TableSetColumnIndex(0);
