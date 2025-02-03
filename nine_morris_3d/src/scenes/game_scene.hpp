@@ -71,7 +71,10 @@ public:
     const Clock& get_clock() const { return m_clock; }
     const MoveList& get_move_list() const { return m_move_list; }
     const std::unique_ptr<Engine>& get_engine() const { return m_engine; }
+    std::shared_ptr<sm::GlTexture> get_icon_white() const { return m_icon_white; }
+    std::shared_ptr<sm::GlTexture> get_icon_black() const { return m_icon_black; }
 
+    virtual void load_game_icons() = 0;
     virtual void reload_scene_texture_data() const = 0;
     virtual void reload_and_set_scene_textures() = 0;
     void reload_and_set_skybox();
@@ -135,6 +138,9 @@ protected:
     // sm::Quad m_wait_indicator;  // TODO
     PointCameraController m_camera_controller;
     Ui m_ui;
+
+    std::shared_ptr<sm::GlTexture> m_icon_white;
+    std::shared_ptr<sm::GlTexture> m_icon_black;
 
     GameState m_game_state {GameState::Ready};
     glm::vec3 m_default_camera_position {};

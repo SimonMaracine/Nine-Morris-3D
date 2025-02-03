@@ -32,19 +32,19 @@ namespace sm {
         }
     }
 
-    bool Ctx::file_exists(const std::string& path) {
+    bool Ctx::file_exists(const std::filesystem::path& path) {
         return internal::FileSystem::file_exists(path);
     }
 
-    bool Ctx::is_directory(const std::string& path) {
+    bool Ctx::is_directory(const std::filesystem::path& path) {
         return internal::FileSystem::is_directory(path);
     }
 
-    bool Ctx::create_directory(const std::string& path) {
+    bool Ctx::create_directory(const std::filesystem::path& path) {
         return internal::FileSystem::create_directory(path);
     }
 
-    bool Ctx::delete_file(const std::string& path) {
+    bool Ctx::delete_file(const std::filesystem::path& path) {
         return internal::FileSystem::delete_file(path);
     }
 
@@ -68,19 +68,19 @@ namespace sm {
         return m_fs.path_engine_assets();
     }
 
-    std::filesystem::path Ctx::path_logs(const std::string& path) const {
+    std::filesystem::path Ctx::path_logs(const std::filesystem::path& path) const {
         return m_fs.path_logs(path);
     }
 
-    std::filesystem::path Ctx::path_saved_data(const std::string& path) const {
+    std::filesystem::path Ctx::path_saved_data(const std::filesystem::path& path) const {
         return m_fs.path_saved_data(path);
     }
 
-    std::filesystem::path Ctx::path_assets(const std::string& path) const {
+    std::filesystem::path Ctx::path_assets(const std::filesystem::path& path) const {
         return m_fs.path_assets(path);
     }
 
-    std::filesystem::path Ctx::path_engine_assets(const std::string& path) const {
+    std::filesystem::path Ctx::path_engine_assets(const std::filesystem::path& path) const {
         return m_fs.path_engine_assets(path);
     }
 

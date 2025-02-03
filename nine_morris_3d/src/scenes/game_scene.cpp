@@ -21,6 +21,7 @@ void GameScene::on_start() {
     setup_lights();
 
     scene_setup();
+    load_game_icons();
     start_engine();
 
     const auto& g {ctx.global<Global>()};

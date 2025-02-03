@@ -34,6 +34,7 @@ public:
     void accept_draw_offer() override;
     void time_control_options_window() override;
 
+    void load_game_icons() override;
     void reload_scene_texture_data() const override;
     void reload_and_set_scene_textures() override;
 

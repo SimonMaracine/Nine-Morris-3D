@@ -213,6 +213,23 @@ void NineMensMorrisBaseScene::time_control_options_window() {
     }
 }
 
+void NineMensMorrisBaseScene::load_game_icons() {
+    sm::TextureSpecification specification;
+    specification.format = sm::TextureFormat::Rgba8;
+
+    m_icon_white = ctx.load_texture(
+        "icon_white"_H,
+        ctx.load_texture_data(ctx.path_assets("textures/icons/icon_white.png"), sm::TexturePostProcessing()),
+        specification
+    );
+
+    m_icon_black = ctx.load_texture(
+        "icon_black"_H,
+        ctx.load_texture_data(ctx.path_assets("textures/icons/icon_black.png"), sm::TexturePostProcessing()),
+        specification
+    );
+}
+
 void NineMensMorrisBaseScene::reload_scene_texture_data() const {
     // Global options must have been set to the desired textures
 

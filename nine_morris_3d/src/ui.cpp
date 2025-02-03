@@ -623,13 +623,15 @@ void Ui::before_game_online_window(sm::Ctx& ctx, GameScene& game_scene) {
 
 void Ui::during_game_window(GameScene& game_scene) {
     {
-        ImGui::Text("B");
+        // ImGui::Text("B");
+        ImGui::Image(game_scene.get_icon_black()->get_id(), ImVec2(rem(1.0f), rem(1.0f)));
         ImGui::SameLine();
         const auto [minutes, seconds, centiseconds] {Clock::split_time(game_scene.get_clock().get_black_time())};
         ImGui::Text("%u:%02u.%02u", minutes, seconds, centiseconds);
     }
     {
-        ImGui::Text("W");
+        // ImGui::Text("W");
+        ImGui::Image(game_scene.get_icon_white()->get_id(), ImVec2(rem(1.0f), rem(1.0f)));
         ImGui::SameLine();
         const auto [minutes, seconds, centiseconds] {Clock::split_time(game_scene.get_clock().get_white_time())};
         ImGui::Text("%u:%02u.%02u", minutes, seconds, centiseconds);
