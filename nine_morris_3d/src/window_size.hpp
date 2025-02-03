@@ -1,9 +1,10 @@
 #pragma once
 
+// https://pacoup.com/2011/06/12/list-of-true-169-resolutions/
 // The window has these default sizes
 
-inline constexpr int MIN_WIDTH {512};
-inline constexpr int MIN_HEIGHT {288};
+inline constexpr int MIN_WIDTH {640};  // Let's hope nobody runs the game on a potato with very low resolution
+inline constexpr int MIN_HEIGHT {360};
 inline constexpr int MAX_WIDTH {2560};
 inline constexpr int MAX_HEIGHT {1440};
 

@@ -15,6 +15,7 @@
 #include "game_options.hpp"
 #include "ver.hpp"
 #include "default_address.hpp"
+#include "window_size.hpp"
 
 void Ui::initialize(sm::Ctx& ctx) {
     const auto& g {ctx.global<Global>()};
@@ -478,7 +479,43 @@ void Ui::main_menu_bar(sm::Ctx& ctx, GameScene& game_scene) {
 }
 
 void Ui::game_window(sm::Ctx& ctx, GameScene& game_scene) {
-    if (ImGui::Begin("Game")) {
+    const auto flags {ImGuiWindowFlags_NoDecoration};
+
+    const float width {sm::utils::map(
+        static_cast<float>(ctx.get_window_width()),
+        static_cast<float>(MIN_WIDTH),
+        static_cast<float>(MAX_WIDTH),
+        rem(11.0f),
+        rem(15.0f)
+    )};
+
+    const float height_offset {sm::utils::map(
+        static_cast<float>(ctx.get_window_height()),
+        static_cast<float>(MIN_HEIGHT),
+        static_cast<float>(MAX_HEIGHT),
+        rem(5.0f),
+        rem(20.0f)
+    )};
+
+    const float right_offset {sm::utils::map(
+        static_cast<float>(ctx.get_window_width()),
+        static_cast<float>(MIN_WIDTH),
+        static_cast<float>(MAX_WIDTH),
+        rem(1.0f),
+        rem(4.0f)
+    )};
+
+    const float height {static_cast<float>(ctx.get_window_height()) - height_offset};
+
+    ImGui::SetNextWindowPos(
+        ImVec2(static_cast<float>(ctx.get_window_width()) - width - right_offset, static_cast<float>(ctx.get_window_height() / 2)),
+        ImGuiCond_Always,
+        ImVec2(0.0f, 0.5f)
+    );
+
+    ImGui::SetNextWindowSize(ImVec2(width, height), ImGuiCond_Always);
+
+    if (ImGui::Begin("Game", nullptr, flags)) {
         if (game_scene.get_game_state() != GameState::Ready) {
             during_game_window(game_scene);
         } else {
