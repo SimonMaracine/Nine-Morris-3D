@@ -700,16 +700,16 @@ void Ui::game_options_window(sm::Ctx& ctx, GameScene& game_scene) {
                     break;
                 case GameTypeLocalHumanVsComputer:
                     ImGui::SeparatorText("Computer Plays As");
-                    ImGui::RadioButton("white", &game_options.computer_color, PlayerColorWhite);
+                    ImGui::RadioButton("White", &game_options.computer_color, PlayerColorWhite);
                     ImGui::SameLine();
-                    ImGui::RadioButton("black", &game_options.computer_color, PlayerColorBlack);
+                    ImGui::RadioButton("Black", &game_options.computer_color, PlayerColorBlack);
                     ImGui::Dummy(ImVec2(0.0f, rem(0.5f)));
                     break;
                 case GameTypeOnline:
                     ImGui::SeparatorText("Remote Plays As");
-                    ImGui::RadioButton("white", &game_options.remote_color, PlayerColorWhite);
+                    ImGui::RadioButton("White", &game_options.remote_color, PlayerColorWhite);
                     ImGui::SameLine();
-                    ImGui::RadioButton("black", &game_options.remote_color, PlayerColorBlack);
+                    ImGui::RadioButton("Black", &game_options.remote_color, PlayerColorBlack);
                     ImGui::Dummy(ImVec2(0.0f, rem(0.5f)));
                     break;
             }
