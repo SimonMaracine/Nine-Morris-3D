@@ -2,7 +2,7 @@
 
 #include <spdlog/fmt/fmt.h>
 
-#include "nine_morris_3d_engine/application/internal/input.hpp"
+#include "nine_morris_3d_engine/application/input_codes.hpp"
 
 // Application-level events
 
@@ -23,14 +23,16 @@ namespace sm {
     };
 
     struct WindowMovedEvent {
-        int position_x {};
-        int position_y {};
+        int x {};
+        int y {};
     };
 
     struct KeyPressedEvent {
         Key key {};
         bool repeat {};
         bool ctrl {};
+        bool shift {};
+        bool alt {};
     };
 
     struct KeyReleasedEvent {
@@ -38,11 +40,15 @@ namespace sm {
     };
 
     struct MouseButtonPressedEvent {
-        MouseButton button {};
+        Button button {};
+        float x {};
+        float y {};
     };
 
     struct MouseButtonReleasedEvent {
-        MouseButton button {};
+        Button button {};
+        float x {};
+        float y {};
     };
 
     struct MouseWheelScrolledEvent {
@@ -50,8 +56,10 @@ namespace sm {
     };
 
     struct MouseMovedEvent {
-        float mouse_x {};
-        float mouse_y {};
+        float x {};
+        float y {};
+        float xrel {};
+        float yrel {};
     };
 }
 
@@ -64,6 +72,7 @@ namespace sm {
         } \
     };
 
+// FIXME
 SM_EVENT_FORMATTER(sm::WindowClosedEvent, "WindowClosedEvent")
 SM_EVENT_FORMATTER(sm::WindowResizedEvent, "WindowResizedEvent({}, {})", event.width, event.height)
 SM_EVENT_FORMATTER(sm::WindowFocusedEvent, "WindowFocusedEvent({})", event.focused)

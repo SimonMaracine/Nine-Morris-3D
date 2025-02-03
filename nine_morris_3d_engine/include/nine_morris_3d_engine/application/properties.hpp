@@ -6,7 +6,6 @@ namespace sm {
     // Initialization application properties
     struct ApplicationProperties {
         bool fullscreen {false};
-        bool native_resolution {true};
         bool resizable {true};
         bool audio {false};
         bool default_renderer_parameters {true};

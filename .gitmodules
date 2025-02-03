@@ -29,3 +29,6 @@
 [submodule "extern/spdlog"]
 	path = extern/spdlog
 	url = https://github.com/SimonMaracine/spdlog
+[submodule "nine_morris_3d_engine/extern/sdl"]
+	path = nine_morris_3d_engine/extern/sdl
+	url = https://github.com/libsdl-org/SDL

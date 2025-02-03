@@ -13,3 +13,7 @@ target_include_directories(stb PUBLIC
     "extern/stb_truetype"
     "extern/stb_vorbis"
 )
+
+if(NM3D_DISTRIBUTION_MODE)
+    target_compile_definitions(stb PRIVATE "NDEBUG")
+endif()

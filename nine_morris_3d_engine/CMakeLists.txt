@@ -8,6 +8,7 @@ include(cmake/dear_imgui.cmake)
 include(cmake/glad.cmake)
 include(cmake/glfw.cmake)
 include(cmake/openal_soft.cmake)
+include(cmake/sdl.cmake)
 include(cmake/stb.cmake)
 
 add_subdirectory(extern/entt)
@@ -23,6 +24,7 @@ add_library(nine_morris_3d_engine STATIC
     "src/application/internal/window.cpp"
     "src/application/application.cpp"
     "src/application/context.cpp"
+    "src/application/input_codes.cpp"
     "src/application/monitors.cpp"
     "src/audio/internal/context.cpp"
     "src/audio/internal/music_player.cpp"
@@ -128,6 +130,7 @@ target_link_libraries(nine_morris_3d_engine PRIVATE
     glad
     assimp::assimp
     glfw
+    SDL3::SDL3
     OpenAL::OpenAL
     utf8cpp
     stb
