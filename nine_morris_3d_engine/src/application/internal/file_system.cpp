@@ -122,7 +122,7 @@ namespace sm::internal {
             m_error_string = "Directory `" + path.string() + "` doesn't exist, creating it...";
 
             if (!create_directory(path)) {
-                throw InitializationError("Could not create directory `" + path.string() + "`");
+                throw OtherError("Could not create directory `" + path.string() + "`");
             }
         }
     }

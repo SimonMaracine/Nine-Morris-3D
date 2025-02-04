@@ -461,7 +461,7 @@ void GameScene::on_key_released(const sm::KeyReleasedEvent& event) {
 }
 
 void GameScene::on_mouse_button_pressed(const sm::MouseButtonPressedEvent& event) {
-    if (event.button == sm::MouseButton::Left) {
+    if (event.button == sm::Button::Left) {
         if (m_game_state == GameState::HumanThinking) {
             get_board().user_click_press();
         }
@@ -469,7 +469,7 @@ void GameScene::on_mouse_button_pressed(const sm::MouseButtonPressedEvent& event
 }
 
 void GameScene::on_mouse_button_released(const sm::MouseButtonReleasedEvent& event) {
-    if (event.button == sm::MouseButton::Left) {
+    if (event.button == sm::Button::Left) {
         if (m_game_state == GameState::HumanThinking) {
             get_board().user_click_release();
         }

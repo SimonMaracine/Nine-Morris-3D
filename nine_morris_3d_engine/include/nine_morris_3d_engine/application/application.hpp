@@ -69,7 +69,8 @@ namespace sm {
 
         void on_window_closed(const WindowClosedEvent&) noexcept;
         void on_window_resized(const WindowResizedEvent& event);
-        void on_window_iconified(const WindowIconifiedEvent& event) noexcept;
+        void on_window_maximized(const WindowMaximizedEvent& event) noexcept;
+        void on_window_minimized(const WindowMinimizedEvent& event) noexcept;
 
         // API accessible to the user
         Ctx m_ctx;

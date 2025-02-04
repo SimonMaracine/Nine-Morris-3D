@@ -23,15 +23,27 @@ namespace sm {
         virtual const char* type() const noexcept = 0;
     };
 
-    // Error related to application window
-    struct WindowError : RuntimeError {
-        explicit WindowError(const char* message)
+    // Error related to video (window, OpenGL context etc.)
+    struct VideoError : RuntimeError {
+        explicit VideoError(const char* message)
             : RuntimeError(message) {}
-        explicit WindowError(const std::string& message)
+        explicit VideoError(const std::string& message)
             : RuntimeError(message) {}
 
         const char* type() const noexcept override {
-            return "window";
+            return "video";
+        }
+    };
+
+    // Error related to audio
+    struct AudioError : RuntimeError {
+        explicit AudioError(const char* message)
+            : RuntimeError(message) {}
+        explicit AudioError(const std::string& message)
+            : RuntimeError(message) {}
+
+        const char* type() const noexcept override {
+            return "audio";
         }
     };
 

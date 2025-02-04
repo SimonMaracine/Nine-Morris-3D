@@ -1,7 +1,6 @@
 #include "nine_morris_3d_engine/application/internal/window.hpp"
 
 #include <vector>
-#include <string>
 #include <cstddef>
 #include <cassert>
 
@@ -19,40 +18,42 @@
 #include "nine_morris_3d_engine/graphics/internal/imgui_context.hpp"
 #include "nine_morris_3d_engine/graphics/opengl/debug.hpp"
 
-using namespace std::string_literals;
-
 namespace sm::internal {
     Window::Window(const ApplicationProperties& properties, EventDispatcher& evt)
-        : m_evt(evt) {
+        : m_width(properties.width), m_height(properties.height), m_evt(evt) {
         if (!SDL_Init(SDL_INIT_VIDEO)) {
-            SM_THROW_ERROR(WindowError, "Could not initialize SDL: "s + SDL_GetError());
+            SM_THROW_ERROR(VideoError, "Could not initialize SDL: {}", SDL_GetError());
         }
 
         if (!SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4)) {
-            SM_THROW_ERROR(WindowError, "Could not set SDL_GL_CONTEXT_MAJOR_VERSION attribute: "s + SDL_GetError());
+            SM_THROW_ERROR(VideoError, "Could not set SDL_GL_CONTEXT_MAJOR_VERSION attribute: {}", SDL_GetError());
         }
 
         if (!SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3)) {
-            SM_THROW_ERROR(WindowError, "Could not set SDL_GL_CONTEXT_MINOR_VERSION attribute: "s + SDL_GetError());
+            SM_THROW_ERROR(VideoError, "Could not set SDL_GL_CONTEXT_MINOR_VERSION attribute: {}", SDL_GetError());
         }
 
         if (!SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE)) {
-            SM_THROW_ERROR(WindowError, "Could not set SDL_GL_CONTEXT_PROFILE_MASK attribute: "s + SDL_GetError());
+            SM_THROW_ERROR(VideoError, "Could not set SDL_GL_CONTEXT_PROFILE_MASK attribute: {}", SDL_GetError());
         }
 
         if (!SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1)) {
-            SM_THROW_ERROR(WindowError, "Could not set SDL_GL_DOUBLEBUFFER attribute: "s + SDL_GetError());
+            SM_THROW_ERROR(VideoError, "Could not set SDL_GL_DOUBLEBUFFER attribute: {}", SDL_GetError());
         }
 
         if (!SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24)) {
-            SM_THROW_ERROR(WindowError, "Could not set SDL_GL_DEPTH_SIZE attribute: "s + SDL_GetError());
+            SM_THROW_ERROR(VideoError, "Could not set SDL_GL_DEPTH_SIZE attribute: {}", SDL_GetError());
         }
 
         if (!SDL_GL_SetAttribute(SDL_GL_FRAMEBUFFER_SRGB_CAPABLE, 1)) {
-            SM_THROW_ERROR(WindowError, "Could not set SDL_GL_FRAMEBUFFER_SRGB_CAPABLE attribute: "s + SDL_GetError());
+            SM_THROW_ERROR(VideoError, "Could not set SDL_GL_FRAMEBUFFER_SRGB_CAPABLE attribute: {}", SDL_GetError());
         }
 
-        unsigned int flags {SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE | SDL_WINDOW_HIDDEN};
+        unsigned int flags {SDL_WINDOW_OPENGL | SDL_WINDOW_HIDDEN};
+
+        if (properties.resizable) {
+            flags |= SDL_WINDOW_RESIZABLE;
+        }
 
         if (properties.fullscreen) {
             flags |= SDL_WINDOW_FULLSCREEN;
@@ -62,7 +63,7 @@ namespace sm::internal {
 
         if (m_window == nullptr) {
             SDL_Quit();
-            SM_THROW_ERROR(WindowError, "Could not create window: "s + SDL_GetError());
+            SM_THROW_ERROR(VideoError, "Could not create window: {}", SDL_GetError());
         }
 
         LOG_INFO("Initialized SDL and created window");
@@ -71,23 +72,23 @@ namespace sm::internal {
 
         if (m_context == nullptr) {
             SDL_Quit();
-            SM_THROW_ERROR(WindowError, "Could not create OpenGL context: "s + SDL_GetError());
+            SM_THROW_ERROR(VideoError, "Could not create OpenGL context: {}", SDL_GetError());
         }
 
         if (!gladLoadGLLoader(reinterpret_cast<GLADloadproc>(SDL_GL_GetProcAddress))) {
             SDL_Quit();
-            SM_THROW_ERROR(WindowError, "Could not initialize GLAD");
+            SM_THROW_ERROR(VideoError, "Could not initialize GLAD");
         }
 
         // FIXME don't panic
         if (!SDL_GL_SetSwapInterval(1)) {
             SDL_Quit();
-            SM_THROW_ERROR(WindowError, "Could not set swap interval: "s + SDL_GetError());
+            SM_THROW_ERROR(VideoError, "Could not set swap interval: {}", SDL_GetError());
         }
 
         if (!SDL_SetWindowMinimumSize(m_window, properties.min_width, properties.min_height)) {
             SDL_Quit();
-            SM_THROW_ERROR(WindowError, "Could not set minimum window size: "s + SDL_GetError());
+            SM_THROW_ERROR(VideoError, "Could not set minimum window size: {}", SDL_GetError());
         }
 
 #ifndef SM_BUILD_DISTRIBUTION
@@ -169,14 +170,14 @@ namespace sm::internal {
         // glfwShowWindow(m_window);
 
         if (!SDL_ShowWindow(m_window)) {
-            SM_THROW_ERROR(WindowError, "Could not show window: "s + SDL_GetError());
+            SM_THROW_ERROR(VideoError, "Could not show window: {}", SDL_GetError());
         }
     }
 
     void Window::set_vsync(bool enable) const {
         // FIXME don't panic
         if (!SDL_GL_SetSwapInterval(static_cast<int>(enable))) {
-            SM_THROW_ERROR(WindowError, "Could not set swap interval: "s + SDL_GetError());
+            SM_THROW_ERROR(VideoError, "Could not set swap interval: {}", SDL_GetError());
         }
 
         // glfwSwapInterval(enable ? 1 : 0);
@@ -227,11 +228,11 @@ namespace sm::internal {
 
     void Window::set_size(int width, int height) {
         if (!SDL_SetWindowSize(m_window, width, height)) {
-            SM_THROW_ERROR(WindowError, "Could not set window size: "s + SDL_GetError());
+            SM_THROW_ERROR(VideoError, "Could not set window size: {}", SDL_GetError());
         }
 
         if (!SDL_SyncWindow(m_window)) {
-            SM_THROW_ERROR(WindowError, "Could not synchronize window: "s + SDL_GetError());
+            SM_THROW_ERROR(VideoError, "Could not synchronize window: {}", SDL_GetError());
         }
 
         m_width = width;
@@ -285,7 +286,7 @@ namespace sm::internal {
 
     void Window::flip() const {
         if (!SDL_GL_SwapWindow(m_window)) {
-            SM_THROW_ERROR(WindowError, "Could not swap window buffers: "s + SDL_GetError());
+            SM_THROW_ERROR(VideoError, "Could not swap window buffers: {}", SDL_GetError());
         }
 
         // glfwPollEvents();
@@ -346,21 +347,21 @@ namespace sm::internal {
                     // );
 
                     if (imgui_context::want_capture_keyboard()) {
-                        return;
+                        break;
                     }
 
                     m_evt.enqueue<KeyPressedEvent>(
                         sdl_keycode_to_key(event.key.key),
                         event.key.repeat,
-                        event.key.mod & SDL_KMOD_CTRL,
-                        event.key.mod & SDL_KMOD_SHIFT,
-                        event.key.mod & SDL_KMOD_ALT
+                        static_cast<bool>(event.key.mod & SDL_KMOD_CTRL),
+                        static_cast<bool>(event.key.mod & SDL_KMOD_SHIFT),
+                        static_cast<bool>(event.key.mod & SDL_KMOD_ALT)
                     );
 
                     break;
                 case SDL_EVENT_KEY_UP:
                     if (imgui_context::want_capture_keyboard()) {
-                        return;
+                        break;
                     }
 
                     m_evt.enqueue<KeyReleasedEvent>(sdl_keycode_to_key(event.key.key));
@@ -378,7 +379,7 @@ namespace sm::internal {
                     // );
 
                     if (imgui_context::want_capture_mouse()) {
-                        return;
+                        break;
                     }
 
                     m_evt.enqueue<MouseMovedEvent>(event.motion.x, event.motion.y, event.motion.xrel, event.motion.yrel);
@@ -392,7 +393,7 @@ namespace sm::internal {
                     // );
 
                     if (imgui_context::want_capture_mouse()) {
-                        return;
+                        break;
                     }
 
                     m_evt.enqueue<MouseButtonPressedEvent>(sdl_button_to_button(event.button.button), event.button.x, event.button.y);
@@ -406,7 +407,7 @@ namespace sm::internal {
                     // );
 
                     if (imgui_context::want_capture_mouse()) {
-                        return;
+                        break;
                     }
 
                     m_evt.enqueue<MouseButtonReleasedEvent>(sdl_button_to_button(event.button.button), event.button.x, event.button.y);
@@ -416,7 +417,7 @@ namespace sm::internal {
                     // application->events.enqueue<MouseWheelScrolledEvent>(event.wheel.y);
 
                     if (imgui_context::want_capture_mouse()) {
-                        return;
+                        break;
                     }
 
                     m_evt.enqueue<MouseWheelScrolledEvent>(event.wheel.y);

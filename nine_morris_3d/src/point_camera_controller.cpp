@@ -198,7 +198,7 @@ void PointCameraController::connect_events(sm::Ctx& ctx) {
     ctx.connect_event<sm::MouseButtonReleasedEvent, &PointCameraController::on_mouse_button_released>(this);
     ctx.connect_event<sm::KeyPressedEvent, &PointCameraController::on_key_pressed>(this);
     ctx.connect_event<sm::KeyReleasedEvent, &PointCameraController::on_key_released>(this);
-    ctx.connect_event<sm::WindowMovedEvent, &PointCameraController::on_window_moved>(this);
+    // ctx.connect_event<sm::WindowMovedEvent, &PointCameraController::on_window_moved>(this);
 }
 
 void PointCameraController::disconnect_events(sm::Ctx& ctx) {
@@ -210,20 +210,20 @@ void PointCameraController::on_mouse_wheel_scrolled(const sm::MouseWheelScrolled
 }
 
 void PointCameraController::on_mouse_moved(const sm::MouseMovedEvent& event) {
-    m_input.dx = m_input.last_mouse_x - event.mouse_x;
-    m_input.dy = m_input.last_mouse_y - event.mouse_y;
-    m_input.last_mouse_x = event.mouse_x;
-    m_input.last_mouse_y = event.mouse_y;
+    m_input.dx = m_input.last_mouse_x - event.x;
+    m_input.dy = m_input.last_mouse_y - event.y;
+    m_input.last_mouse_x = event.x;
+    m_input.last_mouse_y = event.y;
 }
 
 void PointCameraController::on_mouse_button_pressed(const sm::MouseButtonPressedEvent& event) {
-    if (event.button == sm::MouseButton::Right) {
+    if (event.button == sm::Button::Right) {
         m_input.mouse_right = true;
     }
 }
 
 void PointCameraController::on_mouse_button_released(const sm::MouseButtonReleasedEvent& event) {
-    if (event.button == sm::MouseButton::Right) {
+    if (event.button == sm::Button::Right) {
         m_input.mouse_right = false;
     }
 }
@@ -282,14 +282,14 @@ void PointCameraController::on_key_released(const sm::KeyReleasedEvent& event) {
     }
 }
 
-void PointCameraController::on_window_moved(const sm::WindowMovedEvent&) {
-    m_input.key_w = false;
-    m_input.key_a = false;
-    m_input.key_s = false;
-    m_input.key_d = false;
-    m_input.key_r = false;
-    m_input.key_f = false;
-}
+// void PointCameraController::on_window_moved(const sm::WindowMovedEvent&) {
+//     m_input.key_w = false;
+//     m_input.key_a = false;
+//     m_input.key_s = false;
+//     m_input.key_d = false;
+//     m_input.key_r = false;
+//     m_input.key_f = false;
+// }
 
 void PointCameraController::go_towards_position_x(glm::vec3 direction) {
     float integer_angle;

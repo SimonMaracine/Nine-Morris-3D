@@ -17,7 +17,7 @@ void game_start(sm::Ctx& ctx) {
 
     // The window is still hidden at this point
     if (g.get_scale() == 2.0f) {
-        ctx.set_window_dimensions(DEFAULT_WIDTH_LARGE, DEFAULT_HEIGHT_LARGE);
+        ctx.set_window_size(DEFAULT_WIDTH_LARGE, DEFAULT_HEIGHT_LARGE);
     }
 
     // We said earlier to not initialize the renderer with default parameters

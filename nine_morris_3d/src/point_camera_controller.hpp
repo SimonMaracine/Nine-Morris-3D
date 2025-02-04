@@ -52,7 +52,7 @@ private:
     void on_mouse_button_released(const sm::MouseButtonReleasedEvent& event);
     void on_key_pressed(const sm::KeyPressedEvent& event);
     void on_key_released(const sm::KeyReleasedEvent& event);
-    void on_window_moved(const sm::WindowMovedEvent&);
+    // void on_window_moved(const sm::WindowMovedEvent&);  // FIXME
 
     void go_towards_position_x(glm::vec3 direction);
     void go_towards_position_y(glm::vec3 direction);

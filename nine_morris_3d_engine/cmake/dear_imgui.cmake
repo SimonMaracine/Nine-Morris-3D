@@ -23,7 +23,7 @@ add_library(dear_imgui STATIC
 )
 
 target_include_directories(dear_imgui PUBLIC "extern/imgui")
-# target_include_directories(dear_imgui PRIVATE "extern/glfw/include")
+target_include_directories(dear_imgui PRIVATE "extern/sdl/include")
 
 if(NM3D_DISTRIBUTION_MODE)
     target_compile_definitions(dear_imgui PRIVATE "NDEBUG")

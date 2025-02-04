@@ -21,8 +21,7 @@ namespace sm {
         m_win(properties, m_evt),
         m_rnd(properties.width, properties.height, m_fs, m_shd),
         m_snd(properties.audio),
-        m_mus(properties.audio),
-        m_inp(m_win.get_handle()) {
+        m_mus(properties.audio) {
         if (properties.default_renderer_parameters) {
             m_rnd.initialize(properties.width, properties.height, m_fs);
         }
@@ -192,16 +191,16 @@ namespace sm {
         m_tsk.add_async(std::move(function));
     }
 
-    bool Ctx::is_key_pressed(Key key) const noexcept {
-        return m_inp.is_key_pressed(key);
+    bool Ctx::is_key_pressed(Key key) noexcept {
+        return internal::is_key_pressed(key);
     }
 
-    bool Ctx::is_button_pressed(Button button) const noexcept {
-        return m_inp.is_button_pressed(button);
+    bool Ctx::is_button_pressed(Button button) noexcept {
+        return internal::is_button_pressed(button);
     }
 
-    std::pair<float, float> Ctx::get_mouse_position() const noexcept {
-        return m_inp.get_mouse_position();
+    std::pair<float, float> Ctx::get_mouse_position() noexcept {
+        return internal::get_mouse_position();
     }
 
     void Ctx::capture(const Camera& camera, glm::vec3 position) noexcept {

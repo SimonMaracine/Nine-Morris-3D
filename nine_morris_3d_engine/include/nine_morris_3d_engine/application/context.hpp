@@ -133,9 +133,9 @@ namespace sm {
         void add_task_async(AsyncTask::Function&& function);
 
         // Input
-        bool is_key_pressed(Key key) const noexcept;
-        bool is_button_pressed(Button button) const noexcept;
-        std::pair<float, float> get_mouse_position() const noexcept;
+        static bool is_key_pressed(Key key) noexcept;
+        static bool is_button_pressed(Button button) noexcept;
+        static std::pair<float, float> get_mouse_position() noexcept;
 
         // Scene
         void capture(const Camera& camera, glm::vec3 position) noexcept;
@@ -231,7 +231,6 @@ namespace sm {
         internal::OpenAlContext m_snd;
         internal::MusicPlayer m_mus;
         internal::TaskManager m_tsk;
-        internal::Input m_inp;
         internal::Scene m_scn;
         internal::ResourcesCache m_res;
 #ifndef SM_BUILD_DISTRIBUTION

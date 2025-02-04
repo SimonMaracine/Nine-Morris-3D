@@ -17,7 +17,7 @@ namespace sm {
         m_ctx.m_application = this;
         m_ctx.m_user_data = properties.user_data;
 
-        internal::imgui_context::initialize(m_ctx.m_win.get_handle());
+        internal::imgui_context::initialize(m_ctx.m_win.get_window(), m_ctx.m_win.get_context());
 
         LOG_DIST_INFO("Working directory: {}", internal::FileSystem::current_working_directory().string());
 
@@ -34,7 +34,8 @@ namespace sm {
 
         m_ctx.m_evt.connect<WindowClosedEvent, &Application::on_window_closed>(this);
         m_ctx.m_evt.connect<WindowResizedEvent, &Application::on_window_resized>(this);
-        m_ctx.m_evt.connect<WindowIconifiedEvent, &Application::on_window_iconified>(this);
+        m_ctx.m_evt.connect<WindowMaximizedEvent, &Application::on_window_maximized>(this);
+        m_ctx.m_evt.connect<WindowMinimizedEvent, &Application::on_window_minimized>(this);
 
         m_frame_counter.previous_seconds = internal::Window::get_time();
         m_fixed_update.previous_seconds = internal::Window::get_time();
@@ -78,6 +79,9 @@ namespace sm {
                 m_scene_current->scene->on_fixed_update();
             }
 
+            // Events need to be processed before scene update
+            m_ctx.m_win.poll_events();
+
             m_scene_current->scene->on_update();
 
             if (!m_minimized) {
@@ -88,9 +92,12 @@ namespace sm {
                 dear_imgui_render();
             }
 
+            // Swap the buffers
+            m_ctx.m_win.flip();
+
             m_ctx.m_scn.clear();
 
-            m_ctx.m_win.update();
+            // m_ctx.m_win.update();
             m_ctx.m_evt.update();
 
             // Update tasks after scene update and after events
@@ -233,7 +240,11 @@ namespace sm {
         m_ctx.m_rnd.resize_framebuffers(event.width, event.height);
     }
 
-    void Application::on_window_iconified(const WindowIconifiedEvent& event) noexcept {
-        m_minimized = event.iconified;
+    void Application::on_window_maximized(const WindowMaximizedEvent& event) noexcept {
+        m_minimized = false;
+    }
+
+    void Application::on_window_minimized(const WindowMinimizedEvent& event) noexcept {
+        m_minimized = true;
     }
 }

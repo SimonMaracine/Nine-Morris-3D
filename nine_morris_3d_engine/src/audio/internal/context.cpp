@@ -17,7 +17,7 @@ namespace sm::internal {
         m_device = alcOpenDevice(nullptr);
 
         if (m_device == nullptr) {
-            SM_THROW_ERROR(InitializationError, "Could not open a playback device");
+            SM_THROW_ERROR(AudioError, "Could not open a playback device");
         }
 
         m_context = alcCreateContext(m_device, nullptr);
@@ -25,14 +25,14 @@ namespace sm::internal {
         if (m_context == nullptr) {
             alcCloseDevice(m_device);
 
-            SM_THROW_ERROR(InitializationError, "Could not create OpenAL context");
+            SM_THROW_ERROR(AudioError, "Could not create OpenAL context");
         }
 
         if (alcMakeContextCurrent(m_context) == ALC_FALSE) {
             alcDestroyContext(m_context);
             alcCloseDevice(m_device);
 
-            SM_THROW_ERROR(InitializationError, "Could not make OpenAL context current");
+            SM_THROW_ERROR(AudioError, "Could not make OpenAL context current");
         }
 
         // Defaults

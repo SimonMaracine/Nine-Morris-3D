@@ -4,7 +4,7 @@
 #include <SDL3/SDL.h>
 
 namespace sm::internal {
-    bool Input::is_key_pressed(Key key) const noexcept {
+    bool is_key_pressed(Key key) noexcept {
         // return glfwGetKey(m_window_handle, static_cast<int>(key)) == GLFW_PRESS;
 
         const bool* state {SDL_GetKeyboardState(nullptr)};
@@ -12,7 +12,7 @@ namespace sm::internal {
         return state[SDL_GetScancodeFromKey(key_to_sdl_keycode(key), nullptr)];
     }
 
-    bool Input::is_button_pressed(Button button) const noexcept {
+    bool is_button_pressed(Button button) noexcept {
         // return glfwGetMouseButton(m_window_handle, static_cast<int>(button)) == GLFW_PRESS;
 
         const SDL_MouseButtonFlags state {SDL_GetMouseState(nullptr, nullptr)};
@@ -20,7 +20,7 @@ namespace sm::internal {
         return state & SDL_BUTTON_MASK(button_to_sdl_button(button));
     }
 
-    std::pair<float, float> Input::get_mouse_position() const noexcept {
+    std::pair<float, float> get_mouse_position() noexcept {
         float x {}, y {};
 
         SDL_GetMouseState(&x, &y);
