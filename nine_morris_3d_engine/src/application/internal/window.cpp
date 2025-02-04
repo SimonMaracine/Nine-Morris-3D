@@ -44,7 +44,7 @@ namespace sm::internal {
         }
 
         if (!SDL_GL_SetAttribute(SDL_GL_FRAMEBUFFER_SRGB_CAPABLE, 1)) {
-            SM_THROW_ERROR(VideoError, "Could not set SDL_GL_FRAMEBUFFER_SRGB_CAPABLE attribute: {}", SDL_GetError());
+            LOG_DIST_ERROR("Could not set SDL_GL_FRAMEBUFFER_SRGB_CAPABLE attribute: {}", SDL_GetError());
         }
 
         unsigned int flags {SDL_WINDOW_OPENGL | SDL_WINDOW_HIDDEN};
@@ -76,15 +76,12 @@ namespace sm::internal {
             SM_THROW_ERROR(VideoError, "Could not initialize GLAD");
         }
 
-        // FIXME don't panic
         if (!SDL_GL_SetSwapInterval(1)) {
-            SDL_Quit();
-            SM_THROW_ERROR(VideoError, "Could not set swap interval: {}", SDL_GetError());
+            LOG_DIST_ERROR("Could not set swap interval: {}", SDL_GetError());
         }
 
         if (!SDL_SetWindowMinimumSize(m_window, properties.min_width, properties.min_height)) {
-            SDL_Quit();
-            SM_THROW_ERROR(VideoError, "Could not set minimum window size: {}", SDL_GetError());
+            LOG_DIST_ERROR("Could not set minimum window size: {}", SDL_GetError());
         }
 
 #ifndef SM_BUILD_DISTRIBUTION
@@ -95,6 +92,12 @@ namespace sm::internal {
     }
 
     Window::~Window() {
+        for (auto iter {std::next(m_surfaces.begin())}; iter != m_surfaces.end(); iter++) {
+            SDL_DestroySurface(*iter);
+        }
+
+        SDL_DestroySurface(m_surfaces[0]);
+
         SDL_GL_DestroyContext(static_cast<SDL_GLContext>(m_context));
         SDL_DestroyWindow(m_window);
         SDL_Quit();
@@ -117,13 +120,12 @@ namespace sm::internal {
     }
 
     void Window::set_vsync(bool enable) const {
-        // FIXME don't panic
         if (!SDL_GL_SetSwapInterval(static_cast<int>(enable))) {
-            SM_THROW_ERROR(VideoError, "Could not set swap interval: {}", SDL_GetError());
+            LOG_DIST_ERROR("Could not set swap interval: {}", SDL_GetError());
         }
     }
 
-    void Window::set_icons(std::initializer_list<std::unique_ptr<TextureData>> icons) const {
+    void Window::set_icons(std::initializer_list<std::shared_ptr<TextureData>> icons) {
         assert(icons.size() > 0);
 
         std::vector<SDL_Surface*> surfaces;
@@ -132,7 +134,7 @@ namespace sm::internal {
             SDL_Surface* surface {SDL_CreateSurfaceFrom(
                 icon->get_width(),
                 icon->get_height(),
-                SDL_PIXELFORMAT_RGBA8888,
+                SDL_PIXELFORMAT_RGBA32,
                 icon->get_data(),
                 icon->get_width() * 4
             )};
@@ -142,6 +144,7 @@ namespace sm::internal {
             }
 
             surfaces.push_back(surface);
+            m_icons.push_back(icon);
         }
 
         SDL_Surface* surface {surfaces[0]};
@@ -152,15 +155,11 @@ namespace sm::internal {
             }
         }
 
-        if (!SDL_SetWindowIcon(m_window, surfaces[0])) {
-            SM_THROW_ERROR(VideoError, "Could not set window icon: {}", SDL_GetError());
+        if (!SDL_SetWindowIcon(m_window, surface)) {
+            LOG_DIST_ERROR("Could not set window icon: {}", SDL_GetError());
         }
 
-        for (auto iter {std::next(surfaces.begin())}; iter != surfaces.end(); iter++) {
-            SDL_DestroySurface(*iter);
-        }
-
-        SDL_DestroySurface(surface);
+        m_surfaces = std::move(surfaces);
     }
 
     void Window::set_size(int width, int height) {

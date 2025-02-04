@@ -24,7 +24,7 @@
 
 - GCC: build-essential
 - X11: xorg-dev
-- Wayland: libwayland-dev libxkbcommon-dev (wayland-protocols extra-cmake-modules)?
+- Wayland: libwayland-dev libxkbcommon-dev (wayland-protocols extra-cmake-modules)? libdecor.x86_64
 - PulseAudio: libasound2-dev libpulse-dev
 - OpenGL: libopengl-dev | libegl1-mesa-dev | mesa-common-dev (one of these)
 - zlib: zlib1g-dev

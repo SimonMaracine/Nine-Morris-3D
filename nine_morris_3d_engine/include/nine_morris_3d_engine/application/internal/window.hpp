@@ -11,6 +11,7 @@
 #include "nine_morris_3d_engine/graphics/texture_data.hpp"
 
 struct SDL_Window;
+struct SDL_Surface;
 
 namespace sm::internal {
     // Window management API
@@ -37,7 +38,7 @@ namespace sm::internal {
         void set_vsync(bool enable) const;
 
         // Set application icons
-        void set_icons(std::initializer_list<std::unique_ptr<TextureData>> icons) const;
+        void set_icons(std::initializer_list<std::shared_ptr<TextureData>> icons);
 
         // Set window size
         void set_size(int width, int height);
@@ -62,6 +63,10 @@ namespace sm::internal {
 
         SDL_Window* m_window {};
         void* m_context {};
+
+        // FIXME see if needed
+        std::vector<SDL_Surface*> m_surfaces;
+        std::vector<std::shared_ptr<sm::TextureData>> m_icons;
 
         EventDispatcher& m_evt;
     };

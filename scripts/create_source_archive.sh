@@ -44,15 +44,15 @@ strip -v -s $BIN/*
 chmod -v +x $BIN/*
 
 mkdir -v -p $ICONS/32x32/apps
-cp -v $ICONS_DIRECTORY/32x32/ninemorris3d.png $ICONS/32x32/apps/ninemorris3d.png
+cp -v $ICONS_DIRECTORY/32x32/nine_morris_3d.png $ICONS/32x32/apps/nine_morris_3d.png
 mkdir -v -p $ICONS/64x64/apps
-cp -v $ICONS_DIRECTORY/64x64/ninemorris3d.png $ICONS/64x64/apps/ninemorris3d.png
+cp -v $ICONS_DIRECTORY/64x64/nine_morris_3d.png $ICONS/64x64/apps/nine_morris_3d.png
 mkdir -v -p $ICONS/128x128/apps
-cp -v $ICONS_DIRECTORY/128x128/ninemorris3d.png $ICONS/128x128/apps/ninemorris3d.png
+cp -v $ICONS_DIRECTORY/128x128/nine_morris_3d.png $ICONS/128x128/apps/nine_morris_3d.png
 mkdir -v -p $ICONS/256x256/apps
-cp -v $ICONS_DIRECTORY/256x256/ninemorris3d.png $ICONS/256x256/apps/ninemorris3d.png
+cp -v $ICONS_DIRECTORY/256x256/nine_morris_3d.png $ICONS/256x256/apps/nine_morris_3d.png
 mkdir -v -p $ICONS/512x512/apps
-cp -v $ICONS_DIRECTORY/512x512/ninemorris3d.png $ICONS/512x512/apps/ninemorris3d.png
+cp -v $ICONS_DIRECTORY/512x512/nine_morris_3d.png $ICONS/512x512/apps/nine_morris_3d.png
 
 mkdir -v -p $DESKTOP
 cp -v $DESKTOP_FILE $DESKTOP/$(basename $DESKTOP_FILE)

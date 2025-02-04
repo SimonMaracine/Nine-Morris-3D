@@ -107,7 +107,7 @@ namespace sm {
         int get_window_height() const;
         void show_window() const;
         void set_window_vsync(bool enable) const;
-        void set_window_icons(std::initializer_list<std::unique_ptr<TextureData>> icons) const;
+        void set_window_icons(std::initializer_list<std::shared_ptr<TextureData>> icons);
         void set_window_size(int width, int height);
         static double get_time();
 
