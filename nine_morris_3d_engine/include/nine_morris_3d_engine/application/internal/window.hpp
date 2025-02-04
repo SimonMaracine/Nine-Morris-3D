@@ -53,8 +53,8 @@ namespace sm::internal {
         // You may refer to the documentation https://www.glfw.org/docs/latest/window_guide.html
         void set_icons(std::initializer_list<std::unique_ptr<TextureData>> icons) const;
 
-        // Set window dimensions
-        void set_dimensions(int width, int height);
+        // Set window size
+        void set_size(int width, int height);
 
         // Get the current display monitors
         // Monitors get_monitors() const;
@@ -69,10 +69,10 @@ namespace sm::internal {
         void flip() const;
 
         // Update events
-        void update();
+        void poll_events();
     private:
         // void create_window(const ApplicationProperties& properties);
-        void install_callbacks() const noexcept;
+        // void install_callbacks() const noexcept;
 
         int m_width {};
         int m_height {};

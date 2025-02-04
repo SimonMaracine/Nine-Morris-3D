@@ -14,18 +14,17 @@ namespace sm {
         int height {};
     };
 
-    struct WindowFocusedEvent {
-        bool focused {};
-    };
+    struct WindowFocusGainedEvent {};
 
-    struct WindowIconifiedEvent {
-        bool iconified {};
-    };
+    struct WindowFocusLostEvent {};
 
-    struct WindowMovedEvent {
-        int x {};
-        int y {};
-    };
+    struct WindowMouseEnteredEvent {};
+
+    struct WindowMouseLeftEvent {};
+
+    struct WindowMaximizedEvent {};
+
+    struct WindowMinimizedEvent {};
 
     struct KeyPressedEvent {
         Key key {};
@@ -72,15 +71,17 @@ namespace sm {
         } \
     };
 
-// FIXME
 SM_EVENT_FORMATTER(sm::WindowClosedEvent, "WindowClosedEvent")
 SM_EVENT_FORMATTER(sm::WindowResizedEvent, "WindowResizedEvent({}, {})", event.width, event.height)
-SM_EVENT_FORMATTER(sm::WindowFocusedEvent, "WindowFocusedEvent({})", event.focused)
-SM_EVENT_FORMATTER(sm::WindowIconifiedEvent, "WindowIconifiedEvent({})", event.iconified)
-SM_EVENT_FORMATTER(sm::WindowMovedEvent, "WindowMovedEvent({}, {})", event.position_x, event.position_y)
+SM_EVENT_FORMATTER(sm::WindowFocusGainedEvent, "WindowFocusGainedEvent")
+SM_EVENT_FORMATTER(sm::WindowFocusLostEvent, "WindowFocusLostEvent")
+SM_EVENT_FORMATTER(sm::WindowMouseEnteredEvent, "WindowMouseEnteredEvent")
+SM_EVENT_FORMATTER(sm::WindowMouseLeftEvent, "WindowMouseLeftEvent")
+SM_EVENT_FORMATTER(sm::WindowMaximizedEvent, "WindowMaximizedEvent")
+SM_EVENT_FORMATTER(sm::WindowMinimizedEvent, "WindowMinimizedEvent")
 SM_EVENT_FORMATTER(sm::KeyPressedEvent, "KeyPressedEvent({}, {})", static_cast<int>(event.key), event.repeat)
 SM_EVENT_FORMATTER(sm::KeyReleasedEvent, "KeyReleasedEvent({})", static_cast<int>(event.key))
 SM_EVENT_FORMATTER(sm::MouseButtonPressedEvent, "MouseButtonPressedEvent({})", static_cast<int>(event.button))
 SM_EVENT_FORMATTER(sm::MouseButtonReleasedEvent, "MouseButtonReleasedEvent({})", static_cast<int>(event.button))
 SM_EVENT_FORMATTER(sm::MouseWheelScrolledEvent, "MouseWheelScrolledEvent({})", event.scroll)
-SM_EVENT_FORMATTER(sm::MouseMovedEvent, "MouseMovedEvent({}, {})", event.mouse_x, event.mouse_y)
+SM_EVENT_FORMATTER(sm::MouseMovedEvent, "MouseMovedEvent({}, {})", event.x, event.y)

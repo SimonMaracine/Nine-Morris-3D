@@ -3,7 +3,7 @@
 #include <SDL3/SDL.h>
 
 namespace sm {
-    unsigned int key_to_sdl_keycode(Key key) {
+    unsigned int key_to_sdl_keycode(Key key) noexcept {
         switch (key) {
             case Key::Unknown: return SDLK_UNKNOWN;
             case Key::Return: return SDLK_RETURN;
@@ -118,7 +118,7 @@ namespace sm {
         return SDLK_UNKNOWN;
     }
 
-    Key sdl_keycode_to_key(unsigned int keycode) {
+    Key sdl_keycode_to_key(unsigned int keycode) noexcept {
         switch (keycode) {
             case SDLK_UNKNOWN: return Key::Unknown;
             case SDLK_RETURN: return Key::Return;
@@ -233,7 +233,7 @@ namespace sm {
         return Key::Unknown;
     }
 
-    int button_to_sdl_button(Button button) {
+    int button_to_sdl_button(Button button) noexcept {
         switch (button) {
             case Button::Left: return SDL_BUTTON_LEFT;
             case Button::Middle: return SDL_BUTTON_MIDDLE;
@@ -243,7 +243,7 @@ namespace sm {
         }
     }
 
-    Button sdl_button_to_button(int button) {
+    Button sdl_button_to_button(int button) noexcept {
         switch (button) {
             case SDL_BUTTON_LEFT: return Button::Left;
             case SDL_BUTTON_MIDDLE: return Button::Middle;

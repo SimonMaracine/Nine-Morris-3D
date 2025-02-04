@@ -92,33 +92,33 @@ namespace sm {
         return m_win.get_height();
     }
 
-    void Ctx::show_window() const noexcept {
+    void Ctx::show_window() const {
         m_win.show();
     }
 
-    void Ctx::set_window_vsync(bool enable) const noexcept {
+    void Ctx::set_window_vsync(bool enable) const {
         m_win.set_vsync(enable);
     }
 
-    void Ctx::add_window_cursor(Id id, std::unique_ptr<TextureData>&& cursor, int x_hotspot, int y_hotspot) {
-        m_win.add_cursor(id, std::move(cursor), x_hotspot, y_hotspot);
-    }
+    // void Ctx::add_window_cursor(Id id, std::unique_ptr<TextureData>&& cursor, int x_hotspot, int y_hotspot) {
+    //     m_win.add_cursor(id, std::move(cursor), x_hotspot, y_hotspot);
+    // }
 
-    void Ctx::set_window_cursor(Id id) const {
-        m_win.set_cursor(id);
-    }
+    // void Ctx::set_window_cursor(Id id) const {
+    //     m_win.set_cursor(id);
+    // }
 
     void Ctx::set_window_icons(std::initializer_list<std::unique_ptr<TextureData>> icons) const {
         m_win.set_icons(icons);
     }
 
-    void Ctx::set_window_dimensions(int width, int height) noexcept {
-        m_win.set_dimensions(width, height);
+    void Ctx::set_window_size(int width, int height) {
+        m_win.set_size(width, height);
     }
 
-    Monitors Ctx::get_monitors() const {
-        return m_win.get_monitors();
-    }
+    // Monitors Ctx::get_monitors() const {
+    //     return m_win.get_monitors();
+    // }
 
     double Ctx::get_time() noexcept {
         return internal::Window::get_time();
@@ -196,8 +196,8 @@ namespace sm {
         return m_inp.is_key_pressed(key);
     }
 
-    bool Ctx::is_mouse_button_pressed(MouseButton button) const noexcept {
-        return m_inp.is_mouse_button_pressed(button);
+    bool Ctx::is_button_pressed(Button button) const noexcept {
+        return m_inp.is_button_pressed(button);
     }
 
     std::pair<float, float> Ctx::get_mouse_position() const noexcept {

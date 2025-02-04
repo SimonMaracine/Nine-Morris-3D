@@ -17,14 +17,14 @@ namespace sm::internal {
         bool is_key_pressed(Key key) const noexcept;
 
         // Get the current state of a mouse button
-        bool is_mouse_button_pressed(MouseButton button) const noexcept;
+        bool is_button_pressed(Button button) const noexcept;
 
         // Get the current state of the mouse
         std::pair<float, float> get_mouse_position() const noexcept;
 
         // Conversions
-        static Key key_from_code(int code) noexcept;
-        static MouseButton mouse_button_from_code(int code) noexcept;
+        // static Key key_from_code(int code) noexcept;
+        // static MouseButton mouse_button_from_code(int code) noexcept;
     private:
         GLFWwindow* m_window_handle {};
     };

@@ -225,7 +225,7 @@ namespace sm::internal {
         // glfwSetWindowIcon(m_window, static_cast<int>(icons.size()), icons.data());
     }
 
-    void Window::set_dimensions(int width, int height) {
+    void Window::set_size(int width, int height) {
         if (!SDL_SetWindowSize(m_window, width, height)) {
             SM_THROW_ERROR(WindowError, "Could not set window size: "s + SDL_GetError());
         }
@@ -292,12 +292,16 @@ namespace sm::internal {
         // glfwSwapBuffers(m_window);
     }
 
-    void Window::update() {
+    // if (imgui_context::on_char_typed(codepoint)) {
+    //     return;
+    // }
+
+    void Window::poll_events() {
         SDL_Event event;
 
         while (SDL_PollEvent(&event)) {
             switch (event.type) {
-                case SDL_EVENT_QUIT:
+                case SDL_EVENT_WINDOW_CLOSE_REQUESTED:
                     // application->events.enqueue<WindowClosedEvent>();
                     m_evt.enqueue<WindowClosedEvent>();
 
@@ -310,22 +314,38 @@ namespace sm::internal {
 
                     break;
                 case SDL_EVENT_WINDOW_FOCUS_GAINED:
+                    m_evt.enqueue<WindowFocusGainedEvent>();
+
                     break;
                 case SDL_EVENT_WINDOW_FOCUS_LOST:
+                    m_evt.enqueue<WindowFocusLostEvent>();
+
                     break;
                 case SDL_EVENT_WINDOW_MOUSE_ENTER:
+                    m_evt.enqueue<WindowMouseEnteredEvent>();
+
                     break;
                 case SDL_EVENT_WINDOW_MOUSE_LEAVE:
+                    m_evt.enqueue<WindowMouseLeftEvent>();
+
                     break;
                 case SDL_EVENT_WINDOW_MAXIMIZED:
+                    m_evt.enqueue<WindowMaximizedEvent>();
+
                     break;
                 case SDL_EVENT_WINDOW_MINIMIZED:
+                    m_evt.enqueue<WindowMinimizedEvent>();
+
                     break;
                 case SDL_EVENT_KEY_DOWN:
                     // application->events.enqueue<KeyPressedEvent>(
                     //     static_cast<KeyCode>(event.key.keysym.sym),
                     //     static_cast<bool>(event.key.repeat)
                     // );
+
+                    if (imgui_context::on_key_pressed(event.key.key, event.key.scancode)) {
+                        return;
+                    }
 
                     m_evt.enqueue<KeyPressedEvent>(
                         sdl_keycode_to_key(event.key.key),
@@ -337,6 +357,10 @@ namespace sm::internal {
 
                     break;
                 case SDL_EVENT_KEY_UP:
+                    if (imgui_context::on_key_released(event.key.key, event.key.scancode)) {
+                        return;
+                    }
+
                     m_evt.enqueue<KeyReleasedEvent>(sdl_keycode_to_key(event.key.key));
 
                     // application->events.enqueue<KeyReleasedEvent>(static_cast<KeyCode>(event.key.keysym.sym));
@@ -351,6 +375,10 @@ namespace sm::internal {
                     //     event.motion.yrel
                     // );
 
+                    if (imgui_context::on_mouse_moved(event.motion.x, event.motion.y)) {
+                        return;
+                    }
+
                     m_evt.enqueue<MouseMovedEvent>(event.motion.x, event.motion.y, event.motion.xrel, event.motion.yrel);
 
                     break;
@@ -361,6 +389,9 @@ namespace sm::internal {
                     //     event.button.y
                     // );
 
+                    if (imgui_context::on_mouse_button_pressed(event.button.button)) {
+                        return;
+                    }
 
                     m_evt.enqueue<MouseButtonPressedEvent>(sdl_button_to_button(event.button.button), event.button.x, event.button.y);
 
@@ -372,11 +403,19 @@ namespace sm::internal {
                     //     event.button.y
                     // );
 
+                    if (imgui_context::on_mouse_button_released(event.button.button)) {
+                        return;
+                    }
+
                     m_evt.enqueue<MouseButtonReleasedEvent>(sdl_button_to_button(event.button.button), event.button.x, event.button.y);
 
                     break;
                 case SDL_EVENT_MOUSE_WHEEL:
                     // application->events.enqueue<MouseWheelScrolledEvent>(event.wheel.y);
+
+                    if (imgui_context::on_mouse_wheel_scrolled(event.wheel.y)) {
+                        return;
+                    }
 
                     m_evt.enqueue<MouseWheelScrolledEvent>(event.wheel.y);
 

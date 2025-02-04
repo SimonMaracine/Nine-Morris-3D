@@ -100,13 +100,13 @@ namespace sm {
         // Window
         int get_window_width() const noexcept;
         int get_window_height() const noexcept;
-        void show_window() const noexcept;
-        void set_window_vsync(bool enable) const noexcept;
-        void add_window_cursor(Id id, std::unique_ptr<TextureData>&& cursor, int x_hotspot, int y_hotspot);
-        void set_window_cursor(Id id) const;
+        void show_window() const;
+        void set_window_vsync(bool enable) const;
+        // void add_window_cursor(Id id, std::unique_ptr<TextureData>&& cursor, int x_hotspot, int y_hotspot);
+        // void set_window_cursor(Id id) const;
         void set_window_icons(std::initializer_list<std::unique_ptr<TextureData>> icons) const;
-        void set_window_dimensions(int width, int height) noexcept;
-        Monitors get_monitors() const;
+        void set_window_size(int width, int height);
+        // Monitors get_monitors() const;
         static double get_time() noexcept;
 
         // Renderer
@@ -134,7 +134,7 @@ namespace sm {
 
         // Input
         bool is_key_pressed(Key key) const noexcept;
-        bool is_mouse_button_pressed(MouseButton button) const noexcept;
+        bool is_button_pressed(Button button) const noexcept;
         std::pair<float, float> get_mouse_position() const noexcept;
 
         // Scene
