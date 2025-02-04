@@ -58,19 +58,19 @@ namespace sm {
             std::unique_ptr<ApplicationScene> scene;
         };
 
-        float update_frame_counter() noexcept;
-        unsigned int calculate_fixed_update() noexcept;
+        float update_frame_counter();
+        unsigned int calculate_fixed_update();
         void check_changed_scene();
-        void change_scene(Id id, bool clear_resources = false) noexcept;
+        void change_scene(Id id, bool clear_resources = false);
         void dear_imgui_render();
-        void setup_start_scene(Id start_scene_id) noexcept;
+        void setup_start_scene(Id start_scene_id);
         void scene_on_start(MetaScene* meta_scene);
         void scene_on_stop(MetaScene* meta_scene);
 
-        void on_window_closed(const WindowClosedEvent&) noexcept;
+        void on_window_closed(const WindowClosedEvent& event);
         void on_window_resized(const WindowResizedEvent& event);
-        void on_window_maximized(const WindowMaximizedEvent& event) noexcept;
-        void on_window_minimized(const WindowMinimizedEvent& event) noexcept;
+        void on_window_restored(const WindowRestoredEvent& event);
+        void on_window_minimized(const WindowMinimizedEvent& event);
 
         // API accessible to the user
         Ctx m_ctx;

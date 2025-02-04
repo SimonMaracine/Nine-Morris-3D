@@ -1,9 +1,6 @@
 [submodule "nine_morris_3d_engine/extern/assimp"]
 	path = nine_morris_3d_engine/extern/assimp
 	url = https://github.com/SimonMaracine/assimp.git
-[submodule "nine_morris_3d_engine/extern/glfw"]
-	path = nine_morris_3d_engine/extern/glfw
-	url = https://github.com/SimonMaracine/glfw.git
 [submodule "nine_morris_3d_engine/extern/glm"]
 	path = nine_morris_3d_engine/extern/glm
 	url = https://github.com/SimonMaracine/glm.git

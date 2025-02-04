@@ -7,7 +7,7 @@
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
 
-#include "nine_morris_3d_engine/application/error.hpp"
+#include "nine_morris_3d_engine/application/internal/error.hpp"
 #include "nine_morris_3d_engine/application/logging.hpp"
 
 namespace sm {
@@ -150,14 +150,14 @@ namespace sm {
         const aiScene* scene {importer.ReadFileFromMemory(buffer.data(), buffer.size(), flags)};
 
         if (scene == nullptr) {
-            SM_THROW_ERROR(ResourceError, "Could not load model data: {}", importer.GetErrorString());
+            SM_THROW_ERROR(internal::ResourceError, "Could not load model data: {}", importer.GetErrorString());
         }
 
         const aiNode* root_node {scene->mRootNode};
         const aiMesh* mesh {find_mesh(root_node, object_name, scene)};
 
         if (mesh == nullptr) {
-            SM_THROW_ERROR(ResourceError, "Model file does not contain `{}` mesh", object_name);
+            SM_THROW_ERROR(internal::ResourceError, "Model file does not contain `{}` mesh", object_name);
         }
 
         load(type, mesh);
@@ -166,34 +166,34 @@ namespace sm {
         m_aabb.max = glm::vec3(mesh->mAABB.mMax.x, mesh->mAABB.mMax.y, mesh->mAABB.mMax.z);
     }
 
-    Mesh::~Mesh() noexcept {
+    Mesh::~Mesh() {
         delete[] m_vertices;
         delete[] m_indices;
 
         LOG_DEBUG("Freed model data");
     }
 
-    const unsigned char* Mesh::get_vertices() const noexcept {
+    const unsigned char* Mesh::get_vertices() const {
         return m_vertices;
     }
 
-    const unsigned char* Mesh::get_indices() const noexcept {
+    const unsigned char* Mesh::get_indices() const {
         return m_indices;
     }
 
-    std::size_t Mesh::get_vertices_size() const noexcept {
+    std::size_t Mesh::get_vertices_size() const {
         return m_vertices_size;
     }
 
-    std::size_t Mesh::get_indices_size() const noexcept {
+    std::size_t Mesh::get_indices_size() const {
         return m_indices_size;
     }
 
-    const utils::AABB& Mesh::get_aabb() const noexcept {
+    const utils::AABB& Mesh::get_aabb() const {
         return m_aabb;
     }
 
-    Mesh::Type Mesh::get_type() const noexcept {
+    Mesh::Type Mesh::get_type() const {
         return m_type;
     }
 

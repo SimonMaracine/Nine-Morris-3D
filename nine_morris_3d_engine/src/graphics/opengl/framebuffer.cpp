@@ -4,7 +4,7 @@
 
 #include <glad/glad.h>
 
-#include "nine_morris_3d_engine/application/error.hpp"
+#include "nine_morris_3d_engine/application/internal/error.hpp"
 #include "nine_morris_3d_engine/application/logging.hpp"
 
 namespace sm {
@@ -15,11 +15,11 @@ namespace sm {
         GL_COLOR_ATTACHMENT3
     };
 
-    static unsigned int target(bool multisampled) noexcept {
+    static unsigned int target(bool multisampled) {
         return multisampled ? GL_TEXTURE_2D_MULTISAMPLE : GL_TEXTURE_2D;
     }
 
-    static bool depth_attachment_present(const FramebufferSpecification& m_specification) noexcept {
+    static bool depth_attachment_present(const FramebufferSpecification& m_specification) {
         return (
             m_specification.depth_attachment.format != AttachmentFormat::None &&
             m_specification.depth_attachment.type != AttachmentType::None
@@ -33,7 +33,7 @@ namespace sm {
         int width,
         int height,
         unsigned int index
-    ) noexcept {
+    ) {
         const bool multisampled {samples > 1};
 
         if (multisampled) {
@@ -66,7 +66,7 @@ namespace sm {
         int height,
         bool white_border,
         bool comparison_mode
-    ) noexcept {
+    ) {
         const bool multisampled {samples > 1};
 
         if (multisampled) {
@@ -102,7 +102,7 @@ namespace sm {
         int width,
         int height,
         unsigned int index
-    ) noexcept {
+    ) {
         const bool multisampled {samples > 1};
 
         if (multisampled) {
@@ -123,7 +123,7 @@ namespace sm {
         unsigned int attachment,
         int width,
         int height
-    ) noexcept {
+    ) {
         const bool multisampled {samples > 1};
 
         if (multisampled) {
@@ -135,7 +135,7 @@ namespace sm {
         glFramebufferRenderbuffer(GL_FRAMEBUFFER, attachment, GL_RENDERBUFFER, renderbuffer);
     }
 
-    static const char* framebuffer_status_message(GLenum status) noexcept {
+    static const char* framebuffer_status_message(GLenum status) {
         const char* message {};
 
         switch (status) {
@@ -230,25 +230,25 @@ namespace sm {
         LOG_DEBUG("Deleted GL framebuffer {}", m_framebuffer);
     }
 
-    void GlFramebuffer::bind() const noexcept {
+    void GlFramebuffer::bind() const {
         glBindFramebuffer(GL_FRAMEBUFFER, m_framebuffer);
     }
 
-    void GlFramebuffer::bind_default() noexcept {
+    void GlFramebuffer::bind_default() {
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
     }
 
-    unsigned int GlFramebuffer::get_color_attachment(int attachment_index) const noexcept {
+    unsigned int GlFramebuffer::get_color_attachment(int attachment_index) const {
         assert(static_cast<std::size_t>(attachment_index) < m_color_attachments.size());
 
         return m_color_attachments[attachment_index];
     }
 
-    unsigned int GlFramebuffer::get_depth_attachment() const noexcept {
+    unsigned int GlFramebuffer::get_depth_attachment() const {
         return m_depth_attachment;
     }
 
-    const FramebufferSpecification& GlFramebuffer::get_specification() const noexcept {
+    const FramebufferSpecification& GlFramebuffer::get_specification() const {
         return m_specification;
     }
 
@@ -264,7 +264,7 @@ namespace sm {
         build();
     }
 
-    float GlFramebuffer::read_pixel_float(int attachment_index, int x, int y) const noexcept {
+    float GlFramebuffer::read_pixel_float(int attachment_index, int x, int y) const {
         assert(static_cast<std::size_t>(attachment_index) < m_color_attachments.size());
 
         glReadBuffer(GL_COLOR_ATTACHMENT0 + attachment_index);
@@ -274,14 +274,14 @@ namespace sm {
         return pixel;
     }
 
-    void GlFramebuffer::read_pixel_float_pbo(int attachment_index, int x, int y) const noexcept {
+    void GlFramebuffer::read_pixel_float_pbo(int attachment_index, int x, int y) const {
         assert(static_cast<std::size_t>(attachment_index) < m_color_attachments.size());
 
         glReadBuffer(GL_COLOR_ATTACHMENT0 + attachment_index);
         glReadPixels(x, y, 1, 1, GL_RED, GL_FLOAT, nullptr);
     }
 
-    void GlFramebuffer::blit(const GlFramebuffer* draw_framebuffer, int width, int height) const noexcept {
+    void GlFramebuffer::blit(const GlFramebuffer* draw_framebuffer, int width, int height) const {
         assert(m_color_attachments.size() == draw_framebuffer->m_color_attachments.size());
 
         glBindFramebuffer(GL_READ_FRAMEBUFFER, m_framebuffer);
@@ -557,7 +557,7 @@ namespace sm {
 
         if (status != GL_FRAMEBUFFER_COMPLETE) {
             SM_THROW_ERROR(
-                OtherError,
+                internal::OtherError,
                 "GL framebuffer {} is incomplete: {}",
                 m_framebuffer,
                 framebuffer_status_message(status)

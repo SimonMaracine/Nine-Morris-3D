@@ -3,7 +3,7 @@
 #include <cstdio>
 
 #include <imgui.h>
-#include <GLFW/glfw3.h>
+#include <SDL3/SDL.h>
 #include <assimp/version.h>
 #include <glm/glm.hpp>
 #include <spdlog/version.h>
@@ -30,7 +30,7 @@ namespace sm::dependencies {
 
         result += "*** Engine Dependencies ***\n";
 
-        std::snprintf(buffer, sizeof(buffer), "GLFW: %s\n", glfwGetVersionString());
+        std::snprintf(buffer, sizeof(buffer), "SDL: %d\n", SDL_GetVersion());
         result += buffer;
 
         std::snprintf(buffer, sizeof(buffer), "Dear ImGui: %s\n", ImGui::GetVersion());

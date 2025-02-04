@@ -161,7 +161,7 @@ namespace sm::internal {
     //     }
     // }
 
-    void imgui_context::initialize(void* window, void* context) noexcept {
+    void imgui_context::initialize(void* window, void* context) {
         IMGUI_CHECKVERSION();
 
         ImGui::CreateContext();
@@ -174,19 +174,19 @@ namespace sm::internal {
 #endif
     }
 
-    void imgui_context::uninitialize() noexcept {
+    void imgui_context::uninitialize() {
         ImGui_ImplOpenGL3_Shutdown();
         ImGui_ImplSDL3_Shutdown();
         ImGui::DestroyContext();
     }
 
-    void imgui_context::begin_frame() noexcept {
+    void imgui_context::begin_frame() {
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplSDL3_NewFrame();
         ImGui::NewFrame();
     }
 
-    void imgui_context::end_frame() noexcept {
+    void imgui_context::end_frame() {
         ImGui::EndFrame();
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
@@ -204,39 +204,39 @@ namespace sm::internal {
         return ImGui::GetIO().WantCaptureKeyboard;
     }
 
-    void imgui_context::invalidate_texture() noexcept {
+    void imgui_context::invalidate_texture() {
         ImGui_ImplOpenGL3_DestroyFontsTexture();
     }
 
-    // bool imgui_context::on_mouse_wheel_scrolled(float yoffset) noexcept {
+    // bool imgui_context::on_mouse_wheel_scrolled(float yoffset) {
     //     ImGuiIO& io {ImGui::GetIO()};
     //     io.AddMouseWheelEvent(0.0f, yoffset);
 
     //     return io.WantCaptureMouse;
     // }
 
-    // bool imgui_context::on_mouse_moved(float xpos, float ypos) noexcept {
+    // bool imgui_context::on_mouse_moved(float xpos, float ypos) {
     //     ImGuiIO& io {ImGui::GetIO()};
     //     io.AddMousePosEvent(xpos, ypos);
 
     //     return io.WantCaptureMouse;
     // }
 
-    // bool imgui_context::on_mouse_button_pressed(int button) noexcept {
+    // bool imgui_context::on_mouse_button_pressed(int button) {
     //     ImGuiIO& io {ImGui::GetIO()};
     //     io.AddMouseButtonEvent(button, true);
 
     //     return io.WantCaptureMouse;
     // }
 
-    // bool imgui_context::on_mouse_button_released(int button) noexcept {
+    // bool imgui_context::on_mouse_button_released(int button) {
     //     ImGuiIO& io {ImGui::GetIO()};
     //     io.AddMouseButtonEvent(button, false);
 
     //     return io.WantCaptureMouse;
     // }
 
-    // bool imgui_context::on_key_pressed(int key, int scancode) noexcept {
+    // bool imgui_context::on_key_pressed(int key, int scancode) {
     //     key = translate_untranslated_key(key, scancode);
 
     //     ImGuiIO& io {ImGui::GetIO()};
@@ -245,7 +245,7 @@ namespace sm::internal {
     //     return io.WantCaptureKeyboard;
     // }
 
-    // bool imgui_context::on_key_released(int key, int scancode) noexcept {
+    // bool imgui_context::on_key_released(int key, int scancode) {
     //     key = translate_untranslated_key(key, scancode);
 
     //     ImGuiIO& io {ImGui::GetIO()};
@@ -254,7 +254,7 @@ namespace sm::internal {
     //     return io.WantCaptureKeyboard;
     // }
 
-    // bool imgui_context::on_char_typed(unsigned int codepoint) noexcept {
+    // bool imgui_context::on_char_typed(unsigned int codepoint) {
     //     ImGuiIO& io {ImGui::GetIO()};
     //     io.AddInputCharacter(codepoint);
 

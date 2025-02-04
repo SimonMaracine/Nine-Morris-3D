@@ -21,8 +21,8 @@ public:
         float sensitivity
     );
 
-    glm::vec3 get_position() const noexcept override;
-    glm::vec3 get_rotation() const noexcept override;
+    glm::vec3 get_position() const override;
+    glm::vec3 get_rotation() const override;
 
     glm::vec3 get_point() const { return m_point; }
     float get_distance_to_point() const { return m_distance_to_point; }
@@ -52,7 +52,6 @@ private:
     void on_mouse_button_released(const sm::MouseButtonReleasedEvent& event);
     void on_key_pressed(const sm::KeyPressedEvent& event);
     void on_key_released(const sm::KeyReleasedEvent& event);
-    // void on_window_moved(const sm::WindowMovedEvent&);  // FIXME
 
     void go_towards_position_x(glm::vec3 direction);
     void go_towards_position_y(glm::vec3 direction);

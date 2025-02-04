@@ -2,7 +2,7 @@
 
 #include <spdlog/fmt/fmt.h>
 
-#include "nine_morris_3d_engine/application/input_codes.hpp"
+#include "nine_morris_3d_engine/application/internal/input_codes.hpp"
 
 // Application-level events
 
@@ -22,7 +22,7 @@ namespace sm {
 
     struct WindowMouseLeftEvent {};
 
-    struct WindowMaximizedEvent {};
+    struct WindowRestoredEvent {};
 
     struct WindowMinimizedEvent {};
 
@@ -77,7 +77,7 @@ SM_EVENT_FORMATTER(sm::WindowFocusGainedEvent, "WindowFocusGainedEvent")
 SM_EVENT_FORMATTER(sm::WindowFocusLostEvent, "WindowFocusLostEvent")
 SM_EVENT_FORMATTER(sm::WindowMouseEnteredEvent, "WindowMouseEnteredEvent")
 SM_EVENT_FORMATTER(sm::WindowMouseLeftEvent, "WindowMouseLeftEvent")
-SM_EVENT_FORMATTER(sm::WindowMaximizedEvent, "WindowMaximizedEvent")
+SM_EVENT_FORMATTER(sm::WindowRestoredEvent, "WindowRestoredEvent")
 SM_EVENT_FORMATTER(sm::WindowMinimizedEvent, "WindowMinimizedEvent")
 SM_EVENT_FORMATTER(sm::KeyPressedEvent, "KeyPressedEvent({}, {})", static_cast<int>(event.key), event.repeat)
 SM_EVENT_FORMATTER(sm::KeyReleasedEvent, "KeyReleasedEvent({})", static_cast<int>(event.key))

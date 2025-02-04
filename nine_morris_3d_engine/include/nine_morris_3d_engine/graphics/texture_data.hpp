@@ -16,16 +16,17 @@ namespace sm {
     class TextureData {
     public:
         TextureData(const std::string& buffer, const TexturePostProcessing& post_processing = {});
-        ~TextureData() noexcept;
+        ~TextureData();
 
         TextureData(const TextureData&) = delete;
         TextureData& operator=(const TextureData&) = delete;
         TextureData(TextureData&&) = delete;
         TextureData& operator=(TextureData&&) = delete;
 
-        int get_width() const noexcept;
-        int get_height() const noexcept;
-        const unsigned char* get_data() const noexcept;
+        int get_width() const;
+        int get_height() const;
+        const unsigned char* get_data() const;
+        unsigned char* get_data();
     private:
         void resize(int new_width, int new_height);
 

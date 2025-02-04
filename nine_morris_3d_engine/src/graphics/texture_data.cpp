@@ -6,7 +6,7 @@
 #include <stb_image.h>
 #include <stb_image_resize2.h>
 
-#include "nine_morris_3d_engine/application/error.hpp"
+#include "nine_morris_3d_engine/application/internal/error.hpp"
 #include "nine_morris_3d_engine/application/logging.hpp"
 
 // Define these to guarantee we're only using malloc
@@ -40,7 +40,7 @@ namespace sm {
         }
 
         if (m_data == nullptr) {
-            SM_THROW_ERROR(ResourceError, "Could not load texture data");
+            SM_THROW_ERROR(internal::ResourceError, "Could not load texture data");
         }
 
         if (post_processing.size == TextureSize::Half) {
@@ -52,7 +52,7 @@ namespace sm {
         LOG_DEBUG("Loaded texture data");
     }
 
-    TextureData::~TextureData() noexcept {
+    TextureData::~TextureData() {
         assert(m_data != nullptr);
 
         stbi_image_free(m_data);
@@ -60,15 +60,19 @@ namespace sm {
         LOG_DEBUG("Freed texture data");
     }
 
-    int TextureData::get_width() const noexcept {
+    int TextureData::get_width() const {
         return m_width;
     }
 
-    int TextureData::get_height() const noexcept {
+    int TextureData::get_height() const {
         return m_height;
     }
 
-    const unsigned char* TextureData::get_data() const noexcept {
+    const unsigned char* TextureData::get_data() const {
+        return m_data;
+    }
+
+    unsigned char* TextureData::get_data() {
         return m_data;
     }
 

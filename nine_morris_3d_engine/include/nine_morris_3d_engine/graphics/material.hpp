@@ -31,7 +31,7 @@ namespace sm {
             CastShadow = 1u << 2
         };
 
-        Material(std::shared_ptr<GlShader> shader, unsigned int flags = 0) noexcept;
+        Material(std::shared_ptr<GlShader> shader, unsigned int flags = 0);
 
         void add_uniform(Uniform type, Id name);
         void add_texture(Id name);
@@ -66,7 +66,7 @@ namespace sm {
         void set_texture(Id name, std::shared_ptr<GlTexture> texture, int unit);
         void set_texture(Id name, unsigned int texture, int unit);
 
-        const GlShader* get_shader() const noexcept;
+        const GlShader* get_shader() const;
 
         unsigned int flags {};
     private:

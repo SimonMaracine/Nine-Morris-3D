@@ -3,7 +3,7 @@
 #include "nine_morris_3d_engine/graphics/internal/opengl.hpp"
 
 namespace sm {
-    void PostProcessingStep::bind_texture(unsigned int texture, int unit) noexcept {
+    void PostProcessingStep::bind_texture(unsigned int texture, int unit) {
         internal::opengl::bind_texture_2d(texture, unit);
     }
 }

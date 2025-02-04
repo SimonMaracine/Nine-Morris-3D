@@ -2,7 +2,7 @@
 
 #include <AL/alc.h>
 
-#include "nine_morris_3d_engine/application/error.hpp"
+#include "nine_morris_3d_engine/application/internal/error.hpp"
 #include "nine_morris_3d_engine/application/logging.hpp"
 #include "nine_morris_3d_engine/audio/openal/listener.hpp"
 
@@ -43,7 +43,7 @@ namespace sm::internal {
         LOG_INFO("Opened playback device and created OpenAL context");
     }
 
-    OpenAlContext::~OpenAlContext() noexcept {
+    OpenAlContext::~OpenAlContext() {
         if (!m_create) {
             return;
         }

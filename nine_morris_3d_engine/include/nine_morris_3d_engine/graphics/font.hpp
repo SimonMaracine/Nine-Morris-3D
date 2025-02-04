@@ -26,8 +26,8 @@ namespace sm {
         Font(Font&&) = delete;
         Font& operator=(Font&&) = delete;
 
-        int get_bitmap_size() const noexcept;
-        const GlTexture* get_bitmap() const noexcept;
+        int get_bitmap_size() const;
+        const GlTexture* get_bitmap() const;
 
         // Baking API
         void begin_baking();
@@ -62,7 +62,7 @@ namespace sm {
             float x1, y1, s1, t1;
         };
 
-        void get_character_quad(int codepoint, float* x, float* y, Quad* quad) const noexcept;
+        void get_character_quad(int codepoint, float* x, float* y, Quad* quad) const;
         static void write_bitmap_to_file(const char* name, const unsigned char* bitmap, int size);
 
         struct PackRange {

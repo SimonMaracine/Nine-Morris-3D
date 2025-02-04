@@ -9,20 +9,20 @@
 #include "nine_morris_3d_engine/application/platform.hpp"
 
 namespace sm::internal {
-    void Scene::capture(const Camera& camera, glm::vec3 position) noexcept {
+    void Scene::capture(const Camera& camera, glm::vec3 position) {
         m_camera = camera;
         m_camera_position = position;
     }
 
-    void Scene::capture(const Camera2D& camera_2d) noexcept {
+    void Scene::capture(const Camera2D& camera_2d) {
         m_camera_2d = camera_2d;
     }
 
-    void Scene::environment(const Skybox& skybox) noexcept {
+    void Scene::environment(const Skybox& skybox) {
         m_skybox = skybox;
     }
 
-    void Scene::shadow(ShadowBox& box) noexcept {
+    void Scene::shadow(ShadowBox& box) {
         const glm::mat4 view_matrix {
             glm::lookAt(glm::vec3(0.0f), m_directional_light.direction, glm::vec3(0.0f, 1.0f, 0.0f))
         };
@@ -81,7 +81,7 @@ namespace sm::internal {
 #endif
     }
 
-    void Scene::add_light(DirectionalLight& light) noexcept {
+    void Scene::add_light(DirectionalLight& light) {
         add_light(const_cast<const DirectionalLight&>(light));
 
 #ifndef SM_BUILD_DISTRIBUTION
@@ -198,7 +198,7 @@ namespace sm::internal {
         }
     }
 
-    void Scene::clear() noexcept {
+    void Scene::clear() {
         m_renderables.clear();
         m_directional_light = {};
         m_point_lights.clear();
@@ -221,7 +221,7 @@ namespace sm::internal {
 #endif
     }
 
-    void Scene::shadow(const ShadowBox& box) noexcept {
+    void Scene::shadow(const ShadowBox& box) {
         m_shadow_box = box;
     }
 
@@ -229,7 +229,7 @@ namespace sm::internal {
         m_renderables.push_back(renderable);
     }
 
-    void Scene::add_light(const DirectionalLight& light) noexcept {
+    void Scene::add_light(const DirectionalLight& light) {
         m_directional_light = light;
     }
 

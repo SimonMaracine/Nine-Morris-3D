@@ -7,16 +7,16 @@ namespace sm {
     // An entire part of a game, holding lots of state
     class ApplicationScene {
     public:
-        explicit ApplicationScene(Ctx& ctx) noexcept
+        explicit ApplicationScene(Ctx& ctx)
             : ctx(ctx) {}
-        virtual ~ApplicationScene() noexcept = default;
+        virtual ~ApplicationScene() = default;
 
         ApplicationScene(const ApplicationScene&) = delete;
         ApplicationScene& operator=(const ApplicationScene&) = delete;
         ApplicationScene(ApplicationScene&&) = delete;
         ApplicationScene& operator=(ApplicationScene&&) = delete;
 
-        virtual const char* get_name() const noexcept = 0;  // Get the name of the scene
+        virtual const char* get_name() const = 0;  // Get the name of the scene
         virtual void on_start() {}  // Called when the scene is entered
         virtual void on_stop() {}  // Called when the scene is exited, except when an exception is thrown
         virtual void on_update() {}  // Called every frame
@@ -24,7 +24,7 @@ namespace sm {
         virtual void on_imgui_update() {}  // Called every frame for Dear ImGui only
 
         // Retrieve the scene ID
-        Id get_id() const noexcept {
+        Id get_id() const {
             return Id(get_name());
         }
 
@@ -35,5 +35,5 @@ namespace sm {
 
 // Used inside a scene class definition to autocomplete name functions
 #define SM_SCENE_NAME(NAME) \
-    static const char* get_static_name() noexcept { return NAME; } \
-    const char* get_name() const noexcept override { return get_static_name(); }
+    static const char* get_static_name() { return NAME; } \
+    const char* get_name() const override { return get_static_name(); }

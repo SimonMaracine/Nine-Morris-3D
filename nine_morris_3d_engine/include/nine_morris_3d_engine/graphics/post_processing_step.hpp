@@ -17,18 +17,18 @@ namespace sm {
     // Pointers of post processing steps should be retained as a resource
     class PostProcessingStep {
     public:
-        PostProcessingStep(std::shared_ptr<GlFramebuffer> framebuffer, std::shared_ptr<GlShader> shader) noexcept
+        PostProcessingStep(std::shared_ptr<GlFramebuffer> framebuffer, std::shared_ptr<GlShader> shader)
             : m_framebuffer(framebuffer), m_shader(shader) {}
         virtual ~PostProcessingStep() = default;
 
-        PostProcessingStep(const PostProcessingStep&) noexcept = default;
-        PostProcessingStep& operator=(const PostProcessingStep&) noexcept = default;
-        PostProcessingStep(PostProcessingStep&&) noexcept = default;
-        PostProcessingStep& operator=(PostProcessingStep&&) noexcept = default;
+        PostProcessingStep(const PostProcessingStep&) = default;
+        PostProcessingStep& operator=(const PostProcessingStep&) = default;
+        PostProcessingStep(PostProcessingStep&&) = default;
+        PostProcessingStep& operator=(PostProcessingStep&&) = default;
 
         virtual void setup(const PostProcessingCtx& ctx) const = 0;
 
-        static void bind_texture(unsigned int texture, int unit) noexcept;
+        static void bind_texture(unsigned int texture, int unit);
     protected:
         std::shared_ptr<GlFramebuffer> m_framebuffer;
         std::shared_ptr<GlShader> m_shader;

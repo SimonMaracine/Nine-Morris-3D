@@ -18,39 +18,39 @@ namespace sm::internal {
             NotEqual
         };
 
-        void initialize_default() noexcept;
+        void initialize_default();
 
-        void clear(Buffers buffers) noexcept;
-        void clear_color(float red, float green, float blue) noexcept;
+        void clear(Buffers buffers);
+        void clear_color(float red, float green, float blue);
 
-        void viewport(int width, int height) noexcept;
+        void viewport(int width, int height);
 
-        void bind_texture_2d(unsigned int texture, int unit) noexcept;
+        void bind_texture_2d(unsigned int texture, int unit);
 
-        void draw_arrays(int count) noexcept;
-        void draw_arrays_lines(int count) noexcept;
-        void draw_elements(int count) noexcept;
-        void draw_elements_instanced(int count, int instance_count) noexcept;
+        void draw_arrays(int count);
+        void draw_arrays_lines(int count);
+        void draw_elements(int count);
+        void draw_elements_instanced(int count, int instance_count);
 
-        void disable_depth_test() noexcept;
-        void enable_depth_test() noexcept;
+        void disable_depth_test();
+        void enable_depth_test();
 
-        void disable_blending() noexcept;
-        void enable_blending() noexcept;
+        void disable_blending();
+        void enable_blending();
 
-        void disable_back_face_culling() noexcept;
-        void enable_back_face_culling() noexcept;
+        void disable_back_face_culling();
+        void enable_back_face_culling();
 
-        void enable_framebuffer_srgb() noexcept;
-        void disable_framebuffer_srgb() noexcept;
+        void enable_framebuffer_srgb();
+        void disable_framebuffer_srgb();
 
-        void enable_polygon_offset_fill() noexcept;
-        void disable_polygon_offset_fill() noexcept;
+        void enable_polygon_offset_fill();
+        void disable_polygon_offset_fill();
 
-        void initialize_stencil() noexcept;
-        void stencil_function(Function function, int ref, unsigned int mask) noexcept;
-        void stencil_mask(unsigned int mask) noexcept;
+        void initialize_stencil();
+        void stencil_function(Function function, int ref, unsigned int mask);
+        void stencil_mask(unsigned int mask);
 
-        void initialize_polygon_offset() noexcept;
+        void initialize_polygon_offset();
     }
 }

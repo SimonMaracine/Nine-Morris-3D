@@ -52,11 +52,11 @@ PointCameraController::PointCameraController(
     update_camera(1.0f);
 }
 
-glm::vec3 PointCameraController::get_position() const noexcept {
+glm::vec3 PointCameraController::get_position() const {
     return m_position;
 }
 
-glm::vec3 PointCameraController::get_rotation() const noexcept {
+glm::vec3 PointCameraController::get_rotation() const {
     return glm::vec3(m_pitch, m_yaw, 0.0f);
 }
 
@@ -198,7 +198,6 @@ void PointCameraController::connect_events(sm::Ctx& ctx) {
     ctx.connect_event<sm::MouseButtonReleasedEvent, &PointCameraController::on_mouse_button_released>(this);
     ctx.connect_event<sm::KeyPressedEvent, &PointCameraController::on_key_pressed>(this);
     ctx.connect_event<sm::KeyReleasedEvent, &PointCameraController::on_key_released>(this);
-    // ctx.connect_event<sm::WindowMovedEvent, &PointCameraController::on_window_moved>(this);
 }
 
 void PointCameraController::disconnect_events(sm::Ctx& ctx) {
@@ -281,15 +280,6 @@ void PointCameraController::on_key_released(const sm::KeyReleasedEvent& event) {
             break;
     }
 }
-
-// void PointCameraController::on_window_moved(const sm::WindowMovedEvent&) {
-//     m_input.key_w = false;
-//     m_input.key_a = false;
-//     m_input.key_s = false;
-//     m_input.key_d = false;
-//     m_input.key_r = false;
-//     m_input.key_f = false;
-// }
 
 void PointCameraController::go_towards_position_x(glm::vec3 direction) {
     float integer_angle;

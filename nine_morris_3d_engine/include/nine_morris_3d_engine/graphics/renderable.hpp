@@ -18,17 +18,17 @@ namespace sm {
 
     class Renderable {
     public:
-        Renderable() noexcept = default;
+        Renderable() = default;
         Renderable(
             std::shared_ptr<Mesh> mesh,
             std::shared_ptr<GlVertexArray> vertex_array,
             std::shared_ptr<MaterialInstance> material
-        ) noexcept
+        )
             : m_mesh(mesh), m_vertex_array(vertex_array), m_material(material) {}
 
-        const utils::AABB& get_aabb() const noexcept { return m_mesh->get_aabb(); }
-        MaterialInstance* get_material() const noexcept { return m_material.get(); }
-        operator bool() const noexcept { return m_mesh && m_vertex_array && m_material; }
+        const utils::AABB& get_aabb() const { return m_mesh->get_aabb(); }
+        MaterialInstance* get_material() const { return m_material.get(); }
+        operator bool() const { return m_mesh && m_vertex_array && m_material; }
 
         struct Transform {
             glm::vec3 position {};

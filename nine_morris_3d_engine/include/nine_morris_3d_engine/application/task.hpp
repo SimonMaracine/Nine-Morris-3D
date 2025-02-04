@@ -6,7 +6,7 @@
 #include <exception>
 #include <utility>
 
-#include "nine_morris_3d_engine/application/error.hpp"
+#include "nine_morris_3d_engine/application/internal/error.hpp"
 
 namespace sm {
     namespace internal {
@@ -56,20 +56,20 @@ namespace sm {
 
         // Signal that this task has finished successfully
         // Must be called
-        void set_done() noexcept {
+        void set_done() {
             m_done.store(true);
         }
 
         // Signal that this task has finished with an error
         // Must be called
-        void set_done(std::exception_ptr exception) noexcept {
+        void set_done(std::exception_ptr exception) {
             m_exception = exception;
             m_done.store(true);
         }
 
         // Find out if the application wants to stop this task (ex: the application is closing)
         // Used by the user to prematurely stop a task, if possible, in order to avoid stalling the application
-        bool stop_requested() const noexcept {
+        bool stop_requested() const {
             return m_stop.load();
         }
     private:

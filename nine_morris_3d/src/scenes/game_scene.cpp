@@ -204,7 +204,7 @@ void GameScene::connect(const std::string& address, std::uint16_t port, bool rec
 void GameScene::connect(const std::string& address, const std::string& port, bool reconnect) {
     try {
         connect(address, sm::utils::string_to_unsigned_short(port), reconnect);
-    } catch (const sm::OtherError& e) {
+    } catch (const sm::RuntimeError& e) {
         LOG_DIST_ERROR("Invalid port: {}", e.what());
     }
 }
@@ -272,7 +272,7 @@ void GameScene::client_request_join_game_session(const std::string& session_id) 
 
     try {
         payload.session_id = sm::utils::string_to_unsigned_short(session_id);
-    } catch (const sm::OtherError& e) {
+    } catch (const sm::RuntimeError& e) {
         LOG_DIST_ERROR("Invalid code: {}", e.what());
         m_ui.push_modal_window(ModalWindowJoinGameSessionError, "Invalid code");
         return;

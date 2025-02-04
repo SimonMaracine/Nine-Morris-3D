@@ -12,7 +12,7 @@
 namespace sm {
     static constexpr int CHANNELS {4};
 
-    static bool use_mipmapping(const TextureSpecification& specification) noexcept {
+    static bool use_mipmapping(const TextureSpecification& specification) {
         return specification.mipmapping && specification.mipmapping->levels > 1;
     }
 
@@ -43,7 +43,7 @@ namespace sm {
         }
     }
 
-    static int filter_to_int(TextureFilter filter) noexcept {
+    static int filter_to_int(TextureFilter filter) {
         int result {};
 
         switch (filter) {
@@ -58,7 +58,7 @@ namespace sm {
         return result;
     }
 
-    static int wrap_to_int(TextureWrap wrap) noexcept {
+    static int wrap_to_int(TextureWrap wrap) {
         int result {};
 
         switch (wrap) {
@@ -76,7 +76,7 @@ namespace sm {
         return result;
     }
 
-    static void configure_options(const TextureSpecification& specification) noexcept {
+    static void configure_options(const TextureSpecification& specification) {
         const int min_filter {
             use_mipmapping(specification) ? GL_LINEAR_MIPMAP_LINEAR : filter_to_int(specification.min_filter)
         };
@@ -130,30 +130,30 @@ namespace sm {
         LOG_DEBUG("Created GL texture {}", m_texture);
     }
 
-    GlTexture::~GlTexture() noexcept {
+    GlTexture::~GlTexture() {
         glDeleteTextures(1, &m_texture);
 
         LOG_DEBUG("Deleted GL texture {}", m_texture);
     }
 
-    int GlTexture::get_width() const noexcept {
+    int GlTexture::get_width() const {
         return m_width;
     }
 
-    int GlTexture::get_height() const noexcept {
+    int GlTexture::get_height() const {
         return m_height;
     }
 
-    unsigned int GlTexture::get_id() const noexcept {
+    unsigned int GlTexture::get_id() const {
         return m_texture;
     }
 
-    void GlTexture::bind(unsigned int unit) const noexcept {
+    void GlTexture::bind(unsigned int unit) const {
         glActiveTexture(GL_TEXTURE0 + unit);
         glBindTexture(GL_TEXTURE_2D, m_texture);
     }
 
-    void GlTexture::unbind() noexcept {
+    void GlTexture::unbind() {
         glBindTexture(GL_TEXTURE_2D, 0);
     }
 
@@ -184,7 +184,7 @@ namespace sm {
         }
     }
 
-    GlTextureCubemap::GlTextureCubemap(std::initializer_list<std::shared_ptr<TextureData>> data, TextureFormat format) noexcept {
+    GlTextureCubemap::GlTextureCubemap(std::initializer_list<std::shared_ptr<TextureData>> data, TextureFormat format) {
         glGenTextures(1, &m_texture);
         glBindTexture(GL_TEXTURE_CUBE_MAP, m_texture);
 
@@ -239,18 +239,18 @@ namespace sm {
         LOG_DEBUG("Created GL texture cubemap {}", m_texture);
     }
 
-    GlTextureCubemap::~GlTextureCubemap() noexcept {
+    GlTextureCubemap::~GlTextureCubemap() {
         glDeleteTextures(1, &m_texture);
 
         LOG_DEBUG("Deleted GL texture cubemap {}", m_texture);
     }
 
-    void GlTextureCubemap::bind(unsigned int unit) const noexcept {
+    void GlTextureCubemap::bind(unsigned int unit) const {
         glActiveTexture(GL_TEXTURE0 + unit);
         glBindTexture(GL_TEXTURE_CUBE_MAP, m_texture);
     }
 
-    void GlTextureCubemap::unbind() noexcept {
+    void GlTextureCubemap::unbind() {
         glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
     }
 }

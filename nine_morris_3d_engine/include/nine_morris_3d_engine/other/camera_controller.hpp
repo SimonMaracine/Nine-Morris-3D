@@ -8,26 +8,26 @@
 namespace sm {
     class CameraController {
     public:
-        CameraController() noexcept = default;
-        explicit CameraController(Camera& camera) noexcept
+        CameraController() = default;
+        explicit CameraController(Camera& camera)
             : m_camera(&camera) {}
-        virtual ~CameraController() noexcept = default;
+        virtual ~CameraController() = default;
 
-        CameraController(const CameraController&) noexcept = default;
-        CameraController& operator=(const CameraController&) noexcept = default;
-        CameraController(CameraController&&) noexcept = default;
-        CameraController& operator=(CameraController&&) noexcept = default;
+        CameraController(const CameraController&) = default;
+        CameraController& operator=(const CameraController&) = default;
+        CameraController(CameraController&&) = default;
+        CameraController& operator=(CameraController&&) = default;
 
         virtual void update_controls(float dt, const Ctx& ctx) = 0;
         virtual void update_camera(float dt) = 0;
-        virtual glm::vec3 get_position() const noexcept = 0;
-        virtual glm::vec3 get_rotation() const noexcept = 0;
+        virtual glm::vec3 get_position() const = 0;
+        virtual glm::vec3 get_rotation() const = 0;
 
-        const Camera& get_camera() const noexcept {
+        const Camera& get_camera() const {
             return *m_camera;
         }
 
-        void set_camera(Camera& camera) noexcept {
+        void set_camera(Camera& camera) {
             m_camera = &camera;
         }
     protected:

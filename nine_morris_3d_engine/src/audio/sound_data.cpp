@@ -5,7 +5,7 @@
 
 #include <stb_vorbis.h>
 
-#include "nine_morris_3d_engine/application/error.hpp"
+#include "nine_morris_3d_engine/application/internal/error.hpp"
 #include "nine_morris_3d_engine/application/logging.hpp"
 
 namespace sm {
@@ -19,7 +19,7 @@ namespace sm {
         );
 
         if (m_data == nullptr) {
-            SM_THROW_ERROR(ResourceError, "Could not load sound data");
+            SM_THROW_ERROR(internal::ResourceError, "Could not load sound data");
         }
 
         m_size = compute_size();
@@ -32,7 +32,7 @@ namespace sm {
         LOG_DEBUG("Loaded sound data");
     }
 
-    SoundData::~SoundData() noexcept {
+    SoundData::~SoundData() {
         assert(m_data != nullptr);
 
         std::free(m_data);
@@ -40,35 +40,35 @@ namespace sm {
         LOG_DEBUG("Freed sound data");
     }
 
-    int SoundData::get_samples() const noexcept {
+    int SoundData::get_samples() const {
         return m_samples;
     }
 
-    int SoundData::get_channels() const noexcept {
+    int SoundData::get_channels() const {
         return m_channels;
     }
 
-    int SoundData::get_frequency() const noexcept {
+    int SoundData::get_frequency() const {
         return m_sample_rate;
     }
 
-    const short* SoundData::get_data() const noexcept {
+    const short* SoundData::get_data() const {
         return m_data;
     }
 
-    std::size_t SoundData::get_size() const noexcept {
+    std::size_t SoundData::get_size() const {
         return m_size;
     }
 
-    std::size_t SoundData::get_bps() const noexcept {
+    std::size_t SoundData::get_bps() const {
         return m_bits_per_sample;
     }
 
-    std::size_t SoundData::compute_size() const noexcept {
+    std::size_t SoundData::compute_size() const {
         return m_samples * m_channels * sizeof(short);
     }
 
-    std::size_t SoundData::compute_bits_per_sample() const noexcept {
+    std::size_t SoundData::compute_bits_per_sample() const {
         return (8 * m_size) / (m_samples * m_channels);
     }
 }

@@ -932,7 +932,7 @@ void Ui::create_font(sm::Ctx& ctx, int scale) {
     )};
 
     if (font == nullptr) {
-        SM_THROW_ERROR(sm::ResourceError, "Could not load font: `{}`", file_path.string());
+        SM_THROW_ERROR(sm::ApplicationError, "Could not load font: `{}`", file_path.string());
     }
 
     io.FontDefault = font;

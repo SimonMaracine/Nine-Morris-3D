@@ -27,7 +27,7 @@ namespace sm::internal {
 #ifndef SM_BUILD_DISTRIBUTION
     class DebugRenderer {
     public:
-        DebugRenderer() noexcept = default;
+        DebugRenderer() = default;
         DebugRenderer(const FileSystem& fs, Renderer& renderer);
 
         void render(const Scene& scene);
@@ -59,10 +59,10 @@ namespace sm::internal {
     public:
         Renderer(int width, int height, const FileSystem& fs, const ShaderLibrary& shd);
 
-        std::shared_ptr<Font> get_default_font() const noexcept;
-        void set_color_correction(bool enable) noexcept;
-        bool get_color_correction() const noexcept;
-        void set_clear_color(glm::vec3 color) noexcept;
+        std::shared_ptr<Font> get_default_font() const;
+        void set_color_correction(bool enable);
+        bool get_color_correction() const;
+        void set_clear_color(glm::vec3 color);
         void set_samples(int width, int height, int samples);
         void set_scale(const FileSystem& fs, int scale);
         void set_shadow_map_size(int size);
@@ -76,7 +76,7 @@ namespace sm::internal {
         void post_setup();
         void resize_framebuffers(int width, int height);
 
-        static std::size_t get_max_point_lights() noexcept;
+        static std::size_t get_max_point_lights();
     private:
         void set_and_upload_uniform_buffer_data(const Scene& scene);
         void post_processing(const Scene& scene);

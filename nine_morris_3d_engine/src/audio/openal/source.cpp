@@ -8,7 +8,7 @@
 #include "nine_morris_3d_engine/audio/openal/debug.hpp"
 
 namespace sm {
-    AlSource::AlSource() noexcept {
+    AlSource::AlSource() {
         alGenSources(1, &m_source);
         alSourcef(m_source, AL_ROLLOFF_FACTOR, 1.0f);
         alSourcef(m_source, AL_REFERENCE_DISTANCE, 8.0f);
@@ -19,7 +19,7 @@ namespace sm {
         LOG_DEBUG("Created AL source {}", m_source);
     }
 
-    AlSource::~AlSource() noexcept {
+    AlSource::~AlSource() {
         stop();
 
         alDeleteSources(1, &m_source);
@@ -37,25 +37,25 @@ namespace sm {
         play(buffer.get());
     }
 
-    void AlSource::stop() const noexcept {
+    void AlSource::stop() const {
         alSourceStop(m_source);
 
         openal_debug::check_errors();
     }
 
-    void AlSource::pause() const noexcept {
+    void AlSource::pause() const {
         alSourcePause(m_source);
 
         openal_debug::check_errors();
     }
 
-    void AlSource::resume() const noexcept {
+    void AlSource::resume() const {
         alSourcePlay(m_source);
 
         openal_debug::check_errors();
     }
 
-    bool AlSource::is_playing() const noexcept {
+    bool AlSource::is_playing() const {
         int state {};
         alGetSourcei(m_source, AL_SOURCE_STATE, &state);
 
@@ -64,7 +64,7 @@ namespace sm {
         return state == AL_PLAYING;
     }
 
-    void AlSource::set_gain(float gain) const noexcept {
+    void AlSource::set_gain(float gain) const {
         assert(gain >= 0.0f);
 
         alSourcef(m_source, AL_GAIN, gain);
@@ -72,7 +72,7 @@ namespace sm {
         openal_debug::check_errors();
     }
 
-    void AlSource::set_pitch(float pitch) const noexcept {
+    void AlSource::set_pitch(float pitch) const {
         assert(pitch >= 0.0f);
 
         alSourcef(m_source, AL_PITCH, pitch);
@@ -80,49 +80,49 @@ namespace sm {
         openal_debug::check_errors();
     }
 
-    void AlSource::set_position(glm::vec3 position) const noexcept {
+    void AlSource::set_position(glm::vec3 position) const {
         alSource3f(m_source, AL_POSITION, position.x, position.y, position.z);
 
         openal_debug::check_errors();
     }
 
-    void AlSource::set_velocity(glm::vec3 velocity) const noexcept {
+    void AlSource::set_velocity(glm::vec3 velocity) const {
         alSource3f(m_source, AL_VELOCITY, velocity.x, velocity.y, velocity.z);
 
         openal_debug::check_errors();
     }
 
-    void AlSource::set_direction(glm::vec3 direction) const noexcept {
+    void AlSource::set_direction(glm::vec3 direction) const {
         alSource3f(m_source, AL_DIRECTION, direction.x, direction.y, direction.z);
 
         openal_debug::check_errors();
     }
 
-    void AlSource::set_looping(bool looping) const noexcept {
+    void AlSource::set_looping(bool looping) const {
         alSourcei(m_source, AL_LOOPING, static_cast<ALint>(looping));
 
         openal_debug::check_errors();
     }
 
-    void AlSource::set_rolloff_factor(float rolloff_factor) const noexcept {
+    void AlSource::set_rolloff_factor(float rolloff_factor) const {
         alSourcef(m_source, AL_ROLLOFF_FACTOR, rolloff_factor);
 
         openal_debug::check_errors();
     }
 
-    void AlSource::set_reference_distance(float reference_distance) const noexcept {
+    void AlSource::set_reference_distance(float reference_distance) const {
         alSourcef(m_source, AL_REFERENCE_DISTANCE, reference_distance);
 
         openal_debug::check_errors();
     }
 
-    void AlSource::set_max_distance(float max_distance) const noexcept {
+    void AlSource::set_max_distance(float max_distance) const {
         alSourcef(m_source, AL_MAX_DISTANCE, max_distance);
 
         openal_debug::check_errors();
     }
 
-    float AlSource::get_gain() const noexcept {
+    float AlSource::get_gain() const {
         float gain {};
         alGetSourcef(m_source, AL_GAIN, &gain);
 
@@ -131,7 +131,7 @@ namespace sm {
         return gain;
     }
 
-    float AlSource::get_pitch() const noexcept {
+    float AlSource::get_pitch() const {
         float pitch {};
         alGetSourcef(m_source, AL_PITCH, &pitch);
 
@@ -140,7 +140,7 @@ namespace sm {
         return pitch;
     }
 
-    glm::vec3 AlSource::get_position() const noexcept {
+    glm::vec3 AlSource::get_position() const {
         glm::vec3 position {};
         alGetSource3f(m_source, AL_POSITION, &position.x, &position.y, &position.z);
 
@@ -149,7 +149,7 @@ namespace sm {
         return position;
     }
 
-    glm::vec3 AlSource::get_velocity() const noexcept {
+    glm::vec3 AlSource::get_velocity() const {
         glm::vec3 velocity {};
         alGetSource3f(m_source, AL_VELOCITY, &velocity.x, &velocity.y, &velocity.z);
 
@@ -158,7 +158,7 @@ namespace sm {
         return velocity;
     }
 
-    glm::vec3 AlSource::get_direction() const noexcept {
+    glm::vec3 AlSource::get_direction() const {
         glm::vec3 direction {};
         alGetSource3f(m_source, AL_DIRECTION, &direction.x, &direction.y, &direction.z);
 
@@ -167,7 +167,7 @@ namespace sm {
         return direction;
     }
 
-    bool AlSource::get_looping() const noexcept {
+    bool AlSource::get_looping() const {
         int looping {};
         alGetSourcei(m_source, AL_LOOPING, &looping);
 
@@ -176,7 +176,7 @@ namespace sm {
         return static_cast<bool>(looping);
     }
 
-    float AlSource::get_rolloff_factor() const noexcept {
+    float AlSource::get_rolloff_factor() const {
         float rolloff_factor {};
         alGetSourcef(m_source, AL_ROLLOFF_FACTOR, &rolloff_factor);
 
@@ -185,7 +185,7 @@ namespace sm {
         return rolloff_factor;
     }
 
-    float AlSource::get_reference_distance() const noexcept {
+    float AlSource::get_reference_distance() const {
         float reference_distance {};
         alGetSourcef(m_source, AL_REFERENCE_DISTANCE, &reference_distance);
 
@@ -194,7 +194,7 @@ namespace sm {
         return reference_distance;
     }
 
-    float AlSource::get_max_distance() const noexcept {
+    float AlSource::get_max_distance() const {
         float max_distance {};
         alGetSourcef(m_source, AL_MAX_DISTANCE, &max_distance);
 

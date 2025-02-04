@@ -12,7 +12,7 @@
     LOG_DIST_CRITICAL(__VA_ARGS__); \
     throw error(fmt::format(__VA_ARGS__))
 
-namespace sm {
+namespace sm::internal {
     // Base class for the errors thrown by various systems of the application
     struct RuntimeError : std::runtime_error {
         explicit RuntimeError(const char* message)
@@ -20,7 +20,20 @@ namespace sm {
         explicit RuntimeError(const std::string& message)
             : std::runtime_error(message) {}
 
-        virtual const char* type() const noexcept = 0;
+        virtual const char* type() const = 0;
+    };
+
+    // Error only used by the client code
+    // Not thrown by the engine
+    struct ApplicationError : RuntimeError {
+        explicit ApplicationError(const char* message)
+            : RuntimeError(message) {}
+        explicit ApplicationError(const std::string& message)
+            : RuntimeError(message) {}
+
+        const char* type() const override {
+            return "application";
+        }
     };
 
     // Error related to video (window, OpenGL context etc.)
@@ -30,7 +43,7 @@ namespace sm {
         explicit VideoError(const std::string& message)
             : RuntimeError(message) {}
 
-        const char* type() const noexcept override {
+        const char* type() const override {
             return "video";
         }
     };
@@ -42,7 +55,7 @@ namespace sm {
         explicit AudioError(const std::string& message)
             : RuntimeError(message) {}
 
-        const char* type() const noexcept override {
+        const char* type() const override {
             return "audio";
         }
     };
@@ -54,7 +67,7 @@ namespace sm {
         explicit ResourceError(const std::string& message)
             : RuntimeError(message) {}
 
-        const char* type() const noexcept override {
+        const char* type() const override {
             return "resource";
         }
     };
@@ -66,21 +79,8 @@ namespace sm {
         explicit OtherError(const std::string& message)
             : RuntimeError(message) {}
 
-        const char* type() const noexcept override {
+        const char* type() const override {
             return "other";
-        }
-    };
-
-    // Error used only by the client code
-    // Not thrown by the engine
-    struct ApplicationError : RuntimeError {
-        explicit ApplicationError(const char* message)
-            : RuntimeError(message) {}
-        explicit ApplicationError(const std::string& message)
-            : RuntimeError(message) {}
-
-        const char* type() const noexcept override {
-            return "application";
         }
     };
 }

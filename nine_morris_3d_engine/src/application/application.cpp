@@ -22,10 +22,10 @@ namespace sm {
         LOG_DIST_INFO("Working directory: {}", internal::FileSystem::current_working_directory().string());
 
         const auto [version_major, version_minor] {opengl_debug::get_version_number()};
-        LOG_INFO("GL version {}.{}", version_major, version_minor);
+        LOG_INFO("OpenGL version {}.{}", version_major, version_minor);
 
         if (!capabilities::is_srgb_capable()) {
-            LOG_DIST_WARNING("Default GL framebuffer is not sRGB capable");
+            LOG_DIST_WARNING("Default OpenGL framebuffer is not sRGB capable");
         }
 
 #ifndef SM_BUILD_DISTRIBUTION
@@ -34,7 +34,7 @@ namespace sm {
 
         m_ctx.m_evt.connect<WindowClosedEvent, &Application::on_window_closed>(this);
         m_ctx.m_evt.connect<WindowResizedEvent, &Application::on_window_resized>(this);
-        m_ctx.m_evt.connect<WindowMaximizedEvent, &Application::on_window_maximized>(this);
+        m_ctx.m_evt.connect<WindowRestoredEvent, &Application::on_window_restored>(this);
         m_ctx.m_evt.connect<WindowMinimizedEvent, &Application::on_window_minimized>(this);
 
         m_frame_counter.previous_seconds = internal::Window::get_time();
@@ -118,7 +118,7 @@ namespace sm {
         return m_ctx.exit_code;
     }
 
-    float Application::update_frame_counter() noexcept {
+    float Application::update_frame_counter() {
         static constexpr double MAX_DT {1.0 / 20.0};
 
         const double current_seconds {internal::Window::get_time()};
@@ -139,7 +139,7 @@ namespace sm {
         return static_cast<float>(delta_time);
     }
 
-    unsigned int Application::calculate_fixed_update() noexcept {
+    unsigned int Application::calculate_fixed_update() {
         static constexpr double FIXED_DT {1.0 / 50.0};
 
         const double current_seconds {internal::Window::get_time()};
@@ -180,7 +180,7 @@ namespace sm {
         assert(m_scene_next == nullptr);
     }
 
-    void Application::change_scene(Id id, bool clear_resources) noexcept {
+    void Application::change_scene(Id id, bool clear_resources) {
         assert(m_scene_next == nullptr);
 
         for (auto& meta_scene : m_scene_meta_scenes) {
@@ -205,7 +205,7 @@ namespace sm {
         internal::imgui_context::end_frame();
     }
 
-    void Application::setup_start_scene(Id start_scene_id) noexcept {
+    void Application::setup_start_scene(Id start_scene_id) {
         for (auto& meta_scene : m_scene_meta_scenes) {
             if (meta_scene.id == start_scene_id) {
                 m_scene_current = &meta_scene;
@@ -232,7 +232,7 @@ namespace sm {
         meta_scene->scene.reset();
     }
 
-    void Application::on_window_closed(const WindowClosedEvent&) noexcept {
+    void Application::on_window_closed(const WindowClosedEvent&) {
         m_ctx.running = false;
     }
 
@@ -240,11 +240,11 @@ namespace sm {
         m_ctx.m_rnd.resize_framebuffers(event.width, event.height);
     }
 
-    void Application::on_window_maximized(const WindowMaximizedEvent& event) noexcept {
+    void Application::on_window_restored(const WindowRestoredEvent&) {
         m_minimized = false;
     }
 
-    void Application::on_window_minimized(const WindowMinimizedEvent& event) noexcept {
+    void Application::on_window_minimized(const WindowMinimizedEvent&) {
         m_minimized = true;
     }
 }

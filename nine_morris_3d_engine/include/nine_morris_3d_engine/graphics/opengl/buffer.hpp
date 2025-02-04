@@ -18,21 +18,21 @@ namespace sm {
 
     class GlVertexBuffer {
     public:
-        explicit GlVertexBuffer(DrawHint hint = DrawHint::Static) noexcept;
-        GlVertexBuffer(std::size_t size, DrawHint hint = DrawHint::Static) noexcept;
-        GlVertexBuffer(const void* data, std::size_t size, DrawHint hint = DrawHint::Static) noexcept;
-        ~GlVertexBuffer() noexcept;
+        explicit GlVertexBuffer(DrawHint hint = DrawHint::Static);
+        GlVertexBuffer(std::size_t size, DrawHint hint = DrawHint::Static);
+        GlVertexBuffer(const void* data, std::size_t size, DrawHint hint = DrawHint::Static);
+        ~GlVertexBuffer();
 
         GlVertexBuffer(const GlVertexBuffer&) = delete;
         GlVertexBuffer& operator=(const GlVertexBuffer&) = delete;
         GlVertexBuffer(GlVertexBuffer&&) = delete;
         GlVertexBuffer& operator=(GlVertexBuffer&&) = delete;
 
-        void bind() const noexcept;
-        static void unbind() noexcept;
+        void bind() const;
+        static void unbind();
 
-        void upload_data(const void* data, std::size_t size) const noexcept;
-        void upload_sub_data(const void* data, std::size_t offset, std::size_t size) const noexcept;
+        void upload_data(const void* data, std::size_t size) const;
+        void upload_sub_data(const void* data, std::size_t offset, std::size_t size) const;
     private:
         unsigned int m_buffer {};
         DrawHint m_hint {DrawHint::Static};
@@ -41,18 +41,18 @@ namespace sm {
     // Only supports unsigned int
     class GlIndexBuffer {
     public:
-        GlIndexBuffer(const void* data, std::size_t size) noexcept;
-        ~GlIndexBuffer() noexcept;
+        GlIndexBuffer(const void* data, std::size_t size);
+        ~GlIndexBuffer();
 
         GlIndexBuffer(const GlIndexBuffer&) = delete;
         GlIndexBuffer& operator=(const GlIndexBuffer&) = delete;
         GlIndexBuffer(GlIndexBuffer&&) = delete;
         GlIndexBuffer& operator=(GlIndexBuffer&&) = delete;
 
-        void bind() const noexcept;
-        static void unbind() noexcept;
+        void bind() const;
+        static void unbind();
 
-        int get_index_count() const noexcept;
+        int get_index_count() const;
     private:
         unsigned int m_buffer {};
         int m_index_count {};
@@ -74,18 +74,18 @@ namespace sm {
         GlUniformBuffer(GlUniformBuffer&&) = delete;
         GlUniformBuffer& operator=(GlUniformBuffer&&) = delete;
 
-        void bind() const noexcept;
-        static void unbind() noexcept;
+        void bind() const;
+        static void unbind();
 
-        bool is_configured() const noexcept;
+        bool is_configured() const;
         void configure(unsigned int shader_program);
 
         void set(const void* field_data, Id field);
-        void upload() const noexcept;
+        void upload() const;
         void set_and_upload(const void* field_data, Id field);
     private:
         void allocate_memory(std::size_t size);
-        static std::size_t type_size(unsigned int type) noexcept;
+        static std::size_t type_size(unsigned int type);
 
         unsigned int m_buffer {};
 
@@ -109,21 +109,21 @@ namespace sm {
     class GlPixelBuffer {
     public:
         explicit GlPixelBuffer(std::size_t size);
-        ~GlPixelBuffer() noexcept;
+        ~GlPixelBuffer();
 
         GlPixelBuffer(const GlPixelBuffer&) = delete;
         GlPixelBuffer& operator=(const GlPixelBuffer&) = delete;
         GlPixelBuffer(GlPixelBuffer&&) = delete;
         GlPixelBuffer& operator=(GlPixelBuffer&&) = delete;
 
-        void bind() const noexcept;
-        static void unbind() noexcept;
+        void bind() const;
+        static void unbind();
 
-        void map_data() noexcept;
-        void unmap_data() const noexcept;
+        void map_data();
+        void unmap_data() const;
 
         template<typename T>
-        void get_data(T** data_out) const noexcept {
+        void get_data(T** data_out) const {
             *data_out = static_cast<T*>(m_data);
         }
     private:

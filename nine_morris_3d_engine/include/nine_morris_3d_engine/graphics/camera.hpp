@@ -5,15 +5,15 @@
 namespace sm {
     class Camera {
     public:
-        void set_position_orientation(glm::vec3 position, glm::vec3 at, glm::vec3 up) noexcept;
-        void set_position_rotation(glm::vec3 position, glm::vec3 rotation) noexcept;
+        void set_position_orientation(glm::vec3 position, glm::vec3 at, glm::vec3 up);
+        void set_position_rotation(glm::vec3 position, glm::vec3 rotation);
 
-        void set_projection(int width, int height, float fov, float near, float far) noexcept;
-        void set_view(const glm::mat4& view_matrix) noexcept;
+        void set_projection(int width, int height, float fov, float near, float far);
+        void set_view(const glm::mat4& view_matrix);
 
-        const glm::mat4& view() const noexcept;
-        const glm::mat4& projection() const noexcept;
-        const glm::mat4& projection_view() const noexcept;
+        const glm::mat4& view() const;
+        const glm::mat4& projection() const;
+        const glm::mat4& projection_view() const;
     private:
         glm::mat4 m_view_matrix {1.0f};
         glm::mat4 m_projection_matrix {1.0f};
@@ -24,9 +24,9 @@ namespace sm {
 
     class Camera2D {
     public:
-        void set_projection(int left, int right, int bottom, int top) noexcept;
+        void set_projection(int left, int right, int bottom, int top);
 
-        const glm::mat4& projection() const noexcept;
+        const glm::mat4& projection() const;
     private:
         glm::mat4 m_projection_matrix {1.0f};
     };

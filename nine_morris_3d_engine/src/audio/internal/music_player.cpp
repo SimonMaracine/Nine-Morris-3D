@@ -22,7 +22,7 @@ namespace sm::internal {
         LOG_DEBUG("Started playing music track");
     }
 
-    void MusicPlayer::stop() noexcept {
+    void MusicPlayer::stop() {
         if (m_current_music_track == nullptr) {
             LOG_WARNING("No music track");
             return;
@@ -35,7 +35,7 @@ namespace sm::internal {
         m_current_music_track = nullptr;
     }
 
-    void MusicPlayer::pause() noexcept {
+    void MusicPlayer::pause() {
         if (m_current_music_track == nullptr) {
             LOG_WARNING("No music track");
             return;
@@ -46,7 +46,7 @@ namespace sm::internal {
         LOG_DEBUG("Paused playing music track");
     }
 
-    void MusicPlayer::resume() noexcept {
+    void MusicPlayer::resume() {
         if (m_current_music_track == nullptr) {
             LOG_WARNING("No music track");
             return;
@@ -57,7 +57,7 @@ namespace sm::internal {
         LOG_DEBUG("Resumed playing music track");
     }
 
-    void MusicPlayer::set_gain(float gain) noexcept {
+    void MusicPlayer::set_gain(float gain) {
         assert(gain >= 0.0f);
 
         if (gain > 1.0f) {

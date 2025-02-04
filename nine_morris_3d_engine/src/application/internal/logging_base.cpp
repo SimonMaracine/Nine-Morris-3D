@@ -42,7 +42,7 @@ namespace sm::internal {
         g_logger.reset();
     }
 
-    spdlog::logger* Logging::get_global_logger() noexcept {
+    spdlog::logger* Logging::get_global_logger() {
         return g_logger.get();
     }
 

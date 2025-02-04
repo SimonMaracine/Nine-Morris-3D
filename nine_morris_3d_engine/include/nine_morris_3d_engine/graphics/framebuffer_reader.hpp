@@ -21,7 +21,7 @@ namespace sm {
             : m_buffers(buffers), m_framebuffer(framebuffer) {}
 
         // Call this after the framebuffer is bound to begin reading the framebuffer
-        void read(int attachment_index, int x, int y) noexcept {
+        void read(int attachment_index, int x, int y) {
             m_buffer_index = (m_buffer_index + 1) % BufferCount;
             m_next_buffer_index = (m_buffer_index + 1) % BufferCount;
 

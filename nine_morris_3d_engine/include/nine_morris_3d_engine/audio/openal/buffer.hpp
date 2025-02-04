@@ -11,8 +11,8 @@ namespace sm {
 
     class AlBuffer {
     public:
-        AlBuffer(const void* data, std::size_t size, int channels, std::size_t bps, int frequency) noexcept;
-        explicit AlBuffer(std::shared_ptr<SoundData> data) noexcept;
+        AlBuffer(const void* data, std::size_t size, int channels, std::size_t bps, int frequency);
+        explicit AlBuffer(std::shared_ptr<SoundData> data);
         ~AlBuffer();
 
         AlBuffer(const AlBuffer&) = delete;

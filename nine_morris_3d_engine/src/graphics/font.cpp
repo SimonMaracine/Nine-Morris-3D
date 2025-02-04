@@ -8,8 +8,8 @@
 #include <stb_image_write.h>
 #include <utf8.h>
 
+#include "nine_morris_3d_engine/application/internal/error.hpp"
 #include "nine_morris_3d_engine/application/platform.hpp"
-#include "nine_morris_3d_engine/application/error.hpp"
 #include "nine_morris_3d_engine/application/logging.hpp"
 
 namespace sm {
@@ -20,7 +20,7 @@ namespace sm {
         m_font_info = new stbtt_fontinfo;
 
         if (!stbtt_InitFont(m_font_info, reinterpret_cast<unsigned char*>(m_font_buffer.data()), 0)) {
-            SM_THROW_ERROR(ResourceError, "Could not load font");
+            SM_THROW_ERROR(internal::ResourceError, "Could not load font");
         }
 
         m_sf = stbtt_ScaleForPixelHeight(m_font_info, specification.size_height);
@@ -51,11 +51,11 @@ namespace sm {
         LOG_DEBUG("Freed font");
     }
 
-    int Font::get_bitmap_size() const noexcept {
+    int Font::get_bitmap_size() const {
         return m_bitmap_size;
     }
 
-    const GlTexture* Font::get_bitmap() const noexcept {
+    const GlTexture* Font::get_bitmap() const {
         return m_bitmap_texture.get();
     }
 
@@ -66,7 +66,7 @@ namespace sm {
         m_pack_context = new stbtt_pack_context;
 
         if (!stbtt_PackBegin(m_pack_context, m_bitmap.get(), m_bitmap_size, m_bitmap_size, 0, 1, nullptr)) {
-            SM_THROW_ERROR(ResourceError, "Could not begin packing");
+            SM_THROW_ERROR(internal::ResourceError, "Could not begin packing");
         }
 
         m_bitmap_texture.reset();
@@ -100,7 +100,7 @@ namespace sm {
         auto* characters {static_cast<stbtt_packedchar*>(pack_range.packed_characters)};
 
         if (!stbtt_PackFontRange(m_pack_context, data, 0, m_size_height, begin_codepoint, count, characters)) {
-            SM_THROW_ERROR(ResourceError, "Could not pack range [{}, {}]", begin_codepoint, begin_codepoint + count);
+            SM_THROW_ERROR(internal::ResourceError, "Could not pack range [{}, {}]", begin_codepoint, begin_codepoint + count);
         }
 
         pack_range.begin_codepoint = begin_codepoint;
@@ -208,7 +208,7 @@ namespace sm {
         return std::make_pair(static_cast<int>(width * scale), static_cast<int>(height * scale));
     }
 
-    void Font::get_character_quad(int codepoint, float* x, float* y, Quad* quad) const noexcept {
+    void Font::get_character_quad(int codepoint, float* x, float* y, Quad* quad) const {
         stbtt_aligned_quad aligned_quad {};
         [[maybe_unused]] bool found_character {false};
 

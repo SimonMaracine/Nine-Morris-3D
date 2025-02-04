@@ -241,19 +241,19 @@ namespace sm::internal {
 #endif
     }
 
-    std::shared_ptr<Font> Renderer::get_default_font() const noexcept {
+    std::shared_ptr<Font> Renderer::get_default_font() const {
         return m_storage.default_font;
     }
 
-    void Renderer::set_color_correction(bool enable) noexcept {
+    void Renderer::set_color_correction(bool enable) {
         m_color_correction = enable;
     }
 
-    bool Renderer::get_color_correction() const noexcept {
+    bool Renderer::get_color_correction() const {
         return m_color_correction;
     }
 
-    void Renderer::set_clear_color(glm::vec3 color) noexcept {
+    void Renderer::set_clear_color(glm::vec3 color) {
         if (m_color_correction) {
             m_clear_color = glm::convertSRGBToLinear(color);
         } else {
@@ -371,7 +371,7 @@ namespace sm::internal {
         }
     }
 
-    std::size_t Renderer::get_max_point_lights() noexcept {
+    std::size_t Renderer::get_max_point_lights() {
         return SHADER_MAX_POINT_LIGHTS;
     }
 

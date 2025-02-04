@@ -1,9 +1,11 @@
-#include "nine_morris_3d_engine/application/input_codes.hpp"
+#include "nine_morris_3d_engine/application/internal/input_codes.hpp"
 
 #include <SDL3/SDL.h>
 
-namespace sm {
-    unsigned int key_to_sdl_keycode(Key key) noexcept {
+#include "nine_morris_3d_engine/other/utilities.hpp"
+
+namespace sm::internal {
+    unsigned int key_to_sdl_keycode(Key key) {
         switch (key) {
             case Key::Unknown: return SDLK_UNKNOWN;
             case Key::Return: return SDLK_RETURN;
@@ -118,7 +120,7 @@ namespace sm {
         return SDLK_UNKNOWN;
     }
 
-    Key sdl_keycode_to_key(unsigned int keycode) noexcept {
+    Key sdl_keycode_to_key(unsigned int keycode) {
         switch (keycode) {
             case SDLK_UNKNOWN: return Key::Unknown;
             case SDLK_RETURN: return Key::Return;
@@ -233,7 +235,7 @@ namespace sm {
         return Key::Unknown;
     }
 
-    int button_to_sdl_button(Button button) noexcept {
+    int button_to_sdl_button(Button button) {
         switch (button) {
             case Button::Left: return SDL_BUTTON_LEFT;
             case Button::Middle: return SDL_BUTTON_MIDDLE;
@@ -241,9 +243,11 @@ namespace sm {
             case Button::X1: return SDL_BUTTON_X1;
             case Button::X2: return SDL_BUTTON_X2;
         }
+
+        utils::unreachable();
     }
 
-    Button sdl_button_to_button(int button) noexcept {
+    Button sdl_button_to_button(int button) {
         switch (button) {
             case SDL_BUTTON_LEFT: return Button::Left;
             case SDL_BUTTON_MIDDLE: return Button::Middle;
@@ -251,5 +255,7 @@ namespace sm {
             case SDL_BUTTON_X1: return Button::X1;
             case SDL_BUTTON_X2: return Button::X2;
         }
+
+        utils::unreachable();
     }
 }

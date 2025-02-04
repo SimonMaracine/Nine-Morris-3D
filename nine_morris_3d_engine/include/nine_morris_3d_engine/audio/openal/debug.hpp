@@ -3,7 +3,7 @@
 #include <string>
 
 namespace sm::openal_debug {
-    void check_errors() noexcept;
+    void check_errors();
     std::string get_information();
-    const char* get_version() noexcept;
+    const char* get_version();
 }

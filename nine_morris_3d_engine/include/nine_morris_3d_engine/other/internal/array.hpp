@@ -8,53 +8,53 @@ namespace sm::internal {
     template<typename T, typename C, C Capacity>
     class Array {
     public:
-        void push_back(const T& item) noexcept {
+        void push_back(const T& item) {
             m_data[m_size++] = item;
         }
 
-        void push_back(T&& item) noexcept {
+        void push_back(T&& item) {
             m_data[m_size++] = std::move(item);
         }
 
         template<typename... Args>
-        void emplace_back(Args&&... args) noexcept {
+        void emplace_back(Args&&... args) {
             auto address {&m_data[m_size++]};
             new (address) T(std::forward<Args>(args)...);
         }
 
-        void pop_back() noexcept {
+        void pop_back() {
             m_size--;
         }
 
-        const T& operator[](C index) const noexcept {
+        const T& operator[](C index) const {
             return m_data[index];
         }
 
-        T& operator[](C index) noexcept {
+        T& operator[](C index) {
             return m_data[index];
         }
 
-        const T& back() const noexcept {
+        const T& back() const {
             return m_data[m_size - 1];
         }
 
-        T& back() noexcept {
+        T& back() {
             return m_data[m_size - 1];
         }
 
-        C size() const noexcept {
+        C size() const {
             return m_size;
         }
 
-        bool empty() const noexcept {
+        bool empty() const {
             return m_size == 0;
         }
 
-        void clear() noexcept {
+        void clear() {
             m_size = 0;
         }
 
-        void resize(C size) noexcept {
+        void resize(C size) {
             m_size = size;
         }
 
@@ -66,29 +66,29 @@ namespace sm::internal {
             using reference = const T&;
             using iterator_category = std::forward_iterator_tag;
 
-            explicit const_iterator(C index, pointer data) noexcept
+            explicit const_iterator(C index, pointer data)
                 : m_index(index), m_data(data) {}
 
-            const_iterator& operator++() noexcept {
+            const_iterator& operator++() {
                 m_index++;
                 return *this;
             }
 
-            const_iterator operator++(int) noexcept {
+            const_iterator operator++(int) {
                 const_iterator self {*this};
                 ++(*this);
                 return self;
             }
 
-            bool operator==(const_iterator other) const noexcept {
+            bool operator==(const_iterator other) const {
                 return m_index == other.m_index;
             }
 
-            bool operator!=(const_iterator other) const noexcept {
+            bool operator!=(const_iterator other) const {
                 return !(*this == other);
             }
 
-            reference operator*() const noexcept {
+            reference operator*() const {
                 return m_data[m_index];
             }
         private:
@@ -104,29 +104,29 @@ namespace sm::internal {
             using reference = T&;
             using iterator_category = std::forward_iterator_tag;
 
-            explicit iterator(C index, pointer data) noexcept
+            explicit iterator(C index, pointer data)
                 : m_index(index), m_data(data) {}
 
-            iterator& operator++() noexcept {
+            iterator& operator++() {
                 m_index++;
                 return *this;
             }
 
-            iterator operator++(int) noexcept {
+            iterator operator++(int) {
                 iterator self {*this};
                 ++(*this);
                 return self;
             }
 
-            bool operator==(iterator other) const noexcept {
+            bool operator==(iterator other) const {
                 return m_index == other.m_index;
             }
 
-            bool operator!=(iterator other) const noexcept {
+            bool operator!=(iterator other) const {
                 return !(*this == other);
             }
 
-            reference operator*() noexcept {
+            reference operator*() {
                 return m_data[m_index];
             }
         private:
@@ -134,19 +134,19 @@ namespace sm::internal {
             pointer m_data;
         };
 
-        const_iterator begin() const noexcept {
+        const_iterator begin() const {
             return const_iterator(0, m_data);
         }
 
-        const_iterator end() const noexcept {
+        const_iterator end() const {
             return const_iterator(m_size, m_data);
         }
 
-        iterator begin() noexcept {
+        iterator begin() {
             return iterator(0, m_data);
         }
 
-        iterator end() noexcept {
+        iterator end() {
             return iterator(m_size, m_data);
         }
     private:

@@ -8,17 +8,17 @@
 
 #include <glm/gtc/random.hpp>
 
-#include "nine_morris_3d_engine/application/error.hpp"
+#include "nine_morris_3d_engine/application/internal/error.hpp"
 #include "nine_morris_3d_engine/application/logging.hpp"
 
 namespace sm::utils {
-    unsigned int random_int(unsigned int end) noexcept {
+    unsigned int random_int(unsigned int end) {
         assert(end > 0);
 
         return glm::linearRand(0u, end);
     }
 
-    unsigned int random_int(unsigned int begin, unsigned int end) noexcept {
+    unsigned int random_int(unsigned int begin, unsigned int end) {
         assert(end > begin);
 
         return glm::linearRand(begin, end);
@@ -30,13 +30,13 @@ namespace sm::utils {
         try {
             result = std::stoul(string);
         } catch (const std::invalid_argument& e) {
-            throw OtherError(e.what());
+            throw internal::OtherError(e.what());
         } catch (const std::out_of_range& e) {
-            throw OtherError(e.what());
+            throw internal::OtherError(e.what());
         }
 
         if (result > std::numeric_limits<unsigned short>::max()) {
-            throw OtherError("Too large to fit unsigned short");
+            throw internal::OtherError("Too large to fit unsigned short");
         }
 
         return static_cast<unsigned short>(result);
@@ -51,7 +51,7 @@ namespace sm::utils {
         float& y,
         float& width,
         float& height
-    ) noexcept {
+    ) {
         if (screen_width / screen_height > image_width / image_height) {
             width = screen_width;
             height = screen_width * (image_height / image_width);
@@ -69,7 +69,7 @@ namespace sm::utils {
         const char* value {std::getenv(variable.c_str())};
 
         if (value == nullptr) {
-            throw OtherError("Could not get `" + variable + "` environment variable");
+            throw internal::OtherError("Could not get `" + variable + "` environment variable");
         }
 
         return value;
@@ -85,7 +85,7 @@ namespace sm::utils {
         std::ifstream stream {file_path, text ? std::ios::in : std::ios::binary};
 
         if (!stream.is_open()) {
-            throw ResourceError("Could not open file for reading");
+            throw internal::ResourceError("Could not open file for reading");
         }
 
         stream.seekg(0, stream.end);
@@ -98,7 +98,7 @@ namespace sm::utils {
         stream.read(buffer.data(), length);
 
         if (stream.fail()) {
-            throw ResourceError("Error reading file");
+            throw internal::ResourceError("Error reading file");
         }
 
         return buffer;
@@ -109,8 +109,8 @@ namespace sm::utils {
 
         try {
             return read_file_ex(file_path, text);
-        } catch (const ResourceError& e) {
-            SM_THROW_ERROR(ResourceError, "Could not read file `{}`: {}", file_path.string(), e.what());
+        } catch (const internal::ResourceError& e) {
+            SM_THROW_ERROR(internal::ResourceError, "Could not read file `{}`: {}", file_path.string(), e.what());
         }
     }
 
@@ -118,13 +118,13 @@ namespace sm::utils {
         std::ofstream stream {file_path, text ? std::ios::out : std::ios::binary};
 
         if (!stream.is_open()) {
-            throw ResourceError("Could not open file for writing");
+            throw internal::ResourceError("Could not open file for writing");
         }
 
         stream.write(buffer.data(), buffer.size());
 
         if (stream.fail()) {
-            throw ResourceError("Error writing file");
+            throw internal::ResourceError("Error writing file");
         }
     }
 
@@ -133,8 +133,8 @@ namespace sm::utils {
 
         try {
             write_file_ex(file_path, buffer, text);
-        } catch (const ResourceError& e) {
-            SM_THROW_ERROR(ResourceError, "Could not write file `{}`: {}", file_path.string(), e.what());
+        } catch (const internal::ResourceError& e) {
+            SM_THROW_ERROR(internal::ResourceError, "Could not write file `{}`: {}", file_path.string(), e.what());
         }
     }
 }

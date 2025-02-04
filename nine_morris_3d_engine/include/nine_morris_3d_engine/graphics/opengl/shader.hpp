@@ -27,8 +27,8 @@ namespace sm {
         GlShader(GlShader&&) = delete;
         GlShader& operator=(GlShader&&) = delete;
 
-        void bind() const noexcept;
-        static void unbind() noexcept;
+        void bind() const;
+        static void unbind();
 
         void upload_uniform_mat3(Id name, const glm::mat3& matrix) const;
         void upload_uniform_mat3_array(Id name, const std::vector<glm::mat3>& matrices) const;
@@ -42,7 +42,7 @@ namespace sm {
         void upload_uniform_vec3_array(Id name, const std::vector<glm::vec3>& vectors) const;
         void upload_uniform_vec4(Id name, glm::vec4 vector) const;
 
-        unsigned int get_id() const noexcept;
+        unsigned int get_id() const;
 
         void add_uniform_buffer(std::shared_ptr<GlUniformBuffer> uniform_buffer);
     private:
@@ -51,8 +51,8 @@ namespace sm {
 
         std::vector<std::string> introspect_program();
 
-        void create_program(unsigned int vertex_shader, unsigned int fragment_shader) noexcept;
-        void delete_intermediates(unsigned int vertex_shader, unsigned int fragment_shader) noexcept;
+        void create_program(unsigned int vertex_shader, unsigned int fragment_shader);
+        void delete_intermediates(unsigned int vertex_shader, unsigned int fragment_shader);
         static unsigned int compile_shader(const std::string& source, unsigned int type);
         static bool check_compilation(unsigned int shader, unsigned int type);
         bool check_linking(unsigned int program) const;

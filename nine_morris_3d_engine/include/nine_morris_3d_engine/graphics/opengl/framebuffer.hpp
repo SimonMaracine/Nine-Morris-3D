@@ -54,22 +54,22 @@ namespace sm {
         GlFramebuffer(GlFramebuffer&&) = delete;
         GlFramebuffer& operator=(GlFramebuffer&&) = delete;
 
-        void bind() const noexcept;
-        static void bind_default() noexcept;
+        void bind() const;
+        static void bind_default();
 
-        unsigned int get_color_attachment(int attachment_index) const noexcept;
-        unsigned int get_depth_attachment() const noexcept;
-        const FramebufferSpecification& get_specification() const noexcept;
+        unsigned int get_color_attachment(int attachment_index) const;
+        unsigned int get_depth_attachment() const;
+        const FramebufferSpecification& get_specification() const;
 
         // Usually called by application
         void resize(int width, int height);
 
         // Read pixels from some buffer
-        float read_pixel_float(int attachment_index, int x, int y) const noexcept;  // TODO read value is float; should be generic
-        void read_pixel_float_pbo(int attachment_index, int x, int y) const noexcept;
+        float read_pixel_float(int attachment_index, int x, int y) const;  // TODO read value is float; should be generic
+        void read_pixel_float_pbo(int attachment_index, int x, int y) const;
 
         // Resolve this to draw_framebuffer
-        void blit(const GlFramebuffer* draw_framebuffer, int width, int height) const noexcept;
+        void blit(const GlFramebuffer* draw_framebuffer, int width, int height) const;
     private:
         void build();
 

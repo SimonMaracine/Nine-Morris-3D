@@ -6,8 +6,8 @@
 #include <vector>
 #include <sstream>
 
+#include "nine_morris_3d_engine/application/internal/error.hpp"
 #include "nine_morris_3d_engine/application/platform.hpp"
-#include "nine_morris_3d_engine/application/error.hpp"
 #include "nine_morris_3d_engine/application/logging.hpp"
 #include "nine_morris_3d_engine/other/utilities.hpp"
 

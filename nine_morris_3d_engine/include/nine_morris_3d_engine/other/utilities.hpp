@@ -18,8 +18,8 @@ namespace sm::utils {
         glm::vec3 max {};
     };
 
-    unsigned int random_int(unsigned int end) noexcept;
-    unsigned int random_int(unsigned int begin, unsigned int end) noexcept;
+    unsigned int random_int(unsigned int end);
+    unsigned int random_int(unsigned int begin, unsigned int end);
 
     unsigned short string_to_unsigned_short(const std::string& string);
 
@@ -32,7 +32,7 @@ namespace sm::utils {
         float& y,
         float& width,
         float& height
-    ) noexcept;
+    );
 
     const char* get_environment_variable(const std::string& variable);
 
@@ -45,21 +45,29 @@ namespace sm::utils {
     void write_file(const std::filesystem::path& file_path, const std::string& buffer, bool text = false);
 
     template<typename T>
-    T map(T x, T in_min, T in_max, T out_min, T out_max) noexcept {
+    T map(T x, T in_min, T in_max, T out_min, T out_max) {
         return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
     }
 
     template<typename T>
-    T choice(std::initializer_list<T> list) noexcept {
+    T choice(std::initializer_list<T> list) {
         const unsigned int index {random_int(static_cast<unsigned int>(list.size() - 1))};
 
         return list.begin()[index];
     }
 
     template<typename T, typename Iter>
-    T choice(Iter first, Iter last) noexcept {
+    T choice(Iter first, Iter last) {
         const unsigned int index {random_int(static_cast<unsigned int>(std::distance(first, last)))};
 
         return first[index];
+    }
+
+    [[noreturn]] inline void unreachable() {
+#if defined(_MSC_VER) && !defined(__clang__)
+        __assume(false);
+#else
+        __builtin_unreachable();
+#endif
     }
 }

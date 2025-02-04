@@ -51,19 +51,19 @@ namespace sm {
     public:
         GlTexture(std::shared_ptr<TextureData> data, const TextureSpecification& specification = {});
         GlTexture(int width, int height, unsigned char* data, const TextureSpecification& specification = {});
-        ~GlTexture() noexcept;
+        ~GlTexture();
 
         GlTexture(const GlTexture&) = delete;
         GlTexture& operator=(const GlTexture&) = delete;
         GlTexture(GlTexture&&) = delete;
         GlTexture& operator=(GlTexture&&) = delete;
 
-        int get_width() const noexcept;
-        int get_height() const noexcept;
-        unsigned int get_id() const noexcept;
+        int get_width() const;
+        int get_height() const;
+        unsigned int get_id() const;
 
-        void bind(unsigned int unit) const noexcept;
-        static void unbind() noexcept;
+        void bind(unsigned int unit) const;
+        static void unbind();
     private:
         void allocate_texture(int width, int height, const unsigned char* data) const;
 
@@ -76,16 +76,16 @@ namespace sm {
 
     class GlTextureCubemap {
     public:
-        GlTextureCubemap(std::initializer_list<std::shared_ptr<TextureData>> data, TextureFormat format = TextureFormat::Rgba8) noexcept;
-        ~GlTextureCubemap() noexcept;
+        GlTextureCubemap(std::initializer_list<std::shared_ptr<TextureData>> data, TextureFormat format = TextureFormat::Rgba8);
+        ~GlTextureCubemap();
 
         GlTextureCubemap(const GlTextureCubemap&) = delete;
         GlTextureCubemap& operator=(const GlTextureCubemap&) = delete;
         GlTextureCubemap(GlTextureCubemap&&) = delete;
         GlTextureCubemap& operator=(GlTextureCubemap&&) = delete;
 
-        void bind(unsigned int unit) const noexcept;
-        static void unbind() noexcept;
+        void bind(unsigned int unit) const;
+        static void unbind();
     private:
         unsigned int m_texture {};
     };

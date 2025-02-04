@@ -15,15 +15,15 @@ namespace sm::internal {
 #ifndef SM_BUILD_DISTRIBUTION
     class DebugUi {
     public:
-        void render(Scene& scene, Ctx& ctx) noexcept;
+        void render(Scene& scene, Ctx& ctx);
         void render_lines(Scene& scene);
     private:
-        void renderables(Scene& scene) noexcept;
-        void lights(Scene& scene) noexcept;
-        void shadows(Scene& scene) noexcept;
+        void renderables(Scene& scene);
+        void lights(Scene& scene);
+        void shadows(Scene& scene);
         void texts(Scene& scene);
-        void quads(Scene& scene) noexcept;
-        void tasks(Ctx& ctx) noexcept;
+        void quads(Scene& scene);
+        void tasks(Ctx& ctx);
         void frame_time(Ctx& ctx);
 
         void shadows_lines(

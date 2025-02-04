@@ -8,8 +8,8 @@
 #include <glad/glad.h>
 #include <glm/gtc/type_ptr.hpp>
 
+#include "nine_morris_3d_engine/application/internal/error.hpp"
 #include "nine_morris_3d_engine/application/platform.hpp"
-#include "nine_morris_3d_engine/application/error.hpp"
 #include "nine_morris_3d_engine/application/logging.hpp"
 
 namespace sm {
@@ -19,7 +19,7 @@ namespace sm {
         create_program(vertex_shader, fragment_shader);
 
         if (!check_linking(m_program)) {
-            SM_THROW_ERROR(ResourceError, "Could not link shader program {}", m_program);
+            SM_THROW_ERROR(internal::ResourceError, "Could not link shader program {}", m_program);
         }
 
         delete_intermediates(vertex_shader, fragment_shader);
@@ -35,11 +35,11 @@ namespace sm {
         LOG_DEBUG("Deleted GL shader {}", m_program);
     }
 
-    void GlShader::bind() const noexcept {
+    void GlShader::bind() const {
         glUseProgram(m_program);
     }
 
-    void GlShader::unbind() noexcept {
+    void GlShader::unbind() {
         glUseProgram(0);
     }
 
@@ -98,7 +98,7 @@ namespace sm {
         glUniform4f(location, vector.x, vector.y, vector.z, vector.w);
     }
 
-    unsigned int GlShader::get_id() const noexcept {
+    unsigned int GlShader::get_id() const {
         return m_program;
     }
 
@@ -220,7 +220,7 @@ namespace sm {
         return uniforms;
     }
 
-    void GlShader::create_program(unsigned int vertex_shader, unsigned int fragment_shader) noexcept {
+    void GlShader::create_program(unsigned int vertex_shader, unsigned int fragment_shader) {
         assert(vertex_shader != 0);
         assert(fragment_shader != 0);
 
@@ -231,7 +231,7 @@ namespace sm {
         glValidateProgram(m_program);
     }
 
-    void GlShader::delete_intermediates(unsigned int vertex_shader, unsigned int fragment_shader) noexcept {
+    void GlShader::delete_intermediates(unsigned int vertex_shader, unsigned int fragment_shader) {
         assert(m_program != 0);
         assert(vertex_shader != 0);
         assert(fragment_shader != 0);
@@ -252,7 +252,7 @@ namespace sm {
         glCompileShader(shader);
 
         if (!check_compilation(shader, type)) {
-            SM_THROW_ERROR(ResourceError, "Could not compile shader {}", shader);
+            SM_THROW_ERROR(internal::ResourceError, "Could not compile shader {}", shader);
         }
 
         return shader;

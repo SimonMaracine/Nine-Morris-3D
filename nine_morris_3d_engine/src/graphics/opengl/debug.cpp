@@ -56,7 +56,7 @@ namespace sm::opengl_debug {
         "GL_MAX_VIEWPORT_DIMS"
     };
 
-    void initialize() noexcept {
+    void initialize() {
         glDebugMessageCallback(
             [](
                 unsigned int,
@@ -149,7 +149,7 @@ namespace sm::opengl_debug {
         return result;
     }
 
-    std::pair<int, int> get_version_number() noexcept {
+    std::pair<int, int> get_version_number() {
         int major {};
         int minor {};
         glGetIntegerv(GL_MAJOR_VERSION, &major);
@@ -158,19 +158,19 @@ namespace sm::opengl_debug {
         return std::make_pair(major, minor);
     }
 
-    const unsigned char* get_opengl_version() noexcept {
+    const unsigned char* get_opengl_version() {
         return glGetString(GL_VERSION);
     }
 
-    const unsigned char* get_glsl_version() noexcept {
+    const unsigned char* get_glsl_version() {
         return glGetString(GL_SHADING_LANGUAGE_VERSION);
     }
 
-    const unsigned char* get_vendor() noexcept {
+    const unsigned char* get_vendor() {
         return glGetString(GL_VENDOR);
     }
 
-    const unsigned char* get_renderer() noexcept {
+    const unsigned char* get_renderer() {
         return glGetString(GL_RENDERER);
     }
 }

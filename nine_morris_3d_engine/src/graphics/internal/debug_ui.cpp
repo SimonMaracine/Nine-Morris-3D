@@ -10,7 +10,7 @@
 
 namespace sm::internal {
 #ifndef SM_BUILD_DISTRIBUTION
-    void DebugUi::render(Scene& scene, Ctx& ctx) noexcept {
+    void DebugUi::render(Scene& scene, Ctx& ctx) {
         if (ImGui::Begin("Debug")) {
             ImGui::Checkbox("Renderables", &m_renderables);
             ImGui::Checkbox("Lights", &m_lights);
@@ -72,7 +72,7 @@ namespace sm::internal {
         }
     }
 
-    void DebugUi::renderables(Scene& scene) noexcept {
+    void DebugUi::renderables(Scene& scene) {
         if (ImGui::Begin("Debug Renderables")) {
             for (int index {0}; Renderable* renderable : scene.m_debug.renderables) {
                 ImGui::PushID(index);
@@ -90,7 +90,7 @@ namespace sm::internal {
         ImGui::End();
     }
 
-    void DebugUi::lights(Scene& scene) noexcept {
+    void DebugUi::lights(Scene& scene) {
         if (ImGui::Begin("Debug Directional Light")) {
             ImGui::DragFloat3("Direction", glm::value_ptr(scene.m_debug.directional_light->direction), 0.01f, -1.0f, 1.0f);
             ImGui::DragFloat3("Ambient", glm::value_ptr(scene.m_debug.directional_light->ambient_color), 0.01f, 0.0f, 1.0f);
@@ -123,7 +123,7 @@ namespace sm::internal {
         ImGui::End();
     }
 
-    void DebugUi::shadows(Scene& scene) noexcept {
+    void DebugUi::shadows(Scene& scene) {
         if (ImGui::Begin("Debug Shadows")) {
             ImGui::DragFloat("Left", &scene.m_debug.shadow_box->left, 1.0f, -500.0f, 0.0f);
             ImGui::DragFloat("Right", &scene.m_debug.shadow_box->right, 1.0f, 0.0f, 500.0f);
@@ -166,7 +166,7 @@ namespace sm::internal {
         ImGui::End();
     }
 
-    void DebugUi::quads(Scene& scene) noexcept {
+    void DebugUi::quads(Scene& scene) {
         if (ImGui::Begin("Debug Quads")) {
             for (int index {0}; Quad* quad : scene.m_debug.quads) {
                 ImGui::PushID(index);
@@ -183,7 +183,7 @@ namespace sm::internal {
         ImGui::End();
     }
 
-    void DebugUi::tasks(Ctx& ctx) noexcept {
+    void DebugUi::tasks(Ctx& ctx) {
         if (ImGui::Begin("Debug Tasks")) {
             ImGui::Text("Tasks count: %lu", ctx.m_tsk.m_tasks_active.size());
             ImGui::Text("Async tasks count: %lu", ctx.m_tsk.m_async_tasks.size());

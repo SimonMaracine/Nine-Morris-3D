@@ -8,7 +8,7 @@
 #include "nine_morris_3d_engine/application/logging.hpp"
 
 namespace sm::openal_debug {
-    void check_errors() noexcept {
+    void check_errors() {
 #ifndef SM_BUILD_DISTRIBUTION
         const ALenum error {alGetError()};
 
@@ -58,7 +58,7 @@ namespace sm::openal_debug {
         return result;
     }
 
-    const char* get_version() noexcept {
+    const char* get_version() {
         return alGetString(AL_VERSION);
     }
 }

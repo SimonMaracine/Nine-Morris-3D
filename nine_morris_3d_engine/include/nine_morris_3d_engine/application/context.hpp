@@ -6,12 +6,13 @@
 #include <functional>
 #include <filesystem>
 
+#include "nine_morris_3d_engine/application/internal/error.hpp"
 #include "nine_morris_3d_engine/application/internal/file_system.hpp"
+#include "nine_morris_3d_engine/application/internal/input_codes.hpp"
 #include "nine_morris_3d_engine/application/internal/logging_base.hpp"
 #include "nine_morris_3d_engine/application/internal/event_dispatcher.hpp"
 #include "nine_morris_3d_engine/application/internal/window.hpp"
 #include "nine_morris_3d_engine/application/internal/task_manager.hpp"
-#include "nine_morris_3d_engine/application/internal/input.hpp"
 #include "nine_morris_3d_engine/application/platform.hpp"
 #include "nine_morris_3d_engine/application/properties.hpp"
 #include "nine_morris_3d_engine/application/id.hpp"
@@ -48,7 +49,11 @@ namespace sm {
         PhongDiffuseNormalShadow
     };
 
+    using RuntimeError = internal::RuntimeError;
+    using ApplicationError = internal::ApplicationError;
     using RendererSpecification = internal::RendererSpecification;
+    using Key = internal::Key;
+    using Button = internal::Button;
 
     // Wrapper around functionality exposed to the user, i.e. the API
     // Scenes contain references to the context instance
@@ -98,22 +103,19 @@ namespace sm {
         void clear_events() { m_evt.clear<E>(); }
 
         // Window
-        int get_window_width() const noexcept;
-        int get_window_height() const noexcept;
+        int get_window_width() const;
+        int get_window_height() const;
         void show_window() const;
         void set_window_vsync(bool enable) const;
-        // void add_window_cursor(Id id, std::unique_ptr<TextureData>&& cursor, int x_hotspot, int y_hotspot);
-        // void set_window_cursor(Id id) const;
         void set_window_icons(std::initializer_list<std::unique_ptr<TextureData>> icons) const;
         void set_window_size(int width, int height);
-        // Monitors get_monitors() const;
-        static double get_time() noexcept;
+        static double get_time();
 
         // Renderer
-        std::shared_ptr<Font> get_renderer_default_font() const noexcept;
-        void set_renderer_color_correction(bool enable) noexcept;
-        bool get_renderer_color_correction() const noexcept;
-        void set_renderer_clear_color(glm::vec3 color) noexcept;
+        std::shared_ptr<Font> get_renderer_default_font() const;
+        void set_renderer_color_correction(bool enable);
+        bool get_renderer_color_correction() const;
+        void set_renderer_clear_color(glm::vec3 color);
         void set_renderer_samples(int samples);
         void set_renderer_scale(int scale);
         void set_renderer_shadow_map_size(int size);
@@ -121,10 +123,10 @@ namespace sm {
 
         // Music player
         void play_music_track(std::shared_ptr<MusicTrack> music_track);
-        void stop_music_track() noexcept;
-        void pause_music_track() noexcept;
-        void resume_music_track() noexcept;
-        void set_music_gain(float gain) noexcept;
+        void stop_music_track();
+        void pause_music_track();
+        void resume_music_track();
+        void set_music_gain(float gain);
 
         // Task manager
         void add_task_immediate(Task::Function&& function);
@@ -133,18 +135,18 @@ namespace sm {
         void add_task_async(AsyncTask::Function&& function);
 
         // Input
-        static bool is_key_pressed(Key key) noexcept;
-        static bool is_button_pressed(Button button) noexcept;
-        static std::pair<float, float> get_mouse_position() noexcept;
+        static bool is_key_pressed(Key key);
+        static bool is_button_pressed(Button button);
+        static std::pair<float, float> get_mouse_position();
 
         // Scene
-        void capture(const Camera& camera, glm::vec3 position) noexcept;
-        void capture(const Camera2D& camera_2d) noexcept;
-        void environment(const Skybox& skybox) noexcept;
-        void shadow(ShadowBox& box) noexcept;
+        void capture(const Camera& camera, glm::vec3 position);
+        void capture(const Camera2D& camera_2d);
+        void environment(const Skybox& skybox);
+        void shadow(ShadowBox& box);
         void add_post_processing(std::shared_ptr<PostProcessingStep> step);
         void add_renderable(Renderable& renderable);
-        void add_light(DirectionalLight& light) noexcept;
+        void add_light(DirectionalLight& light);
         void add_light(PointLight& light);
         void add_text(Text& text);
         void add_quad(Quad& quad);
@@ -155,13 +157,13 @@ namespace sm {
         void debug_add_lamp(glm::vec3 position, glm::vec3 color);
 
         // Dear ImGui
-        static void invalidate_dear_imgui_texture() noexcept;
+        static void invalidate_dear_imgui_texture();
 
         // Context
-        void change_scene(Id id, bool clear_resources = false) noexcept;
+        void change_scene(Id id, bool clear_resources = false);
         void show_information_text();
-        float get_delta() const noexcept;
-        float get_fps() const noexcept;
+        float get_delta() const;
+        float get_fps() const;
         std::string get_information() const;
         std::shared_ptr<Mesh> get_mesh(Id id) const;
         std::shared_ptr<Mesh> load_mesh(Id id, const std::filesystem::path& file_path, const std::string& mesh_name, Mesh::Type type, bool flip_winding = false);
@@ -187,25 +189,25 @@ namespace sm {
 
         // Retrieve shared data
         template<typename T>
-        T& global() noexcept {
+        T& global() {
             return *static_cast<T*>(m_global_data.get());
         }
 
         // Retrieve shared data
         template<typename T>
-        const T& global() const noexcept {
+        const T& global() const {
             return *static_cast<T*>(m_global_data.get());
         }
 
         // Retrieve user data
         template<typename T>
-        T& user() noexcept {
+        T& user() {
             return *static_cast<T*>(m_user_data);
         }
 
         // Retrieve user data
         template<typename T>
-        const T& user() const noexcept {
+        const T& user() const {
             return *static_cast<T*>(m_user_data);
         }
 

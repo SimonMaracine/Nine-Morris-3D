@@ -6,7 +6,7 @@
 #include "nine_morris_3d_engine/audio/openal/debug.hpp"
 
 namespace sm {
-    static ALenum get_format(int channels, std::size_t bps) noexcept {
+    static ALenum get_format(int channels, std::size_t bps) {
         ALenum format {};
 
         if (channels == 1 && bps == 8) {
@@ -24,7 +24,7 @@ namespace sm {
         return format;
     }
 
-    AlBuffer::AlBuffer(const void* data, std::size_t size, int channels, std::size_t bps, int frequency) noexcept {
+    AlBuffer::AlBuffer(const void* data, std::size_t size, int channels, std::size_t bps, int frequency) {
         alGenBuffers(1, &m_buffer);
         alBufferData(m_buffer, get_format(channels, bps), data, static_cast<int>(size), frequency);
 
@@ -33,7 +33,7 @@ namespace sm {
         LOG_DEBUG("Created AL buffer {}", m_buffer);
     }
 
-    AlBuffer::AlBuffer(std::shared_ptr<SoundData> data) noexcept {
+    AlBuffer::AlBuffer(std::shared_ptr<SoundData> data) {
         alGenBuffers(1, &m_buffer);
         alBufferData(
             m_buffer,

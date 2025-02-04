@@ -4,7 +4,7 @@
 #include <exception>
 
 #include "nine_morris_3d_engine/application/internal/window.hpp"
-#include "nine_morris_3d_engine/application/error.hpp"
+#include "nine_morris_3d_engine/application/internal/error.hpp"
 #include "nine_morris_3d_engine/application/logging.hpp"
 
 namespace sm::internal {

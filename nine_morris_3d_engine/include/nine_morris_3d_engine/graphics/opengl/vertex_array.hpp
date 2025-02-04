@@ -12,7 +12,7 @@ namespace sm {
     public:
         using Configuration = std::function<void(GlVertexArray*)>;
 
-        GlVertexArray() noexcept;
+        GlVertexArray();
         ~GlVertexArray();
 
         GlVertexArray(const GlVertexArray&) = delete;
@@ -20,15 +20,15 @@ namespace sm {
         GlVertexArray(GlVertexArray&&) = delete;
         GlVertexArray& operator=(GlVertexArray&&) = delete;
 
-        void bind() const noexcept;
-        static void unbind() noexcept;
+        void bind() const;
+        static void unbind();
 
         void configure(const Configuration& configuration);
 
         void add_vertex_buffer(std::shared_ptr<GlVertexBuffer> buffer, const VertexBufferLayout& layout);
-        void add_index_buffer(std::shared_ptr<GlIndexBuffer> buffer) noexcept;
+        void add_index_buffer(std::shared_ptr<GlIndexBuffer> buffer);
 
-        const GlIndexBuffer* get_index_buffer() const noexcept;
+        const GlIndexBuffer* get_index_buffer() const;
     private:
         unsigned int m_array {};
 

@@ -2,7 +2,7 @@
 
 // Keyboard key and mouse button definitions
 
-namespace sm {
+namespace sm::internal {
     enum class Key {
         Unknown,
         Return,
@@ -122,9 +122,9 @@ namespace sm {
         X2
     };
 
-    unsigned int key_to_sdl_keycode(Key key) noexcept;
-    Key sdl_keycode_to_key(unsigned int keycode) noexcept;
+    unsigned int key_to_sdl_keycode(Key key);
+    Key sdl_keycode_to_key(unsigned int keycode);
 
-    int button_to_sdl_button(Button button) noexcept;
-    Button sdl_button_to_button(int button) noexcept;
+    int button_to_sdl_button(Button button);
+    Button sdl_button_to_button(int button);
 }

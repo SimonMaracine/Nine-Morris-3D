@@ -6,7 +6,6 @@ set(BUILD_SHARED_LIBS OFF)
 include(cmake/assimp.cmake)
 include(cmake/dear_imgui.cmake)
 include(cmake/glad.cmake)
-include(cmake/glfw.cmake)
 include(cmake/openal_soft.cmake)
 include(cmake/sdl.cmake)
 include(cmake/stb.cmake)
@@ -18,14 +17,13 @@ add_subdirectory(extern/utfcpp)
 
 add_library(nine_morris_3d_engine STATIC
     "src/application/internal/file_system.cpp"
+    "src/application/internal/input_codes.cpp"
     "src/application/internal/input.cpp"
     "src/application/internal/logging_base.cpp"
     "src/application/internal/task_manager.cpp"
     "src/application/internal/window.cpp"
     "src/application/application.cpp"
     "src/application/context.cpp"
-    "src/application/input_codes.cpp"
-    "src/application/monitors.cpp"
     "src/audio/internal/context.cpp"
     "src/audio/internal/music_player.cpp"
     "src/audio/openal/buffer.cpp"
@@ -58,21 +56,20 @@ add_library(nine_morris_3d_engine STATIC
     "src/other/dependencies.cpp"
     "src/other/utilities.cpp"
 
+    "include/nine_morris_3d_engine/application/internal/error.hpp"
     "include/nine_morris_3d_engine/application/internal/event_dispatcher.hpp"
     "include/nine_morris_3d_engine/application/internal/file_system.hpp"
+    "include/nine_morris_3d_engine/application/internal/input_codes.hpp"
     "include/nine_morris_3d_engine/application/internal/input.hpp"
     "include/nine_morris_3d_engine/application/internal/logging_base.hpp"
     "include/nine_morris_3d_engine/application/internal/task_manager.hpp"
     "include/nine_morris_3d_engine/application/internal/window.hpp"
     "include/nine_morris_3d_engine/application/application.hpp"
     "include/nine_morris_3d_engine/application/context.hpp"
-    "include/nine_morris_3d_engine/application/error.hpp"
     "include/nine_morris_3d_engine/application/events.hpp"
     "include/nine_morris_3d_engine/application/global_data.hpp"
     "include/nine_morris_3d_engine/application/id.hpp"
-    "include/nine_morris_3d_engine/application/input_codes.hpp"
     "include/nine_morris_3d_engine/application/logging.hpp"
-    "include/nine_morris_3d_engine/application/monitors.hpp"
     "include/nine_morris_3d_engine/application/platform.hpp"
     "include/nine_morris_3d_engine/application/properties.hpp"
     "include/nine_morris_3d_engine/application/scene.hpp"
@@ -129,7 +126,6 @@ target_include_directories(nine_morris_3d_engine PUBLIC "include")
 target_link_libraries(nine_morris_3d_engine PRIVATE
     glad
     assimp::assimp
-    glfw
     SDL3::SDL3
     OpenAL::OpenAL
     utf8cpp

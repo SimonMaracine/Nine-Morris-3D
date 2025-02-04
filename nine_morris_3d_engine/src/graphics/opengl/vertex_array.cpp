@@ -8,7 +8,7 @@
 #include "nine_morris_3d_engine/application/logging.hpp"
 
 namespace sm {
-    GlVertexArray::GlVertexArray() noexcept {
+    GlVertexArray::GlVertexArray() {
         glGenVertexArrays(1, &m_array);
         glBindVertexArray(m_array);
 
@@ -23,11 +23,11 @@ namespace sm {
         LOG_DEBUG("Deleted GL vertex array {}", m_array);
     }
 
-    void GlVertexArray::bind() const noexcept {
+    void GlVertexArray::bind() const {
         glBindVertexArray(m_array);
     }
 
-    void GlVertexArray::unbind() noexcept {
+    void GlVertexArray::unbind() {
         glBindVertexArray(0);
     }
 
@@ -86,13 +86,13 @@ namespace sm {
         GlVertexBuffer::unbind();
     }
 
-    void GlVertexArray::add_index_buffer(std::shared_ptr<GlIndexBuffer> buffer) noexcept {
+    void GlVertexArray::add_index_buffer(std::shared_ptr<GlIndexBuffer> buffer) {
         buffer->bind();
 
         m_index_buffer = buffer;
     }
 
-    const GlIndexBuffer* GlVertexArray::get_index_buffer() const noexcept {
+    const GlIndexBuffer* GlVertexArray::get_index_buffer() const {
         return m_index_buffer.get();
     }
 }

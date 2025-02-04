@@ -2,6 +2,7 @@
 
 #include <resmanager/resmanager.hpp>
 
+#include "nine_morris_3d_engine/application/internal/input.hpp"
 #include "nine_morris_3d_engine/application/application.hpp"
 #include "nine_morris_3d_engine/application/scene.hpp"
 #include "nine_morris_3d_engine/application/logging.hpp"
@@ -83,11 +84,11 @@ namespace sm {
         return m_fs.path_engine_assets(path);
     }
 
-    int Ctx::get_window_width() const noexcept {
+    int Ctx::get_window_width() const {
         return m_win.get_width();
     }
 
-    int Ctx::get_window_height() const noexcept {
+    int Ctx::get_window_height() const {
         return m_win.get_height();
     }
 
@@ -99,14 +100,6 @@ namespace sm {
         m_win.set_vsync(enable);
     }
 
-    // void Ctx::add_window_cursor(Id id, std::unique_ptr<TextureData>&& cursor, int x_hotspot, int y_hotspot) {
-    //     m_win.add_cursor(id, std::move(cursor), x_hotspot, y_hotspot);
-    // }
-
-    // void Ctx::set_window_cursor(Id id) const {
-    //     m_win.set_cursor(id);
-    // }
-
     void Ctx::set_window_icons(std::initializer_list<std::unique_ptr<TextureData>> icons) const {
         m_win.set_icons(icons);
     }
@@ -115,27 +108,23 @@ namespace sm {
         m_win.set_size(width, height);
     }
 
-    // Monitors Ctx::get_monitors() const {
-    //     return m_win.get_monitors();
-    // }
-
-    double Ctx::get_time() noexcept {
+    double Ctx::get_time() {
         return internal::Window::get_time();
     }
 
-    std::shared_ptr<Font> Ctx::get_renderer_default_font() const noexcept {
+    std::shared_ptr<Font> Ctx::get_renderer_default_font() const {
         return m_rnd.get_default_font();
     }
 
-    void Ctx::set_renderer_color_correction(bool enable) noexcept {
+    void Ctx::set_renderer_color_correction(bool enable) {
         m_rnd.set_color_correction(enable);
     }
 
-    bool Ctx::get_renderer_color_correction() const noexcept {
+    bool Ctx::get_renderer_color_correction() const {
         return m_rnd.get_color_correction();
     }
 
-    void Ctx::set_renderer_clear_color(glm::vec3 color) noexcept {
+    void Ctx::set_renderer_clear_color(glm::vec3 color) {
         m_rnd.set_clear_color(color);
     }
 
@@ -159,19 +148,19 @@ namespace sm {
         m_mus.play(music_track);
     }
 
-    void Ctx::stop_music_track() noexcept {
+    void Ctx::stop_music_track() {
         m_mus.stop();
     }
 
-    void Ctx::pause_music_track() noexcept {
+    void Ctx::pause_music_track() {
         m_mus.pause();
     }
 
-    void Ctx::resume_music_track() noexcept {
+    void Ctx::resume_music_track() {
         m_mus.resume();
     }
 
-    void Ctx::set_music_gain(float gain) noexcept {
+    void Ctx::set_music_gain(float gain) {
         m_mus.set_gain(gain);
     }
 
@@ -191,31 +180,31 @@ namespace sm {
         m_tsk.add_async(std::move(function));
     }
 
-    bool Ctx::is_key_pressed(Key key) noexcept {
+    bool Ctx::is_key_pressed(Key key) {
         return internal::is_key_pressed(key);
     }
 
-    bool Ctx::is_button_pressed(Button button) noexcept {
+    bool Ctx::is_button_pressed(Button button) {
         return internal::is_button_pressed(button);
     }
 
-    std::pair<float, float> Ctx::get_mouse_position() noexcept {
+    std::pair<float, float> Ctx::get_mouse_position() {
         return internal::get_mouse_position();
     }
 
-    void Ctx::capture(const Camera& camera, glm::vec3 position) noexcept {
+    void Ctx::capture(const Camera& camera, glm::vec3 position) {
         m_scn.capture(camera, position);
     }
 
-    void Ctx::capture(const Camera2D& camera_2d) noexcept {
+    void Ctx::capture(const Camera2D& camera_2d) {
         m_scn.capture(camera_2d);
     }
 
-    void Ctx::environment(const Skybox& skybox) noexcept {
+    void Ctx::environment(const Skybox& skybox) {
         m_scn.environment(skybox);
     }
 
-    void Ctx::shadow(ShadowBox& box) noexcept {
+    void Ctx::shadow(ShadowBox& box) {
         m_scn.shadow(box);
     }
 
@@ -227,7 +216,7 @@ namespace sm {
         m_scn.add_renderable(renderable);
     }
 
-    void Ctx::add_light(DirectionalLight& light) noexcept {
+    void Ctx::add_light(DirectionalLight& light) {
         m_scn.add_light(light);
     }
 
@@ -263,11 +252,11 @@ namespace sm {
         m_scn.debug_add_lamp(position, color);
     }
 
-    void Ctx::invalidate_dear_imgui_texture() noexcept {
+    void Ctx::invalidate_dear_imgui_texture() {
         internal::imgui_context::invalidate_texture();
     }
 
-    void Ctx::change_scene(Id id, bool clear_resources) noexcept {
+    void Ctx::change_scene(Id id, bool clear_resources) {
         m_application->change_scene(id, clear_resources);
     }
 
@@ -293,11 +282,11 @@ namespace sm {
         m_scn.add_text(const_cast<const Text&>(text));
     }
 
-    float Ctx::get_delta() const noexcept {
+    float Ctx::get_delta() const {
         return m_delta;
     }
 
-    float Ctx::get_fps() const noexcept {
+    float Ctx::get_fps() const {
         return m_fps;
     }
 
