@@ -9,11 +9,11 @@
 
     Include this entry_point.hpp header file once into your main compilation unit.
 */
-int sm_application_main();
+int sm_application_main(int argc, char** argv);
 
 #if defined(SM_PLATFORM_LINUX)
-    int main(int, char**) {
-        return sm_application_main();
+    int main(int argc, char** argv) {
+        return sm_application_main(argc, argv);
     }
 #elif defined(SM_PLATFORM_WINDOWS)
     #define WIN32_LEAN_AND_MEAN
@@ -21,12 +21,12 @@ int sm_application_main();
     #include <Windows.h>
 
     #if defined(SM_BUILD_DISTRIBUTION)
-        INT WINAPI WinMain(HINSTANCE, HINSTANCE, PSTR, INT) {
+        INT WINAPI WinMain(HINSTANCE, HINSTANCE, PSTR, INT) {  // FIXME
             return sm_application_main();
         }
     #else
-        int main(int, char**) {
-            return sm_application_main();
+        int main(int argc, char** argv) {
+            return sm_application_main(argc, argv);
         }
     #endif
 #endif

@@ -4,6 +4,7 @@
 
 #include "nine_morris_3d_engine/application/application.hpp"
 #include "nine_morris_3d_engine/application/context.hpp"
+#include "nine_morris_3d_engine/application/crash.hpp"
 #include "nine_morris_3d_engine/application/events.hpp"
 #include "nine_morris_3d_engine/application/global_data.hpp"
 #include "nine_morris_3d_engine/application/id.hpp"

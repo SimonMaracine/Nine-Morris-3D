@@ -24,6 +24,7 @@ add_library(nine_morris_3d_engine STATIC
     "src/application/internal/window.cpp"
     "src/application/application.cpp"
     "src/application/context.cpp"
+    "src/application/crash.cpp"
     "src/audio/internal/context.cpp"
     "src/audio/internal/music_player.cpp"
     "src/audio/openal/buffer.cpp"
@@ -66,6 +67,7 @@ add_library(nine_morris_3d_engine STATIC
     "include/nine_morris_3d_engine/application/internal/window.hpp"
     "include/nine_morris_3d_engine/application/application.hpp"
     "include/nine_morris_3d_engine/application/context.hpp"
+    "include/nine_morris_3d_engine/application/crash.hpp"
     "include/nine_morris_3d_engine/application/events.hpp"
     "include/nine_morris_3d_engine/application/global_data.hpp"
     "include/nine_morris_3d_engine/application/id.hpp"
@@ -130,6 +132,8 @@ target_link_libraries(nine_morris_3d_engine PRIVATE
     OpenAL::OpenAL
     utf8cpp
     stb
+    Boost::process
+    Boost::asio
 )
 
 target_link_libraries(nine_morris_3d_engine PUBLIC

@@ -1,5 +1,6 @@
 #include <iostream>
 #include <filesystem>
+#include <cstring>
 
 // Include entry point first as it includes Windows.h
 #include <nine_morris_3d_engine/entry_point.hpp>
@@ -46,7 +47,7 @@ static Paths get_paths() {
 #endif  // SM_BUILD_DISTRIBUTION
 }
 
-int sm_application_main() {
+static int game() {
     Paths paths;
 
     try {
@@ -56,45 +57,97 @@ int sm_application_main() {
         return 1;
     }
 
-    while (true) {
-        int exit_code {};
+    sm::ApplicationProperties properties;
+    properties.width = DEFAULT_WIDTH;
+    properties.height = DEFAULT_HEIGHT;
+    properties.min_width = MIN_WIDTH;
+    properties.min_height = MIN_HEIGHT;
+    properties.title = "Nine Morris 3D";
+    properties.log_file = "nine_morris_3d.log";
+    properties.version_major = VERSION_MAJOR;
+    properties.version_minor = VERSION_MINOR;
+    properties.version_patch = VERSION_PATCH;
+    properties.path_logs = paths.logs;
+    properties.path_saved_data = paths.saved_data;
+    properties.path_assets = paths.assets;
+    properties.build_date = __DATE__;
+    properties.build_time = __TIME__;
+    properties.default_renderer_parameters = false;
+    // properties.audio = true;  // TODO
 
-        sm::ApplicationProperties properties;
-        properties.width = DEFAULT_WIDTH;
-        properties.height = DEFAULT_HEIGHT;
-        properties.min_width = MIN_WIDTH;
-        properties.min_height = MIN_HEIGHT;
-        properties.title = "Nine Morris 3D";
-        properties.log_file = "nine_morris_3d.log";
-        properties.version_major = VERSION_MAJOR;
-        properties.version_minor = VERSION_MINOR;
-        properties.version_patch = VERSION_PATCH;
-        properties.path_logs = paths.logs;
-        properties.path_saved_data = paths.saved_data;
-        properties.path_assets = paths.assets;
-        properties.build_date = __DATE__;
-        properties.build_time = __TIME__;
-        properties.default_renderer_parameters = false;
-        // properties.audio = true;  // TODO
+    sm::UserFunctions functions;
+    functions.start = game_start;
+    functions.stop = game_stop;
 
-        sm::UserFunctions functions;
-        functions.start = game_start;
-        functions.stop = game_stop;
+    try {
+        sm::Application game {properties};
+        game.add_scene<LoadingScene>();
+        game.add_scene<NineMensMorrisScene>();
+        game.add_scene<TwelveMensMorrisScene>();
+        game.set_global_data<Global>();
+        game.run("loading"_H, functions);
+    } catch (const sm::RuntimeError& e) {
+        std::cerr << "Terminated game with error: " << e.type() << ": " << e.what() << '\n';
+        return 1;
+    }
+
+    return 0;
+}
+
+static void crash_handler(int) {
+    const char* title {"Nine Morris 3D Fatal Error"};
+    const char* message {"Sorry! Nine Morris 3D encountered a fatal error! Please take a look at the logs and consider reporting the event to the developer."};
+
+    try {
+        sm::show_error_window(title, message);
+    } catch (const sm::RuntimeError&) {
+        std::cerr << title << ": " << message << '\n';
+    }
+}
+
+int sm_application_main(int argc, char** argv) {
+    if (argc > 1 && std::strcmp(argv[1], "--game") == 0) {
+        return game();
+    }
+
+#ifdef SM_BUILD_DISTRIBUTION
+
+#ifdef SM_PLATFORM_WINDOWS
+    const char* executable {"nine_morris_3d.exe"};
+#else
+    const char* executable {"nine_morris_3d"};
+#endif
+
+#else
+
+#ifdef SM_PLATFORM_WINDOWS
+    const char* executable {"build/nine_morris_3d/Debug/nine_morris_3d.exe"};
+#else
+    const char* executable {"build/nine_morris_3d/nine_morris_3d"};
+#endif
+
+#endif  // SM_BUILD_DISTRIBUTION
+
+#if defined(SM_BUILD_DISTRIBUTION) && defined(SM_PLATFORM_LINUX)
+    const bool find_executable {true};
+#else
+    const bool find_executable {false};
+#endif
+
+    try {
+        sm::launch_process_with_crash_handler(executable, {"--game"}, crash_handler, find_executable);
+    } catch (const sm::RuntimeError& e) {
+        std::cerr << "An fatal error occurred inside outside the game: " << e.what() << '\n';
 
         try {
-            sm::Application game {properties};
-            game.add_scene<LoadingScene>();
-            game.add_scene<NineMensMorrisScene>();
-            game.add_scene<TwelveMensMorrisScene>();
-            game.set_global_data<Global>();
-            exit_code = game.run("loading"_H, functions);
-        } catch (const sm::RuntimeError& e) {
-            std::cerr << "Terminated game with error: " << e.what() << '\n';
-            return 1;
-        }
+            sm::show_error_window(
+                "Nine Morris 3D Fatal Error",
+                "Sorry! A very fatal error occurred. Please consider reporting the event to the developer.\n\n" + std::string(e.what())
+            );
+        } catch (...) {}
 
-        if (exit_code == 0) {
-            return 0;
-        }
+        return 1;
     }
+
+    return 0;
 }
