@@ -70,6 +70,12 @@ namespace sm::internal {
 
         // Update events
         void poll_events();
+
+        // Get handle to the window
+        SDL_Window* get_window() const { return m_window; }
+
+        // Get handle to the OpenGL context
+        void* get_context() const { return m_context; }
     private:
         // void create_window(const ApplicationProperties& properties);
         // void install_callbacks() const noexcept;

@@ -300,6 +300,8 @@ namespace sm::internal {
         SDL_Event event;
 
         while (SDL_PollEvent(&event)) {
+            imgui_context::process_event(&event);
+
             switch (event.type) {
                 case SDL_EVENT_WINDOW_CLOSE_REQUESTED:
                     // application->events.enqueue<WindowClosedEvent>();
@@ -343,7 +345,7 @@ namespace sm::internal {
                     //     static_cast<bool>(event.key.repeat)
                     // );
 
-                    if (imgui_context::on_key_pressed(event.key.key, event.key.scancode)) {
+                    if (imgui_context::want_capture_keyboard()) {
                         return;
                     }
 
@@ -357,7 +359,7 @@ namespace sm::internal {
 
                     break;
                 case SDL_EVENT_KEY_UP:
-                    if (imgui_context::on_key_released(event.key.key, event.key.scancode)) {
+                    if (imgui_context::want_capture_keyboard()) {
                         return;
                     }
 
@@ -375,7 +377,7 @@ namespace sm::internal {
                     //     event.motion.yrel
                     // );
 
-                    if (imgui_context::on_mouse_moved(event.motion.x, event.motion.y)) {
+                    if (imgui_context::want_capture_mouse()) {
                         return;
                     }
 
@@ -389,7 +391,7 @@ namespace sm::internal {
                     //     event.button.y
                     // );
 
-                    if (imgui_context::on_mouse_button_pressed(event.button.button)) {
+                    if (imgui_context::want_capture_mouse()) {
                         return;
                     }
 
@@ -403,7 +405,7 @@ namespace sm::internal {
                     //     event.button.y
                     // );
 
-                    if (imgui_context::on_mouse_button_released(event.button.button)) {
+                    if (imgui_context::want_capture_mouse()) {
                         return;
                     }
 
@@ -413,7 +415,7 @@ namespace sm::internal {
                 case SDL_EVENT_MOUSE_WHEEL:
                     // application->events.enqueue<MouseWheelScrolledEvent>(event.wheel.y);
 
-                    if (imgui_context::on_mouse_wheel_scrolled(event.wheel.y)) {
+                    if (imgui_context::want_capture_mouse()) {
                         return;
                     }
 
