@@ -7,6 +7,7 @@
 #include "nine_morris_3d_engine/application/scene.hpp"
 #include "nine_morris_3d_engine/application/platform.hpp"
 #include "nine_morris_3d_engine/application/logging.hpp"
+#include "nine_morris_3d_engine/audio/internal/audio.hpp"
 #include "nine_morris_3d_engine/graphics/internal/imgui_context.hpp"
 #include "nine_morris_3d_engine/graphics/opengl/debug.hpp"
 #include "nine_morris_3d_engine/graphics/opengl/capabilities.hpp"
@@ -18,6 +19,7 @@ namespace sm {
         m_ctx.m_user_data = properties.user_data;
 
         internal::imgui_context::initialize(m_ctx.m_win.get_window(), m_ctx.m_win.get_context());
+        internal::audio::initialize();
 
         LOG_DIST_INFO("Working directory: {}", internal::FileSystem::current_working_directory().string());
 
@@ -42,6 +44,7 @@ namespace sm {
     }
 
     Application::~Application() {
+        internal::audio::uninitialize();
         internal::imgui_context::uninitialize();
 
         LOG_INFO("Waiting for other threads...");

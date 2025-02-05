@@ -15,8 +15,5 @@ namespace sm::internal {
         shader->clear();
         framebuffer->clear();
         sound_data->clear();
-        music_track->clear();
-        source->clear();
-        buffer->clear();
     }
 }

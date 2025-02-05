@@ -17,11 +17,7 @@
 #include "nine_morris_3d_engine/application/properties.hpp"
 #include "nine_morris_3d_engine/application/id.hpp"
 #include "nine_morris_3d_engine/application/global_data.hpp"
-#include "nine_morris_3d_engine/audio/internal/context.hpp"
-#include "nine_morris_3d_engine/audio/internal/music_player.hpp"
-#include "nine_morris_3d_engine/audio/openal/buffer.hpp"
-#include "nine_morris_3d_engine/audio/openal/source.hpp"
-#include "nine_morris_3d_engine/audio/music_track.hpp"
+#include "nine_morris_3d_engine/audio/internal/audio.hpp"
 #include "nine_morris_3d_engine/audio/sound_data.hpp"
 #include "nine_morris_3d_engine/graphics/internal/shader_library.hpp"
 #include "nine_morris_3d_engine/graphics/internal/renderer.hpp"
@@ -121,12 +117,8 @@ namespace sm {
         void set_renderer_shadow_map_size(int size);
         void initialize_renderer(const RendererSpecification& specification);
 
-        // Music player
-        void play_music_track(std::shared_ptr<MusicTrack> music_track);
-        void stop_music_track();
-        void pause_music_track();
-        void resume_music_track();
-        void set_music_gain(float gain);
+        // Audio
+        void play_sound(std::shared_ptr<SoundData> sound_data);
 
         // Task manager
         void add_task_immediate(Task::Function&& function);
@@ -183,9 +175,6 @@ namespace sm {
         std::shared_ptr<GlFramebuffer> load_framebuffer(Id id, const FramebufferSpecification& specification);
         std::shared_ptr<Font> load_font(Id id, const std::filesystem::path& file_path, const FontSpecification& specification, const std::function<void(Font*)>& bake);
         std::shared_ptr<SoundData> load_sound_data(const std::filesystem::path& file_path);
-        std::shared_ptr<MusicTrack> load_music_track(Id id, std::shared_ptr<SoundData> sound_data);
-        std::shared_ptr<AlSource> load_source(Id id);
-        std::shared_ptr<AlBuffer> load_buffer(Id id, std::shared_ptr<SoundData> sound_data);
 
         // Retrieve shared data
         template<typename T>
@@ -230,8 +219,6 @@ namespace sm {
         internal::EventDispatcher m_evt;
         internal::Window m_win;
         internal::Renderer m_rnd;
-        internal::OpenAlContext m_snd;
-        internal::MusicPlayer m_mus;
         internal::TaskManager m_tsk;
         internal::Scene m_scn;
         internal::ResourcesCache m_res;

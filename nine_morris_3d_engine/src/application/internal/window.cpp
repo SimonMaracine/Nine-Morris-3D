@@ -92,11 +92,13 @@ namespace sm::internal {
     }
 
     Window::~Window() {
-        for (auto iter {std::next(m_surfaces.begin())}; iter != m_surfaces.end(); iter++) {
-            SDL_DestroySurface(*iter);
-        }
+        if (m_surfaces.size() > 1) {
+            for (auto iter {std::next(m_surfaces.begin())}; iter != m_surfaces.end(); iter++) {
+                SDL_DestroySurface(*iter);
+            }
 
-        SDL_DestroySurface(m_surfaces[0]);
+            SDL_DestroySurface(m_surfaces[0]);
+        }
 
         SDL_GL_DestroyContext(static_cast<SDL_GLContext>(m_context));
         SDL_DestroyWindow(m_window);

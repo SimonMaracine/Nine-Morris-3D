@@ -8,6 +8,7 @@ include(cmake/dear_imgui.cmake)
 include(cmake/glad.cmake)
 include(cmake/openal_soft.cmake)
 include(cmake/sdl.cmake)
+include(cmake/sdl_mixer.cmake)
 include(cmake/stb.cmake)
 
 add_subdirectory(extern/entt)
@@ -25,13 +26,7 @@ add_library(nine_morris_3d_engine STATIC
     "src/application/application.cpp"
     "src/application/context.cpp"
     "src/application/crash.cpp"
-    "src/audio/internal/context.cpp"
-    "src/audio/internal/music_player.cpp"
-    "src/audio/openal/buffer.cpp"
-    "src/audio/openal/debug.cpp"
-    "src/audio/openal/listener.cpp"
-    "src/audio/openal/source.cpp"
-    "src/audio/music_track.cpp"
+    "src/audio/internal/audio.cpp"
     "src/audio/sound_data.cpp"
     "src/graphics/internal/debug_ui.cpp"
     "src/graphics/internal/imgui_context.cpp"
@@ -76,13 +71,7 @@ add_library(nine_morris_3d_engine STATIC
     "include/nine_morris_3d_engine/application/properties.hpp"
     "include/nine_morris_3d_engine/application/scene.hpp"
     "include/nine_morris_3d_engine/application/task.hpp"
-    "include/nine_morris_3d_engine/audio/internal/context.hpp"
-    "include/nine_morris_3d_engine/audio/internal/music_player.hpp"
-    "include/nine_morris_3d_engine/audio/openal/buffer.hpp"
-    "include/nine_morris_3d_engine/audio/openal/debug.hpp"
-    "include/nine_morris_3d_engine/audio/openal/listener.hpp"
-    "include/nine_morris_3d_engine/audio/openal/source.hpp"
-    "include/nine_morris_3d_engine/audio/music_track.hpp"
+    "include/nine_morris_3d_engine/audio/internal/audio.hpp"
     "include/nine_morris_3d_engine/audio/sound_data.hpp"
     "include/nine_morris_3d_engine/external/cereal.h++"
     "include/nine_morris_3d_engine/external/glm.h++"
@@ -131,6 +120,7 @@ target_link_libraries(nine_morris_3d_engine PRIVATE
     glad
     assimp::assimp
     SDL3::SDL3
+    SDL3_mixer::SDL3_mixer
     OpenAL::OpenAL
     utf8cpp
     stb

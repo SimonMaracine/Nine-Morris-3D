@@ -7,7 +7,6 @@ namespace sm {
     struct ApplicationProperties {
         bool fullscreen {false};
         bool resizable {true};
-        bool audio {false};
         bool default_renderer_parameters {true};
         int width {1280};
         int height {720};

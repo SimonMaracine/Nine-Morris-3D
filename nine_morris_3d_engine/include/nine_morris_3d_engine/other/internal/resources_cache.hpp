@@ -4,10 +4,7 @@
 
 #include <resmanager/resmanager.hpp>
 
-#include "nine_morris_3d_engine/audio/openal/source.hpp"
-#include "nine_morris_3d_engine/audio/openal/buffer.hpp"
 #include "nine_morris_3d_engine/audio/sound_data.hpp"
-#include "nine_morris_3d_engine/audio/music_track.hpp"
 #include "nine_morris_3d_engine/graphics/opengl/texture.hpp"
 #include "nine_morris_3d_engine/graphics/opengl/vertex_array.hpp"
 #include "nine_morris_3d_engine/graphics/opengl/shader.hpp"
@@ -67,8 +64,5 @@ namespace sm::internal {
         LockedCache<GlShader> shader;
         LockedCache<GlFramebuffer> framebuffer;
         LockedCache<SoundData> sound_data;
-        LockedCache<MusicTrack> music_track;
-        LockedCache<AlSource> source;
-        LockedCache<AlBuffer> buffer;
     };
 }

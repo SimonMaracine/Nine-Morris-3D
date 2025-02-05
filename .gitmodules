@@ -32,3 +32,6 @@
 [submodule "nine_morris_3d_engine/extern/imgui"]
 	path = nine_morris_3d_engine/extern/imgui
 	url = https://github.com/ocornut/imgui
+[submodule "nine_morris_3d_engine/extern/sdl_mixer"]
+	path = nine_morris_3d_engine/extern/sdl_mixer
+	url = https://github.com/libsdl-org/SDL_mixer

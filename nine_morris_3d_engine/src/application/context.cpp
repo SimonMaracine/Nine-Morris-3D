@@ -6,7 +6,6 @@
 #include "nine_morris_3d_engine/application/application.hpp"
 #include "nine_morris_3d_engine/application/scene.hpp"
 #include "nine_morris_3d_engine/application/logging.hpp"
-#include "nine_morris_3d_engine/audio/openal/debug.hpp"
 #include "nine_morris_3d_engine/graphics/internal/imgui_context.hpp"
 #include "nine_morris_3d_engine/graphics/opengl/debug.hpp"
 #include "nine_morris_3d_engine/other/dependencies.hpp"
@@ -20,9 +19,7 @@ namespace sm {
         m_log(properties.log_file, m_fs),
         m_shd({m_fs.path_engine_assets().string(), m_fs.path_assets().string()}),
         m_win(properties, m_evt),
-        m_rnd(properties.width, properties.height, m_fs, m_shd),
-        m_snd(properties.audio),
-        m_mus(properties.audio) {
+        m_rnd(properties.width, properties.height, m_fs, m_shd) {
         if (properties.default_renderer_parameters) {
             m_rnd.initialize(properties.width, properties.height, m_fs);
         }
@@ -144,24 +141,8 @@ namespace sm {
         m_rnd.initialize(m_win.get_width(), m_win.get_height(), m_fs, specification);
     }
 
-    void Ctx::play_music_track(std::shared_ptr<MusicTrack> music_track) {
-        m_mus.play(music_track);
-    }
-
-    void Ctx::stop_music_track() {
-        m_mus.stop();
-    }
-
-    void Ctx::pause_music_track() {
-        m_mus.pause();
-    }
-
-    void Ctx::resume_music_track() {
-        m_mus.resume();
-    }
-
-    void Ctx::set_music_gain(float gain) {
-        m_mus.set_gain(gain);
+    void Ctx::play_sound(std::shared_ptr<SoundData> sound_data) {
+        internal::audio::play_sound(sound_data);
     }
 
     void Ctx::add_task_immediate(Task::Function&& function) {
@@ -300,7 +281,6 @@ namespace sm {
         std::string result;
         result += "*** Build ***\n";
         result += std::string(m_build_date) + " " + m_build_time + SUFFIX + '\n';
-        result += openal_debug::get_information();
         result += opengl_debug::get_information();
         result += dependencies::get_information();
 
@@ -637,22 +617,6 @@ namespace sm {
     std::shared_ptr<SoundData> Ctx::load_sound_data(const std::filesystem::path& file_path) {
         const auto id {Id(utils::file_name(file_path))};
 
-        if (m_res.sound_data->contains(id)) {
-            return m_res.sound_data->get(id);
-        }
-
-        return m_res.sound_data->force_load(id, utils::read_file(file_path));
-    }
-
-    std::shared_ptr<MusicTrack> Ctx::load_music_track(Id id, std::shared_ptr<SoundData> sound_data) {
-        return m_res.music_track->load(id, sound_data);
-    }
-
-    std::shared_ptr<AlSource> Ctx::load_source(Id id) {
-        return m_res.source->load(id);
-    }
-
-    std::shared_ptr<AlBuffer> Ctx::load_buffer(Id id, std::shared_ptr<SoundData> sound_data) {
-        return m_res.buffer->load(id, sound_data);
+        return m_res.sound_data->load(id, file_path);
     }
 }

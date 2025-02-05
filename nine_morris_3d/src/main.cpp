@@ -73,7 +73,6 @@ static int game() {
     properties.build_date = __DATE__;
     properties.build_time = __TIME__;
     properties.default_renderer_parameters = false;
-    // properties.audio = true;  // TODO
 
     sm::UserFunctions functions;
     functions.start = game_start;

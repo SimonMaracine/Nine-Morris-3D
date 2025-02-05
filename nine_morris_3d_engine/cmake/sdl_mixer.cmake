@@ -1,0 +1,8 @@
+set(SDLMIXER_FLAC OFF)
+set(SDLMIXER_MP3 OFF)
+set(SDLMIXER_MOD OFF)
+set(SDLMIXER_MIDI OFF)
+set(SDLMIXER_OPUS OFF)
+set(SDLMIXER_WAVPACK OFF)
+
+add_subdirectory(extern/sdl_mixer)
