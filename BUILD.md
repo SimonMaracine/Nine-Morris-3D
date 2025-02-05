@@ -127,4 +127,7 @@ Running the game is supposed to work only through the scripts on Linux developme
 on Windows development. Similarly, in distribution, the game is supposed to be installed in the system in order
 to work. The reason for this is that it expects the assets and the engines to be in very specific locations.
 
+When debugging, run the game with `--game` argument in order to bypass the crash handler. If the game crashes for
+any reason, the debugger won't catch the exception, as the debugged process is actually the crash handler.
+
 On Linux, currently, only the X11 protocol is supported.
