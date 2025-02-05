@@ -8,7 +8,7 @@
 namespace boost_process = boost::process::v2;
 
 namespace sm {
-    void launch_process_with_crash_handler(
+    void crash::launch_process_with_crash_handler(
         std::filesystem::path executable,
         std::initializer_list<std::string> arguments,
         std::function<void(int)>&& crash_handler,
@@ -39,7 +39,7 @@ namespace sm {
         }
     }
 
-    void show_error_window(const std::string& title, const std::string& message) {
+    void crash::show_error_window(const std::string& title, const std::string& message) {
         if (!SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, title.c_str(), message.c_str(), nullptr)) {
             throw internal::VideoError("Could not show error window: " + std::string(SDL_GetError()));
         }

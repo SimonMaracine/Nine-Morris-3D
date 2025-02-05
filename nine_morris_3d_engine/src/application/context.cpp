@@ -141,8 +141,12 @@ namespace sm {
         m_rnd.initialize(m_win.get_width(), m_win.get_height(), m_fs, specification);
     }
 
-    void Ctx::play_sound(std::shared_ptr<SoundData> sound_data) {
+    void Ctx::play_audio_sound(std::shared_ptr<SoundData> sound_data) {
         internal::audio::play_sound(sound_data);
+    }
+
+    void Ctx::set_audio_volume(float volume) {
+        internal::audio::set_volume(volume);
     }
 
     void Ctx::add_task_immediate(Task::Function&& function) {

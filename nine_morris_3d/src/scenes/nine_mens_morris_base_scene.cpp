@@ -569,10 +569,6 @@ std::shared_ptr<sm::GlTexture> NineMensMorrisBaseScene::load_piece_normal_textur
     }
 }
 
-int NineMensMorrisBaseScene::pieces_count() const {
-    return twelve_mens_morris() ? NineMensMorrisBoard::TWELVE : NineMensMorrisBoard::NINE;
-}
-
 NineMensMorrisBoard NineMensMorrisBaseScene::setup_renderables() {
     return NineMensMorrisBoard(
         setup_board(),
@@ -580,6 +576,14 @@ NineMensMorrisBoard NineMensMorrisBaseScene::setup_renderables() {
         setup_nodes(),
         setup_white_pieces(),
         setup_black_pieces(),
+        ctx.load_sound_data(ctx.path_assets("sounds/place1.ogg")),
+        ctx.load_sound_data(ctx.path_assets("sounds/place2.ogg")),
+        ctx.load_sound_data(ctx.path_assets("sounds/place3.ogg")),
+        ctx.load_sound_data(ctx.path_assets("sounds/move1.ogg")),
+        ctx.load_sound_data(ctx.path_assets("sounds/move2.ogg")),
+        ctx.load_sound_data(ctx.path_assets("sounds/move3.ogg")),
+        ctx.load_sound_data(ctx.path_assets("sounds/capture1.ogg")),
+        ctx.load_sound_data(ctx.path_assets("sounds/capture1.ogg")),
         [this](const NineMensMorrisBoard::Move& move) {
             if (get_player_type() == GamePlayer::Remote) {
                 client_play_move(
@@ -593,4 +597,7 @@ NineMensMorrisBoard NineMensMorrisBaseScene::setup_renderables() {
         }
     );
 }
-;
+
+int NineMensMorrisBaseScene::pieces_count() const {
+    return twelve_mens_morris() ? NineMensMorrisBoard::TWELVE : NineMensMorrisBoard::NINE;
+}

@@ -4,6 +4,7 @@
 
 #include <imgui.h>
 #include <SDL3/SDL.h>
+#include <SDL3_mixer/SDL_mixer.h>
 #include <assimp/version.h>
 #include <glm/glm.hpp>
 #include <spdlog/version.h>
@@ -31,7 +32,24 @@ namespace sm::dependencies {
 
         result += "*** Engine Dependencies ***\n";
 
-        std::snprintf(buffer, sizeof(buffer), "SDL: %d\n", SDL_GetVersion());
+        std::snprintf(
+            buffer,
+            sizeof(buffer),
+            "SDL: %d.%d.%d\n",
+            SDL_MAJOR_VERSION,
+            SDL_MINOR_VERSION,
+            SDL_MICRO_VERSION
+        );
+        result += buffer;
+
+        std::snprintf(
+            buffer,
+            sizeof(buffer),
+            "SDL_mixer: %d.%d.%d\n",
+            SDL_MIXER_MAJOR_VERSION,
+            SDL_MIXER_MINOR_VERSION,
+            SDL_MIXER_MICRO_VERSION
+        );
         result += buffer;
 
         std::snprintf(buffer, sizeof(buffer), "Dear ImGui: %s\n", ImGui::GetVersion());
@@ -100,9 +118,6 @@ namespace sm::dependencies {
         std::snprintf(buffer, sizeof(buffer), "boost: %s\n", BOOST_LIB_VERSION);
         result += buffer;
 
-        std::snprintf(buffer, sizeof(buffer), "OpenAL Soft\n");
-        result += buffer;
-
         std::snprintf(buffer, sizeof(buffer), "Glad\n");
         result += buffer;
 
@@ -113,9 +128,6 @@ namespace sm::dependencies {
         result += buffer;
 
         std::snprintf(buffer, sizeof(buffer), "stb_truetype\n");
-        result += buffer;
-
-        std::snprintf(buffer, sizeof(buffer), "stb_vorbis\n");
         result += buffer;
 
         std::snprintf(buffer, sizeof(buffer), "stb_image_resize2\n");

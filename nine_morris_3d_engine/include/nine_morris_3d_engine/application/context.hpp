@@ -118,7 +118,8 @@ namespace sm {
         void initialize_renderer(const RendererSpecification& specification);
 
         // Audio
-        void play_sound(std::shared_ptr<SoundData> sound_data);
+        static void play_audio_sound(std::shared_ptr<SoundData> sound_data);
+        static void set_audio_volume(float volume);
 
         // Task manager
         void add_task_immediate(Task::Function&& function);

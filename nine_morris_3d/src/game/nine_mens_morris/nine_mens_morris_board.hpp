@@ -94,6 +94,14 @@ public:
         const NodeRenderables& nodes,
         const PieceRenderables& white_pieces,
         const PieceRenderables& black_pieces,
+        std::shared_ptr<sm::SoundData> piece_place1,
+        std::shared_ptr<sm::SoundData> piece_place2,
+        std::shared_ptr<sm::SoundData> piece_place3,
+        std::shared_ptr<sm::SoundData> piece_move1,
+        std::shared_ptr<sm::SoundData> piece_move2,
+        std::shared_ptr<sm::SoundData> piece_move3,
+        std::shared_ptr<sm::SoundData> piece_capture1,
+        std::shared_ptr<sm::SoundData> piece_capture2,
         std::function<void(const Move&)>&& move_callback
     );
 
@@ -139,9 +147,9 @@ private:
     void update_nodes(sm::Ctx& ctx);
     void update_pieces(sm::Ctx& ctx);
 
-    static void do_place_animation(PieceObj& piece, const NodeObj& node, PieceObj::OnFinish&& on_finish);
-    static void do_move_animation(PieceObj& piece, const NodeObj& node, PieceObj::OnFinish&& on_finish, bool direct);
-    static void do_take_animation(PieceObj& piece, PieceObj::OnFinish&& on_finish);
+    void do_place_animation(PieceObj& piece, const NodeObj& node, PieceObj::OnFinish&& on_finish) const;
+    void do_move_animation(PieceObj& piece, const NodeObj& node, PieceObj::OnFinish&& on_finish, bool direct) const;
+    void do_take_animation(PieceObj& piece, PieceObj::OnFinish&& on_finish) const;
 
     void select(int id);
     void try_place(int place_index);
@@ -202,4 +210,14 @@ private:
     sm::Renderable m_paint_renderable;
     Nodes m_nodes;
     Pieces m_pieces;
+
+    // Sounds
+    std::shared_ptr<sm::SoundData> m_piece_place1;
+    std::shared_ptr<sm::SoundData> m_piece_place2;
+    std::shared_ptr<sm::SoundData> m_piece_place3;
+    std::shared_ptr<sm::SoundData> m_piece_move1;
+    std::shared_ptr<sm::SoundData> m_piece_move2;
+    std::shared_ptr<sm::SoundData> m_piece_move3;
+    std::shared_ptr<sm::SoundData> m_piece_capture1;
+    std::shared_ptr<sm::SoundData> m_piece_capture2;
 };

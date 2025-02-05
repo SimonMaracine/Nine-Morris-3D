@@ -98,7 +98,7 @@ static void crash_handler(int) {
     const char* message {"Sorry! Nine Morris 3D encountered a fatal error! Please take a look at the logs and consider reporting the event to the developer."};
 
     try {
-        sm::show_error_window(title, message);
+        sm::crash::show_error_window(title, message);
     } catch (const sm::RuntimeError&) {
         std::cerr << title << ": " << message << '\n';
     }
@@ -134,12 +134,12 @@ int sm_application_main(int argc, char** argv) {
 #endif
 
     try {
-        sm::launch_process_with_crash_handler(executable, {"--game"}, crash_handler, find_executable);
+        sm::crash::launch_process_with_crash_handler(executable, {"--game"}, crash_handler, find_executable);
     } catch (const sm::RuntimeError& e) {
         std::cerr << "An fatal error occurred inside outside the game: " << e.what() << '\n';
 
         try {
-            sm::show_error_window(
+            sm::crash::show_error_window(
                 "Nine Morris 3D Fatal Error",
                 "Sorry! A very fatal error occurred. Please consider reporting the event to the developer.\n\n" + std::string(e.what())
             );

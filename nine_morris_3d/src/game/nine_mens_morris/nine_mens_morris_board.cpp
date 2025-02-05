@@ -219,6 +219,14 @@ NineMensMorrisBoard::NineMensMorrisBoard(
     const NodeRenderables& nodes,
     const PieceRenderables& white_pieces,
     const PieceRenderables& black_pieces,
+    std::shared_ptr<sm::SoundData> piece_place1,
+    std::shared_ptr<sm::SoundData> piece_place2,
+    std::shared_ptr<sm::SoundData> piece_place3,
+    std::shared_ptr<sm::SoundData> piece_move1,
+    std::shared_ptr<sm::SoundData> piece_move2,
+    std::shared_ptr<sm::SoundData> piece_move3,
+    std::shared_ptr<sm::SoundData> piece_capture1,
+    std::shared_ptr<sm::SoundData> piece_capture2,
     std::function<void(const Move&)>&& move_callback
 )
     : m_move_callback(std::move(move_callback)) {
@@ -228,6 +236,15 @@ NineMensMorrisBoard::NineMensMorrisBoard(
     m_paint_renderable = paint;
     m_paint_renderable.transform.scale = 20.0f;
     m_paint_renderable.transform.position.y = 0.062f;
+
+    m_piece_place1 = piece_place1;
+    m_piece_place2 = piece_place2;
+    m_piece_place3 = piece_place3;
+    m_piece_move1 = piece_move1;
+    m_piece_move2 = piece_move2;
+    m_piece_move3 = piece_move3;
+    m_piece_capture1 = piece_capture1;
+    m_piece_capture2 = piece_capture2;
 
     // The number of pieces given decides the variant of the game
     initialize_objects(nodes, white_pieces, black_pieces);
@@ -810,19 +827,24 @@ void NineMensMorrisBoard::update_pieces(sm::Ctx& ctx) {
     }
 }
 
-void NineMensMorrisBoard::do_place_animation(PieceObj& piece, const NodeObj& node, PieceObj::OnFinish&& on_finish) {
+void NineMensMorrisBoard::do_place_animation(PieceObj& piece, const NodeObj& node, PieceObj::OnFinish&& on_finish) const {
     const glm::vec3 origin {piece.get_renderable().transform.position};
     const glm::vec3 target0 {piece.get_renderable().transform.position.x, PIECE_Y_POSITION_AIR_MOVE, piece.get_renderable().transform.position.z};
     const glm::vec3 target1 {node.get_renderable().transform.position.x, PIECE_Y_POSITION_AIR_MOVE, node.get_renderable().transform.position.z};
     const glm::vec3 target {node.get_renderable().transform.position.x, PIECE_Y_POSITION_BOARD, node.get_renderable().transform.position.z};
 
-    piece.move_three_step(origin, target0, target1, target, std::move(on_finish));
+    piece.move_three_step(origin, target0, target1, target, [this, on_finish = std::move(on_finish)](PieceObj& piece) {
+        on_finish(piece);
+        sm::Ctx::play_audio_sound(sm::utils::choice({m_piece_place1, m_piece_place2, m_piece_place3}));
+    });
 }
 
-void NineMensMorrisBoard::do_move_animation(PieceObj& piece, const NodeObj& node, PieceObj::OnFinish&& on_finish, bool direct) {
+void NineMensMorrisBoard::do_move_animation(PieceObj& piece, const NodeObj& node, PieceObj::OnFinish&& on_finish, bool direct) const {
     if (direct) {
         const glm::vec3 origin {piece.get_renderable().transform.position};
         const glm::vec3 target {node.get_renderable().transform.position.x, PIECE_Y_POSITION_BOARD, node.get_renderable().transform.position.z};
+
+        sm::Ctx::play_audio_sound(sm::utils::choice({m_piece_move1, m_piece_move2, m_piece_move3}));
 
         piece.move_direct(origin, target, std::move(on_finish));
     } else {
@@ -831,13 +853,20 @@ void NineMensMorrisBoard::do_move_animation(PieceObj& piece, const NodeObj& node
         const glm::vec3 target1 {node.get_renderable().transform.position.x, PIECE_Y_POSITION_AIR_MOVE, node.get_renderable().transform.position.z};
         const glm::vec3 target {node.get_renderable().transform.position.x, PIECE_Y_POSITION_BOARD, node.get_renderable().transform.position.z};
 
-        piece.move_three_step(origin, target0, target1, target, std::move(on_finish));
+        sm::Ctx::play_audio_sound(sm::utils::choice({m_piece_capture1, m_piece_capture2}));
+
+        piece.move_three_step(origin, target0, target1, target, [this, on_finish = std::move(on_finish)](PieceObj& piece) {
+            on_finish(piece);
+            sm::Ctx::play_audio_sound(sm::utils::choice({m_piece_place1, m_piece_place2, m_piece_place3}));
+        });
     }
 }
 
-void NineMensMorrisBoard::do_take_animation(PieceObj& piece, PieceObj::OnFinish&& on_finish) {
+void NineMensMorrisBoard::do_take_animation(PieceObj& piece, PieceObj::OnFinish&& on_finish) const {
     const glm::vec3 origin {piece.get_renderable().transform.position};
     const glm::vec3 target {piece.get_renderable().transform.position.x, PIECE_Y_POSITION_AIR_TAKE, piece.get_renderable().transform.position.z};
+
+    sm::Ctx::play_audio_sound(sm::utils::choice({m_piece_capture1, m_piece_capture2}));
 
     piece.move_direct(origin, target, std::move(on_finish));
 }
@@ -868,7 +897,9 @@ void NineMensMorrisBoard::try_place(int place_index) {
             m_pieces[PIECE(id)].node_id = place_index;
             m_nodes[place_index].piece_id = id;
 
-            do_place_animation(m_pieces[PIECE(id)], m_nodes[place_index], [](PieceObj&) {});
+            do_place_animation(m_pieces[PIECE(id)], m_nodes[place_index], [this](PieceObj&) {
+                sm::Ctx::play_audio_sound(sm::utils::choice({m_piece_place1, m_piece_place2, m_piece_place3}));
+            });
 
             const Move move {*iter};
             play_place_move(move);
@@ -889,7 +920,9 @@ void NineMensMorrisBoard::try_place(int place_index) {
         m_pieces[PIECE(id)].node_id = place_index;
         m_nodes[place_index].piece_id = id;
 
-        do_place_animation(m_pieces[PIECE(id)], m_nodes[place_index], [](PieceObj&) {});
+        do_place_animation(m_pieces[PIECE(id)], m_nodes[place_index], [this](PieceObj&) {
+            sm::Ctx::play_audio_sound(sm::utils::choice({m_piece_place1, m_piece_place2, m_piece_place3}));
+        });
 
         m_capture_piece = true;
     }

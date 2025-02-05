@@ -10,7 +10,6 @@ namespace sm::internal {
         void uninitialize();
 
         void play_sound(std::shared_ptr<SoundData> sound_data);
-        void pause_sound();
-        void resume_sound();
+        void set_volume(float volume);
     }
 }

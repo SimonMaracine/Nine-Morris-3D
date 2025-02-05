@@ -6,7 +6,6 @@ set(BUILD_SHARED_LIBS OFF)
 include(cmake/assimp.cmake)
 include(cmake/dear_imgui.cmake)
 include(cmake/glad.cmake)
-include(cmake/openal_soft.cmake)
 include(cmake/sdl.cmake)
 include(cmake/sdl_mixer.cmake)
 include(cmake/stb.cmake)
@@ -121,7 +120,6 @@ target_link_libraries(nine_morris_3d_engine PRIVATE
     assimp::assimp
     SDL3::SDL3
     SDL3_mixer::SDL3_mixer
-    OpenAL::OpenAL
     utf8cpp
     stb
     Boost::process

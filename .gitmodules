@@ -10,9 +10,6 @@
 [submodule "nine_morris_3d_engine/extern/entt"]
 	path = nine_morris_3d_engine/extern/entt
 	url = https://github.com/SimonMaracine/entt.git
-[submodule "nine_morris_3d_engine/extern/openal_soft"]
-	path = nine_morris_3d_engine/extern/openal_soft
-	url = https://github.com/SimonMaracine/openal-soft.git
 [submodule "nine_morris_3d_engine/extern/resmanager"]
 	path = nine_morris_3d_engine/extern/resmanager
 	url = https://github.com/SimonMaracine/resource-manager

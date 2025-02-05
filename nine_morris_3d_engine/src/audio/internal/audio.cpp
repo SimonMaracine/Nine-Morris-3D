@@ -1,9 +1,12 @@
 #include "nine_morris_3d_engine/audio/internal/audio.hpp"
 
+#include <cassert>
+
 #include <SDL3_mixer/SDL_mixer.h>
 
 #include "nine_morris_3d_engine/application/internal/error.hpp"
 #include "nine_morris_3d_engine/application/logging.hpp"
+#include "nine_morris_3d_engine/other/utilities.hpp"
 
 namespace sm::internal {
     void audio::initialize() {
@@ -36,11 +39,11 @@ namespace sm::internal {
         }
     }
 
-    void audio::pause_sound() {
+    void audio::set_volume(float volume) {
+        assert(volume >= 0);
 
-    }
+        volume = utils::map(volume, 0.0f, 1.0f, 0.0f, static_cast<float>(MIX_MAX_VOLUME));
 
-    void audio::resume_sound() {
-
+        Mix_Volume(-1, static_cast<int>(volume));
     }
 }

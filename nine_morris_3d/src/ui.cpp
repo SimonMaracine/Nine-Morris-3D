@@ -286,9 +286,7 @@ void Ui::main_menu_bar(sm::Ctx& ctx, GameScene& game_scene) {
                 if (ImGui::BeginMenu("Master Volume")) {
                     ImGui::PushItemWidth(rem(5.0f));
                     if (ImGui::SliderFloat("##", &m_options.master_volume, 0.0f, 1.0f, "%.01f")) {
-                        // ctx->snd->get_listener().set_gain(data.options.master_volume);
-
-                        // LOG_INFO("Changed master volume to {}", data.options.master_volume);
+                        sm::Ctx::set_audio_volume(m_options.master_volume);
                     }
                     ImGui::PopItemWidth();
 
