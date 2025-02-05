@@ -97,7 +97,7 @@ namespace sm {
         m_win.set_vsync(enable);
     }
 
-    void Ctx::set_window_icons(std::initializer_list<std::shared_ptr<TextureData>> icons) {
+    void Ctx::set_window_icons(std::initializer_list<std::unique_ptr<TextureData>> icons) {
         m_win.set_icons(icons);
     }
 

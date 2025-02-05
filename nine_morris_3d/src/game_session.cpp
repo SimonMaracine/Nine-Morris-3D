@@ -24,8 +24,6 @@ void GameSession::remote_sent_message(const std::string& message) {
 }
 
 void GameSession::session_window(sm::Ctx& ctx, GameScene& game_scene) {
-    const auto flags {ImGuiWindowFlags_NoDecoration};
-
     const float width {sm::utils::map(
         static_cast<float>(ctx.get_window_width()),
         static_cast<float>(MIN_WIDTH),
@@ -66,7 +64,7 @@ void GameSession::session_window(sm::Ctx& ctx, GameScene& game_scene) {
 
     ImGui::SetNextWindowSize(ImVec2(width, height), ImGuiCond_Always);
 
-    if (ImGui::Begin("Session", nullptr, flags)) {
+    if (ImGui::Begin("Session", nullptr, ImGuiWindowFlags_NoDecoration)) {
         if (m_remote_joined) {
             ImGui::TextWrapped("Playing against %s.", m_remote_player_name.empty() ? "an unnamed opponnent" : m_remote_player_name.c_str());
         } else if (game_scene.get_game_state() != GameState::Ready) {

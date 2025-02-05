@@ -92,14 +92,6 @@ namespace sm::internal {
     }
 
     Window::~Window() {
-        if (m_surfaces.size() > 1) {
-            for (auto iter {std::next(m_surfaces.begin())}; iter != m_surfaces.end(); iter++) {
-                SDL_DestroySurface(*iter);
-            }
-
-            SDL_DestroySurface(m_surfaces[0]);
-        }
-
         SDL_GL_DestroyContext(static_cast<SDL_GLContext>(m_context));
         SDL_DestroyWindow(m_window);
         SDL_Quit();
@@ -127,7 +119,7 @@ namespace sm::internal {
         }
     }
 
-    void Window::set_icons(std::initializer_list<std::shared_ptr<TextureData>> icons) {
+    void Window::set_icons(std::initializer_list<std::unique_ptr<TextureData>> icons) {
         assert(icons.size() > 0);
 
         std::vector<SDL_Surface*> surfaces;
@@ -146,7 +138,6 @@ namespace sm::internal {
             }
 
             surfaces.push_back(surface);
-            m_icons.push_back(icon);
         }
 
         SDL_Surface* surface {surfaces[0]};
@@ -161,7 +152,11 @@ namespace sm::internal {
             LOG_DIST_ERROR("Could not set window icon: {}", SDL_GetError());
         }
 
-        m_surfaces = std::move(surfaces);
+        for (auto iter {std::next(surfaces.begin())}; iter != surfaces.end(); iter++) {
+            SDL_DestroySurface(*iter);
+        }
+
+        SDL_DestroySurface(surface);
     }
 
     void Window::set_size(int width, int height) {

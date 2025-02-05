@@ -5,4 +5,6 @@ set(SDLMIXER_MIDI OFF)
 set(SDLMIXER_OPUS OFF)
 set(SDLMIXER_WAVPACK OFF)
 
+set(SDLMIXER_VENDORED OFF)
+
 add_subdirectory(extern/sdl_mixer)

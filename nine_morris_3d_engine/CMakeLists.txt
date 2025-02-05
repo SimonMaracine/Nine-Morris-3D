@@ -122,8 +122,6 @@ target_link_libraries(nine_morris_3d_engine PRIVATE
     SDL3_mixer::SDL3_mixer
     utf8cpp
     stb
-    Boost::process
-    Boost::asio
 )
 
 target_link_libraries(nine_morris_3d_engine PUBLIC
@@ -133,6 +131,8 @@ target_link_libraries(nine_morris_3d_engine PUBLIC
     dear_imgui
     resmanager
     spdlog
+    Boost::process
+    Boost::asio
 )
 
 enable_warnings(nine_morris_3d_engine)
@@ -156,11 +156,12 @@ endif()
 
 target_compile_definitions(nine_morris_3d_engine PRIVATE
     "UTF_CPP_CPLUSPLUS=201703"
-    "AL_LIBTYPE_STATIC"
+    "_WIN32_WINNT=0x0601"
 )
 
 target_compile_definitions(nine_morris_3d_engine PUBLIC
     "SPDLOG_ACTIVE_LEVEL=0"
     "GLM_ENABLE_EXPERIMENTAL"
     "_CRT_SECURE_NO_WARNINGS"
+    "ASIO_NO_DEPRECATED"
 )

@@ -20,14 +20,16 @@ void game_start(sm::Ctx& ctx) {
         ctx.set_window_size(DEFAULT_WIDTH_LARGE, DEFAULT_HEIGHT_LARGE);
     }
 
-    // FIXME not working
+    sm::TexturePostProcessing post_processing;
+    post_processing.flip = false;
+
     ctx.set_window_icons(
         {
-            std::make_shared<sm::TextureData>(sm::utils::read_file(ctx.path_assets("icons/32x32/nine_morris_3d.png"))),
-            std::make_shared<sm::TextureData>(sm::utils::read_file(ctx.path_assets("icons/64x64/nine_morris_3d.png"))),
-            std::make_shared<sm::TextureData>(sm::utils::read_file(ctx.path_assets("icons/128x128/nine_morris_3d.png"))),
-            std::make_shared<sm::TextureData>(sm::utils::read_file(ctx.path_assets("icons/256x256/nine_morris_3d.png"))),
-            std::make_shared<sm::TextureData>(sm::utils::read_file(ctx.path_assets("icons/512x512/nine_morris_3d.png")))
+            std::make_unique<sm::TextureData>(sm::utils::read_file(ctx.path_assets("icons/32x32/nine_morris_3d.png")), post_processing),
+            std::make_unique<sm::TextureData>(sm::utils::read_file(ctx.path_assets("icons/64x64/nine_morris_3d.png")), post_processing),
+            std::make_unique<sm::TextureData>(sm::utils::read_file(ctx.path_assets("icons/128x128/nine_morris_3d.png")), post_processing),
+            std::make_unique<sm::TextureData>(sm::utils::read_file(ctx.path_assets("icons/256x256/nine_morris_3d.png")), post_processing),
+            std::make_unique<sm::TextureData>(sm::utils::read_file(ctx.path_assets("icons/512x512/nine_morris_3d.png")), post_processing)
         }
     );
 

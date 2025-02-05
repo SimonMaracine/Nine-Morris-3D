@@ -477,8 +477,6 @@ void Ui::main_menu_bar(sm::Ctx& ctx, GameScene& game_scene) {
 }
 
 void Ui::game_window(sm::Ctx& ctx, GameScene& game_scene) {
-    const auto flags {ImGuiWindowFlags_NoDecoration};
-
     const float width {sm::utils::map(
         static_cast<float>(ctx.get_window_width()),
         static_cast<float>(MIN_WIDTH),
@@ -513,7 +511,7 @@ void Ui::game_window(sm::Ctx& ctx, GameScene& game_scene) {
 
     ImGui::SetNextWindowSize(ImVec2(width, height), ImGuiCond_Always);
 
-    if (ImGui::Begin("Game", nullptr, flags)) {
+    if (ImGui::Begin("Game", nullptr, ImGuiWindowFlags_NoDecoration)) {
         if (game_scene.get_game_state() != GameState::Ready) {
             during_game_window(game_scene);
         } else {
