@@ -87,6 +87,8 @@ add_library(nine_morris_3d_engine STATIC
     "include/nine_morris_3d_engine/external/cereal.h++"
     "include/nine_morris_3d_engine/external/glm.h++"
     "include/nine_morris_3d_engine/external/imgui.h++"
+    "include/nine_morris_3d_engine/external/process_asio.h++"
+    "include/nine_morris_3d_engine/external/process_vfork_launcher.h++"
     "include/nine_morris_3d_engine/external/resmanager.h++"
     "include/nine_morris_3d_engine/nine_morris_3d.hpp"
     "include/nine_morris_3d_engine/graphics/internal/debug_ui.hpp"

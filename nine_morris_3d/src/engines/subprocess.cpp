@@ -6,7 +6,7 @@
 #include <nine_morris_3d_engine/nine_morris_3d.hpp>
 
 #ifdef SM_PLATFORM_LINUX
-    #include <boost/process/posix/vfork_launcher.hpp>
+    #include <nine_morris_3d_engine/external/process_vfork_launcher.h++>
 #endif
 
 Subprocess::Subprocess()

@@ -10,6 +10,7 @@
 #include <cereal/version.hpp>
 #include <resmanager/resmanager.hpp>
 #include <entt/config/version.h>
+#include <boost/version.hpp>
 
 #include "nine_morris_3d_engine/application/platform.hpp"
 
@@ -94,6 +95,9 @@ namespace sm::dependencies {
             resmanager::VERSION_MINOR,
             resmanager::VERSION_PATCH
         );
+        result += buffer;
+
+        std::snprintf(buffer, sizeof(buffer), "boost: %s\n", BOOST_LIB_VERSION);
         result += buffer;
 
         std::snprintf(buffer, sizeof(buffer), "OpenAL Soft\n");
