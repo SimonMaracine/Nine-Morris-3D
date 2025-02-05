@@ -27,7 +27,7 @@ namespace sm {
     struct WindowMinimizedEvent {};
 
     struct KeyPressedEvent {
-        Key key {};
+        internal::Key key {};
         bool repeat {};
         bool ctrl {};
         bool shift {};
@@ -35,17 +35,17 @@ namespace sm {
     };
 
     struct KeyReleasedEvent {
-        Key key {};
+        internal::Key key {};
     };
 
     struct MouseButtonPressedEvent {
-        Button button {};
+        internal::Button button {};
         float x {};
         float y {};
     };
 
     struct MouseButtonReleasedEvent {
-        Button button {};
+        internal::Button button {};
         float x {};
         float y {};
     };
