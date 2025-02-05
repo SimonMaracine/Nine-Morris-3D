@@ -7,6 +7,7 @@
     #pragma warning(disable: 4245)
     #pragma warning(disable: 4100)
     #pragma warning(disable: 4127)
+    #pragma warning(disable: 4456)
 #endif
 
 // https://github.com/chriskohlhoff/asio/issues/1441
