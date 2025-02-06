@@ -22,6 +22,9 @@ int main() {
     try {
         load_configuration(configuration, "nine_morris_3d_config.json");
     } catch (const ConfigurationError& e) {
+        // Must reset the data, as it may be corrupted
+        configuration = Configuration();
+
         std::cerr << "Could not load configuration file: " << e.what() << '\n';
 
         try {

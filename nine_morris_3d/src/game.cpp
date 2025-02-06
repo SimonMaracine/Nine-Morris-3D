@@ -10,6 +10,9 @@ void game_start(sm::Ctx& ctx) {
     try {
         load_options(g.options, ctx.path_saved_data(OPTIONS_FILE_NAME));
     } catch (const OptionsError& e) {
+        // Must reset the data, as it may be corrupted
+        g.options = Options();
+
         LOG_DIST_ERROR("Could not load options: {}", e.what());
     }
 

@@ -29,16 +29,26 @@ static constexpr std::array LOG_LEVELS {
 };
 
 static void validate(Configuration& configuration) {
-    configuration.session_collect_period = std::clamp(configuration.session_collect_period, 1s, 60s);
-    configuration.connection_check_period = std::clamp(configuration.session_collect_period, 1s, 60s);
+    if (configuration.session_collect_period < 1s || configuration.session_collect_period > 60s) {
+        goto corrupted;
+    }
+
+    if (configuration.connection_check_period < 1s || configuration.connection_check_period > 60s) {
+        goto corrupted;
+    }
 
     if (std::find(LOG_TARGETS.begin(), LOG_TARGETS.end(), configuration.log_target) == LOG_TARGETS.end()) {
-        configuration.log_level = "both";
+        goto corrupted;
     }
 
     if (std::find(LOG_LEVELS.begin(), LOG_LEVELS.end(), configuration.log_level) == LOG_LEVELS.end()) {
-        configuration.log_level = "info";
+        goto corrupted;
     }
+
+    return;
+
+corrupted:
+    throw ConfigurationError("Data has been corrupted");
 }
 
 void load_configuration(Configuration& configuration, const std::filesystem::path& file_path) {
