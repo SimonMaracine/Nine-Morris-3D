@@ -130,9 +130,9 @@ void Ui::main_menu_bar(sm::Ctx& ctx, GameScene& game_scene) {
                 game_scene.client_resign();
                 game_scene.client_leave_game_session();
             }
-            if (ImGui::MenuItem("Accept Draw Offer", nullptr, nullptr, accept_draw_offer_available(game_scene))) {
-                game_scene.accept_draw_offer();
-                game_scene.client_accept_draw_offer();
+            if (ImGui::MenuItem("Accept Draw", nullptr, nullptr, accept_draw_available(game_scene))) {
+                game_scene.accept_draw();
+                game_scene.client_accept_draw();
                 game_scene.client_leave_game_session();
             }
             if (ImGui::MenuItem("Offer Draw", nullptr, nullptr, offer_draw_available(game_scene))) {
@@ -956,7 +956,7 @@ bool Ui::offer_draw_available(GameScene& game_scene) {
     return game_scene.get_game_session() && game_scene.get_game_session()->get_remote_joined();
 }
 
-bool Ui::accept_draw_offer_available(GameScene& game_scene) {
+bool Ui::accept_draw_available(GameScene& game_scene) {
     return (
         game_scene.get_game_session() &&
         game_scene.get_game_session()->get_remote_joined() &&

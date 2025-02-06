@@ -174,8 +174,8 @@ void NineMensMorrisBaseScene::resign(PlayerColor color) {
     m_game_state = GameState::Stop;
 }
 
-void NineMensMorrisBaseScene::accept_draw_offer() {
-    m_board.accept_draw_offer();
+void NineMensMorrisBaseScene::accept_draw() {
+    m_board.accept_draw();
 
     m_game_state = GameState::Stop;
 }

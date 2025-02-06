@@ -128,8 +128,8 @@ void Server::handle_message(std::shared_ptr<networking::ClientConnection> connec
             case protocol::message::Client_OfferDraw:
                 client_offer_draw(connection, message);
                 break;
-            case protocol::message::Client_AcceptDrawOffer:
-                client_accept_draw_offer(connection, message);
+            case protocol::message::Client_AcceptDraw:
+                client_accept_draw(connection, message);
                 break;
             case protocol::message::Client_SendMessage:
                 client_send_message(connection, message);
@@ -463,8 +463,8 @@ void Server::server_remote_offered_draw(std::shared_ptr<networking::ClientConnec
     m_server.send_message(connection, message);
 }
 
-void Server::client_accept_draw_offer(std::shared_ptr<networking::ClientConnection> connection, const networking::Message& message) {
-    protocol::Client_AcceptDrawOffer payload;
+void Server::client_accept_draw(std::shared_ptr<networking::ClientConnection> connection, const networking::Message& message) {
+    protocol::Client_AcceptDraw payload;
     message.read(payload);
 
     const auto iter {m_game_sessions.find(payload.session_id)};
@@ -481,17 +481,17 @@ void Server::client_accept_draw_offer(std::shared_ptr<networking::ClientConnecti
     } else if (iter->second.connection2.lock() == connection) {
         remote_connection = iter->second.connection1.lock();
     } else {
-        m_server.get_logger()->warn("Client {} accepted draw offer in session {} in which it wasn't active", connection->get_id(), payload.session_id);
+        m_server.get_logger()->warn("Client {} accepted draw in session {} in which it wasn't active", connection->get_id(), payload.session_id);
         return;
     }
 
     if (remote_connection) {
-        server_remote_accepted_draw_offer(remote_connection);
+        server_remote_accepted_draw(remote_connection);
     }
 }
 
-void Server::server_remote_accepted_draw_offer(std::shared_ptr<networking::ClientConnection> connection) {
-    networking::Message message {protocol::message::Server_RemoteAcceptedDrawOffer};
+void Server::server_remote_accepted_draw(std::shared_ptr<networking::ClientConnection> connection) {
+    networking::Message message {protocol::message::Server_RemoteAcceptedDraw};
 
     m_server.send_message(connection, message);
 }

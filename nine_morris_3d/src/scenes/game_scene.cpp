@@ -400,13 +400,13 @@ void GameScene::client_offer_draw() {
     }
 }
 
-void GameScene::client_accept_draw_offer() {
+void GameScene::client_accept_draw() {
     assert(m_game_session);
 
-    protocol::Client_AcceptDrawOffer payload;
+    protocol::Client_AcceptDraw payload;
     payload.session_id = m_game_session->get_session_id();
 
-    networking::Message message {protocol::message::Client_AcceptDrawOffer};
+    networking::Message message {protocol::message::Client_AcceptDraw};
 
     try {
         message.write(payload);
@@ -876,8 +876,8 @@ void GameScene::handle_message(const networking::Message& message) {
         case protocol::message::Server_RemoteOfferedDraw:
             server_remote_offered_draw(message);
             break;
-        case protocol::message::Server_RemoteAcceptedDrawOffer:
-            server_remote_accepted_draw_offer(message);
+        case protocol::message::Server_RemoteAcceptedDraw:
+            server_remote_accepted_draw(message);
             break;
         case protocol::message::Server_RemoteSentMessage:
             server_remote_sent_message(message);
@@ -1079,14 +1079,14 @@ void GameScene::server_remote_offered_draw(const networking::Message&) {
     m_game_session->set_remote_offered_draw(true);
 }
 
-void GameScene::server_remote_accepted_draw_offer(const networking::Message&) {
+void GameScene::server_remote_accepted_draw(const networking::Message&) {
     // The user may have left the session in the meantime
     if (!m_game_session) {
         return;
     }
 
-    // The remote has accepted our offer, so we "accept" it again
-    accept_draw_offer();
+    // The remote has accepted our draw, so we "accept" it again
+    accept_draw();
 }
 
 void GameScene::server_remote_sent_message(const networking::Message& message) {

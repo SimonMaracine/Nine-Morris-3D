@@ -106,14 +106,14 @@ namespace protocol {
 
         Server_RemoteOfferedDraw
             Notify the client that the remote has offered a draw. The client then has the opportunity to
-            accept the offer by pressing the accept offer button. It loses the opportunity by playing a move.
+            accept the draw by pressing the accept draw button. It loses the opportunity by playing a move.
 
-        Client_AcceptDrawOffer
-            Accept the draw offer by pressing the accept draw offer button. The game is over.
-            The server notifies the remote with Server_RemoteAcceptedDrawOffer.
+        Client_AcceptDraw
+            Accept the draw by pressing the accept draw button. The game is over.
+            The server notifies the remote with Server_RemoteAcceptedDraw.
 
-        Server_RemoteAcceptedDrawOffer
-            Notify the client that the remote has accepted the draw offer. The game is over.
+        Server_RemoteAcceptedDraw
+            Notify the client that the remote has accepted the draw. The game is over.
 
         Client_SendMessage
             Sends a message. The server notifies the remote with Server_RemoteSentMessage.
@@ -150,8 +150,8 @@ namespace protocol {
 
             Client_OfferDraw,
             Server_RemoteOfferedDraw,
-            Client_AcceptDrawOffer,
-            Server_RemoteAcceptedDrawOffer,
+            Client_AcceptDraw,
+            Server_RemoteAcceptedDraw,
 
             Client_SendMessage,
             Server_RemoteSentMessage
@@ -371,7 +371,7 @@ namespace protocol {
 
     struct Server_RemoteOfferedDraw {};
 
-    struct Client_AcceptDrawOffer {
+    struct Client_AcceptDraw {
         SessionId session_id {};
 
         template<typename Archive>
@@ -380,7 +380,7 @@ namespace protocol {
         }
     };
 
-    struct Server_RemoteAcceptedDrawOffer {};
+    struct Server_RemoteAcceptedDraw {};
 
     struct Client_AcknowledgeGameOver {
         SessionId session_id {};

@@ -509,7 +509,7 @@ void NineMensMorrisBoard::resign(Player player) {
     }
 }
 
-void NineMensMorrisBoard::accept_draw_offer() {
+void NineMensMorrisBoard::accept_draw() {
     m_game_over = GameOver(
         GameOver::Draw,
         "Draw has been offered and accepted."

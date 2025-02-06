@@ -125,7 +125,7 @@ public:
     void play_move(const Move& move);
     void timeout(Player player);
     void resign(Player player);
-    void accept_draw_offer();
+    void accept_draw();
 
     static Move move_from_string(const std::string& string);
     static std::string move_to_string(const Move& move);

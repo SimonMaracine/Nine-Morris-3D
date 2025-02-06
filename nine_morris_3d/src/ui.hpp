@@ -77,7 +77,7 @@ private:
     static bool resign_available(GameScene& game_scene);
     static PlayerColor resign_player(GameScene& game_scene);
     static bool offer_draw_available(GameScene& game_scene);
-    static bool accept_draw_offer_available(GameScene& game_scene);
+    static bool accept_draw_available(GameScene& game_scene);
     bool join_game_available(GameScene& game_scene);
 
     // Multiple modal windows may request attention at a time; put them in a queue

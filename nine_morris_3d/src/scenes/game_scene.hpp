@@ -61,7 +61,7 @@ public:
     virtual void play_move(const std::string& string) = 0;
     virtual void timeout(PlayerColor color) = 0;
     virtual void resign(PlayerColor color) = 0;
-    virtual void accept_draw_offer() = 0;
+    virtual void accept_draw() = 0;
     virtual void time_control_options_window() = 0;
 
     PointCameraController& get_camera_controller() { return m_camera_controller; }
@@ -91,7 +91,7 @@ public:
     void client_update_turn_time(protocol::ClockTime time);
     void client_resign();
     void client_offer_draw();
-    void client_accept_draw_offer();
+    void client_accept_draw();
     void client_send_message(const std::string& message_);
 protected:
     void on_window_resized(const sm::WindowResizedEvent& event);
@@ -127,7 +127,7 @@ protected:
     void server_remote_played_move(const networking::Message& message);
     void server_remote_resigned(const networking::Message& message);
     void server_remote_offered_draw(const networking::Message& message);
-    void server_remote_accepted_draw_offer(const networking::Message& message);
+    void server_remote_accepted_draw(const networking::Message& message);
     void server_remote_sent_message(const networking::Message& message);
 
     sm::Camera m_camera;

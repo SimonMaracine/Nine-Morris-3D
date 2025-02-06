@@ -139,7 +139,7 @@ enable_warnings(nine_morris_3d_engine)
 enable_sanitizers_debug_linux(nine_morris_3d_engine)
 
 if(UNIX)
-    target_compile_options(nine_morris_3d PRIVATE "-Wno-parentheses")
+    target_compile_options(nine_morris_3d_engine PRIVATE "-Wno-parentheses")
 endif()
 
 # Use UTF-8 encoding on Windows
