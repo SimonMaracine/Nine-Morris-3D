@@ -303,6 +303,23 @@ bool NineMensMorrisBoard::is_turn_finished() const {
     return true;
 }
 
+void NineMensMorrisBoard::setup_pieces() {
+    initialize_objects();
+
+    for (int i {0}; i < 24; i++) {
+        if (m_position.board[i] == Node::None) {
+            continue;
+        }
+
+        const int id {new_piece_to_place(static_cast<PieceType>(m_position.board[i]))};
+
+        m_pieces[PIECE(id)].node_id = i;
+        m_nodes[i].piece_id = id;
+
+        do_place_animation(m_pieces[PIECE(id)], m_nodes[i], [](PieceObj&) {});
+    }
+}
+
 void NineMensMorrisBoard::update(sm::Ctx& ctx, glm::vec3 ray, glm::vec3 camera, bool user_input) {
     if (user_input) {
         update_hover_id(ray, camera, [this]() {
@@ -381,7 +398,7 @@ void NineMensMorrisBoard::play_move(const Move& move) {
 
     switch (move.type) {
         case MoveType::Place:
-            {
+            if (m_enable_move_animations) {
                 const int id {new_piece_to_place(static_cast<PieceType>(m_position.player))};
 
                 m_pieces[PIECE(id)].node_id = move.place.place_index;
@@ -393,36 +410,37 @@ void NineMensMorrisBoard::play_move(const Move& move) {
             play_place_move(move);
 
             break;
-        case MoveType::PlaceCapture: {
-            int take_id {};
-            {
-                m_pieces[PIECE(m_nodes[move.place_capture.capture_index].piece_id)].node_id = -1;
+        case MoveType::PlaceCapture:
+            if (m_enable_move_animations) {
+                int take_id {};
+                {
+                    m_pieces[PIECE(m_nodes[move.place_capture.capture_index].piece_id)].node_id = -1;
 
-                const int id {std::exchange(m_nodes[move.place_capture.capture_index].piece_id, -1)};
+                    const int id {std::exchange(m_nodes[move.place_capture.capture_index].piece_id, -1)};
 
-                m_pieces[PIECE(id)].to_remove = true;
+                    m_pieces[PIECE(id)].to_remove = true;
 
-                take_id = id;
-            }
-            {
-                const int id {new_piece_to_place(static_cast<PieceType>(m_position.player))};
+                    take_id = id;
+                }
+                {
+                    const int id {new_piece_to_place(static_cast<PieceType>(m_position.player))};
 
-                m_pieces[PIECE(id)].node_id = move.place.place_index;
-                m_nodes[move.place.place_index].piece_id = id;
+                    m_pieces[PIECE(id)].node_id = move.place.place_index;
+                    m_nodes[move.place.place_index].piece_id = id;
 
-                do_place_animation(m_pieces[PIECE(id)], m_nodes[move.place.place_index], [this, take_id](PieceObj&) {
-                    do_take_animation(m_pieces[PIECE(take_id)], [](PieceObj& piece) {
-                        piece.active = false;
+                    do_place_animation(m_pieces[PIECE(id)], m_nodes[move.place.place_index], [this, take_id](PieceObj&) {
+                        do_take_animation(m_pieces[PIECE(take_id)], [](PieceObj& piece) {
+                            piece.active = false;
+                        });
                     });
-                });
+                }
             }
 
             play_place_capture_move(move);
 
             break;
-        }
         case MoveType::Move:
-            {
+            if (m_enable_move_animations) {
                 m_pieces[PIECE(m_nodes[move.move.source_index].piece_id)].node_id = move.move.destination_index;
                 m_nodes[move.move.destination_index].piece_id = m_nodes[move.move.source_index].piece_id;
 
@@ -439,39 +457,40 @@ void NineMensMorrisBoard::play_move(const Move& move) {
             play_move_move(move);
 
             break;
-        case MoveType::MoveCapture: {
-            int take_id {};
-            {
-                m_pieces[PIECE(m_nodes[move.move_capture.capture_index].piece_id)].node_id = -1;
+        case MoveType::MoveCapture:
+            if (m_enable_move_animations) {
+                int take_id {};
+                {
+                    m_pieces[PIECE(m_nodes[move.move_capture.capture_index].piece_id)].node_id = -1;
 
-                const int id {std::exchange(m_nodes[move.move_capture.capture_index].piece_id, -1)};
+                    const int id {std::exchange(m_nodes[move.move_capture.capture_index].piece_id, -1)};
 
-                m_pieces[PIECE(id)].to_remove = true;
+                    m_pieces[PIECE(id)].to_remove = true;
 
-                take_id = id;
-            }
-            {
-                m_pieces[PIECE(m_nodes[move.move_capture.source_index].piece_id)].node_id = move.move_capture.destination_index;
-                m_nodes[move.move_capture.destination_index].piece_id = m_nodes[move.move_capture.source_index].piece_id;
+                    take_id = id;
+                }
+                {
+                    m_pieces[PIECE(m_nodes[move.move_capture.source_index].piece_id)].node_id = move.move_capture.destination_index;
+                    m_nodes[move.move_capture.destination_index].piece_id = m_nodes[move.move_capture.source_index].piece_id;
 
-                const int id {std::exchange(m_nodes[move.move_capture.source_index].piece_id, -1)};
+                    const int id {std::exchange(m_nodes[move.move_capture.source_index].piece_id, -1)};
 
-                do_move_animation(
-                    m_pieces[PIECE(id)],
-                    m_nodes[move.move_capture.destination_index],
-                    [this, take_id](PieceObj&) {
-                        do_take_animation(m_pieces[PIECE(take_id)], [](PieceObj& piece) {
-                            piece.active = false;
-                        });
-                    },
-                    !has_three_pieces(m_position.board, m_pieces[PIECE(id)])
-                );
+                    do_move_animation(
+                        m_pieces[PIECE(id)],
+                        m_nodes[move.move_capture.destination_index],
+                        [this, take_id](PieceObj&) {
+                            do_take_animation(m_pieces[PIECE(take_id)], [](PieceObj& piece) {
+                                piece.active = false;
+                            });
+                        },
+                        !has_three_pieces(m_position.board, m_pieces[PIECE(id)])
+                    );
+                }
             }
 
             play_move_capture_move(move);
 
             break;
-        }
     }
 }
 
@@ -883,14 +902,16 @@ void NineMensMorrisBoard::try_place(int place_index) {
         })};
 
         if (iter != m_legal_moves.cend()) {
-            const int id {new_piece_to_place(static_cast<PieceType>(m_position.player))};
+            if (m_enable_move_animations) {
+                const int id {new_piece_to_place(static_cast<PieceType>(m_position.player))};
 
-            m_pieces[PIECE(id)].node_id = place_index;
-            m_nodes[place_index].piece_id = id;
+                m_pieces[PIECE(id)].node_id = place_index;
+                m_nodes[place_index].piece_id = id;
 
-            do_place_animation(m_pieces[PIECE(id)], m_nodes[place_index], [this](PieceObj&) {
-                sm::Ctx::play_audio_sound(sm::utils::choice({m_piece_place1, m_piece_place2, m_piece_place3}));
-            });
+                do_place_animation(m_pieces[PIECE(id)], m_nodes[place_index], [this](PieceObj&) {
+                    sm::Ctx::play_audio_sound(sm::utils::choice({m_piece_place1, m_piece_place2, m_piece_place3}));
+                });
+            }
 
             const Move move {*iter};
             play_place_move(move);
@@ -906,14 +927,16 @@ void NineMensMorrisBoard::try_place(int place_index) {
     });
 
     if (!m_candidate_moves.empty()) {
-        const int id {new_piece_to_place(static_cast<PieceType>(m_position.player))};
+        if (m_enable_move_animations) {
+            const int id {new_piece_to_place(static_cast<PieceType>(m_position.player))};
 
-        m_pieces[PIECE(id)].node_id = place_index;
-        m_nodes[place_index].piece_id = id;
+            m_pieces[PIECE(id)].node_id = place_index;
+            m_nodes[place_index].piece_id = id;
 
-        do_place_animation(m_pieces[PIECE(id)], m_nodes[place_index], [this](PieceObj&) {
-            sm::Ctx::play_audio_sound(sm::utils::choice({m_piece_place1, m_piece_place2, m_piece_place3}));
-        });
+            do_place_animation(m_pieces[PIECE(id)], m_nodes[place_index], [this](PieceObj&) {
+                sm::Ctx::play_audio_sound(sm::utils::choice({m_piece_place1, m_piece_place2, m_piece_place3}));
+            });
+        }
 
         m_capture_piece = true;
     }
@@ -930,17 +953,19 @@ void NineMensMorrisBoard::try_move(int source_index, int destination_index) {
         })};
 
         if (iter != m_legal_moves.cend()) {
-            m_pieces[PIECE(m_nodes[source_index].piece_id)].node_id = destination_index;
-            m_nodes[destination_index].piece_id = m_nodes[source_index].piece_id;
+            if (m_enable_move_animations) {
+                m_pieces[PIECE(m_nodes[source_index].piece_id)].node_id = destination_index;
+                m_nodes[destination_index].piece_id = m_nodes[source_index].piece_id;
 
-            const int id {std::exchange(m_nodes[source_index].piece_id, -1)};
+                const int id {std::exchange(m_nodes[source_index].piece_id, -1)};
 
-            do_move_animation(
-                m_pieces[PIECE(id)],
-                m_nodes[destination_index],
-                [](PieceObj&) {},
-                !has_three_pieces(m_position.board, m_pieces[PIECE(id)])
-            );
+                do_move_animation(
+                    m_pieces[PIECE(id)],
+                    m_nodes[destination_index],
+                    [](PieceObj&) {},
+                    !has_three_pieces(m_position.board, m_pieces[PIECE(id)])
+                );
+            }
 
             const Move move {*iter};
             play_move_move(move);
@@ -960,17 +985,19 @@ void NineMensMorrisBoard::try_move(int source_index, int destination_index) {
     });
 
     if (!m_candidate_moves.empty()) {
-        m_pieces[PIECE(m_nodes[source_index].piece_id)].node_id = destination_index;
-        m_nodes[destination_index].piece_id = m_nodes[source_index].piece_id;
+        if (m_enable_move_animations) {
+            m_pieces[PIECE(m_nodes[source_index].piece_id)].node_id = destination_index;
+            m_nodes[destination_index].piece_id = m_nodes[source_index].piece_id;
 
-        const int id {std::exchange(m_nodes[source_index].piece_id, -1)};
+            const int id {std::exchange(m_nodes[source_index].piece_id, -1)};
 
-        do_move_animation(
-            m_pieces[PIECE(id)],
-            m_nodes[destination_index],
-            [](PieceObj&) {},
-            !has_three_pieces(m_position.board, m_pieces[PIECE(id)])
-        );
+            do_move_animation(
+                m_pieces[PIECE(id)],
+                m_nodes[destination_index],
+                [](PieceObj&) {},
+                !has_three_pieces(m_position.board, m_pieces[PIECE(id)])
+            );
+        }
 
         m_capture_piece = true;
     }
@@ -997,15 +1024,17 @@ void NineMensMorrisBoard::try_capture(int capture_index) {
 
     switch (iter->type) {
         case MoveType::PlaceCapture: {
-            m_pieces[PIECE(m_nodes[capture_index].piece_id)].node_id = -1;
+            if (m_enable_move_animations) {
+                m_pieces[PIECE(m_nodes[capture_index].piece_id)].node_id = -1;
 
-            const int id {std::exchange(m_nodes[capture_index].piece_id, -1)};
+                const int id {std::exchange(m_nodes[capture_index].piece_id, -1)};
 
-            m_pieces[PIECE(id)].to_remove = true;
+                m_pieces[PIECE(id)].to_remove = true;
 
-            do_take_animation(m_pieces[PIECE(id)], [](PieceObj& piece) {
-                piece.active = false;
-            });
+                do_take_animation(m_pieces[PIECE(id)], [](PieceObj& piece) {
+                    piece.active = false;
+                });
+            }
 
             const Move move {*iter};
             play_place_capture_move(move);
@@ -1013,15 +1042,17 @@ void NineMensMorrisBoard::try_capture(int capture_index) {
             break;
         }
         case MoveType::MoveCapture: {
-            m_pieces[PIECE(m_nodes[capture_index].piece_id)].node_id = -1;
+            if (m_enable_move_animations) {
+                m_pieces[PIECE(m_nodes[capture_index].piece_id)].node_id = -1;
 
-            const int id {std::exchange(m_nodes[capture_index].piece_id, -1)};
+                const int id {std::exchange(m_nodes[capture_index].piece_id, -1)};
 
-            m_pieces[PIECE(id)].to_remove = true;
+                m_pieces[PIECE(id)].to_remove = true;
 
-            do_take_animation(m_pieces[PIECE(id)], [](PieceObj& piece) {
-                piece.active = false;
-            });
+                do_take_animation(m_pieces[PIECE(id)], [](PieceObj& piece) {
+                    piece.active = false;
+                });
+            }
 
             const Move move {*iter};
             play_move_capture_move(move);

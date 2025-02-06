@@ -949,7 +949,11 @@ PlayerColor Ui::resign_player(GameScene& game_scene) {
 }
 
 bool Ui::offer_draw_available(GameScene& game_scene) {
-    return game_scene.get_game_session() && game_scene.get_game_session()->get_remote_joined();
+    return (
+        game_scene.get_game_session() &&
+        game_scene.get_game_session()->get_remote_joined() &&
+        game_scene.get_board().get_player_color() == static_cast<PlayerColor>(game_scene.get_game_options().remote_color)
+    );
 }
 
 bool Ui::accept_draw_available(GameScene& game_scene) {

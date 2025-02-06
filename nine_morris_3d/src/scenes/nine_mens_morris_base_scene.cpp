@@ -127,7 +127,9 @@ void NineMensMorrisBaseScene::reset(const std::string& string, const std::vector
         m_move_list.skip_first(true);
     }
 
+    // Play the moves offscreen
     m_board.enable_move_callback(false);
+    m_board.enable_move_animations(false);
 
     for (const auto& move : moves) {
         play_move(move);
@@ -135,7 +137,11 @@ void NineMensMorrisBaseScene::reset(const std::string& string, const std::vector
         m_move_list.push(move);
     }
 
+    m_board.enable_move_animations(true);
     m_board.enable_move_callback(true);
+
+    // Place the pieces into their places
+    m_board.setup_pieces();
 
     m_camera_controller.go_towards_position(m_default_camera_position);
 }

@@ -69,6 +69,10 @@ void BoardObj::enable_move_callback(bool enable) {
     m_enable_move_callback = enable;
 }
 
+void BoardObj::enable_move_animations(bool enable) {
+    m_enable_move_animations = enable;
+}
+
 void BoardObj::update_hover_id(glm::vec3 ray, glm::vec3 camera, std::function<std::vector<HoverableObj>()>&& get_hoverables) {
     if (camera.y < 0.0f) {
         m_hover_id = -1;

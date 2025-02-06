@@ -49,16 +49,19 @@ public:
     virtual const GameOver& get_game_over() const = 0;
     virtual PlayerColor get_player_color() const = 0;
     virtual bool is_turn_finished() const = 0;
+    virtual void setup_pieces() = 0;
 
     void user_click_press();
     void user_click_release();
     void enable_move_callback(bool enable);
+    void enable_move_animations(bool enable);
 protected:
     void update_hover_id(glm::vec3 ray, glm::vec3 camera, std::function<std::vector<HoverableObj>()>&& get_hoverables);
 
     static std::string format(const char* format, ...);
 
     bool m_enable_move_callback {true};
+    bool m_enable_move_animations {true};
     int m_click_id {-1};
     int m_hover_id {-1};
     GameOver m_game_over;
