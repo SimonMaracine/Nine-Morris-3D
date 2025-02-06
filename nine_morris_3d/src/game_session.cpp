@@ -67,6 +67,16 @@ void GameSession::session_window(sm::Ctx& ctx, GameScene& game_scene) {
     if (ImGui::Begin("Session", nullptr, ImGuiWindowFlags_NoDecoration)) {
         if (m_remote_joined) {
             ImGui::TextWrapped("Playing against %s.", m_remote_player_name.empty() ? "an unnamed opponnent" : m_remote_player_name.c_str());
+
+            if (m_remote_offered_draw) {
+                ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(255, 163, 71, 255));
+                ImGui::TextWrapped("%s has offered a draw.", m_remote_player_name.empty() ? "The opponnent" : m_remote_player_name.c_str());
+                ImGui::PopStyleColor();
+            }
+
+            if (ImGui::IsItemHovered(ImGuiHoveredFlags_DelayShort)) {
+                ImGui::SetTooltip("You may accept the draw from the menu.");
+            }
         } else if (game_scene.get_game_state() != GameState::Ready) {
             ImGui::TextWrapped("The opponent has disconnected. You may wait for them to rejoin.");
         } else {

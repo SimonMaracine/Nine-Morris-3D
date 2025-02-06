@@ -33,7 +33,7 @@ void Ui::update(sm::Ctx& ctx, GameScene& game_scene) {
     main_menu_bar(ctx, game_scene);
     game_window(ctx, game_scene);
 
-    // This way the session window is visible only when the use is in a session
+    // This way the session window is visible only when the user is in a session
     if (game_scene.get_game_session()) {
         game_scene.get_game_session()->session_window(ctx, game_scene);
     }
@@ -919,13 +919,9 @@ void Ui::set_style() {
     style = ImGuiStyle();
     ImGui::StyleColorsClassic();
 
+    style.Colors[ImGuiCol_Text] = ImVec4(0.824f, 0.824f, 0.824f, 1.0f);
+
     style.FramePadding = ImVec2(8.0f, 4.0f);
-    // style.WindowBorderSize = 0.0f;
-    // style.ChildBorderSize = 0.0f;
-    // style.PopupBorderSize = 0.0f;
-    // style.FrameBorderSize = 0.0f;
-    // style.TabBorderSize = 0.0f;
-    // style.TabBarBorderSize = 0.0f;
 
     style.WindowPadding = ImVec2(12.0f, 12.0f);
     style.WindowRounding = 8.0f;
