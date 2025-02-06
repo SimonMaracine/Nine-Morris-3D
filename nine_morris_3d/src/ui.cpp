@@ -264,21 +264,6 @@ void Ui::main_menu_bar(sm::Ctx& ctx, GameScene& game_scene) {
 
                     ctx.set_window_vsync(g.options.vsync);
                 }
-                if (ImGui::MenuItem("Custom Cursor", nullptr, &m_options.custom_cursor)) {
-                    // if (data.options.custom_cursor) {
-                    //     if (get_board().must_take_piece) {
-                    //         ctx->window->set_cursor("cross"_H);
-                    //     } else {
-                    //         ctx->window->set_cursor("arrow"_H);
-                    //     }
-
-                    //     LOG_INFO("Set custom cursor");
-                    // } else {
-                    //     ctx->window->set_cursor("null"_H);
-
-                    //     LOG_INFO("Set default cursor");
-                    // }
-                }
 
                 ImGui::EndMenu();
             }
@@ -286,7 +271,9 @@ void Ui::main_menu_bar(sm::Ctx& ctx, GameScene& game_scene) {
                 if (ImGui::BeginMenu("Master Volume")) {
                     ImGui::PushItemWidth(rem(5.0f));
                     if (ImGui::SliderFloat("##", &m_options.master_volume, 0.0f, 1.0f, "%.01f")) {
-                        sm::Ctx::set_audio_volume(m_options.master_volume);
+                        g.options.master_volume = m_options.master_volume;
+
+                        sm::Ctx::set_audio_volume(g.options.master_volume);
                     }
                     ImGui::PopItemWidth();
 
@@ -295,26 +282,14 @@ void Ui::main_menu_bar(sm::Ctx& ctx, GameScene& game_scene) {
                 if (ImGui::BeginMenu("Music Volume")) {
                     ImGui::PushItemWidth(rem(5.0f));
                     if (ImGui::SliderFloat("##", &m_options.music_volume, 0.0f, 1.0f, "%.01f")) {
-                        // sm::music::set_music_gain(data.options.music_volume);
-
-                        // LOG_INFO("Changed music volume to {}", data.options.music_volume);
+                        // TODO
                     }
                     ImGui::PopItemWidth();
 
                     ImGui::EndMenu();
                 }
                 if (ImGui::MenuItem("Enable Music", nullptr, &m_options.enable_music)) {
-                    // if (data.options.enable_music) {
-                    //     auto& data = ctx->data<Data>();
-
-                    //     sm::music::play_music_track(data.current_music_track);
-
-                    //     LOG_INFO("Enabled music");
-                    // } else {
-                    //     sm::music::stop_music_track();
-
-                    //     LOG_INFO("Disabled music");
-                    // }
+                    // TODO
                 }
 
                 ImGui::EndMenu();
@@ -945,12 +920,12 @@ void Ui::set_style() {
     ImGui::StyleColorsClassic();
 
     style.FramePadding = ImVec2(8.0f, 4.0f);
-    style.WindowBorderSize = 0.0f;
-    style.ChildBorderSize = 0.0f;
-    style.PopupBorderSize = 0.0f;
-    style.FrameBorderSize = 0.0f;
-    style.TabBorderSize = 0.0f;
-    style.TabBarBorderSize = 0.0f;
+    // style.WindowBorderSize = 0.0f;
+    // style.ChildBorderSize = 0.0f;
+    // style.PopupBorderSize = 0.0f;
+    // style.FrameBorderSize = 0.0f;
+    // style.TabBorderSize = 0.0f;
+    // style.TabBarBorderSize = 0.0f;
 
     style.WindowPadding = ImVec2(12.0f, 12.0f);
     style.WindowRounding = 8.0f;

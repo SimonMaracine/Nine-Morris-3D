@@ -24,22 +24,27 @@ namespace sm::internal {
         }
 
         if (!SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4)) {
+            SDL_Quit();
             SM_THROW_ERROR(VideoError, "Could not set SDL_GL_CONTEXT_MAJOR_VERSION attribute: {}", SDL_GetError());
         }
 
         if (!SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3)) {
+            SDL_Quit();
             SM_THROW_ERROR(VideoError, "Could not set SDL_GL_CONTEXT_MINOR_VERSION attribute: {}", SDL_GetError());
         }
 
         if (!SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE)) {
+            SDL_Quit();
             SM_THROW_ERROR(VideoError, "Could not set SDL_GL_CONTEXT_PROFILE_MASK attribute: {}", SDL_GetError());
         }
 
         if (!SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1)) {
+            SDL_Quit();
             SM_THROW_ERROR(VideoError, "Could not set SDL_GL_DOUBLEBUFFER attribute: {}", SDL_GetError());
         }
 
         if (!SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24)) {
+            SDL_Quit();
             SM_THROW_ERROR(VideoError, "Could not set SDL_GL_DEPTH_SIZE attribute: {}", SDL_GetError());
         }
 

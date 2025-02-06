@@ -73,7 +73,6 @@ struct Options {
     bool default_address_port {true};
     bool enable_music {false};
     bool vsync {true};
-    bool custom_cursor {false};
 
     template<typename Archive>
     void serialize(Archive& archive, const std::uint32_t) {
@@ -94,8 +93,7 @@ struct Options {
             port,
             default_address_port,
             enable_music,
-            vsync,
-            custom_cursor
+            vsync
         );
     }
 };
