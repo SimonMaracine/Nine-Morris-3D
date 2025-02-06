@@ -21,7 +21,7 @@ void GameScene::on_start() {
     setup_lights();
 
     scene_setup();
-    load_game_icons();
+    load_icons();
     start_engine();
 
     const auto& g {ctx.global<Global>()};
@@ -525,6 +525,22 @@ void GameScene::setup_lights() {
             m_directional_light.specular_color = glm::vec3(0.9f);
             break;
     }
+}
+
+void GameScene::load_icons() {
+    load_game_icons();
+
+    sm::TextureSpecification specification;
+    specification.format = sm::TextureFormat::Rgba8;
+
+    sm::TexturePostProcessing post_processing;
+    post_processing.flip = false;
+
+    m_icon_wait = ctx.load_texture(
+        "icon_wait"_H,
+        ctx.load_texture_data(ctx.path_assets("textures/icons/icon_wait.png"), post_processing),
+        specification
+    );
 }
 
 void GameScene::reload_skybox_texture_data() const {

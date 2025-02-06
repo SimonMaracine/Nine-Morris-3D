@@ -71,6 +71,7 @@ public:
     const Clock& get_clock() const { return m_clock; }
     const MoveList& get_move_list() const { return m_move_list; }
     const std::unique_ptr<Engine>& get_engine() const { return m_engine; }
+    std::shared_ptr<sm::GlTexture> get_icon_wait() const { return m_icon_wait; }
     std::shared_ptr<sm::GlTexture> get_icon_white() const { return m_icon_white; }
     std::shared_ptr<sm::GlTexture> get_icon_black() const { return m_icon_black; }
 
@@ -103,6 +104,7 @@ protected:
     void setup_skybox(bool reload = false);
     void setup_lights();
 
+    void load_icons();
     void reload_skybox_texture_data() const;
     std::shared_ptr<sm::GlTextureCubemap> load_skybox_texture_cubemap(bool reload = false) const;
 
@@ -135,10 +137,10 @@ protected:
     sm::DirectionalLight m_directional_light;
     sm::ShadowBox m_shadow_box;
     sm::Skybox m_skybox;
-    // sm::Quad m_wait_indicator;  // TODO
     PointCameraController m_camera_controller;
     Ui m_ui;
 
+    std::shared_ptr<sm::GlTexture> m_icon_wait;
     std::shared_ptr<sm::GlTexture> m_icon_white;
     std::shared_ptr<sm::GlTexture> m_icon_black;
 

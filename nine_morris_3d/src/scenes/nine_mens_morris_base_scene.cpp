@@ -228,15 +228,18 @@ void NineMensMorrisBaseScene::load_game_icons() {
     sm::TextureSpecification specification;
     specification.format = sm::TextureFormat::Rgba8;
 
+    sm::TexturePostProcessing post_processing;
+    post_processing.flip = false;
+
     m_icon_white = ctx.load_texture(
         "icon_white"_H,
-        ctx.load_texture_data(ctx.path_assets("textures/icons/icon_white.png"), sm::TexturePostProcessing()),
+        ctx.load_texture_data(ctx.path_assets("textures/icons/icon_white.png"), post_processing),
         specification
     );
 
     m_icon_black = ctx.load_texture(
         "icon_black"_H,
-        ctx.load_texture_data(ctx.path_assets("textures/icons/icon_black.png"), sm::TexturePostProcessing()),
+        ctx.load_texture_data(ctx.path_assets("textures/icons/icon_black.png"), post_processing),
         specification
     );
 }

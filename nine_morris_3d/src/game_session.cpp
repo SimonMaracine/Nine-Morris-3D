@@ -78,8 +78,12 @@ void GameSession::session_window(sm::Ctx& ctx, GameScene& game_scene) {
                 ImGui::SetTooltip("You may accept the draw from the menu.");
             }
         } else if (game_scene.get_game_state() != GameState::Ready) {
+            ImGui::Image(game_scene.get_icon_wait()->get_id(), ImVec2(Ui::rem(1.0f), Ui::rem(1.0f)));
+            ImGui::SameLine();
             ImGui::TextWrapped("The opponent has disconnected. You may wait for them to rejoin.");
         } else {
+            ImGui::Image(game_scene.get_icon_wait()->get_id(), ImVec2(Ui::rem(1.0f), Ui::rem(1.0f)));
+            ImGui::SameLine();
             ImGui::TextWrapped("Waiting for the opponent...");
         }
 
