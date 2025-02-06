@@ -127,16 +127,7 @@ namespace sm::internal {
         }
     }
 
-#ifdef __GNUG__
-    #pragma GCC diagnostic push
-    #pragma GCC diagnostic ignored "-Wparentheses"
-#endif
-
     bool FileSystem::no_directory(const std::filesystem::path& path) {
         return !file_exists(path) || file_exists(path) && !is_directory(path);
     }
-
-#ifdef __GNUG__
-    #pragma GCC diagnostic pop
-#endif
 }

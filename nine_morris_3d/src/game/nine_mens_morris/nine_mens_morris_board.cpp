@@ -324,11 +324,6 @@ void NineMensMorrisBoard::update(sm::Ctx& ctx, glm::vec3 ray, glm::vec3 camera, 
         });
     }
 
-#ifdef __GNUG__
-    #pragma GCC diagnostic push
-    #pragma GCC diagnostic ignored "-Wparentheses"
-#endif
-
     update_nodes_highlight(
         [this]() {
             return (
@@ -348,10 +343,6 @@ void NineMensMorrisBoard::update(sm::Ctx& ctx, glm::vec3 ray, glm::vec3 camera, 
         },
         user_input
     );
-
-#ifdef __GNUG__
-    #pragma GCC diagnostic pop
-#endif
 
     ctx.add_renderable(m_board_renderable);
     ctx.add_renderable(m_paint_renderable);

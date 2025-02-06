@@ -19,5 +19,9 @@ target_link_libraries(nine_morris_3d PRIVATE nine_morris_3d_engine networking_cl
 enable_warnings(nine_morris_3d)
 enable_sanitizers_debug_linux(nine_morris_3d)
 
+if(UNIX)
+    target_compile_options(nine_morris_3d PRIVATE "-Wno-parentheses")
+endif()
+
 # On Windows set Visual Studio working directory
 set_property(TARGET nine_morris_3d PROPERTY VS_DEBUGGER_WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}")
