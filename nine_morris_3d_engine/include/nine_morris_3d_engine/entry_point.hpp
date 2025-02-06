@@ -16,17 +16,31 @@ int sm_application_main(int argc, char** argv);
         return sm_application_main(argc, argv);
     }
 #elif defined(SM_PLATFORM_WINDOWS)
-    #define WIN32_LEAN_AND_MEAN
-    #define NOMINMAX
-    #include <Windows.h>
-    #include <shellapi.h>
-
-    #include <cwchar>
-
     #if defined(SM_BUILD_DISTRIBUTION)
+        #define WIN32_LEAN_AND_MEAN
+        #define NOMINMAX
+        #include <Windows.h>
+        #include <shellapi.h>
+
+        #include <new>
+        #include <cwchar>
+
+        static void delete_and_reset_argv(int& argc, char**& argv) {
+            if (argv != nullptr) {
+                for (int i {0}; i < argc; i++) {
+                    delete[] argv[i];
+                }
+                delete[] argv;
+            }
+
+            argc = 0;
+            argv = nullptr;
+        }
+
         INT WINAPI wWinMain(HINSTANCE, HINSTANCE, PWSTR, INT) {
             int argc {0};
             char** argv {nullptr};
+            int exit_code {};
 
             // Windows forces wide strings upon us :P
             // Must safely convert back into simple strings
@@ -35,13 +49,15 @@ int sm_application_main(int argc, char** argv);
             LPWSTR* wargv {CommandLineToArgvW(GetCommandLineW(), &argc)};
 
             if (wargv == nullptr) {
-                goto ret_error;
+                delete_and_reset_argv(argc, argv);
+                goto ret;
             }
 
             try {
                 argv = new char*[argc];   
             } catch (const std::bad_alloc&) {
-                goto ret_error;    
+                delete_and_reset_argv(argc, argv);
+                goto ret;
             }
 
             try {
@@ -57,20 +73,15 @@ int sm_application_main(int argc, char** argv);
                     argv[i][length] = 0;
                 }
             } catch (const std::bad_alloc&) {
-                for (int i {0}; i < argc; i++) {
-                    delete[] argv[i];
-                }
-                delete[] argv;
-
-                goto ret_error;
+                delete_and_reset_argv(argc, argv);
+                goto ret;
             }
 
-            return sm_application_main(argc, argv);
+        ret:
+            exit_code = sm_application_main(argc, argv);
+            delete_and_reset_argv(argc, argv);
 
-        ret_error:
-            argc = 0;
-            argv = nullptr;
-            return sm_application_main(argc, argv);
+            return exit_code;
         }
     #else
         int main(int argc, char** argv) {
