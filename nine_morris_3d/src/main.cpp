@@ -105,7 +105,8 @@ static void crash_handler(int) {
 }
 
 int sm_application_main(int argc, char** argv) {
-    if (argc > 1 && std::strcmp(argv[1], "--game") == 0) {
+    // argv can be empty; avoid an infinite loop
+    if (argc > 1 && std::strcmp(argv[1], "--game") == 0 || argc == 0) {
         return game();
     }
 

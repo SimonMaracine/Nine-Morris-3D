@@ -6,11 +6,11 @@ file(GLOB_RECURSE NM3D_HEADERS "src/*.hpp")
 # Add WIN32 option for Windows in release + distribution mode
 if(WIN32)
     if(NM3D_DISTRIBUTION_MODE)
-        set(GUI_EXECUTABLE_WINDOWS WIN32)
+        set(NM3D_GUI_WINDOWS WIN32)
     endif()
 endif()
 
-add_executable(nine_morris_3d ${GUI_EXECUTABLE_WINDOWS} ${NM3D_SOURCES} ${NM3D_HEADERS})
+add_executable(nine_morris_3d ${NM3D_GUI_WINDOWS} ${NM3D_SOURCES} ${NM3D_HEADERS})
 
 target_include_directories(nine_morris_3d PRIVATE "src")
 
