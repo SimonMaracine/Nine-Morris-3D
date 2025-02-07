@@ -17,7 +17,7 @@ private:
 
     void update_splash_screen();
     void load_splash_screen();
-    void load_assets();
+    void load_assets(sm::AsyncTask& task);
 
     bool m_done {false};
     sm::Camera2D m_camera_2d;

@@ -249,34 +249,22 @@ void NineMensMorrisBaseScene::reload_scene_texture_data() const {
 
     const auto& g {ctx.global<Global>()};
 
+    sm::TexturePostProcessing post_processing;
+
+    if (g.options.texture_quality == TextureQualityHalf) {
+        post_processing.size = sm::TextureSize::Half;
+    }
+
     {
-        sm::TexturePostProcessing post_processing;
-
-        if (g.options.texture_quality == TextureQualityHalf) {
-            post_processing.size = sm::TextureSize::Half;
-        }
-
         ctx.reload_texture_data(ctx.path_assets("textures/board/board_diffuse.png"), post_processing);
         ctx.reload_texture_data(ctx.path_assets("textures/board/board_normal.png"), post_processing);
     }
 
     {
-        sm::TexturePostProcessing post_processing;
-
-        if (g.options.texture_quality == TextureQualityHalf) {
-            post_processing.size = sm::TextureSize::Half;
-        }
-
         ctx.reload_texture_data(ctx.path_assets("textures/board/paint_diffuse.png"), post_processing);
     }
 
     {
-        sm::TexturePostProcessing post_processing;
-
-        if (g.options.texture_quality == TextureQualityHalf) {
-            post_processing.size = sm::TextureSize::Half;
-        }
-
         ctx.reload_texture_data(ctx.path_assets("textures/piece/piece_white_diffuse.png"), post_processing);
         ctx.reload_texture_data(ctx.path_assets("textures/piece/piece_black_diffuse.png"), post_processing);
         ctx.reload_texture_data(ctx.path_assets("textures/piece/piece_normal.png"), post_processing);

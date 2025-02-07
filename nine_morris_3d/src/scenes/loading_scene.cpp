@@ -11,7 +11,7 @@ void LoadingScene::on_start() {
 
     ctx.add_task_async([this](sm::AsyncTask& task) {
         try {
-            load_assets();
+            load_assets(task);
         } catch (const sm::RuntimeError&) {
             task.set_done(std::current_exception());
             return;
@@ -77,7 +77,7 @@ void LoadingScene::load_splash_screen() {
     m_splash_screen = ctx.load_texture("splash_screen"_H, texture_data, specification);
 }
 
-void LoadingScene::load_assets() {
+void LoadingScene::load_assets(sm::AsyncTask& task) {
     const auto& g {ctx.global<Global>()};
 
     {
@@ -110,6 +110,11 @@ void LoadingScene::load_assets() {
         }
     }
 
+    if (task.stop_requested()) {
+        task.set_done();
+        return;
+    }
+
     {
         sm::TexturePostProcessing post_processing;
 
@@ -120,6 +125,11 @@ void LoadingScene::load_assets() {
         ctx.load_mesh(ctx.path_assets("models/board/board.obj"), "Board_Cube", sm::Mesh::Type::PNTT);
         ctx.load_texture_data(ctx.path_assets("textures/board/board_diffuse.png"), post_processing);
         ctx.load_texture_data(ctx.path_assets("textures/board/board_normal.png"), post_processing);
+    }
+
+    if (task.stop_requested()) {
+        task.set_done();
+        return;
     }
 
     {
@@ -136,6 +146,11 @@ void LoadingScene::load_assets() {
 
     {
         ctx.load_mesh(ctx.path_assets("models/node/node.obj"), "Node", sm::Mesh::Type::PN, true);
+    }
+
+    if (task.stop_requested()) {
+        task.set_done();
+        return;
     }
 
     {
