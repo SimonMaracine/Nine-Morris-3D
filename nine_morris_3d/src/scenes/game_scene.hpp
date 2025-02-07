@@ -81,6 +81,8 @@ public:
     void reload_and_set_skybox();
     void reload_and_set_textures();
 
+    void reset_camera_position();
+
     virtual void start_engine() = 0;
 
     void connect(const std::string& address, std::uint16_t port, bool reconnect = false);
@@ -109,6 +111,7 @@ protected:
     std::shared_ptr<sm::GlTextureCubemap> load_skybox_texture_cubemap(bool reload = false) const;
 
     void update_game_state();
+
     void engine_error(const EngineError& e);
     void stop_engine();
     void assert_engine_game_over();
@@ -145,7 +148,8 @@ protected:
     std::shared_ptr<sm::GlTexture> m_icon_black;
 
     GameState m_game_state {GameState::Ready};
-    glm::vec3 m_default_camera_position {};
+    glm::vec3 m_white_camera_position {};
+    glm::vec3 m_black_camera_position {};
     std::optional<GameSession> m_game_session;
     GameOptions m_game_options;
     Clock m_clock;

@@ -179,6 +179,36 @@ void GameScene::reload_and_set_textures() {
     });
 }
 
+void GameScene::reset_camera_position() {
+    const auto& g {ctx.global<Global>()};
+
+    switch (g.options.game_type) {
+        case GameTypeLocalHumanVsHuman:
+            m_camera_controller.go_towards_position(m_white_camera_position);
+            break;
+        case GameTypeLocalHumanVsComputer:
+            switch (static_cast<PlayerColor>(m_game_options.computer_color)) {
+                case PlayerColorWhite:
+                    m_camera_controller.go_towards_position(m_black_camera_position);
+                    break;
+                case PlayerColorBlack:
+                    m_camera_controller.go_towards_position(m_white_camera_position);
+                    break;
+            }
+            break;
+        case GameTypeOnline:
+            switch (static_cast<PlayerColor>(m_game_options.remote_color)) {
+                case PlayerColorWhite:
+                    m_camera_controller.go_towards_position(m_black_camera_position);
+                    break;
+                case PlayerColorBlack:
+                    m_camera_controller.go_towards_position(m_white_camera_position);
+                    break;
+            }
+            break;
+    }
+}
+
 void GameScene::connect(const std::string& address, std::uint16_t port, bool reconnect) {
     auto& g {ctx.global<Global>()};
 
@@ -456,7 +486,7 @@ void GameScene::on_window_resized(const sm::WindowResizedEvent& event) {
 
 void GameScene::on_key_released(const sm::KeyReleasedEvent& event) {
     if (event.key == sm::Key::Space) {
-        m_camera_controller.go_towards_position(m_default_camera_position);
+        reset_camera_position();
     }
 }
 
@@ -491,9 +521,11 @@ void GameScene::setup_camera() {
 
     m_camera_controller.connect_events(ctx);
 
-    m_default_camera_position = m_camera_controller.get_position();
+    m_white_camera_position = m_camera_controller.get_position();
+    m_black_camera_position = glm::vec3(m_white_camera_position.x, m_white_camera_position.y, -m_white_camera_position.z);
+
     m_camera_controller.set_distance_to_point(m_camera_controller.get_distance_to_point() + 1.0f);
-    m_camera_controller.go_towards_position(m_default_camera_position);
+    reset_camera_position();
 
     m_camera_2d.set_projection(0, ctx.get_window_width(), 0, ctx.get_window_height());
 }
@@ -994,6 +1026,9 @@ void GameScene::server_accept_join_game_session(const networking::Message& messa
             m_clock.set_white_time(payload.time);
             break;
     }
+
+    // Need to reposition the camera in the correct place
+    reset_camera_position();
 
     // Unblock from waiting
     m_ui.clear_modal_window(ModalWindowWaitServerAcceptJoinGameSession);

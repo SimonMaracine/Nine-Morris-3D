@@ -664,10 +664,16 @@ void Ui::game_options_window(sm::Ctx& ctx, GameScene& game_scene) {
             ImGui::BeginDisabled(game_scene.get_game_state() != GameState::Ready);
 
             ImGui::SeparatorText("Game Type");
-            ImGui::RadioButton("Local", &g.options.game_type, GameTypeLocalHumanVsHuman);
+            if (ImGui::RadioButton("Local", &g.options.game_type, GameTypeLocalHumanVsHuman)) {
+                game_scene.reset_camera_position();
+            }
             ImGui::SameLine();
-            ImGui::RadioButton("Local vs Computer", &g.options.game_type, GameTypeLocalHumanVsComputer);
-            ImGui::RadioButton("Online", &g.options.game_type, GameTypeOnline);
+            if (ImGui::RadioButton("Local vs Computer", &g.options.game_type, GameTypeLocalHumanVsComputer)) {
+                game_scene.reset_camera_position();
+            }
+            if (ImGui::RadioButton("Online", &g.options.game_type, GameTypeOnline)) {
+                game_scene.reset_camera_position();
+            }
             ImGui::Dummy(ImVec2(0.0f, rem(0.4f)));
 
             switch (g.options.game_type) {
@@ -675,16 +681,24 @@ void Ui::game_options_window(sm::Ctx& ctx, GameScene& game_scene) {
                     break;
                 case GameTypeLocalHumanVsComputer:
                     ImGui::SeparatorText("Computer Plays As");
-                    ImGui::RadioButton("White", &game_options.computer_color, PlayerColorWhite);
+                    if (ImGui::RadioButton("White", &game_options.computer_color, PlayerColorWhite)) {
+                        game_scene.reset_camera_position();
+                    }
                     ImGui::SameLine();
-                    ImGui::RadioButton("Black", &game_options.computer_color, PlayerColorBlack);
+                    if (ImGui::RadioButton("Black", &game_options.computer_color, PlayerColorBlack)) {
+                        game_scene.reset_camera_position();
+                    }
                     ImGui::Dummy(ImVec2(0.0f, rem(0.4f)));
                     break;
                 case GameTypeOnline:
                     ImGui::SeparatorText("Remote Plays As");
-                    ImGui::RadioButton("White", &game_options.remote_color, PlayerColorWhite);
+                    if (ImGui::RadioButton("White", &game_options.remote_color, PlayerColorWhite)) {
+                        game_scene.reset_camera_position();
+                    }
                     ImGui::SameLine();
-                    ImGui::RadioButton("Black", &game_options.remote_color, PlayerColorBlack);
+                    if (ImGui::RadioButton("Black", &game_options.remote_color, PlayerColorBlack)) {
+                        game_scene.reset_camera_position();
+                    }
                     ImGui::Dummy(ImVec2(0.0f, rem(0.4f)));
                     break;
             }

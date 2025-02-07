@@ -143,7 +143,7 @@ void NineMensMorrisBaseScene::reset(const std::string& string, const std::vector
     // Place the pieces into their places
     m_board.setup_pieces();
 
-    m_camera_controller.go_towards_position(m_default_camera_position);
+    reset_camera_position();
 }
 
 void NineMensMorrisBaseScene::play_move(const std::string& string) {
