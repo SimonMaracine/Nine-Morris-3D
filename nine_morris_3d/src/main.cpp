@@ -21,27 +21,22 @@ struct Paths {
     std::filesystem::path assets;
 };
 
-static Paths get_paths() {
+static void get_paths([[maybe_unused]] Paths& paths) {
 #ifndef SM_BUILD_DISTRIBUTION
-    return {};
+    return;
 #else
 
 #if defined(SM_PLATFORM_LINUX)
     const std::filesystem::path home {sm::utils::get_environment_variable("HOME")};
 
-    return {
-        home / ".ninemorris3d",
-        home / ".ninemorris3d",
-        "/usr/local/share/ninemorris3d"
-    };
+    paths.logs = home / ".ninemorris3d";
+    paths.saved_data = home / ".ninemorris3d";
+    paths.assets = "/usr/local/share/ninemorris3d";
 #elif defined(SM_PLATFORM_WINDOWS)
     const std::filesystem::path username {sm::utils::get_environment_variable("USERNAME")};
 
-    return {
-        "C:\\Users" / username / "Documents\\Nine Morris 3D",
-        "C:\\Users" / username / "Documents\\Nine Morris 3D",
-        ""
-    };
+    paths.logs = "C:\\Users" / username / "Documents\\Nine Morris 3D"
+    paths.saved_data = "C:\\Users" / username / "Documents\\Nine Morris 3D"
 #endif
 
 #endif  // SM_BUILD_DISTRIBUTION
@@ -51,7 +46,7 @@ static int game() {
     Paths paths;
 
     try {
-        paths = get_paths();
+        get_paths(paths);
     } catch (const sm::RuntimeError& e) {
         std::cerr << "Error initializing paths: " << e.what() << '\n';
         return 1;
@@ -99,14 +94,14 @@ static void crash_handler(int) {
 
     try {
         sm::crash::show_error_window(title, message);
-    } catch (const sm::RuntimeError&) {
+    } catch (...) {
         std::cerr << title << ": " << message << '\n';
     }
 }
 
 int sm_application_main(int argc, char** argv) {
     // argv can be empty; avoid an infinite loop
-    if (argc > 1 && std::strcmp(argv[1], "--game") == 0 || argc == 0) {
+    if (argc == 0 || argc > 1 && std::strcmp(argv[1], "--game") == 0) {
         return game();
     }
 
@@ -121,7 +116,7 @@ int sm_application_main(int argc, char** argv) {
 #else
 
 #ifdef SM_PLATFORM_WINDOWS
-    const char* executable {"build/nine_morris_3d/Debug/nine_morris_3d.exe"};
+    const char* executable {"build\\nine_morris_3d\\Debug\\nine_morris_3d.exe"};
 #else
     const char* executable {"build/nine_morris_3d/nine_morris_3d"};
 #endif
