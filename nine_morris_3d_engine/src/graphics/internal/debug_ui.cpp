@@ -10,13 +10,13 @@
 
 namespace sm::internal {
 #ifndef SM_BUILD_DISTRIBUTION
-    void DebugUi::render(Scene& scene, Ctx& ctx) {
+    void DebugUi::render(const Scene& scene, Ctx& ctx) {
         if (ImGui::Begin("Debug")) {
-            ImGui::Checkbox("Renderables", &m_renderables);
+            ImGui::Checkbox("Models", &m_models);
             ImGui::Checkbox("Lights", &m_lights);
             ImGui::Checkbox("Shadows", &m_shadows);
+            ImGui::Checkbox("Images", &m_images);
             ImGui::Checkbox("Texts", &m_texts);
-            ImGui::Checkbox("Quads", &m_quads);
             ImGui::Checkbox("Tasks", &m_tasks);
             ImGui::Checkbox("Frame Time", &m_frame_time);
 
@@ -27,8 +27,39 @@ namespace sm::internal {
 
         ImGui::End();
 
-        if (m_renderables) {
-            renderables(scene);
+        m_model_nodes.clear();
+        m_point_light_nodes.clear();
+        m_image_nodes.clear();
+        m_text_nodes.clear();
+
+        scene.root_3d_node->traverse([this](SceneNode3D* node) {
+            switch (node->type()) {
+                case SceneNode3DType::Root3D:
+                    break;
+                case SceneNode3DType::Model:
+                    m_model_nodes.push_back(static_cast<ModelNode*>(node));
+                    break;
+                case SceneNode3DType::PointLight:
+                    m_point_light_nodes.push_back(static_cast<PointLightNode*>(node));
+                    break;
+            }
+        });
+
+        scene.root_2d_node->traverse([this](SceneNode2D* node) {
+            switch (node->type()) {
+                case SceneNode2DType::Root2D:
+                    break;
+                case SceneNode2DType::Image:
+                    m_image_nodes.push_back(static_cast<ImageNode*>(node));
+                    break;
+                case SceneNode2DType::Text:
+                    m_text_nodes.push_back(static_cast<TextNode*>(node));
+                    break;
+            }
+        });
+
+        if (m_models) {
+            models(scene);
         }
 
         if (m_lights) {
@@ -39,12 +70,12 @@ namespace sm::internal {
             shadows(scene);
         }
 
-        if (m_texts) {
-            texts(scene);
+        if (m_images) {
+            images(scene);
         }
 
-        if (m_quads) {
-            quads(scene);
+        if (m_texts) {
+            texts(scene);
         }
 
         if (m_tasks) {
@@ -56,30 +87,30 @@ namespace sm::internal {
         }
     }
 
-    void DebugUi::render_lines(Scene& scene) {
+    void DebugUi::render_lines(const Scene& scene) {
         if (m_shadows) {
             shadows_lines(
                 scene,
-                scene.m_debug.shadow_box->left,
-                scene.m_debug.shadow_box->right,
-                scene.m_debug.shadow_box->bottom,
-                scene.m_debug.shadow_box->top,
-                scene.m_debug.shadow_box->near_,
-                scene.m_debug.shadow_box->far_,
-                scene.m_debug.shadow_box->position,
-                scene.m_debug.directional_light->direction
+                scene.root_3d_node->m_shadow_box.left,
+                scene.root_3d_node->m_shadow_box.right,
+                scene.root_3d_node->m_shadow_box.bottom,
+                scene.root_3d_node->m_shadow_box.top,
+                scene.root_3d_node->m_shadow_box.near_,
+                scene.root_3d_node->m_shadow_box.far_,
+                scene.root_3d_node->m_shadow_box.position,
+                scene.root_3d_node->m_directional_light.direction
             );
         }
     }
 
-    void DebugUi::renderables(Scene& scene) {
-        if (ImGui::Begin("Debug Renderables")) {
-            for (int index {0}; Renderable* renderable : scene.m_debug.renderables) {
+    void DebugUi::models(const Scene& scene) {
+        if (ImGui::Begin("Debug Models")) {
+            for (int index {0}; const auto& model_node : m_model_nodes) {
                 ImGui::PushID(index);
-                ImGui::Text("Renderable %d", index);
-                ImGui::DragFloat3("Position", glm::value_ptr(renderable->transform.position), 1.0f, -200.0f, 200.0f);
-                ImGui::DragFloat3("Rotation", glm::value_ptr(renderable->transform.rotation), 1.0f, 0.0f, 360.0f);
-                ImGui::DragFloat("Scale", &renderable->transform.scale, 0.1f, 0.0f, 100.0f);
+                ImGui::Text("Model %d", index);
+                ImGui::DragFloat3("Position", glm::value_ptr(model_node->transform.position), 1.0f, -200.0f, 200.0f);
+                ImGui::DragFloat3("Rotation", glm::value_ptr(model_node->transform.rotation), 1.0f, 0.0f, 360.0f);
+                ImGui::DragFloat("Scale", &model_node->transform.scale, 0.1f, 0.0f, 100.0f);
                 ImGui::PopID();
                 ImGui::Spacing();
 
@@ -90,29 +121,29 @@ namespace sm::internal {
         ImGui::End();
     }
 
-    void DebugUi::lights(Scene& scene) {
+    void DebugUi::lights(const Scene& scene) {
         if (ImGui::Begin("Debug Directional Light")) {
-            ImGui::DragFloat3("Direction", glm::value_ptr(scene.m_debug.directional_light->direction), 0.01f, -1.0f, 1.0f);
-            ImGui::DragFloat3("Ambient", glm::value_ptr(scene.m_debug.directional_light->ambient_color), 0.01f, 0.0f, 1.0f);
-            ImGui::DragFloat3("Diffuse", glm::value_ptr(scene.m_debug.directional_light->diffuse_color), 0.01f, 0.0f, 1.0f);
-            ImGui::DragFloat3("Specular", glm::value_ptr(scene.m_debug.directional_light->specular_color), 0.01f, 0.0f, 1.0f);
+            ImGui::DragFloat3("Direction", glm::value_ptr(scene.root_3d_node->m_directional_light.direction), 0.01f, -1.0f, 1.0f);
+            ImGui::DragFloat3("Ambient", glm::value_ptr(scene.root_3d_node->m_directional_light.ambient_color), 0.01f, 0.0f, 1.0f);
+            ImGui::DragFloat3("Diffuse", glm::value_ptr(scene.root_3d_node->m_directional_light.diffuse_color), 0.01f, 0.0f, 1.0f);
+            ImGui::DragFloat3("Specular", glm::value_ptr(scene.root_3d_node->m_directional_light.specular_color), 0.01f, 0.0f, 1.0f);
 
             // Direction should stay normalized no matter what
-            scene.m_debug.directional_light->direction = glm::normalize(scene.m_debug.directional_light->direction);
+            scene.root_3d_node->m_directional_light.direction = glm::normalize(scene.root_3d_node->m_directional_light.direction);
         }
 
         ImGui::End();
 
         if (ImGui::Begin("Debug Point Lights")) {
-            for (int index {0}; PointLight* point_light : scene.m_debug.point_lights) {
+            for (int index {0}; const auto& point_light_node : m_point_light_nodes) {
                 ImGui::PushID(index);
                 ImGui::Text("Light %d", index);
-                ImGui::DragFloat3("Position", glm::value_ptr(point_light->position), 1.0f, -30.0f, 30.0f);
-                ImGui::DragFloat3("Ambient", glm::value_ptr(point_light->ambient_color), 0.01f, 0.0f, 1.0f);
-                ImGui::DragFloat3("Diffuse", glm::value_ptr(point_light->diffuse_color), 0.01f, 0.0f, 1.0f);
-                ImGui::DragFloat3("Specular", glm::value_ptr(point_light->specular_color), 0.01f, 0.0f, 1.0f);
-                ImGui::DragFloat("Falloff L", &point_light->falloff_linear, 0.0001f, 0.0001f, 1.0f);
-                ImGui::DragFloat("Falloff Q", &point_light->falloff_quadratic, 0.00001f, 0.00001f, 1.0f);
+                ImGui::DragFloat3("Position", glm::value_ptr(point_light_node->position), 1.0f, -30.0f, 30.0f);
+                ImGui::DragFloat3("Ambient", glm::value_ptr(point_light_node->ambient_color), 0.01f, 0.0f, 1.0f);
+                ImGui::DragFloat3("Diffuse", glm::value_ptr(point_light_node->diffuse_color), 0.01f, 0.0f, 1.0f);
+                ImGui::DragFloat3("Specular", glm::value_ptr(point_light_node->specular_color), 0.01f, 0.0f, 1.0f);
+                ImGui::DragFloat("Falloff L", &point_light_node->falloff_linear, 0.0001f, 0.0001f, 1.0f);
+                ImGui::DragFloat("Falloff Q", &point_light_node->falloff_quadratic, 0.00001f, 0.00001f, 1.0f);
                 ImGui::PopID();
                 ImGui::Spacing();
 
@@ -123,41 +154,34 @@ namespace sm::internal {
         ImGui::End();
     }
 
-    void DebugUi::shadows(Scene& scene) {
+    void DebugUi::shadows(const Scene& scene) {
         if (ImGui::Begin("Debug Shadows")) {
-            ImGui::DragFloat("Left", &scene.m_debug.shadow_box->left, 1.0f, -500.0f, 0.0f);
-            ImGui::DragFloat("Right", &scene.m_debug.shadow_box->right, 1.0f, 0.0f, 500.0f);
-            ImGui::DragFloat("Bottom", &scene.m_debug.shadow_box->bottom, 1.0f, -500.0f, 0.0f);
-            ImGui::DragFloat("Top", &scene.m_debug.shadow_box->top, 1.0f, 0.0f, 500.0f);
-            ImGui::DragFloat("Near", &scene.m_debug.shadow_box->near_, 1.0f, 0.1f, 2.0f);
-            ImGui::DragFloat("Far", &scene.m_debug.shadow_box->far_, 1.0f, 2.0f, 500.0f);
+            ImGui::DragFloat("Left", &scene.root_3d_node->m_shadow_box.left, 1.0f, -500.0f, 0.0f);
+            ImGui::DragFloat("Right", &scene.root_3d_node->m_shadow_box.right, 1.0f, 0.0f, 500.0f);
+            ImGui::DragFloat("Bottom", &scene.root_3d_node->m_shadow_box.bottom, 1.0f, -500.0f, 0.0f);
+            ImGui::DragFloat("Top", &scene.root_3d_node->m_shadow_box.top, 1.0f, 0.0f, 500.0f);
+            ImGui::DragFloat("Near", &scene.root_3d_node->m_shadow_box.near_, 1.0f, 0.1f, 2.0f);
+            ImGui::DragFloat("Far", &scene.root_3d_node->m_shadow_box.far_, 1.0f, 2.0f, 500.0f);
             ImGui::Text(
                 "Position %f, %f, %f",
-                scene.m_debug.shadow_box->position.x,
-                scene.m_debug.shadow_box->position.y,
-                scene.m_debug.shadow_box->position.z
+                scene.root_3d_node->m_shadow_box.position.x,
+                scene.root_3d_node->m_shadow_box.position.y,
+                scene.root_3d_node->m_shadow_box.position.z
             );
         }
 
         ImGui::End();
     }
 
-    void DebugUi::texts(Scene& scene) {
-        if (ImGui::Begin("Debug Texts")) {
-            for (int index {0}; Text* text : scene.m_debug.texts) {
-                char buffer[512] {};
-                std::strncpy(buffer, text->text.c_str(), sizeof(buffer) - 1);
-
+    void DebugUi::images(const Scene& scene) {
+        if (ImGui::Begin("Debug Images")) {
+            for (int index {0}; const auto& image_node : m_image_nodes) {
                 ImGui::PushID(index);
-                ImGui::Text("Text %d", index);
-                ImGui::DragFloat2("Position", glm::value_ptr(text->position), 1.0f, -2000.0f, 2000.0f);
-                ImGui::DragFloat("Scale", &text->scale, 0.01f, 0.0f, 1.0f);
-                ImGui::DragFloat3("Color", glm::value_ptr(text->color), 1.0f, 0.0f, 1.0f);
-                ImGui::InputTextMultiline("Text", buffer, sizeof(buffer));
+                ImGui::Text("Image %d", index);
+                ImGui::DragFloat2("Position", glm::value_ptr(image_node->position), 1.0f, -2000.0f, 2000.0f);
+                ImGui::DragFloat2("Scale", glm::value_ptr(image_node->scale), 0.01f, 0.0f, 1.0f);
                 ImGui::PopID();
                 ImGui::Spacing();
-
-                text->text = buffer;
 
                 index++;
             }
@@ -166,15 +190,22 @@ namespace sm::internal {
         ImGui::End();
     }
 
-    void DebugUi::quads(Scene& scene) {
-        if (ImGui::Begin("Debug Quads")) {
-            for (int index {0}; Quad* quad : scene.m_debug.quads) {
+    void DebugUi::texts(const Scene& scene) {
+        if (ImGui::Begin("Debug Texts")) {
+            for (int index {0}; const auto& text_node : m_text_nodes) {
+                char buffer[512] {};
+                std::strncpy(buffer, text_node->text.c_str(), sizeof(buffer) - 1);
+
                 ImGui::PushID(index);
-                ImGui::Text("Quad %d", index);
-                ImGui::DragFloat2("Position", glm::value_ptr(quad->position), 1.0f, -2000.0f, 2000.0f);
-                ImGui::DragFloat2("Scale", glm::value_ptr(quad->scale), 0.01f, 0.0f, 1.0f);
+                ImGui::Text("Text %d", index);
+                ImGui::DragFloat2("Position", glm::value_ptr(text_node->position), 1.0f, -2000.0f, 2000.0f);
+                ImGui::DragFloat("Scale", &text_node->scale, 0.01f, 0.0f, 1.0f);
+                ImGui::DragFloat3("Color", glm::value_ptr(text_node->color), 1.0f, 0.0f, 1.0f);
+                ImGui::InputTextMultiline("Text", buffer, sizeof(buffer));
                 ImGui::PopID();
                 ImGui::Spacing();
+
+                text_node->text = buffer;
 
                 index++;
             }
@@ -215,7 +246,7 @@ namespace sm::internal {
     }
 
     void DebugUi::shadows_lines(
-        Scene& scene,
+        const Scene& scene,
         float left,
         float right,
         float bottom,
@@ -229,73 +260,73 @@ namespace sm::internal {
         const glm::vec3 third {glm::cross(orientation, glm::vec3(0.0f, 1.0f, 0.0f))};
         const glm::vec3 third2 {-glm::cross(orientation, glm::cross(orientation, glm::vec3(0.0f, 1.0f, 0.0f)))};
 
-        scene.debug_add_line(
+        scene.root_3d_node->debug_add_line(
             position + glm::normalize(orientation) * near + glm::normalize(third) * left + glm::normalize(third2) * bottom,
             position + glm::normalize(orientation) * near + glm::normalize(third) * left + glm::normalize(third2) * top,
             color
         );
 
-        scene.debug_add_line(
+        scene.root_3d_node->debug_add_line(
             position + glm::normalize(orientation) * near + glm::normalize(third) * right + glm::normalize(third2) * bottom,
             position + glm::normalize(orientation) * near + glm::normalize(third) * right + glm::normalize(third2) * top,
             color
         );
 
-        scene.debug_add_line(
+        scene.root_3d_node->debug_add_line(
             position + glm::normalize(orientation) * near + glm::normalize(third2) * bottom + glm::normalize(third) * left,
             position + glm::normalize(orientation) * near + glm::normalize(third2) * bottom + glm::normalize(third) * right,
             color
         );
 
-        scene.debug_add_line(
+        scene.root_3d_node->debug_add_line(
             position + glm::normalize(orientation) * near + glm::normalize(third2) * top + glm::normalize(third) * left,
             position + glm::normalize(orientation) * near + glm::normalize(third2) * top + glm::normalize(third) * right,
             color
         );
 
-        scene.debug_add_line(
+        scene.root_3d_node->debug_add_line(
             position + glm::normalize(orientation) * far + glm::normalize(third) * left + glm::normalize(third2) * bottom,
             position + glm::normalize(orientation) * far + glm::normalize(third) * left + glm::normalize(third2) * top,
             color
         );
 
-        scene.debug_add_line(
+        scene.root_3d_node->debug_add_line(
             position + glm::normalize(orientation) * far + glm::normalize(third) * right + glm::normalize(third2) * bottom,
             position + glm::normalize(orientation) * far + glm::normalize(third) * right + glm::normalize(third2) * top,
             color
         );
 
-        scene.debug_add_line(
+        scene.root_3d_node->debug_add_line(
             position + glm::normalize(orientation) * far + glm::normalize(third2) * bottom + glm::normalize(third) * left,
             position + glm::normalize(orientation) * far + glm::normalize(third2) * bottom + glm::normalize(third) * right,
             color
         );
 
-        scene.debug_add_line(
+        scene.root_3d_node->debug_add_line(
             position + glm::normalize(orientation) * far + glm::normalize(third2) * top + glm::normalize(third) * left,
             position + glm::normalize(orientation) * far + glm::normalize(third2) * top + glm::normalize(third) * right,
             color
         );
 
-        scene.debug_add_line(
+        scene.root_3d_node->debug_add_line(
             position + glm::normalize(orientation) * near + glm::normalize(third) * left + glm::normalize(third2) * bottom,
             position + glm::normalize(orientation) * far + glm::normalize(third) * left + glm::normalize(third2) * bottom,
             color
         );
 
-        scene.debug_add_line(
+        scene.root_3d_node->debug_add_line(
             position + glm::normalize(orientation) * near + glm::normalize(third) * right + glm::normalize(third2) * bottom,
             position + glm::normalize(orientation) * far + glm::normalize(third) * right + glm::normalize(third2) * bottom,
             color
         );
 
-        scene.debug_add_line(
+        scene.root_3d_node->debug_add_line(
             position + glm::normalize(orientation) * near + glm::normalize(third) * left + glm::normalize(third2) * top,
             position + glm::normalize(orientation) * far + glm::normalize(third) * left + glm::normalize(third2) * top,
             color
         );
 
-        scene.debug_add_line(
+        scene.root_3d_node->debug_add_line(
             position + glm::normalize(orientation) * near + glm::normalize(third) * right + glm::normalize(third2) * top,
             position + glm::normalize(orientation) * far + glm::normalize(third) * right + glm::normalize(third2) * top,
             color

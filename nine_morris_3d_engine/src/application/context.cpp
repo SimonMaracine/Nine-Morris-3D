@@ -177,65 +177,65 @@ namespace sm {
         return internal::get_mouse_position();
     }
 
-    void Ctx::capture(const Camera& camera, glm::vec3 position) {
-        m_scn.capture(camera, position);
-    }
+    // void Ctx::capture(const Camera& camera, glm::vec3 position) {
+    //     m_scn.capture(camera, position);
+    // }
 
-    void Ctx::capture(const Camera2D& camera_2d) {
-        m_scn.capture(camera_2d);
-    }
+    // void Ctx::capture(const Camera2D& camera_2d) {
+    //     m_scn.capture(camera_2d);
+    // }
 
-    void Ctx::environment(const Skybox& skybox) {
-        m_scn.environment(skybox);
-    }
+    // void Ctx::environment(const Skybox& skybox) {
+    //     m_scn.environment(skybox);
+    // }
 
-    void Ctx::shadow(ShadowBox& box) {
-        m_scn.shadow(box);
-    }
+    // void Ctx::shadow(ShadowBox& box) {
+    //     m_scn.shadow(box);
+    // }
 
-    void Ctx::add_post_processing(std::shared_ptr<PostProcessingStep> step) {
-        m_scn.add_post_processing(step);
-    }
+    // void Ctx::add_post_processing(std::shared_ptr<PostProcessingStep> step) {
+    //     m_scn.add_post_processing(step);
+    // }
 
-    void Ctx::add_renderable(Renderable& renderable) {
-        m_scn.add_renderable(renderable);
-    }
+    // void Ctx::add_renderable(Renderable& renderable) {
+    //     m_scn.add_renderable(renderable);
+    // }
 
-    void Ctx::add_light(DirectionalLight& light) {
-        m_scn.add_light(light);
-    }
+    // void Ctx::add_light(DirectionalLight& light) {
+    //     m_scn.add_light(light);
+    // }
 
-    void Ctx::add_light(PointLight& light) {
-        m_scn.add_light(light);
-    }
+    // void Ctx::add_light(PointLight& light) {
+    //     m_scn.add_light(light);
+    // }
 
-    void Ctx::add_text(Text& text) {
-        m_scn.add_text(text);
-    }
+    // void Ctx::add_text(Text& text) {
+    //     m_scn.add_text(text);
+    // }
 
-    void Ctx::add_quad(Quad& quad) {
-        m_scn.add_quad(quad);
-    }
+    // void Ctx::add_quad(Quad& quad) {
+    //     m_scn.add_quad(quad);
+    // }
 
-    void Ctx::debug_add_line(glm::vec3 position1, glm::vec3 position2, glm::vec3 color) {
-        m_scn.debug_add_line(position1, position2, color);
-    }
+    // void Ctx::debug_add_line(glm::vec3 position1, glm::vec3 position2, glm::vec3 color) {
+    //     m_scn.debug_add_line(position1, position2, color);
+    // }
 
-    void Ctx::debug_add_lines(const std::vector<glm::vec3>& positions, glm::vec3 color) {
-        m_scn.debug_add_lines(positions, color);
-    }
+    // void Ctx::debug_add_lines(const std::vector<glm::vec3>& positions, glm::vec3 color) {
+    //     m_scn.debug_add_lines(positions, color);
+    // }
 
-    void Ctx::debug_add_lines(std::initializer_list<glm::vec3> positions, glm::vec3 color) {
-        m_scn.debug_add_lines(positions, color);
-    }
+    // void Ctx::debug_add_lines(std::initializer_list<glm::vec3> positions, glm::vec3 color) {
+    //     m_scn.debug_add_lines(positions, color);
+    // }
 
-    void Ctx::debug_add_point(glm::vec3 position, glm::vec3 color) {
-        m_scn.debug_add_point(position, color);
-    }
+    // void Ctx::debug_add_point(glm::vec3 position, glm::vec3 color) {
+    //     m_scn.debug_add_point(position, color);
+    // }
 
-    void Ctx::debug_add_lamp(glm::vec3 position, glm::vec3 color) {
-        m_scn.debug_add_lamp(position, color);
-    }
+    // void Ctx::debug_add_lamp(glm::vec3 position, glm::vec3 color) {
+    //     m_scn.debug_add_lamp(position, color);
+    // }
 
     void Ctx::invalidate_dear_imgui_texture() {
         internal::imgui_context::invalidate_texture();

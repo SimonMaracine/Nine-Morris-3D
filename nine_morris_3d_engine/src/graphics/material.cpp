@@ -6,9 +6,9 @@
 #include "nine_morris_3d_engine/graphics/internal/opengl.hpp"
 
 namespace sm {
-    Material::Material(std::shared_ptr<GlShader> shader, unsigned int flags)
-        : m_shader(shader), m_flags(flags) {
-        LOG_DEBUG("Created material from shader {} with flags {}", shader->get_id(), flags);
+    Material::Material(std::shared_ptr<GlShader> shader)
+        : m_shader(shader) {
+        LOG_DEBUG("Created material from shader {}", shader->get_id());
     }
 
     void Material::add_uniform(Uniform type, Id name) {
@@ -40,7 +40,6 @@ namespace sm {
 
     MaterialInstance::MaterialInstance(std::shared_ptr<Material> material) {
         m_shader = material->m_shader;
-        flags = material->m_flags;
 
         std::size_t offset {};
 

@@ -4,6 +4,7 @@
 #include <array>
 #include <unordered_map>
 #include <memory>
+#include <functional>
 #include <cstddef>
 
 #include <glm/glm.hpp>
@@ -12,9 +13,9 @@
 #include "nine_morris_3d_engine/application/platform.hpp"
 #include "nine_morris_3d_engine/graphics/internal/shader_library.hpp"
 #include "nine_morris_3d_engine/graphics/internal/post_processing_context.hpp"
-#include "nine_morris_3d_engine/graphics/internal/scene.hpp"
 #include "nine_morris_3d_engine/graphics/opengl/shader.hpp"
 #include "nine_morris_3d_engine/graphics/opengl/framebuffer.hpp"
+#include "nine_morris_3d_engine/graphics/scene.hpp"
 #include "nine_morris_3d_engine/graphics/font.hpp"
 
 namespace sm {
@@ -85,15 +86,36 @@ namespace sm::internal {
         void setup_shader_uniform_buffers(std::shared_ptr<GlShader> shader);
         void clear_expired_resources();
 
+        struct Context3D {
+            Transform3D transform;
+            glm::vec3 outline_color {1.0f};
+            float outline_thickness {1.1f};
+            bool outline {};
+            bool disable_back_face_culling {};
+            bool cast_shadow {};
+        };
+
+        struct Context2D {
+            Transform2D transform;
+
+        };
+
+        void traverse_graph_3d(const Scene& scene, const std::function<void(const SceneNode3D*, Context3D&)>& process);
+        void traverse_graph_2d(const Scene& scene, const std::function<void(const SceneNode3D*, Context2D&)>& process);
+
         // Draw functions
-        void draw_renderables(const Scene& scene);
-        void draw_renderable(const Renderable& renderable);
+        void draw_models(const Scene& scene);
+        void draw_model(const ModelNode* model_node, const Context3D& context);
 
-        void draw_renderables_outlined(const Scene& scene);
-        void draw_renderable_outlined(const Renderable& renderable);
+        void draw_models_outlined(const Scene& scene);
+        void draw_model_outlined(const ModelNode* model_node, const Context3D& context);
 
-        void draw_renderables_to_shadow_map(const Scene& scene);
+        void draw_models_to_shadow_map(const Scene& scene);
         void draw_skybox(const Scene& scene);
+
+        struct Text {
+            std::string text;
+        };
 
         struct TextBatch {
             std::shared_ptr<Font> font;
@@ -103,11 +125,18 @@ namespace sm::internal {
         void draw_texts(const Scene& scene);
         void draw_text_batch(const Scene& scene, const TextBatch& batch);
 
-        void draw_quads(const Scene& scene);
-        void draw_quad(glm::vec2 position, glm::vec2 size, glm::vec2 scale, unsigned int texture);
-        void begin_quads_batch();
-        void end_quads_batch();
-        void flush_quads_batch();
+        struct Image {
+            glm::vec2 position {};
+            glm::vec2 size {};
+            glm::vec2 scale {};
+            unsigned int texture {};
+        };
+
+        void draw_images(const Scene& scene);
+        void draw_image(const Image& image);
+        void begin_images_batch();
+        void end_images_batch();
+        void flush_images_batch();
 
         // Helper functions
         void setup_point_light_uniform_buffer(const Scene& scene, std::shared_ptr<GlUniformBuffer> uniform_buffer);
@@ -116,7 +145,7 @@ namespace sm::internal {
         void setup_shadow_framebuffer(int size);
         void setup_default_font(const FileSystem& fs, int scale);
         std::shared_ptr<GlIndexBuffer> initialize_quads_index_buffer();
-        static glm::mat4 get_renderable_transform(const Renderable::Transform& transform);
+        static glm::mat4 get_transform(const Transform3D& transform);
 
         struct QuadVertex {
             glm::vec2 position {};

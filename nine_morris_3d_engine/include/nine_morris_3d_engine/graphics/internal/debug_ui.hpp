@@ -5,7 +5,7 @@
 #include <glm/glm.hpp>
 
 #include "nine_morris_3d_engine/application/platform.hpp"
-#include "nine_morris_3d_engine/graphics/internal/scene.hpp"
+#include "nine_morris_3d_engine/graphics/scene.hpp"
 
 namespace sm {
     class Ctx;
@@ -15,19 +15,19 @@ namespace sm::internal {
 #ifndef SM_BUILD_DISTRIBUTION
     class DebugUi {
     public:
-        void render(Scene& scene, Ctx& ctx);
-        void render_lines(Scene& scene);
+        void render(const Scene& scene, Ctx& ctx);
+        void render_lines(const Scene& scene);
     private:
-        void renderables(Scene& scene);
-        void lights(Scene& scene);
-        void shadows(Scene& scene);
-        void texts(Scene& scene);
-        void quads(Scene& scene);
+        void models(const Scene& scene);
+        void lights(const Scene& scene);
+        void shadows(const Scene& scene);
+        void images(const Scene& scene);
+        void texts(const Scene& scene);
         void tasks(Ctx& ctx);
         void frame_time(Ctx& ctx);
 
         void shadows_lines(
-            Scene& scene,
+            const Scene& scene,
             float left,
             float right,
             float bottom,
@@ -39,13 +39,18 @@ namespace sm::internal {
         );
 
         bool m_vsync {true};
-        bool m_renderables {false};
+        bool m_models {false};
         bool m_lights {false};
         bool m_shadows {false};
+        bool m_images {false};
         bool m_texts {false};
-        bool m_quads {false};
         bool m_tasks {false};
         bool m_frame_time {false};
+
+        std::vector<ModelNode*> m_model_nodes;
+        std::vector<PointLightNode*> m_point_light_nodes;
+        std::vector<ImageNode*> m_image_nodes;
+        std::vector<TextNode*> m_text_nodes;
 
         static constexpr std::size_t FRAMES_SIZE {100};
         std::vector<float> m_frames {FRAMES_SIZE};

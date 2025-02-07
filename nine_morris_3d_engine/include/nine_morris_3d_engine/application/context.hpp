@@ -21,12 +21,12 @@
 #include "nine_morris_3d_engine/audio/sound_data.hpp"
 #include "nine_morris_3d_engine/graphics/internal/shader_library.hpp"
 #include "nine_morris_3d_engine/graphics/internal/renderer.hpp"
-#include "nine_morris_3d_engine/graphics/internal/scene.hpp"
 #include "nine_morris_3d_engine/graphics/internal/debug_ui.hpp"
 #include "nine_morris_3d_engine/graphics/opengl/vertex_array.hpp"
 #include "nine_morris_3d_engine/graphics/opengl/texture.hpp"
 #include "nine_morris_3d_engine/graphics/opengl/shader.hpp"
 #include "nine_morris_3d_engine/graphics/opengl/framebuffer.hpp"
+#include "nine_morris_3d_engine/graphics/scene.hpp"
 #include "nine_morris_3d_engine/graphics/mesh.hpp"
 #include "nine_morris_3d_engine/graphics/material.hpp"
 #include "nine_morris_3d_engine/graphics/font.hpp"
@@ -133,21 +133,24 @@ namespace sm {
         static std::pair<float, float> get_mouse_position();
 
         // Scene
-        void capture(const Camera& camera, glm::vec3 position);
-        void capture(const Camera2D& camera_2d);
-        void environment(const Skybox& skybox);
-        void shadow(ShadowBox& box);
-        void add_post_processing(std::shared_ptr<PostProcessingStep> step);
-        void add_renderable(Renderable& renderable);
-        void add_light(DirectionalLight& light);
-        void add_light(PointLight& light);
-        void add_text(Text& text);
-        void add_quad(Quad& quad);
-        void debug_add_line(glm::vec3 position1, glm::vec3 position2, glm::vec3 color);
-        void debug_add_lines(const std::vector<glm::vec3>& positions, glm::vec3 color);
-        void debug_add_lines(std::initializer_list<glm::vec3> positions, glm::vec3 color);
-        void debug_add_point(glm::vec3 position, glm::vec3 color);
-        void debug_add_lamp(glm::vec3 position, glm::vec3 color);
+        std::shared_ptr<Root3DNode> root_3d() const { return m_scn.root_3d_node; }
+        std::shared_ptr<Root2DNode> root_2d() const { return m_scn.root_2d_node; }
+
+        // void capture(const Camera& camera, glm::vec3 position);
+        // void capture(const Camera2D& camera_2d);
+        // void environment(const Skybox& skybox);
+        // void shadow(ShadowBox& box);
+        // void add_post_processing(std::shared_ptr<PostProcessingStep> step);
+        // void add_renderable(Renderable& renderable);
+        // void add_light(DirectionalLight& light);
+        // void add_light(PointLight& light);
+        // void add_text(Text& text);
+        // void add_quad(Quad& quad);
+        // void debug_add_line(glm::vec3 position1, glm::vec3 position2, glm::vec3 color);
+        // void debug_add_lines(const std::vector<glm::vec3>& positions, glm::vec3 color);
+        // void debug_add_lines(std::initializer_list<glm::vec3> positions, glm::vec3 color);
+        // void debug_add_point(glm::vec3 position, glm::vec3 color);
+        // void debug_add_lamp(glm::vec3 position, glm::vec3 color);
 
         // Dear ImGui
         static void invalidate_dear_imgui_texture();
@@ -221,11 +224,11 @@ namespace sm {
         internal::Window m_win;
         internal::Renderer m_rnd;
         internal::TaskManager m_tsk;
-        internal::Scene m_scn;
         internal::ResourcesCache m_res;
 #ifndef SM_BUILD_DISTRIBUTION
         internal::DebugUi m_dbg;
 #endif
+        Scene m_scn;
 
         float m_delta {};
         float m_fps {};
