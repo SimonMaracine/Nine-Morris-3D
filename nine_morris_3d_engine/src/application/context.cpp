@@ -27,6 +27,14 @@ namespace sm {
         if (!m_fs.get_error_string().empty()) {
             LOG_DIST_ERROR("{}", m_fs.get_error_string());
         }
+
+        m_scn.root_node_3d = std::make_shared<RootNode3D>();
+        m_scn.root_node_2d = std::make_shared<RootNode2D>();
+
+        m_default_camera_controller = std::make_shared<internal::DefaultCameraController>();
+
+        m_information_text = std::make_shared<TextNode>(m_rnd.get_default_font());
+        m_information_text->color = glm::vec3(0.9f);
     }
 
     bool Ctx::file_exists(const std::filesystem::path& path) {
@@ -177,66 +185,6 @@ namespace sm {
         return internal::get_mouse_position();
     }
 
-    // void Ctx::capture(const Camera& camera, glm::vec3 position) {
-    //     m_scn.capture(camera, position);
-    // }
-
-    // void Ctx::capture(const Camera2D& camera_2d) {
-    //     m_scn.capture(camera_2d);
-    // }
-
-    // void Ctx::environment(const Skybox& skybox) {
-    //     m_scn.environment(skybox);
-    // }
-
-    // void Ctx::shadow(ShadowBox& box) {
-    //     m_scn.shadow(box);
-    // }
-
-    // void Ctx::add_post_processing(std::shared_ptr<PostProcessingStep> step) {
-    //     m_scn.add_post_processing(step);
-    // }
-
-    // void Ctx::add_renderable(Renderable& renderable) {
-    //     m_scn.add_renderable(renderable);
-    // }
-
-    // void Ctx::add_light(DirectionalLight& light) {
-    //     m_scn.add_light(light);
-    // }
-
-    // void Ctx::add_light(PointLight& light) {
-    //     m_scn.add_light(light);
-    // }
-
-    // void Ctx::add_text(Text& text) {
-    //     m_scn.add_text(text);
-    // }
-
-    // void Ctx::add_quad(Quad& quad) {
-    //     m_scn.add_quad(quad);
-    // }
-
-    // void Ctx::debug_add_line(glm::vec3 position1, glm::vec3 position2, glm::vec3 color) {
-    //     m_scn.debug_add_line(position1, position2, color);
-    // }
-
-    // void Ctx::debug_add_lines(const std::vector<glm::vec3>& positions, glm::vec3 color) {
-    //     m_scn.debug_add_lines(positions, color);
-    // }
-
-    // void Ctx::debug_add_lines(std::initializer_list<glm::vec3> positions, glm::vec3 color) {
-    //     m_scn.debug_add_lines(positions, color);
-    // }
-
-    // void Ctx::debug_add_point(glm::vec3 position, glm::vec3 color) {
-    //     m_scn.debug_add_point(position, color);
-    // }
-
-    // void Ctx::debug_add_lamp(glm::vec3 position, glm::vec3 color) {
-    //     m_scn.debug_add_lamp(position, color);
-    // }
-
     void Ctx::invalidate_dear_imgui_texture() {
         internal::imgui_context::invalidate_texture();
     }
@@ -258,13 +206,14 @@ namespace sm {
         information_text += " dev";
 #endif
 
-        Text text;
-        text.font = m_rnd.get_default_font();
-        text.text = std::move(information_text);
-        text.color = glm::vec3(1.0f);
+        m_information_text->text = std::move(information_text);
 
-        // Don't add it to the debug lists
-        m_scn.add_text(const_cast<const Text&>(text));
+        // The font could be empty, because renderer initializaton might have been deferred
+        if (m_information_text->get_font() == nullptr) {
+            m_information_text->set_font(m_rnd.get_default_font());
+        }
+
+        m_scn.root_node_2d->add_node(m_information_text);
     }
 
     float Ctx::get_delta() const {
@@ -390,7 +339,7 @@ namespace sm {
         return m_res.texture_cubemap->force_load(id, texture_data, format);
     }
 
-    std::shared_ptr<Material> Ctx::load_material(MaterialType type, unsigned int flags) {
+    std::shared_ptr<Material> Ctx::load_material(MaterialType type) {
         using namespace resmanager::literals;
 
         switch (type) {
@@ -403,7 +352,7 @@ namespace sm {
                     m_fs.path_engine_assets("shaders/flat.frag")
                 )};
 
-                const auto [material, present] {m_res.material->load_check(id, shader, flags)};
+                const auto [material, present] {m_res.material->load_check(id, shader)};
 
                 if (present) {
                     return material;
@@ -422,7 +371,7 @@ namespace sm {
                     m_fs.path_engine_assets("shaders/phong.frag")
                 )};
 
-                const auto [material, present] {m_res.material->load_check(id, shader, flags)};
+                const auto [material, present] {m_res.material->load_check(id, shader)};
 
                 if (present) {
                     return material;
@@ -443,7 +392,7 @@ namespace sm {
                     m_fs.path_engine_assets("shaders/phong_shadow.frag")
                 )};
 
-                const auto [material, present] {m_res.material->load_check(id, shader, flags)};
+                const auto [material, present] {m_res.material->load_check(id, shader)};
 
                 if (present) {
                     return material;
@@ -464,7 +413,7 @@ namespace sm {
                     m_fs.path_engine_assets("shaders/phong_diffuse.frag")
                 )};
 
-                const auto [material, present] {m_res.material->load_check(id, shader, flags)};
+                const auto [material, present] {m_res.material->load_check(id, shader)};
 
                 if (present) {
                     return material;
@@ -485,7 +434,7 @@ namespace sm {
                     m_fs.path_engine_assets("shaders/phong_diffuse_shadow.frag")
                 )};
 
-                const auto [material, present] {m_res.material->load_check(id, shader, flags)};
+                const auto [material, present] {m_res.material->load_check(id, shader)};
 
                 if (present) {
                     return material;
@@ -506,7 +455,7 @@ namespace sm {
                     m_fs.path_engine_assets("shaders/phong_diffuse_normal_shadow.frag")
                 )};
 
-                const auto [material, present] {m_res.material->load_check(id, shader, flags)};
+                const auto [material, present] {m_res.material->load_check(id, shader)};
 
                 if (present) {
                     return material;
@@ -524,12 +473,12 @@ namespace sm {
         return {};
     }
 
-    std::shared_ptr<Material> Ctx::load_material(Id id, const std::filesystem::path& vertex_file_path, const std::filesystem::path& fragment_file_path, MaterialType type, unsigned int flags) {
+    std::shared_ptr<Material> Ctx::load_material(Id id, const std::filesystem::path& vertex_file_path, const std::filesystem::path& fragment_file_path, MaterialType type) {
         using namespace resmanager::literals;
 
         const auto shader {load_shader(id, vertex_file_path, fragment_file_path)};
 
-        const auto [material, present] {m_res.material->load_check(id, shader, flags)};
+        const auto [material, present] {m_res.material->load_check(id, shader)};
 
         if (present) {
             return material;

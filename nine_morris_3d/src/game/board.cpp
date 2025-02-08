@@ -82,8 +82,8 @@ void BoardObj::update_hover_id(glm::vec3 ray, glm::vec3 camera, std::function<st
     auto hoverables {get_hoverables()};
 
     std::sort(hoverables.begin(), hoverables.end(), [camera](const auto& lhs, const auto& rhs) {
-        const auto left {glm::distance(lhs.get_renderable().transform.position, camera)};
-        const auto right {glm::distance(rhs.get_renderable().transform.position, camera)};
+        const auto left {glm::distance(lhs.get_model()->transform.position, camera)};
+        const auto right {glm::distance(rhs.get_model()->transform.position, camera)};
 
         return left > right;
     });
@@ -91,12 +91,12 @@ void BoardObj::update_hover_id(glm::vec3 ray, glm::vec3 camera, std::function<st
     bool hover {false};
 
     for (const HoverableObj& hoverable : hoverables) {
-        const auto& transform {hoverable.get_renderable().transform};
+        const auto& transform {hoverable.get_model()->transform};
         const glm::mat4 to_world_space {transformation_matrix(transform.position, transform.rotation, transform.scale)};
 
         sm::utils::AABB aabb;
-        aabb.min = to_world_space * glm::vec4(hoverable.get_renderable().get_aabb().min, 1.0f);
-        aabb.max = to_world_space * glm::vec4(hoverable.get_renderable().get_aabb().max, 1.0f);
+        aabb.min = to_world_space * glm::vec4(hoverable.get_model()->get_aabb().min, 1.0f);
+        aabb.max = to_world_space * glm::vec4(hoverable.get_model()->get_aabb().max, 1.0f);
 
         if (ray_aabb_collision(ray, camera, aabb)) {
             m_hover_id = hoverable.get_id();

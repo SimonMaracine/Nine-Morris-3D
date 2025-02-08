@@ -11,15 +11,15 @@
 #include "global.hpp"
 
 void NineMensMorrisBaseScene::scene_setup() {
-    m_board = setup_renderables();
+    m_board = setup_models();
     m_game_options.time_enum = NineMensMorrisTime10min;
 }
 
 void NineMensMorrisBaseScene::scene_update() {
     m_board.update(
         ctx,
-        cast_mouse_ray(ctx, m_camera),
-        m_camera_controller.get_position(),
+        cast_mouse_ray(ctx, ctx.root_3d()->get_camera()),
+        ctx.root_3d()->get_camera_position(),
         m_game_state == GameState::HumanThinking && m_board.get_game_over() == GameOver::None
     );
 }
@@ -274,25 +274,25 @@ void NineMensMorrisBaseScene::reload_scene_texture_data() const {
 void NineMensMorrisBaseScene::reload_and_set_scene_textures() {
     const auto board_normal {load_board_normal_texture(true)};
 
-    m_board.get_board_renderable().get_material()->set_texture(
+    m_board.get_board_model()->get_material()->set_texture(
         "u_material.ambient_diffuse"_H,
         load_board_diffuse_texture(true),
         0
     );
 
-    m_board.get_board_renderable().get_material()->set_texture(
+    m_board.get_board_model()->get_material()->set_texture(
         "u_material.normal"_H,
         board_normal,
         1
     );
 
-    m_board.get_paint_renderable().get_material()->set_texture(
+    m_board.get_paint_model()->get_material()->set_texture(
         "u_material.ambient_diffuse"_H,
         load_paint_diffuse_texture(true),
         0
     );
 
-    m_board.get_paint_renderable().get_material()->set_texture(
+    m_board.get_paint_model()->get_material()->set_texture(
         "u_material.normal"_H,
         board_normal,
         1
@@ -303,13 +303,13 @@ void NineMensMorrisBaseScene::reload_and_set_scene_textures() {
     const auto piece_normal {load_piece_normal_texture(true)};
 
     for (PieceObj& piece : m_board.get_pieces()) {
-        piece.get_renderable().get_material()->set_texture(
+        piece.get_model()->get_material()->set_texture(
             "u_material.ambient_diffuse"_H,
             piece.get_type() == PieceType::White ? piece_white_diffuse : piece_black_diffuse,
             0
         );
 
-        piece.get_renderable().get_material()->set_texture(
+        piece.get_model()->get_material()->set_texture(
             "u_material.normal"_H,
             piece_normal,
             1
@@ -360,7 +360,7 @@ void NineMensMorrisBaseScene::start_engine() {
     }
 }
 
-sm::Renderable NineMensMorrisBaseScene::setup_board() const {
+std::shared_ptr<sm::ModelNode> NineMensMorrisBaseScene::setup_board() const {
     const auto mesh {ctx.get_mesh("board.obj"_H)};
 
     const auto vertex_array {ctx.load_vertex_array("board"_H, mesh)};
@@ -368,7 +368,7 @@ sm::Renderable NineMensMorrisBaseScene::setup_board() const {
     const auto diffuse {load_board_diffuse_texture()};
     const auto normal {load_board_normal_texture()};
 
-    const auto material {ctx.load_material(sm::MaterialType::PhongDiffuseNormalShadow, sm::Material::CastShadow)};
+    const auto material {ctx.load_material(sm::MaterialType::PhongDiffuseNormalShadow)};
 
     const auto material_instance {ctx.load_material_instance("board"_H, material)};
     material_instance->set_texture("u_material.ambient_diffuse"_H, diffuse, 0);
@@ -376,10 +376,14 @@ sm::Renderable NineMensMorrisBaseScene::setup_board() const {
     material_instance->set_float("u_material.shininess"_H, 8.0f);
     material_instance->set_texture("u_material.normal"_H, normal, 1);
 
-    return sm::Renderable(mesh, vertex_array, material_instance);
+    const auto model {std::make_shared<sm::ModelNode>(mesh, vertex_array, material_instance)};
+    model->set_id("board"_H);
+    model->cast_shadow = sm::NodeFlag::Enabled;
+
+    return model;
 }
 
-sm::Renderable NineMensMorrisBaseScene::setup_paint() const {
+std::shared_ptr<sm::ModelNode> NineMensMorrisBaseScene::setup_paint() const {
     const auto mesh {ctx.get_mesh("paint.obj"_H)};
 
     const auto vertex_array {ctx.load_vertex_array("paint"_H, mesh)};
@@ -400,17 +404,20 @@ sm::Renderable NineMensMorrisBaseScene::setup_paint() const {
     material_instance->set_float("u_material.shininess"_H, 8.0f);
     material_instance->set_texture("u_material.normal"_H, normal, 1);
 
-    return sm::Renderable(mesh, vertex_array, material_instance);
+    const auto model {std::make_shared<sm::ModelNode>(mesh, vertex_array, material_instance)};
+    model->cast_shadow = sm::NodeFlag::Disabled;
+
+    return model;
 }
 
-NineMensMorrisBoard::NodeRenderables NineMensMorrisBaseScene::setup_nodes() const {
+NineMensMorrisBoard::NodeModels NineMensMorrisBaseScene::setup_nodes() const {
     const auto mesh {ctx.get_mesh("node.obj"_H)};
 
     const auto vertex_array {ctx.load_vertex_array("node"_H, mesh)};
 
     const auto material {ctx.load_material(sm::MaterialType::Phong)};
 
-    NineMensMorrisBoard::NodeRenderables renderables;
+    NineMensMorrisBoard::NodeModels models;
 
     for (int i {0}; i < NineMensMorrisBoard::NODES; i++) {
         const auto material_instance {ctx.load_material_instance(sm::Id("node" + std::to_string(i)), material)};
@@ -418,13 +425,16 @@ NineMensMorrisBoard::NodeRenderables NineMensMorrisBaseScene::setup_nodes() cons
         material_instance->set_vec3("u_material.specular"_H, glm::vec3(0.05f));
         material_instance->set_float("u_material.shininess"_H, 8.0f);
 
-        renderables.emplace_back(mesh, vertex_array, material_instance);
+        const auto model {std::make_shared<sm::ModelNode>(mesh, vertex_array, material_instance)};
+        model->cast_shadow = sm::NodeFlag::Disabled;
+
+        models.push_back(model);
     }
 
-    return renderables;
+    return models;
 }
 
-NineMensMorrisBoard::PieceRenderables NineMensMorrisBaseScene::setup_white_pieces() const {
+NineMensMorrisBoard::PieceModels NineMensMorrisBaseScene::setup_white_pieces() const {
     const auto mesh {ctx.get_mesh("piece_white.obj"_H)};
 
     const auto vertex_array {ctx.load_vertex_array("piece_white"_H, mesh)};
@@ -432,9 +442,9 @@ NineMensMorrisBoard::PieceRenderables NineMensMorrisBaseScene::setup_white_piece
     const auto diffuse {load_piece_white_diffuse_texture()};
     const auto normal {load_piece_normal_texture()};
 
-    const auto material {ctx.load_material(sm::MaterialType::PhongDiffuseNormalShadow, sm::Material::CastShadow)};
+    const auto material {ctx.load_material(sm::MaterialType::PhongDiffuseNormalShadow)};
 
-    NineMensMorrisBoard::PieceRenderables renderables;
+    NineMensMorrisBoard::PieceModels models;
 
     for (int i {0}; i < pieces_count() / 2; i++) {
         const auto material_instance {ctx.load_material_instance(sm::Id("piece_white" + std::to_string(i)), material)};
@@ -443,13 +453,13 @@ NineMensMorrisBoard::PieceRenderables NineMensMorrisBaseScene::setup_white_piece
         material_instance->set_float("u_material.shininess"_H, 8.0f);
         material_instance->set_texture("u_material.normal"_H, normal, 1);
 
-        renderables.emplace_back(mesh, vertex_array, material_instance);
+        models.push_back(std::make_shared<sm::ModelNode>(mesh, vertex_array, material_instance));
     }
 
-    return renderables;
+    return models;
 }
 
-NineMensMorrisBoard::PieceRenderables NineMensMorrisBaseScene::setup_black_pieces() const {
+NineMensMorrisBoard::PieceModels NineMensMorrisBaseScene::setup_black_pieces() const {
     const auto mesh {ctx.get_mesh("piece_black.obj"_H)};
 
     const auto vertex_array {ctx.load_vertex_array("piece_black"_H, mesh)};
@@ -457,9 +467,9 @@ NineMensMorrisBoard::PieceRenderables NineMensMorrisBaseScene::setup_black_piece
     const auto diffuse {load_piece_black_diffuse_texture()};
     const auto normal {load_piece_normal_texture()};
 
-    const auto material {ctx.load_material(sm::MaterialType::PhongDiffuseNormalShadow, sm::Material::CastShadow)};
+    const auto material {ctx.load_material(sm::MaterialType::PhongDiffuseNormalShadow)};
 
-    NineMensMorrisBoard::PieceRenderables renderables;
+    NineMensMorrisBoard::PieceModels models;
 
     for (int i {0}; i < pieces_count() / 2; i++) {
         const auto material_instance {ctx.load_material_instance(sm::Id("piece_black" + std::to_string(i)), material)};
@@ -468,10 +478,10 @@ NineMensMorrisBoard::PieceRenderables NineMensMorrisBaseScene::setup_black_piece
         material_instance->set_float("u_material.shininess"_H, 8.0f);
         material_instance->set_texture("u_material.normal"_H, normal, 1);
 
-        renderables.emplace_back(mesh, vertex_array, material_instance);
+        models.push_back(std::make_shared<sm::ModelNode>(mesh, vertex_array, material_instance));
     }
 
-    return renderables;
+    return models;
 }
 
 std::shared_ptr<sm::GlTexture> NineMensMorrisBaseScene::load_board_diffuse_texture(bool reload) const {
@@ -566,7 +576,7 @@ std::shared_ptr<sm::GlTexture> NineMensMorrisBaseScene::load_piece_normal_textur
     }
 }
 
-NineMensMorrisBoard NineMensMorrisBaseScene::setup_renderables() {
+NineMensMorrisBoard NineMensMorrisBaseScene::setup_models() {
     return NineMensMorrisBoard(
         setup_board(),
         setup_paint(),

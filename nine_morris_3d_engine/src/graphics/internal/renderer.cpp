@@ -27,64 +27,6 @@
 using namespace resmanager::literals;
 
 namespace sm::internal {
-#ifndef SM_BUILD_DISTRIBUTION
-    DebugRenderer::DebugRenderer(const FileSystem& fs, Renderer& renderer) {
-        m_storage.shader = std::make_shared<GlShader>(
-            utils::read_file(fs.path_engine_assets("shaders/internal/debug.vert")),
-            utils::read_file(fs.path_engine_assets("shaders/internal/debug.frag"))
-        );
-
-        renderer.register_shader(m_storage.shader);
-
-        const auto vertex_buffer {std::make_shared<GlVertexBuffer>(DrawHint::Stream)};
-        m_storage.wvertex_buffer = vertex_buffer;
-
-        m_storage.vertex_array = std::make_unique<GlVertexArray>();
-        m_storage.vertex_array->configure([&](GlVertexArray* va) {
-            VertexBufferLayout layout;
-            layout.add(0, VertexBufferLayout::Float, 3);
-            layout.add(1, VertexBufferLayout::Float, 3);
-
-            va->add_vertex_buffer(vertex_buffer, layout);
-        });
-    }
-
-    void DebugRenderer::render(const Scene& scene) {
-        for (const DebugLine& line : scene.root_3d_node->m_debug_lines) {
-            BufferVertex v1;
-            v1.position = line.position1;
-            v1.color = line.color;
-
-            m_storage.lines_buffer.push_back(v1);
-
-            BufferVertex v2;
-            v2.position = line.position2;
-            v2.color = line.color;
-
-            m_storage.lines_buffer.push_back(v2);
-        }
-
-        if (m_storage.lines_buffer.empty()) {
-            return;
-        }
-
-        const auto vertex_buffer {m_storage.wvertex_buffer.lock()};
-
-        vertex_buffer->bind();
-        vertex_buffer->upload_data(m_storage.lines_buffer.data(), m_storage.lines_buffer.size() * sizeof(BufferVertex));
-        GlVertexBuffer::unbind();
-
-        m_storage.lines_buffer.clear();
-
-        m_storage.shader->bind();
-        m_storage.vertex_array->bind();
-
-        opengl::draw_arrays_lines(static_cast<int>(scene.root_3d_node->m_debug_lines.size()) * 2);
-
-        GlVertexArray::unbind();
-    }
-#endif
-
     Renderer::Renderer(int width, int height, const FileSystem& fs, const ShaderLibrary& shd) {
         opengl::initialize_default();
         opengl::initialize_stencil();
@@ -236,7 +178,7 @@ namespace sm::internal {
         }
 
 #ifndef SM_BUILD_DISTRIBUTION
-        m_debug = DebugRenderer(fs, *this);
+        debug_initialize(fs);
 #endif
     }
 
@@ -317,7 +259,7 @@ namespace sm::internal {
         draw_models(scene);
 
         // Skybox is rendered last, but with its depth values modified to keep it in the background
-        if (scene.root_3d_node->m_skybox.texture != nullptr) {
+        if (scene.root_node_3d->m_skybox.texture != nullptr) {
             draw_skybox(scene);
         }
 
@@ -336,7 +278,7 @@ namespace sm::internal {
         draw_texts(scene);
 
 #ifndef SM_BUILD_DISTRIBUTION
-        m_debug.render(scene);
+        debug_render(scene);
 #endif
     }
 
@@ -384,16 +326,16 @@ namespace sm::internal {
 
             switch (binding_index) {
                 case PROJECTON_VIEW_UNIFORM_BLOCK_BINDING:
-                    uniform_buffer->set(&scene.root_3d_node->m_camera.projection_view(), "u_projection_view_matrix"_H);
+                    uniform_buffer->set(&scene.root_node_3d->m_camera.projection_view(), "u_projection_view_matrix"_H);
                     break;
                 case DIRECTIONAL_LIGHT_UNIFORM_BLOCK_BINDING:
-                    uniform_buffer->set(&scene.root_3d_node->m_directional_light.direction, "u_directional_light.direction"_H);
-                    uniform_buffer->set(&scene.root_3d_node->m_directional_light.ambient_color, "u_directional_light.ambient"_H);
-                    uniform_buffer->set(&scene.root_3d_node->m_directional_light.diffuse_color, "u_directional_light.diffuse"_H);
-                    uniform_buffer->set(&scene.root_3d_node->m_directional_light.specular_color, "u_directional_light.specular"_H);
+                    uniform_buffer->set(&scene.root_node_3d->m_directional_light.direction, "u_directional_light.direction"_H);
+                    uniform_buffer->set(&scene.root_node_3d->m_directional_light.ambient_color, "u_directional_light.ambient"_H);
+                    uniform_buffer->set(&scene.root_node_3d->m_directional_light.diffuse_color, "u_directional_light.diffuse"_H);
+                    uniform_buffer->set(&scene.root_node_3d->m_directional_light.specular_color, "u_directional_light.specular"_H);
                     break;
                 case VIEW_UNIFORM_BLOCK_BINDING:
-                    uniform_buffer->set(&scene.root_3d_node->m_camera_position, "u_view_position"_H);
+                    uniform_buffer->set(&scene.root_node_3d->m_camera_position, "u_view_position"_H);
                     break;
                 case POINT_LIGHT_UNIFORM_BLOCK_BINDING:
                     setup_point_light_uniform_buffer(scene, uniform_buffer);
@@ -418,7 +360,7 @@ namespace sm::internal {
         m_post_processing_context.last_texture = m_post_processing_context.original_texture;
         m_post_processing_context.textures.clear();
 
-        for (const auto& step : scene.root_3d_node->m_post_processing_steps) {
+        for (const auto& step : scene.root_node_3d->m_post_processing_steps) {
             step->m_framebuffer->bind();
             opengl::clear(opengl::Buffers::C);
             opengl::viewport(step->m_framebuffer->get_specification().width, step->m_framebuffer->get_specification().height);
@@ -506,69 +448,16 @@ namespace sm::internal {
         }
     }
 
-    void Renderer::traverse_graph_3d(const Scene& scene, const std::function<void(const SceneNode3D*, Context3D&)>& process) {
-        scene.root_3d_node->traverse<Context3D>(Context3D(), [&](const SceneNode3D* node, Context3D& context) {
-            if (auto model_node {dynamic_cast<const ModelNode*>(node)}; model_node != nullptr) {
-                context.transform.position += model_node->transform.position;
-                context.transform.rotation += model_node->transform.rotation;
-                context.transform.scale *= model_node->transform.scale;
-
-                switch (model_node->outline) {
-                    case NodeFlag::Inherited:
-                        break;
-                    case NodeFlag::Enabled:
-                        context.outline = true;
-                        context.outline_color = model_node->outline_color;
-                        context.outline_thickness = model_node->outline_thickness;
-                        break;
-                    case NodeFlag::Disabled:
-                        context.outline = false;
-                        break;
-                }
-
-                switch (model_node->disable_back_face_culling) {
-                    case NodeFlag::Inherited:
-                        break;
-                    case NodeFlag::Enabled:
-                        context.disable_back_face_culling = true;
-                        break;
-                    case NodeFlag::Disabled:
-                        context.disable_back_face_culling = false;
-                        break;
-                }
-
-                switch (model_node->cast_shadow) {
-                    case NodeFlag::Inherited:
-                        break;
-                    case NodeFlag::Enabled:
-                        context.cast_shadow = true;
-                        break;
-                    case NodeFlag::Disabled:
-                        context.cast_shadow = false;
-                        break;
-                }
-            } else if (auto point_light_node {dynamic_cast<const PointLightNode*>(node)}; point_light_node != nullptr) {
-                context.transform.position += point_light_node->position;
-            }
-
-            process(node, context);
-        });
-    }
-
-    void Renderer::traverse_graph_2d(const Scene& scene, const std::function<void(const SceneNode3D*, Context2D&)>& process) {
-
-    }
-
     void Renderer::draw_models(const Scene& scene) {
-        traverse_graph_3d(scene, [this](const SceneNode3D* node, Context3D& context) {
+        scene.root_node_3d->traverse([this](const SceneNode3D* node, Context3D& context) {
             auto model_node {dynamic_cast<const ModelNode*>(node)};
 
             if (model_node == nullptr) {
-                return;
+                return false;
             }
 
             if (context.outline) {
-                return;  // This one is rendered differently
+                return false;  // This one is rendered differently
             }
 
             if (context.disable_back_face_culling) {
@@ -578,6 +467,8 @@ namespace sm::internal {
             } else {
                 draw_model(model_node, context);
             }
+
+            return false;
         });
 
         GlVertexArray::unbind();
@@ -586,7 +477,7 @@ namespace sm::internal {
     void Renderer::draw_model(const ModelNode* model_node, const Context3D& context) {
         model_node->m_vertex_array->bind();
         model_node->m_material->bind_and_upload();
-        model_node->m_material->get_shader()->upload_uniform_mat4("u_model_matrix"_H, get_transform(context.transform));
+        model_node->m_material->get_shader()->upload_uniform_mat4("u_model_matrix"_H, context.transform_);
 
         opengl::draw_elements(model_node->m_vertex_array->get_index_buffer()->get_index_count());
 
@@ -596,21 +487,23 @@ namespace sm::internal {
     void Renderer::draw_models_outlined(const Scene& scene) {
         std::vector<std::pair<const ModelNode*, Context3D>> model_nodes;
 
-        traverse_graph_3d(scene, [this, &model_nodes](const SceneNode3D* node, Context3D& context) {
+        scene.root_node_3d->traverse([this, &model_nodes](const SceneNode3D* node, Context3D& context) {
             auto model_node {dynamic_cast<const ModelNode*>(node)};
 
             if (model_node == nullptr) {
-                return;
+                return false;
             }
 
             if (context.outline) {
                 model_nodes.emplace_back(model_node, context);
             }
+
+            return false;
         });
 
         std::sort(model_nodes.begin(), model_nodes.end(), [&](const auto& lhs, const auto& rhs) {
-            const float distance_left {glm::distance(lhs.second.transform.position, scene.root_3d_node->m_camera_position)};
-            const float distance_right {glm::distance(rhs.second.transform.position, scene.root_3d_node->m_camera_position)};
+            const float distance_left {glm::distance(lhs.second.transform.position, scene.root_node_3d->m_camera_position)};
+            const float distance_right {glm::distance(rhs.second.transform.position, scene.root_node_3d->m_camera_position)};
 
             return distance_left < distance_right;
         });
@@ -628,7 +521,7 @@ namespace sm::internal {
         {
             model_node->m_vertex_array->bind();
             model_node->m_material->bind_and_upload();
-            model_node->m_material->get_shader()->upload_uniform_mat4("u_model_matrix"_H, get_transform(context.transform));
+            model_node->m_material->get_shader()->upload_uniform_mat4("u_model_matrix"_H, context.transform_);
 
             opengl::draw_elements(model_node->m_vertex_array->get_index_buffer()->get_index_count());
         }
@@ -640,11 +533,11 @@ namespace sm::internal {
             // Vertex array is already bound
 
             const glm::vec3 color {
-                m_color_correction ? glm::convertSRGBToLinear(context.outline_color) : context.outline_color
+                m_color_correction ? glm::convertSRGBToLinear(model_node->outline_color) : model_node->outline_color
             };
 
             m_storage.outline_shader->bind();
-            m_storage.outline_shader->upload_uniform_mat4("u_model_matrix"_H, glm::scale(get_transform(context.transform), glm::vec3(context.outline_thickness)));
+            m_storage.outline_shader->upload_uniform_mat4("u_model_matrix"_H, glm::scale(context.transform_, glm::vec3(model_node->outline_thickness)));
             m_storage.outline_shader->upload_uniform_vec3("u_color"_H, color);
 
             opengl::draw_elements(model_node->m_vertex_array->get_index_buffer()->get_index_count());
@@ -661,22 +554,24 @@ namespace sm::internal {
 
         m_storage.shadow_shader->bind();
 
-        traverse_graph_3d(scene, [this](const SceneNode3D* node, Context3D& context) {
+        scene.root_node_3d->traverse([this](const SceneNode3D* node, Context3D& context) {
             auto model_node {dynamic_cast<const ModelNode*>(node)};
 
             if (model_node == nullptr) {
-                return;
+                return false;
             }
 
             if (!context.cast_shadow) {
-                return;
+                return false;
             }
 
             model_node->m_vertex_array->bind();
 
-            m_storage.shadow_shader->upload_uniform_mat4("u_model_matrix"_H, get_transform(context.transform));
+            m_storage.shadow_shader->upload_uniform_mat4("u_model_matrix"_H, context.transform_);
 
             opengl::draw_elements(model_node->m_vertex_array->get_index_buffer()->get_index_count());
+
+            return false;
         });
 
         GlVertexArray::unbind();
@@ -685,14 +580,14 @@ namespace sm::internal {
     }
 
     void Renderer::draw_skybox(const Scene& scene) {
-        const glm::mat4& projection {scene.root_3d_node->m_camera.projection()};
-        const glm::mat4 view {glm::mat4(glm::mat3(scene.root_3d_node->m_camera.view()))};
+        const glm::mat4& projection {scene.root_node_3d->m_camera.projection()};
+        const glm::mat4 view {glm::mat4(glm::mat3(scene.root_node_3d->m_camera.view()))};
 
         m_storage.skybox_shader->bind();
         m_storage.skybox_shader->upload_uniform_mat4("u_projection_view_matrix"_H, projection * view);
 
         m_storage.skybox_vertex_array->bind();
-        scene.root_3d_node->m_skybox.texture->bind(0);
+        scene.root_node_3d->m_skybox.texture->bind(0);
 
         opengl::draw_arrays(36);
 
@@ -704,28 +599,40 @@ namespace sm::internal {
 
         m_storage.text_shader->bind();
 
-        auto texts {scene.m_texts};
+        std::vector<std::pair<const TextNode*, Context2D>> text_nodes;
 
-        std::stable_sort(texts.begin(), texts.end(), [](const Text& lhs, const Text& rhs) {
-            return lhs.font.get() < rhs.font.get();
+        scene.root_node_2d->traverse([&text_nodes](const SceneNode2D* node, Context2D& context) {
+            auto text_node {dynamic_cast<const TextNode*>(node)};
+
+            if (text_node == nullptr) {
+                return false;
+            }
+
+            text_nodes.emplace_back(text_node, context);
+
+            return false;
         });
 
-        for (const void* last {}; const auto& text : texts) {
-            const void* current {text.font.get()};
+        std::stable_sort(text_nodes.begin(), text_nodes.end(), [](const auto& lhs, const auto& rhs) {
+            return lhs.first->m_font.get() < rhs.first->m_font.get();
+        });
+
+        for (const void* last {}; const auto& text_node : text_nodes) {
+            const void* current {text_node.first->m_font.get()};
 
             assert(current != nullptr);
 
             if (current != last) {
                 last = current;
 
-                m_storage.text.batches.emplace_back().font = text.font;
+                m_storage.text.batches.emplace_back().font = text_node.first->m_font;
             }
 
             if (m_storage.text.batches.back().texts.size() >= SHADER_MAX_BATCH_TEXTS) {
-                m_storage.text.batches.emplace_back().font = text.font;
+                m_storage.text.batches.emplace_back().font = text_node.first->m_font;
             }
 
-            m_storage.text.batches.back().texts.push_back(text);
+            m_storage.text.batches.back().texts.push_back(text_node);
         }
 
         for (const auto& batch : m_storage.text.batches) {
@@ -741,24 +648,24 @@ namespace sm::internal {
     }
 
     void Renderer::draw_text_batch(const Scene& scene, const TextBatch& batch) {
-        for (std::size_t i {0}; const Text& text : batch.texts) {
+        for (std::size_t i {0}; const auto& text_node : batch.texts) {
             assert(i < SHADER_MAX_BATCH_TEXTS);
 
             // Pushes the rendered text onto the buffer
-            batch.font->render(text.text, static_cast<int>(i++), m_storage.text.batch_buffer);
+            batch.font->render(text_node.first->text, static_cast<int>(i++), m_storage.text.batch_buffer);
 
             glm::mat4 matrix {1.0f};  // TODO upload mat3 instead
-            matrix = glm::translate(matrix, glm::vec3(text.position, 0.0f));
-            matrix = glm::scale(matrix, glm::vec3(text.scale, text.scale, 1.0f));
+            matrix = glm::translate(matrix, glm::vec3(text_node.first->transform.position, 0.0f));
+            matrix = glm::scale(matrix, glm::vec3(text_node.first->transform.scale, 1.0f));
 
             m_storage.text.batch_matrices.push_back(matrix);
-            m_storage.text.batch_colors.push_back(text.color);
+            m_storage.text.batch_colors.push_back(text_node.first->color);
         }
 
         // Uniforms must be set as arrays
         m_storage.text_shader->upload_uniform_mat4_array("u_model_matrix[0]"_H, m_storage.text.batch_matrices);
         m_storage.text_shader->upload_uniform_vec3_array("u_color[0]"_H, m_storage.text.batch_colors);
-        m_storage.text_shader->upload_uniform_mat4("u_projection_matrix"_H, scene.m_camera_2d.projection());
+        m_storage.text_shader->upload_uniform_mat4("u_projection_matrix"_H, scene.root_node_2d->m_camera.projection());
 
         const auto vertex_buffer {m_storage.wtext_vertex_buffer.lock()};
         vertex_buffer->bind();
@@ -780,28 +687,31 @@ namespace sm::internal {
         m_storage.quad_shader->bind();
         m_storage.quad_vertex_array->bind();
 
-        m_storage.quad_shader->upload_uniform_mat4("u_projection_matrix"_H, scene.m_camera_2d.projection());
+        m_storage.quad_shader->upload_uniform_mat4("u_projection_matrix"_H, scene.root_node_2d->m_camera.projection());
 
-        begin_quads_batch();
+        begin_images_batch();
 
-        for (const Quad& quad : scene.m_quads) {
-            draw_quad(
-                quad.position,
-                glm::vec2(static_cast<float>(quad.texture->get_width()), static_cast<float>(quad.texture->get_height())),
-                quad.scale,
-                quad.texture->get_id()
-            );
-        }
+        scene.root_node_2d->traverse([this](const SceneNode2D* node, Context2D& context) {
+            auto image_node {dynamic_cast<const ImageNode*>(node)};
 
-        end_quads_batch();
-        flush_quads_batch();
+            if (image_node == nullptr) {
+                return false;
+            }
+
+            draw_image(image_node, context);
+
+            return false;
+        });
+
+        end_images_batch();
+        flush_images_batch();
 
         GlVertexArray::unbind();
 
         opengl::enable_depth_test();
     }
 
-    void Renderer::draw_image(const Image& image) {
+    void Renderer::draw_image(const ImageNode* image_node, const Context2D& context) {
         if (m_storage.quad.quad_count == MAX_QUAD_COUNT || m_storage.quad.texture_index == m_storage.quad.textures.size()) {
             end_images_batch();
             flush_images_batch();
@@ -809,10 +719,11 @@ namespace sm::internal {
         }
 
         int texture_index {-1};
+        glm::vec2 size {static_cast<float>(image_node->m_texture->get_width()), static_cast<float>(image_node->m_texture->get_height())};
 
         // Search for this texture in textures array
         for (std::size_t i {0}; i < m_storage.quad.texture_index; i++) {
-            if (m_storage.quad.textures[i] == image.texture) {
+            if (m_storage.quad.textures[i] == image_node->m_texture->get_id()) {
                 texture_index = static_cast<int>(i);
                 break;
             }
@@ -821,28 +732,28 @@ namespace sm::internal {
         if (texture_index < 0) {
             // Not found in textures
             texture_index = static_cast<int>(m_storage.quad.texture_index);
-            m_storage.quad.textures[m_storage.quad.texture_index] = image.texture;
+            m_storage.quad.textures[m_storage.quad.texture_index] = image_node->m_texture->get_id();
             m_storage.quad.texture_index++;
         }
 
-        image.size *= image.scale;
+        size *= context.transform.scale;
 
-        m_storage.quad.buffer_pointer->position = glm::vec2(image.position.x + image.size.x, image.position.y + image.size.y);
+        m_storage.quad.buffer_pointer->position = glm::vec2(context.transform.position.x + size.x, context.transform.position.y + size.y);
         m_storage.quad.buffer_pointer->texture_coordinate = glm::vec2(1.0f, 1.0f);
         m_storage.quad.buffer_pointer->texture_index = texture_index;
         m_storage.quad.buffer_pointer++;
 
-        m_storage.quad.buffer_pointer->position = glm::vec2(image.position.x, image.position.y + image.size.y);
+        m_storage.quad.buffer_pointer->position = glm::vec2(context.transform.position.x, context.transform.position.y + size.y);
         m_storage.quad.buffer_pointer->texture_coordinate = glm::vec2(0.0f, 1.0f);
         m_storage.quad.buffer_pointer->texture_index = texture_index;
         m_storage.quad.buffer_pointer++;
 
-        m_storage.quad.buffer_pointer->position = glm::vec2(image.position.x, image.position.y);
+        m_storage.quad.buffer_pointer->position = glm::vec2(context.transform.position.x, context.transform.position.y);
         m_storage.quad.buffer_pointer->texture_coordinate = glm::vec2(0.0f, 0.0f);
         m_storage.quad.buffer_pointer->texture_index = texture_index;
         m_storage.quad.buffer_pointer++;
 
-        m_storage.quad.buffer_pointer->position = glm::vec2(image.position.x + image.size.x, image.position.y);
+        m_storage.quad.buffer_pointer->position = glm::vec2(context.transform.position.x + size.x, context.transform.position.y);
         m_storage.quad.buffer_pointer->texture_coordinate = glm::vec2(1.0f, 0.0f);
         m_storage.quad.buffer_pointer->texture_index = texture_index;
         m_storage.quad.buffer_pointer++;
@@ -875,54 +786,73 @@ namespace sm::internal {
 
     void Renderer::setup_point_light_uniform_buffer(const Scene& scene, const std::shared_ptr<GlUniformBuffer> uniform_buffer) {
         // Sort front to back with respect to the camera; lights in the front of the list will be used
-        auto point_lights {scene.m_point_lights};
+        // auto point_lights {scene.m_point_lights};
+
+        std::vector<std::pair<const PointLightNode*, Context3D>> point_light_nodes;
+
+        scene.root_node_3d->traverse([&point_light_nodes](const SceneNode3D* node, Context3D& context) {
+            auto point_light_node {dynamic_cast<const PointLightNode*>(node)};
+
+            if (point_light_node == nullptr) {
+                return false;
+            }
+
+            if (context.outline) {
+                point_light_nodes.emplace_back(point_light_node, context);
+            }
+
+            return false;
+        });
 
         std::sort(
-            point_lights.begin(),
-            point_lights.end(),
-            [&](const PointLight& lhs, const PointLight& rhs) {
-                const float distance_left {glm::distance(lhs.position, scene.root_3d_node->m_camera_position)};
-                const float distance_right {glm::distance(rhs.position, scene.root_3d_node->m_camera_position)};
+            point_light_nodes.begin(),
+            point_light_nodes.end(),
+            [&](const auto& lhs, const auto& rhs) {
+                const float distance_left {glm::distance(lhs.second.transform.position, scene.root_node_3d->m_camera_position)};
+                const float distance_right {glm::distance(rhs.second.transform.position, scene.root_node_3d->m_camera_position)};
 
                 return distance_left < distance_right;
             }
         );
 
-        // Add dummy point lights to make the size 4, which is a requirement from the shader
-        if (point_lights.size() < SHADER_MAX_POINT_LIGHTS) {
-            point_lights.resize(SHADER_MAX_POINT_LIGHTS);
-        }
-
+        // Send dummy point lights to make the size 4, which is a requirement from the shader
         for (std::size_t i {0}; i < SHADER_MAX_POINT_LIGHTS; i++) {
-            const PointLight& light {point_lights[i]};
+            glm::vec3 position {};
+            PointLight point_light;
+
+            if (i + 1 <= point_light_nodes.size()) {
+                position = point_light_nodes[i].second.transform.position;
+                point_light = *point_light_nodes[i].first;
+            }
+
             const std::string index {std::to_string(i)};
 
             // Uniforms must be set individually by index
-            uniform_buffer->set(&light.position, Id("u_point_lights[" + index + "].position"));
-            uniform_buffer->set(&light.ambient_color, Id("u_point_lights[" + index + "].ambient"));
-            uniform_buffer->set(&light.diffuse_color, Id("u_point_lights[" + index + "].diffuse"));
-            uniform_buffer->set(&light.specular_color, Id("u_point_lights[" + index + "].specular"));
-            uniform_buffer->set(&light.falloff_linear, Id("u_point_lights[" + index + "].falloff_linear"));
-            uniform_buffer->set(&light.falloff_quadratic, Id("u_point_lights[" + index + "].falloff_quadratic"));
+            uniform_buffer->set(&position, Id("u_point_lights[" + index + "].position"));
+            uniform_buffer->set(&point_light.ambient_color, Id("u_point_lights[" + index + "].ambient"));
+            uniform_buffer->set(&point_light.diffuse_color, Id("u_point_lights[" + index + "].diffuse"));
+            uniform_buffer->set(&point_light.specular_color, Id("u_point_lights[" + index + "].specular"));
+            uniform_buffer->set(&point_light.falloff_linear, Id("u_point_lights[" + index + "].falloff_linear"));
+            uniform_buffer->set(&point_light.falloff_quadratic, Id("u_point_lights[" + index + "].falloff_quadratic"));
         }
     }
 
     void Renderer::setup_light_space_uniform_buffer(const Scene& scene, std::shared_ptr<GlUniformBuffer> uniform_buffer) {
         const glm::mat4 projection {
             glm::ortho(
-                scene.root_3d_node->m_shadow_box.left,
-                scene.root_3d_node->m_shadow_box.right,
-                scene.root_3d_node->m_shadow_box.bottom,
-                scene.root_3d_node->m_shadow_box.top,
-                scene.root_3d_node->m_shadow_box.near_,
-                scene.root_3d_node->m_shadow_box.far_
+                scene.root_node_3d->m_shadow_box.left,
+                scene.root_node_3d->m_shadow_box.right,
+                scene.root_node_3d->m_shadow_box.bottom,
+                scene.root_node_3d->m_shadow_box.top,
+                scene.root_node_3d->m_shadow_box.near_,
+                scene.root_node_3d->m_shadow_box.far_
             )
         };
 
         const glm::mat4 view {
             glm::lookAt(
-                scene.root_3d_node->m_shadow_box.position,
-                scene.root_3d_node->m_directional_light.direction,
+                scene.root_node_3d->m_shadow_box.position,
+                scene.root_node_3d->m_directional_light.direction,
                 glm::vec3(0.0f, 1.0f, 0.0f)
             )
         };
@@ -995,15 +925,61 @@ namespace sm::internal {
         return std::make_shared<GlIndexBuffer>(buffer.get(), MAX_QUADS_INDICES * sizeof(unsigned int));
     }
 
-    glm::mat4 Renderer::get_transform(const Transform3D& transform) {
-        glm::mat4 matrix {1.0f};
+#ifndef SM_BUILD_DISTRIBUTION
+    void Renderer::debug_initialize(const FileSystem& fs) {
+        m_debug_storage.shader = std::make_shared<GlShader>(
+            utils::read_file(fs.path_engine_assets("shaders/internal/debug.vert")),
+            utils::read_file(fs.path_engine_assets("shaders/internal/debug.frag"))
+        );
 
-        matrix = glm::translate(matrix, transform.position);
-        matrix = glm::rotate(matrix, glm::radians(transform.rotation.x), glm::vec3(1.0f, 0.0f, 0.0f));
-        matrix = glm::rotate(matrix, glm::radians(transform.rotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
-        matrix = glm::rotate(matrix, glm::radians(transform.rotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
-        matrix = glm::scale(matrix, glm::vec3(transform.scale));
+        register_shader(m_debug_storage.shader);
 
-        return matrix;
+        const auto vertex_buffer {std::make_shared<GlVertexBuffer>(DrawHint::Stream)};
+        m_debug_storage.wvertex_buffer = vertex_buffer;
+
+        m_debug_storage.vertex_array = std::make_unique<GlVertexArray>();
+        m_debug_storage.vertex_array->configure([&](GlVertexArray* va) {
+            VertexBufferLayout layout;
+            layout.add(0, VertexBufferLayout::Float, 3);
+            layout.add(1, VertexBufferLayout::Float, 3);
+
+            va->add_vertex_buffer(vertex_buffer, layout);
+        });
     }
+
+    void Renderer::debug_render(const Scene& scene) {
+        for (const DebugLine& line : scene.root_node_3d->m_debug_lines) {
+            BufferVertex v1;
+            v1.position = line.position1;
+            v1.color = line.color;
+
+            m_debug_storage.lines_buffer.push_back(v1);
+
+            BufferVertex v2;
+            v2.position = line.position2;
+            v2.color = line.color;
+
+            m_debug_storage.lines_buffer.push_back(v2);
+        }
+
+        if (m_debug_storage.lines_buffer.empty()) {
+            return;
+        }
+
+        const auto vertex_buffer {m_debug_storage.wvertex_buffer.lock()};
+
+        vertex_buffer->bind();
+        vertex_buffer->upload_data(m_debug_storage.lines_buffer.data(), m_debug_storage.lines_buffer.size() * sizeof(BufferVertex));
+        GlVertexBuffer::unbind();
+
+        m_debug_storage.lines_buffer.clear();
+
+        m_debug_storage.shader->bind();
+        m_debug_storage.vertex_array->bind();
+
+        opengl::draw_arrays_lines(static_cast<int>(scene.root_node_3d->m_debug_lines.size()) * 2);
+
+        GlVertexArray::unbind();
+    }
+#endif
 }

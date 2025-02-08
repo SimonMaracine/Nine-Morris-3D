@@ -1,13 +1,15 @@
 #include "game/nine_mens_morris/node.hpp"
 
-NodeObj::NodeObj(int id, const sm::Renderable& renderable, glm::vec3 position)
-    : HoverableObj(id, renderable) {
-    m_renderable.transform.position = position;
-    m_renderable.transform.scale = 20.0f;
+#include <nine_morris_3d_engine/external/resmanager.h++>
+
+NodeObj::NodeObj(int id, std::shared_ptr<sm::ModelNode> model, glm::vec3 position)
+    : HoverableObj(id, model) {
+    m_model->transform.position = position;
 }
 
 void NodeObj::update(sm::Ctx& ctx) {
     if (m_highlighted) {
-        ctx.add_renderable(m_renderable);
+        const auto board_model {ctx.root_3d()->find_node("board"_H)};
+        board_model->add_node(m_model);
     }
 }

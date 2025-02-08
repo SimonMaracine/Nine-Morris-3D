@@ -7,7 +7,6 @@
 #include "default_address.hpp"
 
 void GameScene::on_start() {
-    ctx.connect_event<sm::WindowResizedEvent, &GameScene::on_window_resized>(this);
     ctx.connect_event<sm::KeyReleasedEvent, &GameScene::on_key_released>(this);
     ctx.connect_event<sm::MouseButtonPressedEvent, &GameScene::on_mouse_button_pressed>(this);
     ctx.connect_event<sm::MouseButtonReleasedEvent, &GameScene::on_mouse_button_released>(this);
@@ -78,31 +77,22 @@ void GameScene::on_stop() {
 
     stop_engine();
 
-    m_camera_controller.disconnect_events(ctx);
+    m_camera_controller->disconnect_events(ctx);
     ctx.disconnect_events(this);
 }
 
 void GameScene::on_update() {
-    m_camera_controller.update_controls(ctx.get_delta(), ctx);
-    m_camera_controller.update_camera(ctx.get_delta());
-
-    ctx.capture(m_camera, m_camera_controller.get_position());
-    ctx.capture(m_camera_2d);
-
-    ctx.add_light(m_directional_light);
-    ctx.environment(m_skybox);
-
     if (m_ui.get_show_information()) {
         ctx.show_information_text();
     }
 
     // Origin
-    ctx.debug_add_line(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-    ctx.debug_add_line(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-    ctx.debug_add_line(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+    ctx.root_3d()->debug_add_line(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+    ctx.root_3d()->debug_add_line(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+    ctx.root_3d()->debug_add_line(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(0.0f, 0.0f, 1.0f));
 
     // Light
-    ctx.debug_add_lamp(glm::normalize(-m_directional_light.direction) * 15.0f, glm::vec3(0.6f));
+    ctx.root_3d()->debug_add_lamp(glm::normalize(-ctx.root_3d()->get_directional_light().direction) * 15.0f, glm::vec3(0.6f));
 
     m_clock.update();
 
@@ -118,15 +108,11 @@ void GameScene::on_update() {
 
     scene_update();
     update_game_state();
-
-    // This needs to be called after all scene is updated
-    ctx.shadow(m_shadow_box);
-
     update_connection_state();
 }
 
 void GameScene::on_fixed_update() {
-    m_camera_controller.update_friction();
+    m_camera_controller->update_friction();
 
     scene_fixed_update();
 }
@@ -184,25 +170,25 @@ void GameScene::reset_camera_position() {
 
     switch (g.options.game_type) {
         case GameTypeLocalHumanVsHuman:
-            m_camera_controller.go_towards_position(m_white_camera_position);
+            m_camera_controller->go_towards_position(m_white_camera_position);
             break;
         case GameTypeLocalHumanVsComputer:
             switch (static_cast<PlayerColor>(m_game_options.computer_color)) {
                 case PlayerColorWhite:
-                    m_camera_controller.go_towards_position(m_black_camera_position);
+                    m_camera_controller->go_towards_position(m_black_camera_position);
                     break;
                 case PlayerColorBlack:
-                    m_camera_controller.go_towards_position(m_white_camera_position);
+                    m_camera_controller->go_towards_position(m_white_camera_position);
                     break;
             }
             break;
         case GameTypeOnline:
             switch (static_cast<PlayerColor>(m_game_options.remote_color)) {
                 case PlayerColorWhite:
-                    m_camera_controller.go_towards_position(m_black_camera_position);
+                    m_camera_controller->go_towards_position(m_black_camera_position);
                     break;
                 case PlayerColorBlack:
-                    m_camera_controller.go_towards_position(m_white_camera_position);
+                    m_camera_controller->go_towards_position(m_white_camera_position);
                     break;
             }
             break;
@@ -479,11 +465,6 @@ void GameScene::client_send_message(const std::string& message_) {
     }
 }
 
-void GameScene::on_window_resized(const sm::WindowResizedEvent& event) {
-    m_camera.set_projection(event.width, event.height, LENS_FOV, LENS_NEAR, LENS_FAR);
-    m_camera_2d.set_projection(0, event.width, 0, event.height);
-}
-
 void GameScene::on_key_released(const sm::KeyReleasedEvent& event) {
     if (event.key == sm::Key::Space) {
         reset_camera_position();
@@ -509,8 +490,8 @@ void GameScene::on_mouse_button_released(const sm::MouseButtonReleasedEvent& eve
 void GameScene::setup_camera() {
     const auto& g {ctx.global<Global>()};
 
-    m_camera_controller = PointCameraController(
-        m_camera,
+    m_camera_controller = std::make_shared<PointCameraController>(
+        ctx.root_3d()->get_camera(),
         ctx.get_window_width(),
         ctx.get_window_height(),
         glm::vec3(0.0f),
@@ -519,19 +500,22 @@ void GameScene::setup_camera() {
         g.options.camera_sensitivity
     );
 
-    m_camera_controller.connect_events(ctx);
+    ctx.root_3d()->set_camera_controller(m_camera_controller);
 
-    m_white_camera_position = m_camera_controller.get_position();
+    m_camera_controller->connect_events(ctx);
+
+    m_white_camera_position = m_camera_controller->get_position();
     m_black_camera_position = glm::vec3(m_white_camera_position.x, m_white_camera_position.y, -m_white_camera_position.z);
 
-    m_camera_controller.set_distance_to_point(m_camera_controller.get_distance_to_point() + 1.0f);
+    m_camera_controller->set_distance_to_point(m_camera_controller->get_distance_to_point() + 1.0f);
     reset_camera_position();
-
-    m_camera_2d.set_projection(0, ctx.get_window_width(), 0, ctx.get_window_height());
 }
 
 void GameScene::setup_skybox(bool reload) {
-    m_skybox.texture = load_skybox_texture_cubemap(reload);
+    sm::Skybox skybox;
+    skybox.texture = load_skybox_texture_cubemap(reload);
+
+    ctx.root_3d()->set_skybox(skybox);
 }
 
 void GameScene::setup_lights() {
@@ -539,22 +523,22 @@ void GameScene::setup_lights() {
 
     switch (g.options.skybox) {
         case SkyboxNone:
-            m_directional_light.direction = glm::normalize(glm::vec3(0.307f, -0.901f, 0.307f));
-            m_directional_light.ambient_color = glm::vec3(0.1f);
-            m_directional_light.diffuse_color = glm::vec3(0.5f);
-            m_directional_light.specular_color = glm::vec3(0.8f);
+            ctx.root_3d()->get_directional_light().direction = glm::normalize(glm::vec3(0.307f, -0.901f, 0.307f));
+            ctx.root_3d()->get_directional_light().ambient_color = glm::vec3(0.1f);
+            ctx.root_3d()->get_directional_light().diffuse_color = glm::vec3(0.5f);
+            ctx.root_3d()->get_directional_light().specular_color = glm::vec3(0.8f);
             break;
         case SkyboxField:
-            m_directional_light.direction = glm::normalize(glm::vec3(-0.525f, -0.405f, -0.748f));
-            m_directional_light.ambient_color = glm::vec3(0.25f);
-            m_directional_light.diffuse_color = glm::vec3(0.7f);
-            m_directional_light.specular_color = glm::vec3(1.0f);
+            ctx.root_3d()->get_directional_light().direction = glm::normalize(glm::vec3(-0.525f, -0.405f, -0.748f));
+            ctx.root_3d()->get_directional_light().ambient_color = glm::vec3(0.25f);
+            ctx.root_3d()->get_directional_light().diffuse_color = glm::vec3(0.7f);
+            ctx.root_3d()->get_directional_light().specular_color = glm::vec3(1.0f);
             break;
         case SkyboxAutumn:
-            m_directional_light.direction = glm::normalize(glm::vec3(0.370f, -0.925f, -0.092f));
-            m_directional_light.ambient_color = glm::vec3(0.2f);
-            m_directional_light.diffuse_color = glm::vec3(0.7f);
-            m_directional_light.specular_color = glm::vec3(0.9f);
+            ctx.root_3d()->get_directional_light().direction = glm::normalize(glm::vec3(0.370f, -0.925f, -0.092f));
+            ctx.root_3d()->get_directional_light().ambient_color = glm::vec3(0.2f);
+            ctx.root_3d()->get_directional_light().diffuse_color = glm::vec3(0.7f);
+            ctx.root_3d()->get_directional_light().specular_color = glm::vec3(0.9f);
             break;
     }
 }

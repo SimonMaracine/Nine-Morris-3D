@@ -2,10 +2,6 @@
 
 #include <nine_morris_3d_engine/nine_morris_3d.hpp>
 
-inline constexpr float LENS_FOV {45.0f};
-inline constexpr float LENS_NEAR {1.0f};
-inline constexpr float LENS_FAR {100.0f};
-
 // TODO maybe refactor camera using quaternions
 class PointCameraController : public sm::CameraController {
 public:
@@ -23,6 +19,10 @@ public:
 
     glm::vec3 get_position() const override;
     glm::vec3 get_rotation() const override;
+
+    float get_fov() const override;
+    float get_near() const override;
+    float get_far() const override;
 
     glm::vec3 get_point() const { return m_point; }
     float get_distance_to_point() const { return m_distance_to_point; }

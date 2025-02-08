@@ -41,6 +41,8 @@ namespace sm {
 
         m_frame_counter.previous_seconds = internal::Window::get_time();
         m_fixed_update.previous_seconds = internal::Window::get_time();
+
+        update_projection_matrices(m_ctx.m_win.get_width(), m_ctx.m_win.get_height());
     }
 
     Application::~Application() {
@@ -85,7 +87,9 @@ namespace sm {
             // Events need to be processed before scene update
             m_ctx.m_win.poll_events();
 
+            m_scene_current->scene->pre_update();
             m_scene_current->scene->on_update();
+            m_scene_current->scene->post_update();
 
             if (!m_minimized) {
 #ifndef SM_BUILD_DISTRIBUTION
@@ -95,12 +99,14 @@ namespace sm {
                 dear_imgui_render();
             }
 
+            // Every frame the graph is rebuilt
+            m_ctx.m_scn.root_node_3d->clear_nodes();
+            m_ctx.m_scn.root_node_2d->clear_nodes();
+            m_ctx.m_scn.root_node_3d->debug_clear();
+
             // Swap the buffers
             m_ctx.m_win.flip();
 
-            m_ctx.m_scn.clear();
-
-            // m_ctx.m_win.update();
             m_ctx.m_evt.update();
 
             // Update tasks after scene update and after events
@@ -159,6 +165,24 @@ namespace sm {
         }
 
         return updates;
+    }
+
+    void Application::update_projection_matrices(int width, int height) {
+        auto camera_controller {m_ctx.m_scn.root_node_3d->get_camera_controller()};
+
+        if (camera_controller == nullptr) {
+            camera_controller = m_ctx.m_default_camera_controller;
+        }
+
+        m_ctx.m_scn.root_node_3d->get_camera().set_projection(
+            width,
+            height,
+            camera_controller->get_fov(),
+            camera_controller->get_near(),
+            camera_controller->get_far()
+        );
+
+        m_ctx.m_scn.root_node_2d->get_camera().set_projection(0, width, 0, height);
     }
 
     void Application::check_changed_scene() {
@@ -241,6 +265,7 @@ namespace sm {
 
     void Application::on_window_resized(const WindowResizedEvent& event) {
         m_ctx.m_rnd.resize_framebuffers(event.width, event.height);
+        update_projection_matrices(event.width, event.height);
     }
 
     void Application::on_window_restored(const WindowRestoredEvent&) {

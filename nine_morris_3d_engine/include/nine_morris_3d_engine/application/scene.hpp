@@ -30,6 +30,11 @@ namespace sm {
 
         // Window to the user API
         Ctx& ctx;
+    private:
+        void pre_update();
+        void post_update();
+
+        friend class Application;
     };
 }
 

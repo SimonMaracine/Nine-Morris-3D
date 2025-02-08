@@ -64,7 +64,7 @@ public:
     virtual void accept_draw() = 0;
     virtual void time_control_options_window() = 0;
 
-    PointCameraController& get_camera_controller() { return m_camera_controller; }
+    std::shared_ptr<PointCameraController> get_camera_controller() const { return m_camera_controller; }
     GameState& get_game_state() { return m_game_state; }
     GameOptions& get_game_options() { return m_game_options; }
     std::optional<GameSession>& get_game_session() { return m_game_session; }
@@ -97,7 +97,6 @@ public:
     void client_accept_draw();
     void client_send_message(const std::string& message_);
 protected:
-    void on_window_resized(const sm::WindowResizedEvent& event);
     void on_key_released(const sm::KeyReleasedEvent& event);
     void on_mouse_button_pressed(const sm::MouseButtonPressedEvent& event);
     void on_mouse_button_released(const sm::MouseButtonReleasedEvent& event);
@@ -135,12 +134,7 @@ protected:
     void server_remote_accepted_draw(const networking::Message& message);
     void server_remote_sent_message(const networking::Message& message);
 
-    sm::Camera m_camera;
-    sm::Camera2D m_camera_2d;
-    sm::DirectionalLight m_directional_light;
-    sm::ShadowBox m_shadow_box;
-    sm::Skybox m_skybox;
-    PointCameraController m_camera_controller;
+    std::shared_ptr<PointCameraController> m_camera_controller;
     Ui m_ui;
 
     std::shared_ptr<sm::GlTexture> m_icon_wait;

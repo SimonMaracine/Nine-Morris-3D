@@ -1,0 +1,20 @@
+#include "nine_morris_3d_engine/application/scene.hpp"
+
+namespace sm {
+    void ApplicationScene::pre_update() {
+        auto camera_controller {ctx.root_3d()->get_camera_controller()};
+
+        if (camera_controller == nullptr) {
+            camera_controller = ctx.m_default_camera_controller;
+        }
+
+        camera_controller->update_controls(ctx.get_delta(), ctx);
+        camera_controller->update_camera(ctx.get_delta());
+
+        ctx.root_3d()->update_camera();
+    }
+
+    void ApplicationScene::post_update() {
+        ctx.root_3d()->update_shadow_box();
+    }
+}

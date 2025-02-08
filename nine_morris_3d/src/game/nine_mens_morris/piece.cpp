@@ -1,22 +1,22 @@
 #include "game/nine_mens_morris/piece.hpp"
 
-#include <utility>
+#include <nine_morris_3d_engine/external/resmanager.h++>
 
 static constexpr float PIECE_BASE_VELOCITY {0.23f};
 static constexpr float PIECE_MIN_VELOCITY_STRENGTH {0.01f};
 static constexpr float PIECE_MAX_VELOCITY_STRENGTH {1.0f};
 static constexpr float PIECE_DISTANCE_ERROR {0.001f};
 
-PieceObj::PieceObj(int id, const sm::Renderable& renderable, glm::vec3 position, PieceType type)
-    : HoverableObj(id, renderable), m_type(type) {
-    m_renderable.transform.position = position;
-    m_renderable.transform.scale = 20.0f;
-    m_renderable.outline.thickness = 1.15f;
+PieceObj::PieceObj(int id, std::shared_ptr<sm::ModelNode> model, glm::vec3 position, PieceType type)
+    : HoverableObj(id, model), m_type(type) {
+    m_model->transform.position = position;
+    m_model->outline_thickness = 1.15f;
 }
 
 void PieceObj::update(sm::Ctx& ctx) {
     if (active) {
-        ctx.add_renderable(m_renderable);
+        const auto board_model {ctx.root_3d()->find_node("board"_H)};
+        board_model->add_node(m_model);
     }
 }
 
@@ -51,8 +51,8 @@ void PieceObj::move_three_step(glm::vec3 origin, glm::vec3 target0, glm::vec3 ta
 
 void PieceObj::direct_movement(glm::vec3 origin, glm::vec3 target, auto on_arrive) {
     const float initial_distance {glm::distance(origin, target)};
-    const float current_distance {glm::distance(m_renderable.transform.position, target)};
-    const glm::vec3 difference {target - m_renderable.transform.position};
+    const float current_distance {glm::distance(m_model->transform.position, target)};
+    const glm::vec3 difference {target - m_model->transform.position};
 
     const float velocity_strength {
         glm::clamp(
@@ -64,9 +64,9 @@ void PieceObj::direct_movement(glm::vec3 origin, glm::vec3 target, auto on_arriv
 
     const glm::vec3 velocity {glm::normalize(difference) * velocity_strength};
 
-    m_renderable.transform.position += velocity;
+    m_model->transform.position += velocity;
 
-    if (glm::distance(m_renderable.transform.position, target) < PIECE_MIN_VELOCITY_STRENGTH + PIECE_DISTANCE_ERROR) {
+    if (glm::distance(m_model->transform.position, target) < PIECE_MIN_VELOCITY_STRENGTH + PIECE_DISTANCE_ERROR) {
         on_arrive();
     }
 }
@@ -92,7 +92,7 @@ void PieceObj::threestep_movement() {
 }
 
 void PieceObj::finish_movement() {
-    m_renderable.transform.position = m_target;
+    m_model->transform.position = m_target;
     m_on_finish(*this);
 
     m_movement = PieceMovement::None;

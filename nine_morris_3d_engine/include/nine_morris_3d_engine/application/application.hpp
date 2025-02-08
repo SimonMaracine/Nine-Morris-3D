@@ -60,6 +60,7 @@ namespace sm {
 
         float update_frame_counter();
         unsigned int calculate_fixed_update();
+        void update_projection_matrices(int width, int height);
         void check_changed_scene();
         void change_scene(Id id, bool clear_resources = false);
         void dear_imgui_render();

@@ -13,13 +13,10 @@ public:
     void on_stop() override;
     void on_update() override;
 private:
-    void on_window_resized(const sm::WindowResizedEvent& event);
-
-    void update_splash_screen();
-    void load_splash_screen();
+    void update_loading_image();
+    std::shared_ptr<sm::GlTexture> load_splash_screen();
     void load_assets(sm::AsyncTask& task);
 
     bool m_done {false};
-    sm::Camera2D m_camera_2d;
-    std::shared_ptr<sm::GlTexture> m_splash_screen;
+    std::shared_ptr<sm::ImageNode> m_loading_image;
 };

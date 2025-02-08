@@ -11,12 +11,68 @@ namespace sm {
         m_children.push_back(node);
     }
 
-    void SceneNode3D::traverse_transform_cast_shadow(const std::function<void(const SceneNode3D*, TransformCastShadow&)>& process) {
-        traverse<TransformCastShadow>(TransformCastShadow(), [&](const SceneNode3D* node, TransformCastShadow& context) {
-            if (auto model_node {dynamic_cast<ModelNode*>(this)}; model_node != nullptr) {
-                context.position += model_node->transform.position;
-                context.rotation += model_node->transform.rotation;
-                context.scale *= model_node->transform.scale;
+    void SceneNode3D::clear_nodes() {
+        for (const auto& child : m_children) {
+            child->clear_nodes();
+        }
+
+        m_children.clear();
+    }
+
+    void SceneNode3D::traverse(const std::function<bool(std::shared_ptr<SceneNode3D>)>& process) {
+        if (process(shared_from_this())) {
+            return;
+        }
+
+        for (const auto& child : m_children) {
+            child->traverse(process);
+        }
+    }
+
+    void SceneNode3D::traverse(const std::function<bool(SceneNode3D*)>& process) {
+        if (process(this)) {
+            return;
+        }
+
+        for (const auto& child : m_children) {
+            child->traverse(process);
+        }
+    }
+
+    void SceneNode3D::traverse(const std::function<bool(const SceneNode3D*, Context3D&)>& process) const {
+        traverse<Context3D>(Context3D(), [&](const SceneNode3D* node, Context3D& context) {
+            if (auto model_node {dynamic_cast<const ModelNode*>(node)}; model_node != nullptr) {
+                context.transform_ = glm::translate(context.transform_, model_node->transform.position);
+                context.transform_ = glm::rotate(context.transform_, model_node->transform.rotation.x, glm::vec3(1.0f, 0.0f, 0.0f));
+                context.transform_ = glm::rotate(context.transform_, model_node->transform.rotation.y, glm::vec3(0.0f, 1.0f, 0.0f));
+                context.transform_ = glm::rotate(context.transform_, model_node->transform.rotation.z, glm::vec3(0.0f, 0.0f, 1.0f));
+                context.transform_ = glm::scale(context.transform_, glm::vec3(model_node->transform.scale));
+
+                context.transform.position += model_node->transform.position;
+                context.transform.rotation += model_node->transform.rotation;
+                context.transform.scale *= model_node->transform.scale;
+
+                switch (model_node->outline) {
+                    case NodeFlag::Inherited:
+                        break;
+                    case NodeFlag::Enabled:
+                        context.outline = true;
+                        break;
+                    case NodeFlag::Disabled:
+                        context.outline = false;
+                        break;
+                }
+
+                switch (model_node->disable_back_face_culling) {
+                    case NodeFlag::Inherited:
+                        break;
+                    case NodeFlag::Enabled:
+                        context.disable_back_face_culling = true;
+                        break;
+                    case NodeFlag::Disabled:
+                        context.disable_back_face_culling = false;
+                        break;
+                }
 
                 switch (model_node->cast_shadow) {
                     case NodeFlag::Inherited:
@@ -28,50 +84,106 @@ namespace sm {
                         context.cast_shadow = false;
                         break;
                 }
-            } else if (auto point_light_node {dynamic_cast<PointLightNode*>(this)}; point_light_node != nullptr) {
-                context.position += point_light_node->position;
+            } else if (auto point_light_node {dynamic_cast<const PointLightNode*>(node)}; point_light_node != nullptr) {
+                context.transform_ = glm::translate(context.transform_, model_node->transform.position);
+
+                context.transform.position += point_light_node->position;
             }
 
-            process(node, context);
+            return process(node, context);
         });
+    }
+
+    std::shared_ptr<SceneNode3D> SceneNode3D::find_node(Id id) {
+        std::shared_ptr<SceneNode3D> result;
+
+        traverse([&](std::shared_ptr<SceneNode3D> node) {
+            if (node->m_id == id) {
+                result = node;
+                return true;
+            }
+
+            return false;
+        });
+
+        return result;
     }
 
     void SceneNode2D::add_node(std::shared_ptr<SceneNode2D> node) {
         m_children.push_back(node);
     }
 
-    // void SceneNode2D::traverse_transform(const std::function<void(const SceneNode2D*, Transform&)>& process) {
-    //     traverse<Transform>(Transform(), [&](const SceneNode2D* node, Transform& transform) {
-    //         if (auto image_node {dynamic_cast<const ImageNode*>(this)}; image_node != nullptr) {
-    //             transform.position += image_node->position;
-    //             transform.scale *= image_node->scale;
-    //         } else if (auto text_node {dynamic_cast<const TextNode*>(this)}; text_node != nullptr) {
-    //             transform.position += text_node->position;
-    //             transform.scale *= text_node->scale;
-    //         }
+    void SceneNode2D::clear_nodes() {
+        m_children.clear();
+    }
 
-    //         process(node, transform);
-    //     });
-    // }
+    void SceneNode2D::traverse(const std::function<bool(std::shared_ptr<SceneNode2D>)>& process) {
+        if (process(shared_from_this())) {
+            return;
+        }
 
-    void Root3DNode::set_camera(const Camera& camera, glm::vec3 position) {
+        for (const auto& child : m_children) {
+            child->traverse(process);
+        }
+    }
+
+    void SceneNode2D::traverse(const std::function<bool(SceneNode2D*)>& process) {
+        if (process(this)) {
+            return;
+        }
+
+        for (const auto& child : m_children) {
+            child->traverse(process);
+        }
+    }
+
+    void SceneNode2D::traverse(const std::function<bool(const SceneNode2D*, Context2D&)>& process) const {
+        traverse<Context2D>(Context2D(), [&](const SceneNode2D* node, Context2D& context) {
+            if (auto image_node {dynamic_cast<const ImageNode*>(node)}; image_node != nullptr) {
+                context.transform.position += image_node->transform.position;
+                context.transform.scale *= image_node->transform.scale;
+            } else if (auto text_node {dynamic_cast<const TextNode*>(node)}; text_node != nullptr) {
+                context.transform.position += text_node->transform.position;
+                context.transform.scale *= text_node->transform.scale;
+            }
+
+            return process(node, context);
+        });
+    }
+
+    std::shared_ptr<SceneNode2D> SceneNode2D::find_node(Id id) {
+        std::shared_ptr<SceneNode2D> result;
+
+        traverse([=](std::shared_ptr<SceneNode2D> node) mutable {
+            if (node->m_id == id) {
+                result = node;
+                return true;
+            }
+
+            return false;
+        });
+
+        return result;
+    }
+
+    void RootNode3D::set_camera(const Camera& camera, glm::vec3 position) {
         m_camera = camera;
         m_camera_position = position;
     }
 
-    void Root3DNode::set_skybox(const Skybox& skybox) {
+    void RootNode3D::set_skybox(const Skybox& skybox) {
         m_skybox = skybox;
     }
 
-    void Root3DNode::set_directional_light(const DirectionalLight& directional_light) {
+    void RootNode3D::set_directional_light(const DirectionalLight& directional_light) {
         m_directional_light = directional_light;
     }
 
-    void Root3DNode::set_shadow_box(const ShadowBox& shadow_box) {
+    void RootNode3D::set_shadow_box(const ShadowBox& shadow_box) {
         m_shadow_box = shadow_box;
     }
 
-    void Root3DNode::debug_add_line(glm::vec3 position1, glm::vec3 position2, glm::vec3 color) {
+    void RootNode3D::debug_add_line(glm::vec3 position1, glm::vec3 position2, glm::vec3 color) {
         DebugLine line;
         line.position1 = position1;
         line.position2 = position2;
@@ -82,7 +194,7 @@ namespace sm {
 #endif
     }
 
-    void Root3DNode::debug_add_lines(const std::vector<glm::vec3>& positions, glm::vec3 color) {
+    void RootNode3D::debug_add_lines(const std::vector<glm::vec3>& positions, glm::vec3 color) {
         assert(positions.size() >= 2);
 
         DebugLine line;
@@ -98,7 +210,7 @@ namespace sm {
         }
     }
 
-    void Root3DNode::debug_add_point(glm::vec3 position, glm::vec3 color) {
+    void RootNode3D::debug_add_point(glm::vec3 position, glm::vec3 color) {
         static constexpr float SIZE {0.3f};
 
         debug_add_line(glm::vec3(-SIZE, 0.0f, 0.0f) + position, glm::vec3(SIZE, 0.0f, 0.0f) + position, color);
@@ -106,7 +218,7 @@ namespace sm {
         debug_add_line(glm::vec3(0.0f, 0.0f, -SIZE) + position, glm::vec3(0.0f, 0.0f, SIZE) + position, color);
     }
 
-    void Root3DNode::debug_add_lamp(glm::vec3 position, glm::vec3 color) {
+    void RootNode3D::debug_add_lamp(glm::vec3 position, glm::vec3 color) {
         static constexpr float SIZE {0.3f};
         static constexpr float SIZE2 {0.15f};
         static constexpr float SIZE3 {0.5f};
@@ -152,11 +264,11 @@ namespace sm {
         }
     }
 
-    void Root3DNode::debug_clear() {
+    void RootNode3D::debug_clear() {
         m_debug_lines.clear();
     }
 
-    void Root3DNode::update_shadow_box() {
+    void RootNode3D::update_shadow_box() {
         const glm::mat4 view_matrix {
             glm::lookAt(glm::vec3(0.0f), m_directional_light.direction, glm::vec3(0.0f, 1.0f, 0.0f))
         };
@@ -168,19 +280,19 @@ namespace sm {
         float max_z_positive {std::numeric_limits<float>::min()};
         float max_z_negative {std::numeric_limits<float>::max()};
 
-        traverse_transform_cast_shadow([&](const SceneNode3D* node, SceneNode3D::TransformCastShadow& context) {
+        traverse([&](const SceneNode3D* node, Context3D& context) {
             auto model_node {dynamic_cast<const ModelNode*>(node)};
 
             if (model_node == nullptr) {
-                return;
+                return false;
             }
 
             if (!context.cast_shadow) {
-                return;
+                return false;
             }
 
-            const glm::vec3 position_bb {view_matrix * glm::vec4(context.position, 1.0f)};
-            const float radius_bb {glm::length(glm::max(model_node->get_aabb().max, model_node->get_aabb().min)) * context.scale};
+            const glm::vec3 position_bb {view_matrix * glm::vec4(context.transform.position, 1.0f)};
+            const float radius_bb {glm::length(glm::max(model_node->get_aabb().max, model_node->get_aabb().min)) * context.transform.scale};
 
             max_x_positive = glm::max(max_x_positive, position_bb.x + radius_bb);
             max_x_negative = glm::min(max_x_negative, position_bb.x - radius_bb);
@@ -188,6 +300,8 @@ namespace sm {
             max_y_negative = glm::min(max_y_negative, position_bb.y - radius_bb);
             max_z_positive = glm::max(max_z_positive, position_bb.z + radius_bb);
             max_z_negative = glm::min(max_z_negative, position_bb.z - radius_bb);
+
+            return false;
         });
 
         m_shadow_box.left = max_x_negative;
@@ -201,7 +315,11 @@ namespace sm {
         m_shadow_box.far_ = -max_z_negative + max_z_positive + 1.0f;
     }
 
-    void Root2DNode::set_camera(const Camera2D& camera) {
+    void RootNode3D::update_camera() {
+        m_camera_position = m_camera_controller ? m_camera_controller->get_position() : glm::vec3(0.0f);
+    }
+
+    void RootNode2D::set_camera(const Camera2D& camera) {
         m_camera = camera;
     }
 }

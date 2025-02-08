@@ -327,7 +327,7 @@ void Ui::main_menu_bar(sm::Ctx& ctx, GameScene& game_scene) {
                 if (ImGui::SliderFloat("##", &m_options.camera_sensitivity, 0.5f, 2.0f, "%.01f", ImGuiSliderFlags_Logarithmic)) {
                     g.options.camera_sensitivity = m_options.camera_sensitivity;
 
-                    game_scene.get_camera_controller().sensitivity = g.options.camera_sensitivity;;
+                    game_scene.get_camera_controller()->sensitivity = g.options.camera_sensitivity;;
                 }
                 ImGui::PopItemWidth();
 

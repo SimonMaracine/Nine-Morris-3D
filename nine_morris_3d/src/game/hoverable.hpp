@@ -6,8 +6,8 @@
 class HoverableObj {
 public:
     HoverableObj() = default;
-    HoverableObj(int id, const sm::Renderable& renderable)
-        : m_id(id), m_renderable(renderable) {}
+    HoverableObj(int id, std::shared_ptr<sm::ModelNode> model)
+        : m_id(id), m_model(model) {}
 
     virtual ~HoverableObj() = default;
 
@@ -17,9 +17,8 @@ public:
     HoverableObj& operator=(HoverableObj&&) = default;
 
     int get_id() const { return m_id; }
-    const sm::Renderable& get_renderable() const { return m_renderable; }
-    sm::Renderable& get_renderable() { return m_renderable; }
+    std::shared_ptr<sm::ModelNode> get_model() const { return m_model; }
 protected:
     int m_id {-1};
-    sm::Renderable m_renderable;
+    std::shared_ptr<sm::ModelNode> m_model;
 };

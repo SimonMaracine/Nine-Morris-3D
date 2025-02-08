@@ -2,6 +2,10 @@
 
 #include <nine_morris_3d_engine/external/glm.h++>
 
+static constexpr float LENS_FOV {45.0f};
+static constexpr float LENS_NEAR {1.0f};
+static constexpr float LENS_FAR {100.0f};
+
 static constexpr float ZOOM_BASE_VELOCITY {0.03f};
 static constexpr float ZOOM_VARIABLE_VELOCITY {5.0f};
 static constexpr float Y_BASE_VELOCITY {0.03f};
@@ -58,6 +62,18 @@ glm::vec3 PointCameraController::get_position() const {
 
 glm::vec3 PointCameraController::get_rotation() const {
     return glm::vec3(m_pitch, m_yaw, 0.0f);
+}
+
+float PointCameraController::get_fov() const {
+    return LENS_FOV;
+}
+
+float PointCameraController::get_near() const {
+    return LENS_NEAR;
+}
+
+float PointCameraController::get_far() const {
+    return LENS_FAR;
 }
 
 void PointCameraController::set_distance_to_point(float distance_to_point) {

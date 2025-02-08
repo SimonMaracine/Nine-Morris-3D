@@ -7,7 +7,7 @@
 class NodeObj : public HoverableObj {
 public:
     NodeObj() = default;
-    NodeObj(int id, const sm::Renderable& renderable, glm::vec3 position);
+    NodeObj(int id, std::shared_ptr<sm::ModelNode> model, glm::vec3 position);
 
     void set_highlighted(bool highlighted) { m_highlighted = highlighted; }
 

@@ -22,7 +22,7 @@ public:
     using OnFinish = std::function<void(PieceObj&)>;
 
     PieceObj() = default;
-    PieceObj(int id, const sm::Renderable& renderable, glm::vec3 position, PieceType type);
+    PieceObj(int id, std::shared_ptr<sm::ModelNode> model, glm::vec3 position, PieceType type);
 
     PieceType get_type() const { return m_type; }
     bool is_moving() const { return m_movement != PieceMovement::None; }

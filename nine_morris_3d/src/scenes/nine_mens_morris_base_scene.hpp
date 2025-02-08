@@ -42,11 +42,11 @@ public:
 
     virtual bool twelve_mens_morris() const = 0;
 private:
-    sm::Renderable setup_board() const;
-    sm::Renderable setup_paint() const;
-    NineMensMorrisBoard::NodeRenderables setup_nodes() const;
-    NineMensMorrisBoard::PieceRenderables setup_white_pieces() const;
-    NineMensMorrisBoard::PieceRenderables setup_black_pieces() const;
+    std::shared_ptr<sm::ModelNode> setup_board() const;
+    std::shared_ptr<sm::ModelNode> setup_paint() const;
+    NineMensMorrisBoard::NodeModels setup_nodes() const;
+    NineMensMorrisBoard::PieceModels setup_white_pieces() const;
+    NineMensMorrisBoard::PieceModels setup_black_pieces() const;
 
     std::shared_ptr<sm::GlTexture> load_board_diffuse_texture(bool reload = false) const;
     std::shared_ptr<sm::GlTexture> load_paint_diffuse_texture(bool reload = false) const;
@@ -55,7 +55,7 @@ private:
     std::shared_ptr<sm::GlTexture> load_piece_black_diffuse_texture(bool reload = false) const;
     std::shared_ptr<sm::GlTexture> load_piece_normal_texture(bool reload = false) const;
 
-    NineMensMorrisBoard setup_renderables();
+    NineMensMorrisBoard setup_models();
     int pieces_count() const;
 
     NineMensMorrisBoard m_board;

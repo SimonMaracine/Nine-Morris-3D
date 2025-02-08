@@ -32,9 +32,11 @@
 #include "nine_morris_3d_engine/graphics/font.hpp"
 #include "nine_morris_3d_engine/graphics/texture_data.hpp"
 #include "nine_morris_3d_engine/other/internal/resources_cache.hpp"
+#include "nine_morris_3d_engine/other/internal/default_camera_controller.hpp"
 
 namespace sm {
     class Application;
+    class ApplicationScene;
 
     enum class MaterialType {
         Flat,
@@ -133,24 +135,8 @@ namespace sm {
         static std::pair<float, float> get_mouse_position();
 
         // Scene
-        std::shared_ptr<Root3DNode> root_3d() const { return m_scn.root_3d_node; }
-        std::shared_ptr<Root2DNode> root_2d() const { return m_scn.root_2d_node; }
-
-        // void capture(const Camera& camera, glm::vec3 position);
-        // void capture(const Camera2D& camera_2d);
-        // void environment(const Skybox& skybox);
-        // void shadow(ShadowBox& box);
-        // void add_post_processing(std::shared_ptr<PostProcessingStep> step);
-        // void add_renderable(Renderable& renderable);
-        // void add_light(DirectionalLight& light);
-        // void add_light(PointLight& light);
-        // void add_text(Text& text);
-        // void add_quad(Quad& quad);
-        // void debug_add_line(glm::vec3 position1, glm::vec3 position2, glm::vec3 color);
-        // void debug_add_lines(const std::vector<glm::vec3>& positions, glm::vec3 color);
-        // void debug_add_lines(std::initializer_list<glm::vec3> positions, glm::vec3 color);
-        // void debug_add_point(glm::vec3 position, glm::vec3 color);
-        // void debug_add_lamp(glm::vec3 position, glm::vec3 color);
+        std::shared_ptr<RootNode3D> root_3d() const { return m_scn.root_node_3d; }
+        std::shared_ptr<RootNode2D> root_2d() const { return m_scn.root_node_2d; }
 
         // Dear ImGui
         static void invalidate_dear_imgui_texture();
@@ -172,8 +158,8 @@ namespace sm {
         std::shared_ptr<GlTexture> reload_texture(Id id, std::shared_ptr<TextureData> texture_data, const TextureSpecification& specification);
         std::shared_ptr<GlTextureCubemap> load_texture_cubemap(Id id, std::initializer_list<std::shared_ptr<TextureData>> texture_data, TextureFormat format);
         std::shared_ptr<GlTextureCubemap> reload_texture_cubemap(Id id, std::initializer_list<std::shared_ptr<TextureData>> texture_data, TextureFormat format);
-        std::shared_ptr<Material> load_material(MaterialType type, unsigned int flags = 0);
-        std::shared_ptr<Material> load_material(Id id, const std::filesystem::path& vertex_file_path, const std::filesystem::path& fragment_file_path, MaterialType type, unsigned int flags = 0);
+        std::shared_ptr<Material> load_material(MaterialType type);
+        std::shared_ptr<Material> load_material(Id id, const std::filesystem::path& vertex_file_path, const std::filesystem::path& fragment_file_path, MaterialType type);
         std::shared_ptr<MaterialInstance> load_material_instance(Id id, std::shared_ptr<Material> material);
         std::shared_ptr<GlShader> load_shader(Id id, const std::filesystem::path& vertex_file_path, const std::filesystem::path& fragment_file_path);
         std::shared_ptr<GlFramebuffer> load_framebuffer(Id id, const FramebufferSpecification& specification);
@@ -237,7 +223,11 @@ namespace sm {
         void* m_user_data {};  // Arbitrary pointer to data defined by the user
         Application* m_application {};  // Context needs to know about the application
 
+        std::shared_ptr<internal::DefaultCameraController> m_default_camera_controller;
+        std::shared_ptr<TextNode> m_information_text;
+
         friend class Application;
+        friend class ApplicationScene;
         friend class internal::DebugUi;
     };
 }

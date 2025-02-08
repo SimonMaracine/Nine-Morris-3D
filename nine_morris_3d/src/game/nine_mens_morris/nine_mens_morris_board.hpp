@@ -81,19 +81,19 @@ public:
         }
     };
 
-    using NodeRenderables = sm::utils::Array<sm::Renderable, int, NODES>;
-    using PieceRenderables = sm::utils::Array<sm::Renderable, int, PIECES / 2>;
+    using NodeModels = sm::utils::Array<std::shared_ptr<sm::ModelNode>, int, NODES>;
+    using PieceModels = sm::utils::Array<std::shared_ptr<sm::ModelNode>, int, PIECES / 2>;
 
     using Nodes = std::array<NodeObj, NODES>;
     using Pieces = sm::utils::Array<PieceObj, int, PIECES>;
 
     NineMensMorrisBoard() = default;
     NineMensMorrisBoard(
-        const sm::Renderable& board,
-        const sm::Renderable& paint,
-        const NodeRenderables& nodes,
-        const PieceRenderables& white_pieces,
-        const PieceRenderables& black_pieces,
+        std::shared_ptr<sm::ModelNode> board,
+        std::shared_ptr<sm::ModelNode> paint,
+        const NodeModels& nodes,
+        const PieceModels& white_pieces,
+        const PieceModels& black_pieces,
         std::shared_ptr<sm::SoundData> piece_place1,
         std::shared_ptr<sm::SoundData> piece_place2,
         std::shared_ptr<sm::SoundData> piece_place3,
@@ -114,8 +114,8 @@ public:
     Player get_player() const { return m_position.player; }
     const Position& get_setup_position() const { return m_setup_position; }
 
-    sm::Renderable& get_board_renderable() { return m_board_renderable; }
-    sm::Renderable& get_paint_renderable() { return m_paint_renderable; }
+    std::shared_ptr<sm::ModelNode> get_board_model() const { return m_board_model; }
+    std::shared_ptr<sm::ModelNode> get_paint_model() const { return m_paint_model; }
     Nodes& get_nodes() { return m_nodes; }
     Pieces& get_pieces() { return m_pieces; }
 
@@ -140,7 +140,7 @@ public:
         return m_position.player == Player::White ? value_if_white : value_if_black;
     }
 private:
-    void initialize_objects(const NodeRenderables& nodes, const PieceRenderables& white_pieces, const PieceRenderables& black_pieces);
+    void initialize_objects(const NodeModels& nodes, const PieceModels& white_pieces, const PieceModels& black_pieces);
     void initialize_objects();
 
     void update_nodes_highlight(std::function<bool()>&& highlight, bool enabled);
@@ -207,8 +207,8 @@ private:
     std::function<void(const Move&)> m_move_callback;  // Called after the turn has finished
 
     // Objects
-    sm::Renderable m_board_renderable;
-    sm::Renderable m_paint_renderable;
+    std::shared_ptr<sm::ModelNode> m_board_model;
+    std::shared_ptr<sm::ModelNode> m_paint_model;
     Nodes m_nodes;
     Pieces m_pieces;
 

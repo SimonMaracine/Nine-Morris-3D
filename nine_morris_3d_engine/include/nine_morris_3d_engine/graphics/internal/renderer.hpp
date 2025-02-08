@@ -25,31 +25,6 @@ namespace sm {
 }
 
 namespace sm::internal {
-#ifndef SM_BUILD_DISTRIBUTION
-    class DebugRenderer {
-    public:
-        DebugRenderer() = default;
-        DebugRenderer(const FileSystem& fs, Renderer& renderer);
-
-        void render(const Scene& scene);
-    private:
-        struct BufferVertex {
-            glm::vec3 position;
-            glm::vec3 color;
-        };
-
-        struct {
-            std::shared_ptr<GlShader> shader;
-            std::weak_ptr<GlVertexBuffer> wvertex_buffer;
-            std::unique_ptr<GlVertexArray> vertex_array;
-
-            std::vector<BufferVertex> lines_buffer;
-        } m_storage;
-    };
-#else
-    class DebugRenderer {};
-#endif
-
     struct RendererSpecification {
         int samples {1};
         int scale {1};
@@ -86,23 +61,6 @@ namespace sm::internal {
         void setup_shader_uniform_buffers(std::shared_ptr<GlShader> shader);
         void clear_expired_resources();
 
-        struct Context3D {
-            Transform3D transform;
-            glm::vec3 outline_color {1.0f};
-            float outline_thickness {1.1f};
-            bool outline {};
-            bool disable_back_face_culling {};
-            bool cast_shadow {};
-        };
-
-        struct Context2D {
-            Transform2D transform;
-
-        };
-
-        void traverse_graph_3d(const Scene& scene, const std::function<void(const SceneNode3D*, Context3D&)>& process);
-        void traverse_graph_2d(const Scene& scene, const std::function<void(const SceneNode3D*, Context2D&)>& process);
-
         // Draw functions
         void draw_models(const Scene& scene);
         void draw_model(const ModelNode* model_node, const Context3D& context);
@@ -113,27 +71,16 @@ namespace sm::internal {
         void draw_models_to_shadow_map(const Scene& scene);
         void draw_skybox(const Scene& scene);
 
-        struct Text {
-            std::string text;
-        };
-
         struct TextBatch {
             std::shared_ptr<Font> font;
-            std::vector<Text> texts;
+            std::vector<std::pair<const TextNode*, Context2D>> texts;
         };
 
         void draw_texts(const Scene& scene);
         void draw_text_batch(const Scene& scene, const TextBatch& batch);
 
-        struct Image {
-            glm::vec2 position {};
-            glm::vec2 size {};
-            glm::vec2 scale {};
-            unsigned int texture {};
-        };
-
         void draw_images(const Scene& scene);
-        void draw_image(const Image& image);
+        void draw_image(const ImageNode* image_node, const Context2D& context);
         void begin_images_batch();
         void end_images_batch();
         void flush_images_batch();
@@ -145,7 +92,6 @@ namespace sm::internal {
         void setup_shadow_framebuffer(int size);
         void setup_default_font(const FileSystem& fs, int scale);
         std::shared_ptr<GlIndexBuffer> initialize_quads_index_buffer();
-        static glm::mat4 get_transform(const Transform3D& transform);
 
         struct QuadVertex {
             glm::vec2 position {};
@@ -201,7 +147,21 @@ namespace sm::internal {
         bool m_color_correction {true};
 
 #ifndef SM_BUILD_DISTRIBUTION
-        DebugRenderer m_debug;
+        void debug_initialize(const FileSystem& fs);
+        void debug_render(const Scene& scene);
+
+        struct BufferVertex {
+            glm::vec3 position;
+            glm::vec3 color;
+        };
+
+        struct {
+            std::shared_ptr<GlShader> shader;
+            std::weak_ptr<GlVertexBuffer> wvertex_buffer;
+            std::unique_ptr<GlVertexArray> vertex_array;
+
+            std::vector<BufferVertex> lines_buffer;
+        } m_debug_storage;
 #endif
 
         static constexpr unsigned int PROJECTON_VIEW_UNIFORM_BLOCK_BINDING {0};
