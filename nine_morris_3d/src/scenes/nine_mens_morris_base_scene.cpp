@@ -325,16 +325,19 @@ void NineMensMorrisBaseScene::start_engine() {
     m_engine->set_log_output(true, "nine_mens_morris_engine.log");
 #endif
 
+#if defined(SM_BUILD_DISTRIBUTION) && defined(SM_PLATFORM_LINUX)
+    const bool search_executable {true};
+#else
+    const bool search_executable {false};
+#endif
+
     try {
 #ifdef SM_PLATFORM_WINDOWS
-        m_engine->initialize("nine_morris_3d_engine_muhle_intelligence.exe");
+        m_engine->initialize("nine_morris_3d_engine_muhle_intelligence.exe", search_executable);
 #else
-    #ifdef SM_BUILD_DISTRIBUTION
-        m_engine->initialize("nine_morris_3d_engine_muhle_intelligence", true);
-    #else
-        m_engine->initialize("nine_morris_3d_engine_muhle_intelligence");
-    #endif
+        m_engine->initialize("nine_morris_3d_engine_muhle_intelligence", search_executable);
 #endif
+
 #ifndef SM_BUILD_DISTRIBUTION
         m_engine->set_debug(true);
 #endif
