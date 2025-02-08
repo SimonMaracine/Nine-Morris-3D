@@ -135,8 +135,8 @@ namespace sm {
         static std::pair<float, float> get_mouse_position();
 
         // Scene
-        std::shared_ptr<RootNode3D> root_3d() const { return m_scn.root_node_3d; }
-        std::shared_ptr<RootNode2D> root_2d() const { return m_scn.root_node_2d; }
+        std::shared_ptr<RootNode3D> render_3d() const { return m_scn.root_node_3d; }
+        std::shared_ptr<RootNode2D> render_2d() const { return m_scn.root_node_2d; }
 
         // Dear ImGui
         static void invalidate_dear_imgui_texture();

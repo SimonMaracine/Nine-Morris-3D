@@ -18,8 +18,8 @@ void NineMensMorrisBaseScene::scene_setup() {
 void NineMensMorrisBaseScene::scene_update() {
     m_board.update(
         ctx,
-        cast_mouse_ray(ctx, ctx.root_3d()->get_camera()),
-        ctx.root_3d()->get_camera_position(),
+        cast_mouse_ray(ctx, ctx.render_3d()->get_camera()),
+        ctx.render_3d()->get_camera_position(),
         m_game_state == GameState::HumanThinking && m_board.get_game_over() == GameOver::None
     );
 }

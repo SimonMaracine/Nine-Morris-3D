@@ -9,7 +9,7 @@ NodeObj::NodeObj(int id, std::shared_ptr<sm::ModelNode> model, glm::vec3 positio
 
 void NodeObj::update(sm::Ctx& ctx) {
     if (m_highlighted) {
-        const auto board_model {ctx.root_3d()->find_node("board"_H)};
+        const auto board_model {ctx.render_3d()->find_node("board"_H)};
         board_model->add_node(m_model);
     }
 }

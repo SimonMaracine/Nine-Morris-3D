@@ -56,7 +56,7 @@ void LoadingScene::update_loading_image() {
         height / static_cast<float>(m_loading_image->get_texture()->get_height())
     );
 
-    ctx.root_2d()->add_node(m_loading_image);
+    ctx.render_2d()->add_node(m_loading_image);
 }
 
 std::shared_ptr<sm::GlTexture> LoadingScene::load_splash_screen() {

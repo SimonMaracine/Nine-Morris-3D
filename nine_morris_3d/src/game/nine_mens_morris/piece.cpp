@@ -15,7 +15,7 @@ PieceObj::PieceObj(int id, std::shared_ptr<sm::ModelNode> model, glm::vec3 posit
 
 void PieceObj::update(sm::Ctx& ctx) {
     if (active) {
-        const auto board_model {ctx.root_3d()->find_node("board"_H)};
+        const auto board_model {ctx.render_3d()->find_node("board"_H)};
         board_model->add_node(m_model);
     }
 }

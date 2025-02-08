@@ -366,7 +366,7 @@ void NineMensMorrisBoard::update(sm::Ctx& ctx, glm::vec3 ray, glm::vec3 camera, 
         user_input
     );
 
-    ctx.root_3d()->add_node(m_board_model);
+    ctx.render_3d()->add_node(m_board_model);
     m_board_model->add_node(m_paint_model);
 
     update_nodes(ctx);
