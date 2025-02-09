@@ -244,7 +244,9 @@ namespace sm {
     }
 
     void RootNode3D::debug_clear() {
+#ifndef SM_BUILD_DISTRIBUTION
         m_debug_lines.clear();
+#endif
     }
 
     void RootNode3D::update_shadow_box() {
@@ -269,9 +271,6 @@ namespace sm {
             if (!context.cast_shadow) {
                 return false;
             }
-
-            // const glm::vec3 position_bb {view_matrix * glm::vec4(context.transform_position, 1.0f)};
-            // const float radius_bb {glm::length(glm::max(model_node->get_aabb().max, model_node->get_aabb().min)) * context.transform_scale};
 
             const glm::vec3 position_bb {view_matrix * context.transform * glm::vec4(0.0f, 0.0f, 0.0f, 1.0f)};
             const float radius_bb {glm::length(glm::max(model_node->get_aabb().max, model_node->get_aabb().min)) * context.transform_scale};

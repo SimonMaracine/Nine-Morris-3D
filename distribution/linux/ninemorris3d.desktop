@@ -2,7 +2,7 @@
 Name=Nine Morris 3D
 Exec=nine_morris_3d
 Type=Application
-Icon=ninemorris3d
+Icon=nine_morris_3d
 Categories=Game;
 Comment=A nine men's morris implementation in 3D
-Version=0.4.0
+Version=0.5.0

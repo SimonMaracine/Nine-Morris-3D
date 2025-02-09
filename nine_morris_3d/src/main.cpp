@@ -35,8 +35,8 @@ static void get_paths([[maybe_unused]] Paths& paths) {
 #elif defined(SM_PLATFORM_WINDOWS)
     const std::filesystem::path username {sm::utils::get_environment_variable("USERNAME")};
 
-    paths.logs = "C:\\Users" / username / "Documents\\Nine Morris 3D"
-    paths.saved_data = "C:\\Users" / username / "Documents\\Nine Morris 3D"
+    paths.logs = "C:\\Users" / username / "Documents\\Nine Morris 3D";
+    paths.saved_data = "C:\\Users" / username / "Documents\\Nine Morris 3D";
 #endif
 
 #endif  // SM_BUILD_DISTRIBUTION

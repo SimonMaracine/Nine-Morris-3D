@@ -103,7 +103,7 @@ python build.py dist
 :: Or open in Visual Studio, change to Release mode and build from there
 ```
 
-Note: on Windows, you have to rerun setup.py in order to change from development to distribution and back.
+Note of caution: on Windows, you have to rerun setup.py in order to change from development to distribution and back.
 
 ## Running
 

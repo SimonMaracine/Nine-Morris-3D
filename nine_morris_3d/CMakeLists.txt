@@ -3,14 +3,18 @@ cmake_minimum_required(VERSION 3.20)
 file(GLOB_RECURSE NM3D_SOURCES CONFIGURE_DEPENDS "src/*.cpp")
 file(GLOB_RECURSE NM3D_HEADERS "src/*.hpp")
 
-# Add WIN32 option for Windows in release + distribution mode
+
 if(WIN32)
+    # Remove console from distribution builds
     if(NM3D_DISTRIBUTION_MODE)
         set(NM3D_GUI_WINDOWS WIN32)
     endif()
+
+    # Add icon
+    set(NM3D_ICON_WINDOWS "res/nine_morris_3d.rc")
 endif()
 
-add_executable(nine_morris_3d ${NM3D_GUI_WINDOWS} ${NM3D_SOURCES} ${NM3D_HEADERS})
+add_executable(nine_morris_3d ${NM3D_GUI_WINDOWS} ${NM3D_SOURCES} ${NM3D_HEADERS} ${NM3D_ICON_WINDOWS})
 
 target_include_directories(nine_morris_3d PRIVATE "src")
 

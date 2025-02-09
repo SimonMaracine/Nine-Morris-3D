@@ -8,7 +8,7 @@
 
 Var StartMenuFolder
 !define ApplicationName "Nine Morris 3D"
-!define ApplicationVersion "0.4.0"
+!define ApplicationVersion "0.5.0"
 
 ; General
 
@@ -24,7 +24,7 @@ InstallDirRegKey HKLM "Software\${ApplicationName}" "InstallationDirectory"
 
 ; Pages
 
-; !insertmacro MUI_PAGE_LICENSE "${NSISDIR}\Docs\Modern UI\License.txt"  ; TODO this
+; !insertmacro MUI_PAGE_LICENSE "${NSISDIR}\Docs\Modern UI\License.txt"  ; TODO
 !insertmacro MUI_PAGE_COMPONENTS
 !insertmacro MUI_PAGE_DIRECTORY
 
@@ -44,6 +44,11 @@ InstallDirRegKey HKLM "Software\${ApplicationName}" "InstallationDirectory"
 
 !insertmacro MUI_LANGUAGE "English"
 
+; Icon
+
+; Icon icon.ico  ; TODO
+; UninstallIcon icon.ico
+
 ; Installer Sections
 
 Section "Nine Morris 3D (required)" section_game
@@ -57,6 +62,7 @@ Section "Nine Morris 3D (required)" section_game
   File /r "assets"
   File /r "assets_engine"
   File "README.txt"
+  File "nine_morris_3d.ico"
   File "nine_morris_3d.exe"
   File "nine_morris_3d_engine_*.exe"
 
@@ -70,10 +76,8 @@ Section "Nine Morris 3D (required)" section_game
       "UninstallString" "$\"$INSTDIR\Uninstall.exe$\""
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${ApplicationName}" \
       "QuietUninstallString" "$\"$INSTDIR\Uninstall.exe$\" /S"
-  ; WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${ApplicationName}" \  ; TODO fill these
-  ;     "DisplayIcon" "$\"...$\""
-  ; WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${ApplicationName}" \
-  ;     "Publisher" "Simon Mărăcine"
+  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${ApplicationName}" \
+      "DisplayIcon" "$\"$INSTDIR\nine_morris_3d.ico$\""
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${ApplicationName}" \
       "DisplayVersion" "${ApplicationVersion}"
 
@@ -109,6 +113,7 @@ Section "Uninstall"
 
   Delete "$INSTDIR\nine_morris_3d_engine_*.exe"
   Delete "$INSTDIR\nine_morris_3d.exe"
+  Delete "$INSTDIR\nine_morris_3d.ico"
   Delete "$INSTDIR\README.txt"
   RMDir /r "$INSTDIR\assets_engine"
   RMDir /r "$INSTDIR\assets"

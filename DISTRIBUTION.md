@@ -44,11 +44,12 @@ python export_assets.py ..\build ..\assets ..\assets_engine
 ```
 
 - Create a new folder called whatever
-- Copy the game binary from `build\nine_morris_3d\Release` into the folder
+- Copy `nine_morris_3d.exe` from `build\nine_morris_3d\Release` into the folder
 - Copy the engine binaries from root into the folder
 - Copy the assets directories from `build` into the folder
 - Copy `README.txt` from `distribution` into the folder
 - Copy `installer.nsi` from `distribution\windows` into the folder
+- Copy `nine_morris_3d.ico` from `distribution\windows` into the folder
 - Create an NSIS installer called `Nine-Morris-3D-X.Y.Z-Windows` using the installer script
 
 ## Update the version
