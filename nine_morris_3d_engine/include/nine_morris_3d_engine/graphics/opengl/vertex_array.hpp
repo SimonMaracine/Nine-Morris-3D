@@ -8,6 +8,7 @@
 #include "nine_morris_3d_engine/graphics/opengl/vertex_buffer_layout.hpp"
 
 namespace sm {
+    // OpenGL resource representing a vertex array
     class GlVertexArray {
     public:
         using Configuration = std::function<void(GlVertexArray*)>;

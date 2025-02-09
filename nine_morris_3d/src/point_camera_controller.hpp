@@ -6,9 +6,9 @@
 class PointCameraController : public sm::CameraController {
 public:
     PointCameraController() = default;
-    explicit PointCameraController(sm::Camera& camera);
+    explicit PointCameraController(sm::Camera3D& camera);
     PointCameraController(
-        sm::Camera& camera,
+        sm::Camera3D& camera,
         int width,
         int height,
         glm::vec3 point,

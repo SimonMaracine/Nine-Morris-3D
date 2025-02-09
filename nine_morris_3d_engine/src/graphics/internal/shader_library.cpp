@@ -1,6 +1,5 @@
 #include "nine_morris_3d_engine/graphics/internal/shader_library.hpp"
 
-#include <filesystem>
 #include <regex>
 #include <iterator>
 #include <vector>
@@ -12,7 +11,7 @@
 #include "nine_morris_3d_engine/other/utilities.hpp"
 
 namespace sm::internal {
-    ShaderLibrary::ShaderLibrary(std::initializer_list<std::string> include_directories) {
+    ShaderLibrary::ShaderLibrary(std::initializer_list<std::filesystem::path> include_directories) {
         load_shaders_from_include_directories(include_directories);
     }
 
@@ -38,7 +37,7 @@ namespace sm::internal {
 #endif
     }
 
-    std::string ShaderLibrary::load_shader(const std::string& source, std::initializer_list<Define> defines) const {
+    std::string ShaderLibrary::load_shader(const std::string& source, std::initializer_list<Definition> defines) const {
         std::string result {source};
 
         for (const auto& define : defines) {
@@ -60,13 +59,13 @@ namespace sm::internal {
         return result;
     }
 
-    void ShaderLibrary::load_shaders_from_include_directories(std::initializer_list<std::string> include_directories) {
+    void ShaderLibrary::load_shaders_from_include_directories(std::initializer_list<std::filesystem::path> include_directories) {
         for (const auto& include_directory : include_directories) {
             std::error_code ec;
             auto iter {std::filesystem::recursive_directory_iterator(include_directory, ec)};
 
             if (ec) {
-                SM_THROW_ERROR(ResourceError, "Could not iterate over include directory `{}`: {}", include_directory, ec.message());
+                SM_THROW_ERROR(ResourceError, "Could not iterate over include directory `{}`: {}", include_directory.string(), ec.message());
             }
 
             for (const std::filesystem::directory_entry& entry : iter) {

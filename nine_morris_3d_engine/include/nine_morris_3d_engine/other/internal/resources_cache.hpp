@@ -15,6 +15,8 @@
 #include "nine_morris_3d_engine/graphics/texture_data.hpp"
 #include "nine_morris_3d_engine/graphics/mesh.hpp"
 
+// Resources are usually cached when loaded or created
+
 namespace sm::internal {
     template<typename T>
     class LockedCache {

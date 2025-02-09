@@ -7,10 +7,12 @@
 namespace sm {
     class Ctx;
 
+    // Base class for a camera controller, used by the application
+    // It references a 3D camera, controlling it
     class CameraController {
     public:
         CameraController() = default;
-        explicit CameraController(Camera& camera)
+        explicit CameraController(Camera3D& camera)
             : m_camera(&camera) {}
         virtual ~CameraController() = default;
 
@@ -29,14 +31,14 @@ namespace sm {
         virtual float get_near() const = 0;
         virtual float get_far() const = 0;
 
-        const Camera& get_camera() const {
+        const Camera3D& get_camera() const {
             return *m_camera;
         }
 
-        void set_camera(Camera& camera) {
+        void set_camera(Camera3D& camera) {
             m_camera = &camera;
         }
     protected:
-        Camera* m_camera {};
+        Camera3D* m_camera {};
     };
 }

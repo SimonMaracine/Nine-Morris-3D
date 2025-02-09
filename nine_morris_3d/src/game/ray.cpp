@@ -2,7 +2,7 @@
 
 #include <nine_morris_3d_engine/external/glm.h++>
 
-glm::vec3 cast_mouse_ray(sm::Ctx& ctx, const sm::Camera& camera) {
+glm::vec3 cast_mouse_ray(sm::Ctx& ctx, const sm::Camera3D& camera) {
     const auto [mouse_x, mouse_y] {ctx.get_mouse_position()};
 
     // To normalized device space

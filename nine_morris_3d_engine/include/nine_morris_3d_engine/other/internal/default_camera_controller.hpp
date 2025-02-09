@@ -7,6 +7,7 @@ namespace sm::internal {
     static constexpr float LENS_NEAR {0.5f};
     static constexpr float LENS_FAR {1000.0f};
 
+    // The application has to have a camera controller, if one is not set by the client
     struct DefaultCameraController : CameraController {
         void update_controls(float, const Ctx&) override {}
 

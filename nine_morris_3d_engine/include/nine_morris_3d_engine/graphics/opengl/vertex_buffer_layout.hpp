@@ -4,6 +4,7 @@
 #include <cstddef>
 
 namespace sm {
+    // Used to configure a vertex array
     struct VertexBufferLayout {
         enum Type : unsigned char {
             Float,

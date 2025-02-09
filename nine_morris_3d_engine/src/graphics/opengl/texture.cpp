@@ -1,6 +1,5 @@
 #include "nine_morris_3d_engine/graphics/opengl/texture.hpp"
 
-#include <cstddef>
 #include <cassert>
 
 #include <glad/glad.h>
@@ -10,8 +9,6 @@
 #include "nine_morris_3d_engine/graphics/opengl/capabilities.hpp"
 
 namespace sm {
-    static constexpr int CHANNELS {4};
-
     static bool use_mipmapping(const TextureSpecification& specification) {
         return specification.mipmapping && specification.mipmapping->levels > 1;
     }
@@ -220,9 +217,9 @@ namespace sm {
                 break;
         }
 
-        for (std::size_t i {0}; i < 6; i++) {
+        for (unsigned int i {0}; i < 6; i++) {
             glTexSubImage2D(
-                GL_TEXTURE_CUBE_MAP_POSITIVE_X + static_cast<unsigned int>(i),
+                GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,
                 0,
                 0,
                 0,

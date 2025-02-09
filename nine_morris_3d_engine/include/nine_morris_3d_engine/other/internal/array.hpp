@@ -5,6 +5,7 @@
 #include <cstddef>
 
 namespace sm::internal {
+    // Fixed-capacity, dynamic-sized array
     template<typename T, typename C, C Capacity>
     class Array {
     public:

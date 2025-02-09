@@ -94,7 +94,7 @@ namespace sm {
         std::shared_ptr<SceneNode3D> result;
 
         traverse([&](std::shared_ptr<SceneNode3D> node) {
-            if (node->m_id == id) {
+            if (node->id == id) {
                 result = node;
                 return true;
             }
@@ -151,7 +151,7 @@ namespace sm {
         std::shared_ptr<SceneNode2D> result;
 
         traverse([=](std::shared_ptr<SceneNode2D> node) mutable {
-            if (node->m_id == id) {
+            if (node->id == id) {
                 result = node;
                 return true;
             }

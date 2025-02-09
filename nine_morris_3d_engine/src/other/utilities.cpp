@@ -11,20 +11,20 @@
 #include "nine_morris_3d_engine/application/internal/error.hpp"
 #include "nine_morris_3d_engine/application/logging.hpp"
 
-namespace sm::utils {
-    unsigned int random_int(unsigned int end) {
+namespace sm {
+    unsigned int utils::random_int(unsigned int end) {
         assert(end > 0);
 
         return glm::linearRand(0u, end);
     }
 
-    unsigned int random_int(unsigned int begin, unsigned int end) {
+    unsigned int utils::random_int(unsigned int begin, unsigned int end) {
         assert(end > begin);
 
         return glm::linearRand(begin, end);
     }
 
-    unsigned short string_to_unsigned_short(const std::string& string) {
+    unsigned short utils::string_to_unsigned_short(const std::string& string) {
         unsigned long result {};
 
         try {
@@ -42,7 +42,7 @@ namespace sm::utils {
         return static_cast<unsigned short>(result);
     }
 
-    void center_image(
+    void utils::center_image(
         float screen_width,
         float screen_height,
         float image_width,
@@ -65,7 +65,7 @@ namespace sm::utils {
         }
     }
 
-    const char* get_environment_variable(const std::string& variable) {
+    const char* utils::get_environment_variable(const std::string& variable) {
         const char* value {std::getenv(variable.c_str())};
 
         if (value == nullptr) {
@@ -75,13 +75,13 @@ namespace sm::utils {
         return value;
     }
 
-    std::string file_name(const std::filesystem::path& file_path) {
+    std::string utils::file_name(const std::filesystem::path& file_path) {
         assert(file_path.has_filename());
 
         return file_path.filename().string();
     }
 
-    std::string read_file_ex(const std::filesystem::path& file_path, bool text) {
+    std::string utils::read_file_ex(const std::filesystem::path& file_path, bool text) {
         std::ifstream stream {file_path, text ? std::ios::in : std::ios::binary};
 
         if (!stream.is_open()) {
@@ -104,7 +104,7 @@ namespace sm::utils {
         return buffer;
     }
 
-    std::string read_file(const std::filesystem::path& file_path, bool text) {
+    std::string utils::read_file(const std::filesystem::path& file_path, bool text) {
         LOG_DEBUG("Reading file `{}`...", file_path.string());
 
         try {
@@ -114,7 +114,7 @@ namespace sm::utils {
         }
     }
 
-    void write_file_ex(const std::filesystem::path& file_path, const std::string& buffer, bool text) {
+    void utils::write_file_ex(const std::filesystem::path& file_path, const std::string& buffer, bool text) {
         std::ofstream stream {file_path, text ? std::ios::out : std::ios::binary};
 
         if (!stream.is_open()) {
@@ -128,7 +128,7 @@ namespace sm::utils {
         }
     }
 
-    void write_file(const std::filesystem::path& file_path, const std::string& buffer, bool text) {
+    void utils::write_file(const std::filesystem::path& file_path, const std::string& buffer, bool text) {
         LOG_DEBUG("Writing file `{}`...", file_path.string());
 
         try {

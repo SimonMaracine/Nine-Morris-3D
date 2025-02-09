@@ -1,8 +1,6 @@
 #include "nine_morris_3d_engine/graphics/internal/renderer.hpp"
 
 #include <algorithm>
-#include <string>
-#include <utility>
 #include <cassert>
 
 #include <glm/gtc/matrix_transform.hpp>
@@ -10,14 +8,11 @@
 #include <resmanager/resmanager.hpp>
 
 #include "nine_morris_3d_engine/application/id.hpp"
-#include "nine_morris_3d_engine/application/platform.hpp"
 #include "nine_morris_3d_engine/graphics/internal/opengl.hpp"
 #include "nine_morris_3d_engine/graphics/opengl/vertex_array.hpp"
 #include "nine_morris_3d_engine/graphics/opengl/buffer.hpp"
 #include "nine_morris_3d_engine/graphics/opengl/vertex_buffer_layout.hpp"
 #include "nine_morris_3d_engine/graphics/opengl/texture.hpp"
-#include "nine_morris_3d_engine/graphics/light.hpp"
-#include "nine_morris_3d_engine/graphics/camera.hpp"
 #include "nine_morris_3d_engine/other/utilities.hpp"
 
 // shader uniform limit https://www.khronos.org/opengl/wiki/Uniform_(GLSL)#Implementation_limits
@@ -325,7 +320,7 @@ namespace sm::internal {
             }
 
             switch (binding_index) {
-                case PROJECTON_VIEW_UNIFORM_BLOCK_BINDING:
+                case PROJECTION_VIEW_UNIFORM_BLOCK_BINDING:
                     uniform_buffer->set(&scene.root_node_3d->camera.projection_view(), "u_projection_view_matrix"_H);
                     break;
                 case DIRECTIONAL_LIGHT_UNIFORM_BLOCK_BINDING:

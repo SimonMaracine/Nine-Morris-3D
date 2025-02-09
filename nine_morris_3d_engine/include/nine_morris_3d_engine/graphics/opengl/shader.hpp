@@ -17,6 +17,7 @@ namespace sm {
         class Renderer;
     }
 
+    // OpenGL resource representing a shader program
     class GlShader {
     public:
         GlShader(const std::string& source_vertex, const std::string& source_fragment);

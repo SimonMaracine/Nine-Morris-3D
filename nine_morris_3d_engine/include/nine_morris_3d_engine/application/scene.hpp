@@ -4,6 +4,8 @@
 #include "nine_morris_3d_engine/application/id.hpp"
 
 namespace sm {
+    class Application;
+
     // An entire part of a game, holding lots of state
     class ApplicationScene {
     public:

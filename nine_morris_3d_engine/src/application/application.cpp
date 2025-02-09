@@ -10,7 +10,6 @@
 #include "nine_morris_3d_engine/audio/internal/audio.hpp"
 #include "nine_morris_3d_engine/graphics/internal/imgui_context.hpp"
 #include "nine_morris_3d_engine/graphics/opengl/debug.hpp"
-#include "nine_morris_3d_engine/graphics/opengl/capabilities.hpp"
 
 namespace sm {
     Application::Application(const ApplicationProperties& properties)
@@ -25,10 +24,6 @@ namespace sm {
 
         const auto [version_major, version_minor] {opengl_debug::get_version_number()};
         LOG_INFO("OpenGL version {}.{}", version_major, version_minor);
-
-        if (!capabilities::is_srgb_capable()) {
-            LOG_DIST_WARNING("Default OpenGL framebuffer is not sRGB capable");
-        }
 
 #ifndef SM_BUILD_DISTRIBUTION
         LOG_INFO("\n{}", m_ctx.get_information());
@@ -93,7 +88,7 @@ namespace sm {
 
             if (!m_minimized) {
 #ifndef SM_BUILD_DISTRIBUTION
-                m_ctx.m_dbg.render_lines(m_ctx.m_scn);
+                m_ctx.m_dbg.render(m_ctx.m_scn);
 #endif
                 m_ctx.m_rnd.render(m_ctx.m_scn, m_ctx.m_win.get_width(), m_ctx.m_win.get_height());
                 dear_imgui_render();
@@ -226,7 +221,7 @@ namespace sm {
 
         m_scene_current->scene->on_imgui_update();
 #ifndef SM_BUILD_DISTRIBUTION
-        m_ctx.m_dbg.render(m_ctx.m_scn, m_ctx);
+        m_ctx.m_dbg.render_dear_imgui(m_ctx.m_scn, m_ctx);
 #endif
 
         internal::imgui_context::end_frame();

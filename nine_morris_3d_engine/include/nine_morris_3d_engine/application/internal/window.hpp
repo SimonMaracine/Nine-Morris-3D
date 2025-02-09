@@ -3,15 +3,11 @@
 #include <memory>
 #include <initializer_list>
 
-#include <resmanager/resmanager.hpp>
-
 #include "nine_morris_3d_engine/application/internal/event_dispatcher.hpp"
 #include "nine_morris_3d_engine/application/properties.hpp"
-#include "nine_morris_3d_engine/application/id.hpp"
 #include "nine_morris_3d_engine/graphics/texture_data.hpp"
 
 struct SDL_Window;
-struct SDL_Surface;
 
 namespace sm::internal {
     // Window management API

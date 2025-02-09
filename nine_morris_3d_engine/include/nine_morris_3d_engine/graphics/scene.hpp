@@ -29,11 +29,12 @@ namespace sm {
     }
 
     enum NodeFlag {
-        Inherited,
+        Inherited,  // The parent's or default value
         Enabled,
         Disabled
     };
 
+    // Used to draw 3D debug lines
     struct DebugLine {
         glm::vec3 position1 {};
         glm::vec3 position2 {};
@@ -65,25 +66,32 @@ namespace sm {
         Text
     };
 
+    // Base class for a 3D scene node
     class SceneNode3D : public std::enable_shared_from_this<SceneNode3D> {
     public:
         SceneNode3D() = default;
         explicit SceneNode3D(Id id)
-            : m_id(id) {}
+            : id(id) {}
         virtual ~SceneNode3D() = default;
 
+        // Get the node type
         virtual SceneNode3DType type() const = 0;
 
-        void set_id(Id id) { m_id = id; };
-        Id get_id() const { return m_id; };
-
+        // Attach a node as a child
         void add_node(std::shared_ptr<SceneNode3D> node);
+
+        // Recursively clear the nodes
         void clear_nodes();
+
+        // Traverse the tree
         void traverse(const std::function<bool(std::shared_ptr<SceneNode3D>)>& process);
         void traverse(const std::function<bool(SceneNode3D*)>& process);
         void traverse(const std::function<bool(const SceneNode3D*, Context3D&)>& process) const;
+
+        // Find a node by identifier
         std::shared_ptr<SceneNode3D> find_node(Id id);
 
+        // Generic traverse
         template<typename T>
         void traverse(T context, const std::function<bool(const SceneNode3D*, T&)>& process) const {
             if (process(this, context)) {
@@ -94,28 +102,40 @@ namespace sm {
                 child->traverse(context, process);
             }
         }
+
+        // Every node has an optional identifier (tag)
+        Id id;
     protected:
-        Id m_id;
         std::vector<std::shared_ptr<SceneNode3D>> m_children;
         std::weak_ptr<SceneNode3D> m_parent;
     };
 
+    // Base class for a 2D scene node
     class SceneNode2D : public std::enable_shared_from_this<SceneNode2D> {
     public:
         SceneNode2D() = default;
         explicit SceneNode2D(Id id)
-            : m_id(id) {}
+            : id(id) {}
         virtual ~SceneNode2D() = default;
 
+        // Get the node type
         virtual SceneNode2DType type() const = 0;
 
+        // Attach a node as a child
         void add_node(std::shared_ptr<SceneNode2D> node);
+
+        // Recursively clear the nodes
         void clear_nodes();
+
+        // Traverse the tree
         void traverse(const std::function<bool(std::shared_ptr<SceneNode2D>)>& process);
         void traverse(const std::function<bool(SceneNode2D*)>& process);
         void traverse(const std::function<bool(const SceneNode2D*, Context2D&)>& process) const;
+
+        // Find a node by identifier
         std::shared_ptr<SceneNode2D> find_node(Id id);
 
+        // Generic traverse
         template<typename T>
         void traverse(T context, const std::function<bool(const SceneNode2D*, T&)>& process) const {
             if (process(this, context)) {
@@ -126,12 +146,15 @@ namespace sm {
                 child->traverse(context, process);
             }
         }
+
+        // Every node has an optional identifier (tag)
+        Id id;
     protected:
-        Id m_id;
         std::vector<std::shared_ptr<SceneNode2D>> m_children;
         std::weak_ptr<SceneNode2D> m_parent;
     };
 
+    // Root node contains general information about the 3D scene
     class RootNode3D : public SceneNode3D {
     public:
         SceneNode3DType type() const override {
@@ -147,7 +170,7 @@ namespace sm {
         void debug_add_lamp(glm::vec3 position, glm::vec3 color);
         void debug_clear();
 
-        Camera camera;
+        Camera3D camera;
         Skybox skybox;
         DirectionalLight directional_light;
         ShadowBox shadow_box;
@@ -257,6 +280,8 @@ namespace sm {
         friend class internal::Renderer;
     };
 
+    // The root nodes of the scene
+    // Handled by application or context
     struct Scene {
         std::shared_ptr<RootNode3D> root_node_3d;
         std::shared_ptr<RootNode2D> root_node_2d;

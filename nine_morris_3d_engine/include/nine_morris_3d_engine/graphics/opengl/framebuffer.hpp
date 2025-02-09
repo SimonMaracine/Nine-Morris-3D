@@ -28,6 +28,7 @@ namespace sm {
         AttachmentType type {AttachmentType::None};
     };
 
+    // Parameters used to construct a framebuffer
     struct FramebufferSpecification {
         // At least one of these two must be specified
         std::vector<Attachment> color_attachments;
@@ -44,6 +45,7 @@ namespace sm {
         bool comparison_mode_depth_texture {false};
     };
 
+    // OpenGL resource representing a framebuffer, a collection of images plus metadata
     class GlFramebuffer {
     public:
         explicit GlFramebuffer(const FramebufferSpecification& specification);
@@ -61,7 +63,7 @@ namespace sm {
         unsigned int get_depth_attachment() const;
         const FramebufferSpecification& get_specification() const;
 
-        // Usually called by application
+        // Usually called by the application
         void resize(int width, int height);
 
         // Read pixels from some buffer

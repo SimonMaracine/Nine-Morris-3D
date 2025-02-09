@@ -15,8 +15,11 @@ namespace sm::internal {
 #ifndef SM_BUILD_DISTRIBUTION
     class DebugUi {
     public:
-        void render(const Scene& scene, Ctx& ctx);
-        void render_lines(const Scene& scene);
+        // Render all Dear ImGui UI
+        void render_dear_imgui(const Scene& scene, Ctx& ctx);
+
+        // Render all other debug UI
+        void render(const Scene& scene);
     private:
         void models(const Scene& scene);
         void lights(const Scene& scene);

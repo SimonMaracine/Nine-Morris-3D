@@ -1,6 +1,5 @@
 #include "nine_morris_3d_engine/graphics/opengl/vertex_array.hpp"
 
-#include <cstddef>
 #include <cassert>
 
 #include <glad/glad.h>

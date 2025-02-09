@@ -3,12 +3,16 @@
 #include <string>
 #include <utility>
 
-namespace sm::opengl_debug {
-    void initialize();
-    std::string get_information();
-    std::pair<int, int> get_version_number();
-    const unsigned char* get_opengl_version();
-    const unsigned char* get_glsl_version();
-    const unsigned char* get_renderer();
-    const unsigned char* get_vendor();
+// Retrieve information about the OpenGL context
+
+namespace sm {
+    namespace opengl_debug {
+        void initialize();
+        std::string get_information();
+        std::pair<int, int> get_version_number();
+        const char* get_opengl_version();
+        const char* get_glsl_version();
+        const char* get_renderer();
+        const char* get_vendor();
+    }
 }

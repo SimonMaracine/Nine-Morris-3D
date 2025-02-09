@@ -3,7 +3,6 @@
 #include <memory>
 #include <unordered_map>
 #include <vector>
-#include <cstddef>
 
 #include <glm/glm.hpp>
 
@@ -14,6 +13,7 @@
 namespace sm {
     class MaterialInstance;
 
+    // Resource representing a material, a shader plus uniforms
     class Material {
     public:
         enum class Uniform {
@@ -43,6 +43,7 @@ namespace sm {
         friend class MaterialInstance;
     };
 
+    // Resource representing an instance of a material, the actual uniform data
     class MaterialInstance {
     public:
         explicit MaterialInstance(std::shared_ptr<Material> material);

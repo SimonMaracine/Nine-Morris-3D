@@ -28,12 +28,14 @@ namespace sm {
         R8
     };
 
+    // Mipmapping parameters
     struct TextureMipmapping {
         int levels {4};
         float bias {0.0f};
         int anisotropic_filtering {0};
     };
 
+    // Texture parameters
     struct TextureSpecification {
         TextureFormat format {TextureFormat::Srgb8Alpha8};
 
@@ -47,6 +49,7 @@ namespace sm {
         std::optional<TextureMipmapping> mipmapping;
     };
 
+    // OpenGL resource representing a texture, an image plus metadata
     class GlTexture {
     public:
         GlTexture(std::shared_ptr<TextureData> data, const TextureSpecification& specification = {});

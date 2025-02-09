@@ -2,8 +2,10 @@
 
 #include <glm/glm.hpp>
 
+// Object representing a cameras in 3D and 2D, matrices only
+
 namespace sm {
-    class Camera {
+    class Camera3D {
     public:
         void set_position_orientation(glm::vec3 position, glm::vec3 at, glm::vec3 up);
         void set_position_rotation(glm::vec3 position, glm::vec3 rotation);

@@ -54,7 +54,7 @@ int sm_application_main(int argc, char** argv);
             }
 
             try {
-                argv = new char*[argc];   
+                argv = new char*[argc];
             } catch (const std::bad_alloc&) {
                 delete_and_reset_argv(argc, argv);
                 goto ret;
@@ -65,7 +65,7 @@ int sm_application_main(int argc, char** argv);
                     const auto length {std::wcslen(wargv[i])};
 
                     argv[i] = new char[length + 1];
-                        
+
                     for (int c {0}; c < length; c++) {
                         const char character {static_cast<char>(wargv[i][c])};
                         argv[i][c] = character >= 0 && character <= 127 ? character : '?';

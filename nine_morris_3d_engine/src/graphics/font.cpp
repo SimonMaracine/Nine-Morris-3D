@@ -51,10 +51,6 @@ namespace sm {
         LOG_DEBUG("Freed font");
     }
 
-    int Font::get_bitmap_size() const {
-        return m_bitmap_size;
-    }
-
     const GlTexture* Font::get_bitmap() const {
         return m_bitmap_texture.get();
     }

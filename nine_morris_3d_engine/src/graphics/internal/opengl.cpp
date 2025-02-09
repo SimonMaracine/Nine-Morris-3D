@@ -100,6 +100,10 @@ namespace sm::internal {
         glDisable(GL_FRAMEBUFFER_SRGB);
     }
 
+    void opengl::initialize_polygon_offset() {
+        glPolygonOffset(2.0f, 4.0f);
+    }
+
     void opengl::enable_polygon_offset_fill() {
         glEnable(GL_POLYGON_OFFSET_FILL);
     }
@@ -131,9 +135,5 @@ namespace sm::internal {
 
     void opengl::stencil_mask(unsigned int mask) {
         glStencilMask(mask);
-    }
-
-    void opengl::initialize_polygon_offset() {
-        glPolygonOffset(2.0f, 4.0f);
     }
 }

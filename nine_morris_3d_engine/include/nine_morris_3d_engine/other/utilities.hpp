@@ -9,65 +9,81 @@
 
 #include "nine_morris_3d_engine/other/internal/array.hpp"
 
-namespace sm::utils {
-    template<typename T, typename C, C Capacity>
-    using Array = internal::Array<T, C, Capacity>;
+// General utility functions and structures
 
-    struct AABB {
-        glm::vec3 min {};
-        glm::vec3 max {};
-    };
+namespace sm {
+    namespace utils {
+        template<typename T, typename C, C Capacity>
+        using Array = internal::Array<T, C, Capacity>;
 
-    unsigned int random_int(unsigned int end);
-    unsigned int random_int(unsigned int begin, unsigned int end);
+        // Axis-aligned bounding box
+        struct AABB {
+            glm::vec3 min {};
+            glm::vec3 max {};
+        };
 
-    unsigned short string_to_unsigned_short(const std::string& string);
+        // Generate a random unsigned integer
+        unsigned int random_int(unsigned int end);
+        unsigned int random_int(unsigned int begin, unsigned int end);
 
-    void center_image(
-        float screen_width,
-        float screen_height,
-        float image_width,
-        float image_height,
-        float& x,
-        float& y,
-        float& width,
-        float& height
-    );
+        // Safely convert a string to unsigned short
+        unsigned short string_to_unsigned_short(const std::string& string);
 
-    const char* get_environment_variable(const std::string& variable);
+        // Center and fit an image on a screen
+        void center_image(
+            float screen_width,
+            float screen_height,
+            float image_width,
+            float image_height,
+            float& x,
+            float& y,
+            float& width,
+            float& height
+        );
 
-    std::string file_name(const std::filesystem::path& file_path);
+        // Retrieve an environment variable
+        const char* get_environment_variable(const std::string& variable);
 
-    std::string read_file_ex(const std::filesystem::path& file_path, bool text = false);
-    std::string read_file(const std::filesystem::path& file_path, bool text = false);
+        // Retrieve the name of a file
+        std::string file_name(const std::filesystem::path& file_path);
 
-    void write_file_ex(const std::filesystem::path& file_path, const std::string& buffer, bool text = false);
-    void write_file(const std::filesystem::path& file_path, const std::string& buffer, bool text = false);
+        // Read a file into a string buffer
+        std::string read_file_ex(const std::filesystem::path& file_path, bool text = false);
+        std::string read_file(const std::filesystem::path& file_path, bool text = false);
 
-    template<typename T>
-    T map(T x, T in_min, T in_max, T out_min, T out_max) {
-        return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
-    }
+        // Write a file from a string buffer
+        void write_file_ex(const std::filesystem::path& file_path, const std::string& buffer, bool text = false);
+        void write_file(const std::filesystem::path& file_path, const std::string& buffer, bool text = false);
 
-    template<typename T>
-    T choice(std::initializer_list<T> list) {
-        const unsigned int index {random_int(static_cast<unsigned int>(list.size() - 1))};
+        // Map a value from a range to another
+        template<typename T>
+        T map(T x, T in_min, T in_max, T out_min, T out_max) {
+            return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
+        }
 
-        return list.begin()[index];
-    }
+        // Get a random value from a list
+        template<typename T>
+        T choice(std::initializer_list<T> list) {
+            const auto index {random_int(static_cast<unsigned int>(list.size() - 1))};
 
-    template<typename T, typename Iter>
-    T choice(Iter first, Iter last) {
-        const unsigned int index {random_int(static_cast<unsigned int>(std::distance(first, last)))};
+            return list.begin()[index];
+        }
 
-        return first[index];
-    }
+        // Get a random value from a list
+        template<typename T, typename Iter>
+        T choice(Iter first, Iter last) {
+            const auto index {random_int(static_cast<unsigned int>(std::distance(first, last)))};
 
-    [[noreturn]] inline void unreachable() {
+            return first[index];
+        }
+
+        // Mark unreachable sections of code
+        [[noreturn]] inline void unreachable() {
 #if defined(_MSC_VER) && !defined(__clang__)
-        __assume(false);
+            __assume(false);
 #else
-        __builtin_unreachable();
+            __builtin_unreachable();
 #endif
+        }
     }
 }

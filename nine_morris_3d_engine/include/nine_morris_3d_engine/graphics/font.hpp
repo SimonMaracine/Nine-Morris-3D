@@ -11,11 +11,13 @@ struct stbtt_fontinfo;
 struct stbtt_pack_context;
 
 namespace sm {
+    // Font parameters
     struct FontSpecification {
         float size_height {16.0f};
         int bitmap_size {128};
     };
 
+    // Resource representing a font
     class Font {
     public:
         Font(const std::string& buffer, const FontSpecification& specification = {});
@@ -26,7 +28,7 @@ namespace sm {
         Font(Font&&) = delete;
         Font& operator=(Font&&) = delete;
 
-        int get_bitmap_size() const;
+        // Get the texture containing the glyphs
         const GlTexture* get_bitmap() const;
 
         // Baking API

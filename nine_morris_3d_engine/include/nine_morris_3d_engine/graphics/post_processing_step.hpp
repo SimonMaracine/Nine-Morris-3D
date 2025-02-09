@@ -14,7 +14,7 @@ namespace sm {
     using PostProcessingCtx = internal::PostProcessingContext;
 
     // Extend this class for every step of the post processing pipeline
-    // Pointers of post processing steps should be retained as a resource
+    // Pointers of post processing steps should be treated as resources
     class PostProcessingStep {
     public:
         PostProcessingStep(std::shared_ptr<GlFramebuffer> framebuffer, std::shared_ptr<GlShader> shader)
@@ -26,6 +26,7 @@ namespace sm {
         PostProcessingStep(PostProcessingStep&&) = default;
         PostProcessingStep& operator=(PostProcessingStep&&) = default;
 
+        // Called before rendering the to the framebuffer
         virtual void setup(const PostProcessingCtx& ctx) const = 0;
 
         static void bind_texture(unsigned int texture, int unit);

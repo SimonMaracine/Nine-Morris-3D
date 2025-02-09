@@ -10,7 +10,7 @@
 
 namespace sm::internal {
 #ifndef SM_BUILD_DISTRIBUTION
-    void DebugUi::render(const Scene& scene, Ctx& ctx) {
+    void DebugUi::render_dear_imgui(const Scene& scene, Ctx& ctx) {
         if (ImGui::Begin("Debug")) {
             ImGui::Checkbox("Models", &m_models);
             ImGui::Checkbox("Lights", &m_lights);
@@ -91,7 +91,7 @@ namespace sm::internal {
         }
     }
 
-    void DebugUi::render_lines(const Scene& scene) {
+    void DebugUi::render(const Scene& scene) {
         if (m_shadows) {
             shadows_lines(
                 scene,

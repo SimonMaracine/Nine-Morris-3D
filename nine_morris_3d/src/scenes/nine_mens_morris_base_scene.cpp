@@ -380,7 +380,7 @@ std::shared_ptr<sm::ModelNode> NineMensMorrisBaseScene::setup_board() const {
     material_instance->set_texture("u_material.normal"_H, normal, 1);
 
     const auto model {std::make_shared<sm::ModelNode>(mesh, vertex_array, material_instance)};
-    model->set_id("board"_H);
+    model->id = "board"_H;
     model->cast_shadow = sm::NodeFlag::Enabled;
 
     return model;

@@ -8,6 +8,7 @@
 #include "nine_morris_3d_engine/graphics/opengl/framebuffer.hpp"
 
 namespace sm {
+    // Object used to manage screen raeding
     template<std::size_t BufferCount>
     class FramebufferReader {
     public:

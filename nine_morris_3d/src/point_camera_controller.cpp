@@ -36,13 +36,13 @@ static float calculate_angle_velocity(float target_angle, float angle) {
     return result;
 }
 
-PointCameraController::PointCameraController(sm::Camera& camera)
+PointCameraController::PointCameraController(sm::Camera3D& camera)
     : sm::CameraController(camera) {
     update_camera(1.0f);
 }
 
 PointCameraController::PointCameraController(
-    sm::Camera& camera,
+    sm::Camera3D& camera,
     int width,
     int height,
     glm::vec3 point,

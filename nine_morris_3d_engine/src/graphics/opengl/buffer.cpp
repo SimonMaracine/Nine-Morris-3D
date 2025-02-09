@@ -164,18 +164,18 @@ namespace sm {
         // Link uniform buffer to binding index
         glBindBufferBase(GL_UNIFORM_BUFFER, m_specification.binding_index, m_buffer);
 
-        const std::size_t field_count {m_specification.uniforms.size()};
-        static constexpr std::size_t MAX_FIELD_COUNT {24};
+        const auto field_count {m_specification.uniforms.size()};
+        static constexpr auto MAX_FIELD_COUNT {24};
 
         assert(field_count <= MAX_FIELD_COUNT);
 
-        unsigned int indices[MAX_FIELD_COUNT];
-        int offsets[MAX_FIELD_COUNT];
-        int sizes[MAX_FIELD_COUNT];
-        int types[MAX_FIELD_COUNT];
+        unsigned int indices[MAX_FIELD_COUNT] {};
+        int offsets[MAX_FIELD_COUNT] {};
+        int sizes[MAX_FIELD_COUNT] {};
+        int types[MAX_FIELD_COUNT] {};
 
         // Create the uniforms names list; the order of these names matters
-        const char* field_names[MAX_FIELD_COUNT];
+        const char* field_names[MAX_FIELD_COUNT] {};
 
         for (std::size_t i {0}; i < field_count; i++) {
             field_names[i] = m_specification.uniforms[i].c_str();

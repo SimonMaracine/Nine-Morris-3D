@@ -186,7 +186,7 @@ namespace sm {
     }
 
     void Ctx::invalidate_dear_imgui_texture() {
-        internal::imgui_context::invalidate_texture();
+        internal::imgui_context::invalidate_font_texture();
     }
 
     void Ctx::change_scene(Id id, bool clear_resources) {
@@ -195,10 +195,10 @@ namespace sm {
 
     void Ctx::show_information_text() {
         std::string information_text;
-        information_text += std::string(reinterpret_cast<const char*>(opengl_debug::get_opengl_version())) + '\n';
-        information_text += std::string(reinterpret_cast<const char*>(opengl_debug::get_glsl_version())) + '\n';
-        information_text += std::string(reinterpret_cast<const char*>(opengl_debug::get_renderer())) + '\n';
-        information_text += std::string(reinterpret_cast<const char*>(opengl_debug::get_vendor())) + '\n';
+        information_text += std::string(opengl_debug::get_opengl_version()) + '\n';
+        information_text += std::string(opengl_debug::get_glsl_version()) + '\n';
+        information_text += std::string(opengl_debug::get_renderer()) + '\n';
+        information_text += std::string(opengl_debug::get_vendor()) + '\n';
         information_text += std::to_string(static_cast<int>(m_fps)) + " FPS ";
         information_text += std::to_string(static_cast<int>(m_delta * 1000.0f)) + " ms\n";
         information_text += std::string("build ") + m_build_date + " " + m_build_time;

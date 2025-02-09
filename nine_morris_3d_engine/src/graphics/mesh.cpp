@@ -166,19 +166,12 @@ namespace sm {
         m_aabb.max = glm::vec3(mesh->mAABB.mMax.x, mesh->mAABB.mMax.y, mesh->mAABB.mMax.z);
     }
 
-    Mesh::~Mesh() {
-        delete[] m_vertices;
-        delete[] m_indices;
-
-        LOG_DEBUG("Freed model data");
-    }
-
     const unsigned char* Mesh::get_vertices() const {
-        return m_vertices;
+        return m_vertices.get();
     }
 
     const unsigned char* Mesh::get_indices() const {
-        return m_indices;
+        return m_indices.get();
     }
 
     std::size_t Mesh::get_vertices_size() const {
@@ -273,12 +266,12 @@ namespace sm {
     }
 
     void Mesh::allocate(const void* vertices, std::size_t vertices_size, const void* indices, std::size_t indices_size) {
-        m_vertices = new unsigned char[vertices_size];
-        std::memcpy(m_vertices, vertices, vertices_size);
+        m_vertices = std::make_unique<unsigned char[]>(vertices_size);
+        std::memcpy(m_vertices.get(), vertices, vertices_size);
         m_vertices_size = vertices_size;
 
-        m_indices = new unsigned char[indices_size];
-        std::memcpy(m_indices, indices, indices_size);
+        m_indices = std::make_unique<unsigned char[]>(indices_size);
+        std::memcpy(m_indices.get(), indices, indices_size);
         m_indices_size = indices_size;
     }
 }

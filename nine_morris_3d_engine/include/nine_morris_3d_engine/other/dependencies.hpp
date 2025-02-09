@@ -2,6 +2,9 @@
 
 #include <string>
 
-namespace sm::dependencies {
-    std::string get_information();
+namespace sm {
+    namespace dependencies {
+        // Get information about engine dependencies
+        std::string get_information();
+    }
 }

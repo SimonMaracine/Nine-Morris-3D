@@ -158,19 +158,19 @@ namespace sm::opengl_debug {
         return std::make_pair(major, minor);
     }
 
-    const unsigned char* get_opengl_version() {
-        return glGetString(GL_VERSION);
+    const char* get_opengl_version() {
+        return reinterpret_cast<const char*>(glGetString(GL_VERSION));
     }
 
-    const unsigned char* get_glsl_version() {
-        return glGetString(GL_SHADING_LANGUAGE_VERSION);
+    const char* get_glsl_version() {
+        return reinterpret_cast<const char*>(glGetString(GL_SHADING_LANGUAGE_VERSION));
     }
 
-    const unsigned char* get_vendor() {
-        return glGetString(GL_VENDOR);
+    const char* get_vendor() {
+        return reinterpret_cast<const char*>(glGetString(GL_VENDOR));
     }
 
-    const unsigned char* get_renderer() {
-        return glGetString(GL_RENDERER);
+    const char* get_renderer() {
+        return reinterpret_cast<const char*>(glGetString(GL_RENDERER));
     }
 }

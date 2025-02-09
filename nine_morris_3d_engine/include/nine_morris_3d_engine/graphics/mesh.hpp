@@ -1,13 +1,17 @@
 #pragma once
 
 #include <string>
+#include <memory>
 #include <cstddef>
 
 #include "nine_morris_3d_engine/other/utilities.hpp"
 
 namespace sm {
+    // Resource representing a mesh with vertices and indices
+    // It is used to create a vertex array
     class Mesh {
     public:
+        // Position, normals, texture coordinates, tangents
         enum class Type {
             P,
             PN,
@@ -18,7 +22,7 @@ namespace sm {
         static constexpr const char* DEFAULT_OBJECT {"defaultobject"};
 
         Mesh(const std::string& buffer, const std::string& object_name, Type type, bool flip_winding = false);
-        ~Mesh();
+        ~Mesh() = default;
 
         Mesh(const Mesh&) = delete;
         Mesh& operator=(const Mesh&) = delete;
@@ -36,8 +40,8 @@ namespace sm {
         void allocate(const void* vertices, std::size_t vertices_size, const void* indices, std::size_t indices_size);
 
         // Raw data
-        unsigned char* m_vertices {};
-        unsigned char* m_indices {};
+        std::unique_ptr<unsigned char[]> m_vertices;
+        std::unique_ptr<unsigned char[]> m_indices;
         std::size_t m_vertices_size {};
         std::size_t m_indices_size {};
 

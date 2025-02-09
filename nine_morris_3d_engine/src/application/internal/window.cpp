@@ -9,7 +9,6 @@
 
 #include "nine_morris_3d_engine/application/internal/input_codes.hpp"
 #include "nine_morris_3d_engine/application/internal/error.hpp"
-#include "nine_morris_3d_engine/application/application.hpp"
 #include "nine_morris_3d_engine/application/events.hpp"
 #include "nine_morris_3d_engine/application/platform.hpp"
 #include "nine_morris_3d_engine/application/logging.hpp"
@@ -180,10 +179,7 @@ namespace sm::internal {
     double Window::get_time() {
         const Uint64 milliseconds {SDL_GetTicks()};
 
-        const Uint64 seconds {milliseconds / 1000};
-        const Uint64 remainder {milliseconds % 1000};
-
-        return static_cast<double>(seconds) + static_cast<double>(remainder) / 1000.0;
+        return static_cast<double>(milliseconds) / 1000.0;
     }
 
     void Window::flip() const {
@@ -257,7 +253,7 @@ namespace sm::internal {
 
                     break;
                 case SDL_EVENT_MOUSE_MOTION:
-                         if (imgui_context::want_capture_mouse()) {
+                    if (imgui_context::want_capture_mouse()) {
                         break;
                     }
 

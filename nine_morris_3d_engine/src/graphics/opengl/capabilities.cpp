@@ -4,8 +4,8 @@
 
 #include <glad/glad.h>
 
-namespace sm::capabilities {
-    int max_anisotropic_filtering_supported() {
+namespace sm {
+    int capabilities::max_anisotropic_filtering_supported() {
         if (GLAD_GL_EXT_texture_filter_anisotropic) {
             float max_amount {};
             glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT, &max_amount);
@@ -16,7 +16,7 @@ namespace sm::capabilities {
         }
     }
 
-    int max_samples_supported() {
+    int capabilities::max_samples_supported() {
         int max_samples {};
         glGetIntegerv(GL_MAX_SAMPLES, &max_samples);
 
@@ -29,17 +29,10 @@ namespace sm::capabilities {
         return glm::min(glm::min(max_samples, max_depth_texture_samples), max_color_texture_samples);
     }
 
-    int max_texture_units_supported() {
+    int capabilities::max_texture_units_supported() {
         int max_units {};
         glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &max_units);
 
         return max_units;
-    }
-
-    bool is_srgb_capable() {
-        int encoding {};
-        glGetFramebufferAttachmentParameteriv(GL_FRAMEBUFFER, GL_BACK, GL_FRAMEBUFFER_ATTACHMENT_COLOR_ENCODING, &encoding);
-
-        return encoding == GL_SRGB;
     }
 }

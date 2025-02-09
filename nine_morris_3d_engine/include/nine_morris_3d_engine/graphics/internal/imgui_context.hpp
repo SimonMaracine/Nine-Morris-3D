@@ -2,23 +2,24 @@
 
 namespace sm::internal {
     namespace imgui_context {
+        // Initialize Dear ImGui and setup basic options
         void initialize(void* window, void* context);
+
+        // Uninitialize Dear ImGui
         void uninitialize();
 
+        // Called in the update portion for Dear ImGui
         void begin_frame();
         void end_frame();
 
+        // Must be called for every SDL event in the window
         void process_event(const void* event);
+
+        // Check if events should be propagated to the application or not
         bool want_capture_mouse();
         bool want_capture_keyboard();
-        void invalidate_texture();
 
-        // bool on_mouse_wheel_scrolled(float yoffset);
-        // bool on_mouse_moved(float xpos, float ypos);
-        // bool on_mouse_button_pressed(int button);
-        // bool on_mouse_button_released(int button);
-        // bool on_key_pressed(int key, int scancode);
-        // bool on_key_released(int key, int scancode);
-        // bool on_char_typed(unsigned int codepoint);
+        // Reset font texture
+        void invalidate_font_texture();
     }
 }

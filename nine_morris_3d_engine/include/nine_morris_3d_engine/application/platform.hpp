@@ -1,8 +1,6 @@
 #pragma once
 
-#include <cstdint>
-
-// Include platform.hpp whenever there is conditional code regarding platform or build mode
+// Include this header whenever there is conditional code regarding platform or build mode
 
 #if defined(__linux__)
     #if defined(__GNUG__)
@@ -18,11 +16,6 @@
     #endif
 #else
     #error "Unsupported platform"
-#endif
-
-// Check for 64-bit architecture
-#if SIZE_MAX != 0xFFFFFFFFFFFFFFFFul
-    #error "No support for 32-bit"
 #endif
 
 // Used to differentiate between testing and distribution builds

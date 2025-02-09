@@ -1,11 +1,12 @@
 #pragma once
 
-#include <cstddef>
 #include <unordered_map>
 #include <vector>
 #include <string>
 
 #include "nine_morris_3d_engine/application/id.hpp"
+
+// OpenGL resources representing buffers
 
 namespace sm {
     class GlShader;
@@ -58,6 +59,7 @@ namespace sm {
         int m_index_count {};
     };
 
+    // Used by shader
     struct UniformBlockSpecification {
         std::string block_name;
         std::vector<std::string> uniforms;
