@@ -465,7 +465,7 @@ void Ui::game_window(sm::Ctx& ctx, GameScene& game_scene) {
         static_cast<float>(MIN_HEIGHT),
         static_cast<float>(MAX_HEIGHT),
         rem(5.0f),
-        rem(20.0f)
+        rem(15.0f)
     )};
 
     const float right_offset {sm::utils::map(
