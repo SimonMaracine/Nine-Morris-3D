@@ -168,13 +168,13 @@ namespace sm {
     }
 
     void Application::update_projection_matrices(int width, int height) {
-        auto camera_controller {m_ctx.m_scn.root_node_3d->get_camera_controller()};
+        auto camera_controller {m_ctx.m_scn.root_node_3d->camera_controller};
 
         if (camera_controller == nullptr) {
             camera_controller = m_ctx.m_default_camera_controller;
         }
 
-        m_ctx.m_scn.root_node_3d->get_camera().set_projection(
+        m_ctx.m_scn.root_node_3d->camera.set_projection(
             width,
             height,
             camera_controller->get_fov(),
@@ -182,7 +182,7 @@ namespace sm {
             camera_controller->get_far()
         );
 
-        m_ctx.m_scn.root_node_2d->get_camera().set_projection(0, width, 0, height);
+        m_ctx.m_scn.root_node_2d->camera.set_projection(0, width, 0, height);
     }
 
     void Application::check_changed_scene() {

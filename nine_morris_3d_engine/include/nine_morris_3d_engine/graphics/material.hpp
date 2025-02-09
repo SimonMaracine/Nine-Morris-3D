@@ -25,12 +25,6 @@ namespace sm {
             Vec4
         };
 
-        // enum : unsigned int {
-        //     Outline = 1u << 0,
-        //     DisableBackFaceCulling = 1u << 1,
-        //     CastShadow = 1u << 2
-        // };
-
         explicit Material(std::shared_ptr<GlShader> shader);
 
         void add_uniform(Uniform type, Id name);
@@ -45,8 +39,6 @@ namespace sm {
         std::vector<Id> m_uniforms_vec3;
         std::vector<Id> m_uniforms_vec4;
         std::vector<Id> m_textures;
-
-        // unsigned int m_flags {};
 
         friend class MaterialInstance;
     };
@@ -67,8 +59,6 @@ namespace sm {
         void set_texture(Id name, unsigned int texture, int unit);
 
         const GlShader* get_shader() const;
-
-        // unsigned int flags {};
     private:
         struct Element {
             enum class Type {
@@ -85,8 +75,8 @@ namespace sm {
         };
 
         struct Texture {
-            int unit;
-            unsigned int texture;
+            int unit {};
+            unsigned int texture {};
         };
 
         std::shared_ptr<GlShader> m_shader;

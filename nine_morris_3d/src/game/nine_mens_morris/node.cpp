@@ -4,7 +4,7 @@
 
 NodeObj::NodeObj(int id, std::shared_ptr<sm::ModelNode> model, glm::vec3 position)
     : HoverableObj(id, model) {
-    m_model->transform.position = position;
+    m_model->position = position;
 }
 
 void NodeObj::update(sm::Ctx& ctx) {

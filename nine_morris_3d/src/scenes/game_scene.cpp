@@ -92,7 +92,7 @@ void GameScene::on_update() {
     ctx.render_3d()->debug_add_line(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(0.0f, 0.0f, 1.0f));
 
     // Light
-    ctx.render_3d()->debug_add_lamp(glm::normalize(-ctx.render_3d()->get_directional_light().direction) * 15.0f, glm::vec3(0.6f));
+    ctx.render_3d()->debug_add_lamp(glm::normalize(-ctx.render_3d()->directional_light.direction) * 15.0f, glm::vec3(0.6f));
 
     m_clock.update();
 
@@ -491,7 +491,7 @@ void GameScene::setup_camera() {
     const auto& g {ctx.global<Global>()};
 
     m_camera_controller = std::make_shared<PointCameraController>(
-        ctx.render_3d()->get_camera(),
+        ctx.render_3d()->camera,
         ctx.get_window_width(),
         ctx.get_window_height(),
         glm::vec3(0.0f),
@@ -500,7 +500,7 @@ void GameScene::setup_camera() {
         g.options.camera_sensitivity
     );
 
-    ctx.render_3d()->set_camera_controller(m_camera_controller);
+    ctx.render_3d()->camera_controller = m_camera_controller;
 
     m_camera_controller->connect_events(ctx);
 
@@ -512,10 +512,7 @@ void GameScene::setup_camera() {
 }
 
 void GameScene::setup_skybox(bool reload) {
-    sm::Skybox skybox;
-    skybox.texture = load_skybox_texture_cubemap(reload);
-
-    ctx.render_3d()->set_skybox(skybox);
+    ctx.render_3d()->skybox.texture = load_skybox_texture_cubemap(reload);
 }
 
 void GameScene::setup_lights() {
@@ -523,22 +520,22 @@ void GameScene::setup_lights() {
 
     switch (g.options.skybox) {
         case SkyboxNone:
-            ctx.render_3d()->get_directional_light().direction = glm::normalize(glm::vec3(0.307f, -0.901f, 0.307f));
-            ctx.render_3d()->get_directional_light().ambient_color = glm::vec3(0.1f);
-            ctx.render_3d()->get_directional_light().diffuse_color = glm::vec3(0.5f);
-            ctx.render_3d()->get_directional_light().specular_color = glm::vec3(0.8f);
+            ctx.render_3d()->directional_light.direction = glm::normalize(glm::vec3(0.307f, -0.901f, 0.307f));
+            ctx.render_3d()->directional_light.ambient_color = glm::vec3(0.1f);
+            ctx.render_3d()->directional_light.diffuse_color = glm::vec3(0.5f);
+            ctx.render_3d()->directional_light.specular_color = glm::vec3(0.8f);
             break;
         case SkyboxField:
-            ctx.render_3d()->get_directional_light().direction = glm::normalize(glm::vec3(-0.525f, -0.405f, -0.748f));
-            ctx.render_3d()->get_directional_light().ambient_color = glm::vec3(0.25f);
-            ctx.render_3d()->get_directional_light().diffuse_color = glm::vec3(0.7f);
-            ctx.render_3d()->get_directional_light().specular_color = glm::vec3(1.0f);
+            ctx.render_3d()->directional_light.direction = glm::normalize(glm::vec3(-0.525f, -0.405f, -0.748f));
+            ctx.render_3d()->directional_light.ambient_color = glm::vec3(0.25f);
+            ctx.render_3d()->directional_light.diffuse_color = glm::vec3(0.7f);
+            ctx.render_3d()->directional_light.specular_color = glm::vec3(1.0f);
             break;
         case SkyboxAutumn:
-            ctx.render_3d()->get_directional_light().direction = glm::normalize(glm::vec3(0.370f, -0.925f, -0.092f));
-            ctx.render_3d()->get_directional_light().ambient_color = glm::vec3(0.2f);
-            ctx.render_3d()->get_directional_light().diffuse_color = glm::vec3(0.7f);
-            ctx.render_3d()->get_directional_light().specular_color = glm::vec3(0.9f);
+            ctx.render_3d()->directional_light.direction = glm::normalize(glm::vec3(0.370f, -0.925f, -0.092f));
+            ctx.render_3d()->directional_light.ambient_color = glm::vec3(0.2f);
+            ctx.render_3d()->directional_light.diffuse_color = glm::vec3(0.7f);
+            ctx.render_3d()->directional_light.specular_color = glm::vec3(0.9f);
             break;
     }
 }

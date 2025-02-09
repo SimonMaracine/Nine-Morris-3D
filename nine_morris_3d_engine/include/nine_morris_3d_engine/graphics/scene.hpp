@@ -34,27 +34,23 @@ namespace sm {
         Disabled
     };
 
-    struct Transform3D {
-        glm::vec3 position {};
-        glm::vec3 rotation {};
-        float scale {1.0f};
-    };
-
-    struct Transform2D {
-        glm::vec2 position {};
-        glm::vec2 scale {1.0f};
+    struct DebugLine {
+        glm::vec3 position1 {};
+        glm::vec3 position2 {};
+        glm::vec3 color {};
     };
 
     struct Context3D {
-        glm::mat4 transform_ {1.0f};
-        Transform3D transform;
+        glm::mat4 transform {1.0f};
+        float transform_scale {1.0f};
         bool outline {false};
         bool disable_back_face_culling {false};
         bool cast_shadow {false};
     };
 
     struct Context2D {
-        Transform2D transform;
+        glm::vec2 position {};
+        glm::vec2 scale {1.0f};
     };
 
     enum class SceneNode3DType {
@@ -136,30 +132,13 @@ namespace sm {
         std::weak_ptr<SceneNode2D> m_parent;
     };
 
-    struct DebugLine {
-        glm::vec3 position1 {};
-        glm::vec3 position2 {};
-        glm::vec3 color {};
-    };
-
     class RootNode3D : public SceneNode3D {
     public:
         SceneNode3DType type() const override {
             return SceneNode3DType::Root3D;
         }
 
-        void set_camera(const Camera& camera, glm::vec3 position);
-        void set_skybox(const Skybox& skybox);
-        void set_directional_light(const DirectionalLight& directional_light);
-        void set_shadow_box(const ShadowBox& shadow_box);
-
-        const Camera& get_camera() const { return m_camera; }
-        Camera& get_camera() { return m_camera; }
         glm::vec3 get_camera_position() const { return m_camera_position; }
-        const DirectionalLight& get_directional_light() const { return m_directional_light; }
-        DirectionalLight& get_directional_light() { return m_directional_light; }
-        void set_camera_controller(std::shared_ptr<CameraController> camera_controller) { m_camera_controller = camera_controller; }
-        std::shared_ptr<CameraController> get_camera_controller() const { return m_camera_controller; }
 
         // Immediate mode debug API
         void debug_add_line(glm::vec3 position1, glm::vec3 position2, glm::vec3 color);
@@ -167,16 +146,17 @@ namespace sm {
         void debug_add_point(glm::vec3 position, glm::vec3 color);
         void debug_add_lamp(glm::vec3 position, glm::vec3 color);
         void debug_clear();
+
+        Camera camera;
+        Skybox skybox;
+        DirectionalLight directional_light;
+        ShadowBox shadow_box;
+        std::shared_ptr<CameraController> camera_controller;
     private:
         void update_shadow_box();
         void update_camera();
 
-        Camera m_camera;
         glm::vec3 m_camera_position {};
-        Skybox m_skybox;
-        DirectionalLight m_directional_light;
-        ShadowBox m_shadow_box;
-        std::shared_ptr<CameraController> m_camera_controller;
         std::vector<std::shared_ptr<PostProcessingStep>> m_post_processing_steps;
 
 #ifndef SM_BUILD_DISTRIBUTION
@@ -200,7 +180,9 @@ namespace sm {
         const utils::AABB& get_aabb() const { return m_mesh->get_aabb(); }
         std::shared_ptr<MaterialInstance> get_material() const { return m_material; }
 
-        Transform3D transform;
+        glm::vec3 position {};
+        glm::vec3 rotation {};
+        float scale {1.0f};
 
         NodeFlag outline {Inherited};
         glm::vec3 outline_color {1.0f};
@@ -228,11 +210,7 @@ namespace sm {
             return SceneNode2DType::Root2D;
         }
 
-        void set_camera(const Camera2D& camera);
-        const Camera2D& get_camera() const { return m_camera; }
-        Camera2D& get_camera() { return m_camera; }
-    private:
-        Camera2D m_camera;
+        Camera2D camera;
 
         friend class internal::Renderer;
     };
@@ -246,9 +224,11 @@ namespace sm {
             return SceneNode2DType::Image;
         }
 
+        void set_texture(std::shared_ptr<GlTexture> texture) { m_texture = texture; }
         std::shared_ptr<GlTexture> get_texture() const { return m_texture; }
 
-        Transform2D transform;
+        glm::vec2 position {};
+        glm::vec2 scale {1.0f};
     private:
         std::shared_ptr<GlTexture> m_texture;
 
@@ -264,10 +244,11 @@ namespace sm {
             return SceneNode2DType::Text;
         }
 
-        std::shared_ptr<Font> get_font() const { return m_font; }
         void set_font(std::shared_ptr<Font> font) { m_font = font; }
+        std::shared_ptr<Font> get_font() const { return m_font; }
 
-        Transform2D transform;  // FIXME uniform scale
+        glm::vec2 position {};
+        float scale {1.0f};
         glm::vec3 color {};
         std::string text;
     private:

@@ -2,7 +2,7 @@
 
 namespace sm {
     void ApplicationScene::pre_update() {
-        auto camera_controller {ctx.render_3d()->get_camera_controller()};
+        auto camera_controller {ctx.render_3d()->camera_controller};
 
         if (camera_controller == nullptr) {
             camera_controller = ctx.m_default_camera_controller;

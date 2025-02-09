@@ -41,8 +41,9 @@ static const glm::vec3 NODE_POSITIONS[24] {
 static constexpr float BOARD_SCALE {1.0f};
 static constexpr float PAINT_Y_POSITION {0.049f};
 
-static const glm::vec3 RED {0.8f, 0.16f, 0.3f};
-static const glm::vec3 ORANGE {0.96f, 0.58f, 0.15f};
+static const glm::vec3 RED {0.996f, 0.443f, 0.443f};
+static const glm::vec3 ORANGE {1.0f, 0.733f, 0.36f};
+static const glm::vec3 GRAY {0.827f, 0.827f, 0.85f};
 
 static constexpr float PIECE_X_POSITION_OFFSET {3.0f};
 static constexpr float PIECE_Y_POSITION_AIR_INITIAL {0.5f};
@@ -237,10 +238,10 @@ NineMensMorrisBoard::NineMensMorrisBoard(
 )
     : m_move_callback(std::move(move_callback)) {
     m_board_model = board;
-    m_board_model->transform.scale = BOARD_SCALE;
+    m_board_model->scale = BOARD_SCALE;
 
     m_paint_model = paint;
-    m_paint_model->transform.position.y = PAINT_Y_POSITION;
+    m_paint_model->position.y = PAINT_Y_POSITION;
 
     m_piece_place1 = piece_place1;
     m_piece_place2 = piece_place2;
@@ -389,9 +390,9 @@ void NineMensMorrisBoard::reset(const Position& position) {
     m_game_over = GameOver();
     m_setup_position = m_position;
 
-    m_legal_moves = generate_moves();
-
     initialize_objects();
+
+    m_legal_moves = generate_moves();
 }
 
 void NineMensMorrisBoard::play_move(const Move& move) {
@@ -740,7 +741,7 @@ void NineMensMorrisBoard::initialize_objects(const NodeModels& nodes, const Piec
                 -PIECE_X_POSITION_OFFSET,
                 PIECE_Y_POSITION_AIR_INITIAL,
                 static_cast<float>(i) * PIECE_Z_POSITION_MULTIPLIER -
-                (m_pieces.size() == NINE ? PIECE_Z_POSITION_OFFSET_NINE : PIECE_Z_POSITION_OFFSET_TWELVE)
+                    (m_pieces.size() == NINE ? PIECE_Z_POSITION_OFFSET_NINE : PIECE_Z_POSITION_OFFSET_TWELVE)
             ),
             PieceType::White
         );
@@ -754,7 +755,7 @@ void NineMensMorrisBoard::initialize_objects(const NodeModels& nodes, const Piec
                 PIECE_X_POSITION_OFFSET,
                 PIECE_Y_POSITION_AIR_INITIAL,
                 static_cast<float>(i - m_pieces.size() / 2) * -PIECE_Z_POSITION_MULTIPLIER +
-                (m_pieces.size() == NINE ? PIECE_Z_POSITION_OFFSET_NINE : PIECE_Z_POSITION_OFFSET_TWELVE)
+                    (m_pieces.size() == NINE ? PIECE_Z_POSITION_OFFSET_NINE : PIECE_Z_POSITION_OFFSET_TWELVE)
             ),
             PieceType::Black
         );
@@ -815,7 +816,7 @@ void NineMensMorrisBoard::update_pieces_highlight(std::function<bool(const Piece
     for (PieceObj& piece : m_pieces) {
         if (piece.get_id() == m_hover_id && highlight(piece)) {
             piece.get_model()->outline = sm::NodeFlag::Enabled;
-            piece.get_model()->outline_color = ORANGE;
+            piece.get_model()->outline_color = m_capture_piece ? GRAY : ORANGE;
         } else {
             piece.get_model()->outline = sm::NodeFlag::Inherited;
         }
@@ -845,10 +846,10 @@ void NineMensMorrisBoard::update_pieces(sm::Ctx& ctx) {
 }
 
 void NineMensMorrisBoard::do_place_animation(PieceObj& piece, const NodeObj& node, PieceObj::OnFinish&& on_finish) const {
-    const glm::vec3 origin {piece.get_model()->transform.position};
-    const glm::vec3 target0 {piece.get_model()->transform.position.x, PIECE_Y_POSITION_AIR_MOVE, piece.get_model()->transform.position.z};
-    const glm::vec3 target1 {node.get_model()->transform.position.x, PIECE_Y_POSITION_AIR_MOVE, node.get_model()->transform.position.z};
-    const glm::vec3 target {node.get_model()->transform.position.x, PIECE_Y_POSITION_BOARD, node.get_model()->transform.position.z};
+    const glm::vec3 origin {piece.get_model()->position};
+    const glm::vec3 target0 {piece.get_model()->position.x, PIECE_Y_POSITION_AIR_MOVE, piece.get_model()->position.z};
+    const glm::vec3 target1 {node.get_model()->position.x, PIECE_Y_POSITION_AIR_MOVE, node.get_model()->position.z};
+    const glm::vec3 target {node.get_model()->position.x, PIECE_Y_POSITION_BOARD, node.get_model()->position.z};
 
     piece.move_three_step(origin, target0, target1, target, [this, on_finish = std::move(on_finish)](PieceObj& piece) {
         on_finish(piece);
@@ -858,17 +859,17 @@ void NineMensMorrisBoard::do_place_animation(PieceObj& piece, const NodeObj& nod
 
 void NineMensMorrisBoard::do_move_animation(PieceObj& piece, const NodeObj& node, PieceObj::OnFinish&& on_finish, bool direct) const {
     if (direct) {
-        const glm::vec3 origin {piece.get_model()->transform.position};
-        const glm::vec3 target {node.get_model()->transform.position.x, PIECE_Y_POSITION_BOARD, node.get_model()->transform.position.z};
+        const glm::vec3 origin {piece.get_model()->position};
+        const glm::vec3 target {node.get_model()->position.x, PIECE_Y_POSITION_BOARD, node.get_model()->position.z};
 
         sm::Ctx::play_audio_sound(sm::utils::choice({m_piece_move1, m_piece_move2, m_piece_move3}));
 
         piece.move_direct(origin, target, std::move(on_finish));
     } else {
-        const glm::vec3 origin {piece.get_model()->transform.position};
-        const glm::vec3 target0 {piece.get_model()->transform.position.x, PIECE_Y_POSITION_AIR_MOVE, piece.get_model()->transform.position.z};
-        const glm::vec3 target1 {node.get_model()->transform.position.x, PIECE_Y_POSITION_AIR_MOVE, node.get_model()->transform.position.z};
-        const glm::vec3 target {node.get_model()->transform.position.x, PIECE_Y_POSITION_BOARD, node.get_model()->transform.position.z};
+        const glm::vec3 origin {piece.get_model()->position};
+        const glm::vec3 target0 {piece.get_model()->position.x, PIECE_Y_POSITION_AIR_MOVE, piece.get_model()->position.z};
+        const glm::vec3 target1 {node.get_model()->position.x, PIECE_Y_POSITION_AIR_MOVE, node.get_model()->position.z};
+        const glm::vec3 target {node.get_model()->position.x, PIECE_Y_POSITION_BOARD, node.get_model()->position.z};
 
         sm::Ctx::play_audio_sound(sm::utils::choice({m_piece_capture1, m_piece_capture2}));
 
@@ -880,8 +881,8 @@ void NineMensMorrisBoard::do_move_animation(PieceObj& piece, const NodeObj& node
 }
 
 void NineMensMorrisBoard::do_take_animation(PieceObj& piece, PieceObj::OnFinish&& on_finish) const {
-    const glm::vec3 origin {piece.get_model()->transform.position};
-    const glm::vec3 target {piece.get_model()->transform.position.x, PIECE_Y_POSITION_AIR_TAKE, piece.get_model()->transform.position.z};
+    const glm::vec3 origin {piece.get_model()->position};
+    const glm::vec3 target {piece.get_model()->position.x, PIECE_Y_POSITION_AIR_TAKE, piece.get_model()->position.z};
 
     sm::Ctx::play_audio_sound(sm::utils::choice({m_piece_capture1, m_piece_capture2}));
 

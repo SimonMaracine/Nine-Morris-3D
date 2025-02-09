@@ -50,8 +50,8 @@ void LoadingScene::update_loading_image() {
         x, y, width, height
     );
 
-    m_loading_image->transform.position = glm::vec2(x, y);
-    m_loading_image->transform.scale = glm::vec2(
+    m_loading_image->position = glm::vec2(x, y);
+    m_loading_image->scale = glm::vec2(
         width / static_cast<float>(m_loading_image->get_texture()->get_width()),
         height / static_cast<float>(m_loading_image->get_texture()->get_height())
     );

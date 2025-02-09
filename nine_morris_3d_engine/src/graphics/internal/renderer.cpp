@@ -259,7 +259,7 @@ namespace sm::internal {
         draw_models(scene);
 
         // Skybox is rendered last, but with its depth values modified to keep it in the background
-        if (scene.root_node_3d->m_skybox.texture != nullptr) {
+        if (scene.root_node_3d->skybox.texture != nullptr) {
             draw_skybox(scene);
         }
 
@@ -326,13 +326,13 @@ namespace sm::internal {
 
             switch (binding_index) {
                 case PROJECTON_VIEW_UNIFORM_BLOCK_BINDING:
-                    uniform_buffer->set(&scene.root_node_3d->m_camera.projection_view(), "u_projection_view_matrix"_H);
+                    uniform_buffer->set(&scene.root_node_3d->camera.projection_view(), "u_projection_view_matrix"_H);
                     break;
                 case DIRECTIONAL_LIGHT_UNIFORM_BLOCK_BINDING:
-                    uniform_buffer->set(&scene.root_node_3d->m_directional_light.direction, "u_directional_light.direction"_H);
-                    uniform_buffer->set(&scene.root_node_3d->m_directional_light.ambient_color, "u_directional_light.ambient"_H);
-                    uniform_buffer->set(&scene.root_node_3d->m_directional_light.diffuse_color, "u_directional_light.diffuse"_H);
-                    uniform_buffer->set(&scene.root_node_3d->m_directional_light.specular_color, "u_directional_light.specular"_H);
+                    uniform_buffer->set(&scene.root_node_3d->directional_light.direction, "u_directional_light.direction"_H);
+                    uniform_buffer->set(&scene.root_node_3d->directional_light.ambient_color, "u_directional_light.ambient"_H);
+                    uniform_buffer->set(&scene.root_node_3d->directional_light.diffuse_color, "u_directional_light.diffuse"_H);
+                    uniform_buffer->set(&scene.root_node_3d->directional_light.specular_color, "u_directional_light.specular"_H);
                     break;
                 case VIEW_UNIFORM_BLOCK_BINDING:
                     uniform_buffer->set(&scene.root_node_3d->m_camera_position, "u_view_position"_H);
@@ -477,7 +477,7 @@ namespace sm::internal {
     void Renderer::draw_model(const ModelNode* model_node, const Context3D& context) {
         model_node->m_vertex_array->bind();
         model_node->m_material->bind_and_upload();
-        model_node->m_material->get_shader()->upload_uniform_mat4("u_model_matrix"_H, context.transform_);
+        model_node->m_material->get_shader()->upload_uniform_mat4("u_model_matrix"_H, context.transform);
 
         opengl::draw_elements(model_node->m_vertex_array->get_index_buffer()->get_index_count());
 
@@ -502,8 +502,14 @@ namespace sm::internal {
         });
 
         std::sort(model_nodes.begin(), model_nodes.end(), [&](const auto& lhs, const auto& rhs) {
-            const float distance_left {glm::distance(lhs.second.transform.position, scene.root_node_3d->m_camera_position)};
-            const float distance_right {glm::distance(rhs.second.transform.position, scene.root_node_3d->m_camera_position)};
+            const float distance_left {glm::distance(
+                glm::vec3(lhs.second.transform * glm::vec4(0.0f, 0.0f, 0.0f, 1.0f)),
+                scene.root_node_3d->m_camera_position
+            )};
+            const float distance_right {glm::distance(
+                glm::vec3(rhs.second.transform * glm::vec4(0.0f, 0.0f, 0.0f, 1.0f)),
+                scene.root_node_3d->m_camera_position
+            )};
 
             return distance_left < distance_right;
         });
@@ -521,7 +527,7 @@ namespace sm::internal {
         {
             model_node->m_vertex_array->bind();
             model_node->m_material->bind_and_upload();
-            model_node->m_material->get_shader()->upload_uniform_mat4("u_model_matrix"_H, context.transform_);
+            model_node->m_material->get_shader()->upload_uniform_mat4("u_model_matrix"_H, context.transform);
 
             opengl::draw_elements(model_node->m_vertex_array->get_index_buffer()->get_index_count());
         }
@@ -537,7 +543,7 @@ namespace sm::internal {
             };
 
             m_storage.outline_shader->bind();
-            m_storage.outline_shader->upload_uniform_mat4("u_model_matrix"_H, glm::scale(context.transform_, glm::vec3(model_node->outline_thickness)));
+            m_storage.outline_shader->upload_uniform_mat4("u_model_matrix"_H, glm::scale(context.transform, glm::vec3(model_node->outline_thickness)));
             m_storage.outline_shader->upload_uniform_vec3("u_color"_H, color);
 
             opengl::draw_elements(model_node->m_vertex_array->get_index_buffer()->get_index_count());
@@ -567,7 +573,7 @@ namespace sm::internal {
 
             model_node->m_vertex_array->bind();
 
-            m_storage.shadow_shader->upload_uniform_mat4("u_model_matrix"_H, context.transform_);
+            m_storage.shadow_shader->upload_uniform_mat4("u_model_matrix"_H, context.transform);
 
             opengl::draw_elements(model_node->m_vertex_array->get_index_buffer()->get_index_count());
 
@@ -580,14 +586,14 @@ namespace sm::internal {
     }
 
     void Renderer::draw_skybox(const Scene& scene) {
-        const glm::mat4& projection {scene.root_node_3d->m_camera.projection()};
-        const glm::mat4 view {glm::mat4(glm::mat3(scene.root_node_3d->m_camera.view()))};
+        const glm::mat4& projection {scene.root_node_3d->camera.projection()};
+        const glm::mat4 view {glm::mat4(glm::mat3(scene.root_node_3d->camera.view()))};
 
         m_storage.skybox_shader->bind();
         m_storage.skybox_shader->upload_uniform_mat4("u_projection_view_matrix"_H, projection * view);
 
         m_storage.skybox_vertex_array->bind();
-        scene.root_node_3d->m_skybox.texture->bind(0);
+        scene.root_node_3d->skybox.texture->bind(0);
 
         opengl::draw_arrays(36);
 
@@ -655,8 +661,8 @@ namespace sm::internal {
             batch.font->render(text_node.first->text, static_cast<int>(i++), m_storage.text.batch_buffer);
 
             glm::mat4 matrix {1.0f};  // TODO upload mat3 instead
-            matrix = glm::translate(matrix, glm::vec3(text_node.first->transform.position, 0.0f));
-            matrix = glm::scale(matrix, glm::vec3(text_node.first->transform.scale, 1.0f));
+            matrix = glm::translate(matrix, glm::vec3(text_node.first->position, 0.0f));
+            matrix = glm::scale(matrix, glm::vec3(text_node.first->scale, text_node.first->scale, 1.0f));
 
             m_storage.text.batch_matrices.push_back(matrix);
             m_storage.text.batch_colors.push_back(text_node.first->color);
@@ -665,7 +671,7 @@ namespace sm::internal {
         // Uniforms must be set as arrays
         m_storage.text_shader->upload_uniform_mat4_array("u_model_matrix[0]"_H, m_storage.text.batch_matrices);
         m_storage.text_shader->upload_uniform_vec3_array("u_color[0]"_H, m_storage.text.batch_colors);
-        m_storage.text_shader->upload_uniform_mat4("u_projection_matrix"_H, scene.root_node_2d->m_camera.projection());
+        m_storage.text_shader->upload_uniform_mat4("u_projection_matrix"_H, scene.root_node_2d->camera.projection());
 
         const auto vertex_buffer {m_storage.wtext_vertex_buffer.lock()};
         vertex_buffer->bind();
@@ -687,7 +693,7 @@ namespace sm::internal {
         m_storage.quad_shader->bind();
         m_storage.quad_vertex_array->bind();
 
-        m_storage.quad_shader->upload_uniform_mat4("u_projection_matrix"_H, scene.root_node_2d->m_camera.projection());
+        m_storage.quad_shader->upload_uniform_mat4("u_projection_matrix"_H, scene.root_node_2d->camera.projection());
 
         begin_images_batch();
 
@@ -736,24 +742,24 @@ namespace sm::internal {
             m_storage.quad.texture_index++;
         }
 
-        size *= context.transform.scale;
+        size *= context.scale;
 
-        m_storage.quad.buffer_pointer->position = glm::vec2(context.transform.position.x + size.x, context.transform.position.y + size.y);
+        m_storage.quad.buffer_pointer->position = glm::vec2(context.position.x + size.x, context.position.y + size.y);
         m_storage.quad.buffer_pointer->texture_coordinate = glm::vec2(1.0f, 1.0f);
         m_storage.quad.buffer_pointer->texture_index = texture_index;
         m_storage.quad.buffer_pointer++;
 
-        m_storage.quad.buffer_pointer->position = glm::vec2(context.transform.position.x, context.transform.position.y + size.y);
+        m_storage.quad.buffer_pointer->position = glm::vec2(context.position.x, context.position.y + size.y);
         m_storage.quad.buffer_pointer->texture_coordinate = glm::vec2(0.0f, 1.0f);
         m_storage.quad.buffer_pointer->texture_index = texture_index;
         m_storage.quad.buffer_pointer++;
 
-        m_storage.quad.buffer_pointer->position = glm::vec2(context.transform.position.x, context.transform.position.y);
+        m_storage.quad.buffer_pointer->position = glm::vec2(context.position.x, context.position.y);
         m_storage.quad.buffer_pointer->texture_coordinate = glm::vec2(0.0f, 0.0f);
         m_storage.quad.buffer_pointer->texture_index = texture_index;
         m_storage.quad.buffer_pointer++;
 
-        m_storage.quad.buffer_pointer->position = glm::vec2(context.transform.position.x + size.x, context.transform.position.y);
+        m_storage.quad.buffer_pointer->position = glm::vec2(context.position.x + size.x, context.position.y);
         m_storage.quad.buffer_pointer->texture_coordinate = glm::vec2(1.0f, 0.0f);
         m_storage.quad.buffer_pointer->texture_index = texture_index;
         m_storage.quad.buffer_pointer++;
@@ -808,8 +814,14 @@ namespace sm::internal {
             point_light_nodes.begin(),
             point_light_nodes.end(),
             [&](const auto& lhs, const auto& rhs) {
-                const float distance_left {glm::distance(lhs.second.transform.position, scene.root_node_3d->m_camera_position)};
-                const float distance_right {glm::distance(rhs.second.transform.position, scene.root_node_3d->m_camera_position)};
+                const float distance_left {glm::distance(
+                    glm::vec3(lhs.second.transform * glm::vec4(0.0f, 0.0f, 0.0f, 1.0f)),
+                    scene.root_node_3d->m_camera_position
+                )};
+                const float distance_right {glm::distance(
+                    glm::vec3(rhs.second.transform * glm::vec4(0.0f, 0.0f, 0.0f, 1.0f)),
+                    scene.root_node_3d->m_camera_position
+                )};
 
                 return distance_left < distance_right;
             }
@@ -821,7 +833,7 @@ namespace sm::internal {
             PointLight point_light;
 
             if (i + 1 <= point_light_nodes.size()) {
-                position = point_light_nodes[i].second.transform.position;
+                position = point_light_nodes[i].second.transform * glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
                 point_light = *point_light_nodes[i].first;
             }
 
@@ -840,19 +852,19 @@ namespace sm::internal {
     void Renderer::setup_light_space_uniform_buffer(const Scene& scene, std::shared_ptr<GlUniformBuffer> uniform_buffer) {
         const glm::mat4 projection {
             glm::ortho(
-                scene.root_node_3d->m_shadow_box.left,
-                scene.root_node_3d->m_shadow_box.right,
-                scene.root_node_3d->m_shadow_box.bottom,
-                scene.root_node_3d->m_shadow_box.top,
-                scene.root_node_3d->m_shadow_box.near_,
-                scene.root_node_3d->m_shadow_box.far_
+                scene.root_node_3d->shadow_box.left,
+                scene.root_node_3d->shadow_box.right,
+                scene.root_node_3d->shadow_box.bottom,
+                scene.root_node_3d->shadow_box.top,
+                scene.root_node_3d->shadow_box.near_,
+                scene.root_node_3d->shadow_box.far_
             )
         };
 
         const glm::mat4 view {
             glm::lookAt(
-                scene.root_node_3d->m_shadow_box.position,
-                scene.root_node_3d->m_directional_light.direction,
+                scene.root_node_3d->shadow_box.position,
+                scene.root_node_3d->directional_light.direction,
                 glm::vec3(0.0f, 1.0f, 0.0f)
             )
         };

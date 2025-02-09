@@ -42,15 +42,13 @@ namespace sm {
     void SceneNode3D::traverse(const std::function<bool(const SceneNode3D*, Context3D&)>& process) const {
         traverse<Context3D>(Context3D(), [&](const SceneNode3D* node, Context3D& context) {
             if (auto model_node {dynamic_cast<const ModelNode*>(node)}; model_node != nullptr) {
-                context.transform_ = glm::translate(context.transform_, model_node->transform.position);
-                context.transform_ = glm::rotate(context.transform_, model_node->transform.rotation.x, glm::vec3(1.0f, 0.0f, 0.0f));
-                context.transform_ = glm::rotate(context.transform_, model_node->transform.rotation.y, glm::vec3(0.0f, 1.0f, 0.0f));
-                context.transform_ = glm::rotate(context.transform_, model_node->transform.rotation.z, glm::vec3(0.0f, 0.0f, 1.0f));
-                context.transform_ = glm::scale(context.transform_, glm::vec3(model_node->transform.scale));
+                context.transform = glm::translate(context.transform, model_node->position);
+                context.transform = glm::rotate(context.transform, glm::radians(model_node->rotation.x), glm::vec3(1.0f, 0.0f, 0.0f));
+                context.transform = glm::rotate(context.transform, glm::radians(model_node->rotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
+                context.transform = glm::rotate(context.transform, glm::radians(model_node->rotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
+                context.transform = glm::scale(context.transform, glm::vec3(model_node->scale));
 
-                context.transform.position += model_node->transform.position;
-                context.transform.rotation += model_node->transform.rotation;
-                context.transform.scale *= model_node->transform.scale;
+                context.transform_scale *= model_node->scale;
 
                 switch (model_node->outline) {
                     case NodeFlag::Inherited:
@@ -85,9 +83,7 @@ namespace sm {
                         break;
                 }
             } else if (auto point_light_node {dynamic_cast<const PointLightNode*>(node)}; point_light_node != nullptr) {
-                context.transform_ = glm::translate(context.transform_, model_node->transform.position);
-
-                context.transform.position += point_light_node->position;
+                context.transform = glm::translate(context.transform, point_light_node->position);
             }
 
             return process(node, context);
@@ -140,11 +136,11 @@ namespace sm {
     void SceneNode2D::traverse(const std::function<bool(const SceneNode2D*, Context2D&)>& process) const {
         traverse<Context2D>(Context2D(), [&](const SceneNode2D* node, Context2D& context) {
             if (auto image_node {dynamic_cast<const ImageNode*>(node)}; image_node != nullptr) {
-                context.transform.position += image_node->transform.position;
-                context.transform.scale *= image_node->transform.scale;
+                context.position += image_node->position;
+                context.scale *= image_node->scale;
             } else if (auto text_node {dynamic_cast<const TextNode*>(node)}; text_node != nullptr) {
-                context.transform.position += text_node->transform.position;
-                context.transform.scale *= text_node->transform.scale;
+                context.position += text_node->position;
+                context.scale *= text_node->scale;
             }
 
             return process(node, context);
@@ -164,23 +160,6 @@ namespace sm {
         });
 
         return result;
-    }
-
-    void RootNode3D::set_camera(const Camera& camera, glm::vec3 position) {
-        m_camera = camera;
-        m_camera_position = position;
-    }
-
-    void RootNode3D::set_skybox(const Skybox& skybox) {
-        m_skybox = skybox;
-    }
-
-    void RootNode3D::set_directional_light(const DirectionalLight& directional_light) {
-        m_directional_light = directional_light;
-    }
-
-    void RootNode3D::set_shadow_box(const ShadowBox& shadow_box) {
-        m_shadow_box = shadow_box;
     }
 
     void RootNode3D::debug_add_line(glm::vec3 position1, glm::vec3 position2, glm::vec3 color) {
@@ -270,7 +249,7 @@ namespace sm {
 
     void RootNode3D::update_shadow_box() {
         const glm::mat4 view_matrix {
-            glm::lookAt(glm::vec3(0.0f), m_directional_light.direction, glm::vec3(0.0f, 1.0f, 0.0f))
+            glm::lookAt(glm::vec3(0.0f), directional_light.direction, glm::vec3(0.0f, 1.0f, 0.0f))
         };
 
         float max_x_positive {std::numeric_limits<float>::min()};
@@ -291,8 +270,11 @@ namespace sm {
                 return false;
             }
 
-            const glm::vec3 position_bb {view_matrix * glm::vec4(context.transform.position, 1.0f)};
-            const float radius_bb {glm::length(glm::max(model_node->get_aabb().max, model_node->get_aabb().min)) * context.transform.scale};
+            // const glm::vec3 position_bb {view_matrix * glm::vec4(context.transform_position, 1.0f)};
+            // const float radius_bb {glm::length(glm::max(model_node->get_aabb().max, model_node->get_aabb().min)) * context.transform_scale};
+
+            const glm::vec3 position_bb {view_matrix * context.transform * glm::vec4(0.0f, 0.0f, 0.0f, 1.0f)};
+            const float radius_bb {glm::length(glm::max(model_node->get_aabb().max, model_node->get_aabb().min)) * context.transform_scale};
 
             max_x_positive = glm::max(max_x_positive, position_bb.x + radius_bb);
             max_x_negative = glm::min(max_x_negative, position_bb.x - radius_bb);
@@ -304,22 +286,18 @@ namespace sm {
             return false;
         });
 
-        m_shadow_box.left = max_x_negative;
-        m_shadow_box.right = max_x_positive;
-        m_shadow_box.bottom = max_y_negative;
-        m_shadow_box.top = max_y_positive;
+        shadow_box.left = max_x_negative;
+        shadow_box.right = max_x_positive;
+        shadow_box.bottom = max_y_negative;
+        shadow_box.top = max_y_positive;
 
         // After calculating some bound values, offset the position according to those values
-        m_shadow_box.position = glm::normalize(m_directional_light.direction) * -(max_z_positive + 1.0f);
-        m_shadow_box.near_ = 1.0f;
-        m_shadow_box.far_ = -max_z_negative + max_z_positive + 1.0f;
+        shadow_box.position = glm::normalize(directional_light.direction) * -(max_z_positive + 1.0f);
+        shadow_box.near_ = 1.0f;
+        shadow_box.far_ = -max_z_negative + max_z_positive + 1.0f;
     }
 
     void RootNode3D::update_camera() {
-        m_camera_position = m_camera_controller ? m_camera_controller->get_position() : glm::vec3(0.0f);
-    }
-
-    void RootNode2D::set_camera(const Camera2D& camera) {
-        m_camera = camera;
+        m_camera_position = camera_controller ? camera_controller->get_position() : glm::vec3(0.0f);
     }
 }

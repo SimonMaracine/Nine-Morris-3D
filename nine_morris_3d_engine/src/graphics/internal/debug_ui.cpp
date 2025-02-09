@@ -95,14 +95,14 @@ namespace sm::internal {
         if (m_shadows) {
             shadows_lines(
                 scene,
-                scene.root_node_3d->m_shadow_box.left,
-                scene.root_node_3d->m_shadow_box.right,
-                scene.root_node_3d->m_shadow_box.bottom,
-                scene.root_node_3d->m_shadow_box.top,
-                scene.root_node_3d->m_shadow_box.near_,
-                scene.root_node_3d->m_shadow_box.far_,
-                scene.root_node_3d->m_shadow_box.position,
-                scene.root_node_3d->m_directional_light.direction
+                scene.root_node_3d->shadow_box.left,
+                scene.root_node_3d->shadow_box.right,
+                scene.root_node_3d->shadow_box.bottom,
+                scene.root_node_3d->shadow_box.top,
+                scene.root_node_3d->shadow_box.near_,
+                scene.root_node_3d->shadow_box.far_,
+                scene.root_node_3d->shadow_box.position,
+                scene.root_node_3d->directional_light.direction
             );
         }
     }
@@ -112,9 +112,9 @@ namespace sm::internal {
             for (int index {0}; const auto& model_node : m_model_nodes) {
                 ImGui::PushID(index);
                 ImGui::Text("Model %d", index);
-                ImGui::DragFloat3("Position", glm::value_ptr(model_node->transform.position), 0.01f, -200.0f, 200.0f);
-                ImGui::DragFloat3("Rotation", glm::value_ptr(model_node->transform.rotation), 0.01f, -360.0f, 360.0f);
-                ImGui::DragFloat("Scale", &model_node->transform.scale, 0.01f, 0.0f, 100.0f);
+                ImGui::DragFloat3("Position", glm::value_ptr(model_node->position), 0.01f, -200.0f, 200.0f);
+                ImGui::DragFloat3("Rotation", glm::value_ptr(model_node->rotation), 1.0f, -360.0f, 360.0f);
+                ImGui::DragFloat("Scale", &model_node->scale, 0.01f, 0.0f, 100.0f);
                 ImGui::PopID();
                 ImGui::Spacing();
 
@@ -127,13 +127,13 @@ namespace sm::internal {
 
     void DebugUi::lights(const Scene& scene) {
         if (ImGui::Begin("Debug Directional Light")) {
-            ImGui::DragFloat3("Direction", glm::value_ptr(scene.root_node_3d->m_directional_light.direction), 0.01f, -1.0f, 1.0f);
-            ImGui::DragFloat3("Ambient", glm::value_ptr(scene.root_node_3d->m_directional_light.ambient_color), 0.01f, 0.0f, 1.0f);
-            ImGui::DragFloat3("Diffuse", glm::value_ptr(scene.root_node_3d->m_directional_light.diffuse_color), 0.01f, 0.0f, 1.0f);
-            ImGui::DragFloat3("Specular", glm::value_ptr(scene.root_node_3d->m_directional_light.specular_color), 0.01f, 0.0f, 1.0f);
+            ImGui::DragFloat3("Direction", glm::value_ptr(scene.root_node_3d->directional_light.direction), 0.01f, -1.0f, 1.0f);
+            ImGui::DragFloat3("Ambient", glm::value_ptr(scene.root_node_3d->directional_light.ambient_color), 0.01f, 0.0f, 1.0f);
+            ImGui::DragFloat3("Diffuse", glm::value_ptr(scene.root_node_3d->directional_light.diffuse_color), 0.01f, 0.0f, 1.0f);
+            ImGui::DragFloat3("Specular", glm::value_ptr(scene.root_node_3d->directional_light.specular_color), 0.01f, 0.0f, 1.0f);
 
             // Direction should stay normalized no matter what
-            scene.root_node_3d->m_directional_light.direction = glm::normalize(scene.root_node_3d->m_directional_light.direction);
+            scene.root_node_3d->directional_light.direction = glm::normalize(scene.root_node_3d->directional_light.direction);
         }
 
         ImGui::End();
@@ -160,17 +160,17 @@ namespace sm::internal {
 
     void DebugUi::shadows(const Scene& scene) {
         if (ImGui::Begin("Debug Shadows")) {
-            ImGui::DragFloat("Left", &scene.root_node_3d->m_shadow_box.left, 0.01f, -500.0f, 0.0f);
-            ImGui::DragFloat("Right", &scene.root_node_3d->m_shadow_box.right, 0.01f, 0.0f, 500.0f);
-            ImGui::DragFloat("Bottom", &scene.root_node_3d->m_shadow_box.bottom, 0.01f, -500.0f, 0.0f);
-            ImGui::DragFloat("Top", &scene.root_node_3d->m_shadow_box.top, 0.01f, 0.0f, 500.0f);
-            ImGui::DragFloat("Near", &scene.root_node_3d->m_shadow_box.near_, 0.01f, 0.1f, 2.0f);
-            ImGui::DragFloat("Far", &scene.root_node_3d->m_shadow_box.far_, 0.01f, 2.0f, 500.0f);
+            ImGui::DragFloat("Left", &scene.root_node_3d->shadow_box.left, 0.01f, -500.0f, 0.0f);
+            ImGui::DragFloat("Right", &scene.root_node_3d->shadow_box.right, 0.01f, 0.0f, 500.0f);
+            ImGui::DragFloat("Bottom", &scene.root_node_3d->shadow_box.bottom, 0.01f, -500.0f, 0.0f);
+            ImGui::DragFloat("Top", &scene.root_node_3d->shadow_box.top, 0.01f, 0.0f, 500.0f);
+            ImGui::DragFloat("Near", &scene.root_node_3d->shadow_box.near_, 0.01f, 0.1f, 2.0f);
+            ImGui::DragFloat("Far", &scene.root_node_3d->shadow_box.far_, 0.01f, 2.0f, 500.0f);
             ImGui::Text(
                 "Position %f, %f, %f",
-                scene.root_node_3d->m_shadow_box.position.x,
-                scene.root_node_3d->m_shadow_box.position.y,
-                scene.root_node_3d->m_shadow_box.position.z
+                scene.root_node_3d->shadow_box.position.x,
+                scene.root_node_3d->shadow_box.position.y,
+                scene.root_node_3d->shadow_box.position.z
             );
         }
 
@@ -182,8 +182,8 @@ namespace sm::internal {
             for (int index {0}; const auto& image_node : m_image_nodes) {
                 ImGui::PushID(index);
                 ImGui::Text("Image %d", index);
-                ImGui::DragFloat2("Position", glm::value_ptr(image_node->transform.position), 0.01f, -2000.0f, 2000.0f);
-                ImGui::DragFloat2("Scale", glm::value_ptr(image_node->transform.scale), 0.01f, 0.0f, 1.0f);
+                ImGui::DragFloat2("Position", glm::value_ptr(image_node->position), 0.01f, -2000.0f, 2000.0f);
+                ImGui::DragFloat2("Scale", glm::value_ptr(image_node->scale), 0.01f, 0.0f, 1.0f);
                 ImGui::PopID();
                 ImGui::Spacing();
 
@@ -202,8 +202,8 @@ namespace sm::internal {
 
                 ImGui::PushID(index);
                 ImGui::Text("Text %d", index);
-                ImGui::DragFloat2("Position", glm::value_ptr(text_node->transform.position), 0.01f, -2000.0f, 2000.0f);
-                ImGui::DragFloat2("Scale", glm::value_ptr(text_node->transform.scale), 0.01f, 0.0f, 1.0f);
+                ImGui::DragFloat2("Position", glm::value_ptr(text_node->position), 0.01f, -2000.0f, 2000.0f);
+                ImGui::DragFloat2("Scale", &text_node->scale, 0.01f, 0.0f, 1.0f);
                 ImGui::DragFloat3("Color", glm::value_ptr(text_node->color), 0.001f, 0.0f, 1.0f);
                 ImGui::InputTextMultiline("Text", buffer, sizeof(buffer));
                 ImGui::PopID();

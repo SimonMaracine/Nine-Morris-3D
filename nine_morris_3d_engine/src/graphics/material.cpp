@@ -166,7 +166,7 @@ namespace sm {
                     break;
                 }
                 case Element::Type::Texture: {
-                    Texture texture {};
+                    Texture texture;
                     std::memcpy(&texture, m_data.get() + element.offset, sizeof(texture));
 
                     m_shader->upload_uniform_int(name, texture.unit);
@@ -213,7 +213,7 @@ namespace sm {
     }
 
     void MaterialInstance::set_texture(Id name, unsigned int texture, int unit) {
-        Texture result_texture {};
+        Texture result_texture;
         result_texture.unit = unit;
         result_texture.texture = texture;
 
