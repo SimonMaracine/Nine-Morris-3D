@@ -1,7 +1,8 @@
 #! /bin/bash
 
 function print_help() {
-    echo "Usage: create_source_archive.sh <output_directory> <version_string> <binary_file> <engine_binaries_directory> <icons_directory> <desktop_file> <assets_directories...>"
+    echo "Usage: create_source_archive.sh <output_directory> <version_string> <binary_file>" \
+        "<engine_binaries_directory> <icons_directory> <desktop_file> <assets_directories...>"
 }
 
 function check_argument() {
@@ -19,17 +20,17 @@ ICONS_DIRECTORY=$5
 DESKTOP_FILE=$6
 ASSETS_DIRECTORIES="${@: 7}"
 
-OUTPUT_DIRECTORY=$(realpath -m $OUTPUT_DIRECTORY)
-ENGINE_BINARIES_DIRECTORY=$(realpath -m $ENGINE_BINARIES_DIRECTORY)
-ICONS_DIRECTORY=$(realpath -m $ICONS_DIRECTORY)
-ASSETS_DIRECTORIES=$(realpath -m $ASSETS_DIRECTORIES)
-
 check_argument $OUTPUT_DIRECTORY
 check_argument $VERSION_STRING
 check_argument $BINARY_FILE
 check_argument $ENGINE_BINARIES_DIRECTORY
 check_argument $ICONS_DIRECTORY
 check_argument $DESKTOP_FILE
+
+OUTPUT_DIRECTORY=$(realpath -m $OUTPUT_DIRECTORY)
+ENGINE_BINARIES_DIRECTORY=$(realpath -m $ENGINE_BINARIES_DIRECTORY)
+ICONS_DIRECTORY=$(realpath -m $ICONS_DIRECTORY)
+ASSETS_DIRECTORIES=$(realpath -m $ASSETS_DIRECTORIES)
 
 BASE=$OUTPUT_DIRECTORY/ninemorris3d-$VERSION_STRING
 BIN=$BASE/usr/local/bin

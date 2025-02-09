@@ -19,7 +19,7 @@ cd scripts
 ```txt
 cd scripts
 ./create_source_archive.sh ../build_dist/ X.Y.Z ../build_dist/nine_morris_3d/nine_morris_3d ../ \
-    ../build_dist/assets/icons/ ../distribution/linux/ninemorris3d.desktop ../build_dist/assets/ \
+    ../build_dist/assets/icons/ ../distribution/linux/nine_morris_3d.desktop ../build_dist/assets/ \
     ../build_dist/assets_engine/
 ```
 
@@ -48,7 +48,7 @@ python export_assets.py ..\build ..\assets ..\assets_engine
 - Copy the engine binaries from root into the folder
 - Copy the assets directories from `build` into the folder
 - Copy `README.txt` from `distribution` into the folder
-- Copy `installer.nsi` from `distribution\windows` into the folder
+- Copy `nine_morris_3d.nsi` from `distribution\windows` into the folder
 - Copy `nine_morris_3d.ico` from `nine_morris_3d\res` into the folder
 - Create an NSIS installer called `Nine-Morris-3D-X.Y.Z-Windows` using the installer script
 
@@ -56,7 +56,7 @@ python export_assets.py ..\build ..\assets ..\assets_engine
 
 - main.cpp
 - ninemorris3d.desktop
-- installer.nsi
+- nine_morris_3d.nsi
 
 ## Caveats
 

@@ -14,7 +14,7 @@ if(WIN32)
     set(NM3D_ICON_WINDOWS "res/nine_morris_3d.rc")
 endif()
 
-add_executable(nine_morris_3d ${NM3D_GUI_WINDOWS} ${NM3D_SOURCES} ${NM3D_HEADERS} ${NM3D_ICON_WINDOWS})
+add_executable(nine_morris_3d ${NM3D_GUI_WINDOWS} ${NM3D_ICON_WINDOWS} ${NM3D_SOURCES} ${NM3D_HEADERS})
 
 target_include_directories(nine_morris_3d PRIVATE "src")
 
