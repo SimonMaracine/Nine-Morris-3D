@@ -89,7 +89,7 @@ namespace sm {
         void traverse(const std::function<bool(const SceneNode3D*, Context3D&)>& process) const;
 
         // Find a node by identifier
-        std::shared_ptr<SceneNode3D> find_node(Id id);
+        std::shared_ptr<SceneNode3D> find_node(Id node_id);
 
         // Generic traverse
         template<typename T>
@@ -133,7 +133,7 @@ namespace sm {
         void traverse(const std::function<bool(const SceneNode2D*, Context2D&)>& process) const;
 
         // Find a node by identifier
-        std::shared_ptr<SceneNode2D> find_node(Id id);
+        std::shared_ptr<SceneNode2D> find_node(Id node_id);
 
         // Generic traverse
         template<typename T>

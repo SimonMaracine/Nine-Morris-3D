@@ -90,11 +90,11 @@ namespace sm {
         });
     }
 
-    std::shared_ptr<SceneNode3D> SceneNode3D::find_node(Id id) {
+    std::shared_ptr<SceneNode3D> SceneNode3D::find_node(Id node_id) {
         std::shared_ptr<SceneNode3D> result;
 
         traverse([&](std::shared_ptr<SceneNode3D> node) {
-            if (node->id == id) {
+            if (node->id == node_id) {
                 result = node;
                 return true;
             }
@@ -147,11 +147,11 @@ namespace sm {
         });
     }
 
-    std::shared_ptr<SceneNode2D> SceneNode2D::find_node(Id id) {
+    std::shared_ptr<SceneNode2D> SceneNode2D::find_node(Id node_id) {
         std::shared_ptr<SceneNode2D> result;
 
         traverse([=](std::shared_ptr<SceneNode2D> node) mutable {
-            if (node->id == id) {
+            if (node->id == node_id) {
                 result = node;
                 return true;
             }
