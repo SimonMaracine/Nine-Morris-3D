@@ -59,6 +59,9 @@ void Ui::update(sm::Ctx& ctx, GameScene& game_scene) {
             case ModalWindowConnectionError:
                 connection_error_window();
                 break;
+            case ModalWindowServerRejection:
+                server_rejection_window(string);
+                break;
             case ModalWindowNewGameSessionError:
                 new_game_session_error_window(string);
                 break;
@@ -710,6 +713,13 @@ void Ui::connection_error_window() {
     generic_modal_window_ok("Connection Error", []() {
         ImGui::Text("An error occurred with the connection to the server.");
         ImGui::Text("You may want to reconnect.");
+    });
+}
+
+void Ui::server_rejection_window(const std::string& string) {
+    generic_modal_window_ok("Server Error", [&string]() {
+        ImGui::Text("The server rejected the connection.");
+        ImGui::Text("%s.", string.c_str());
     });
 }
 

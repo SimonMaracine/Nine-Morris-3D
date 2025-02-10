@@ -102,6 +102,9 @@ void Server::disconnected_client_from_game_session(std::shared_ptr<networking::C
 void Server::handle_message(std::shared_ptr<networking::ClientConnection> connection, const networking::Message& message) {
     try {
         switch (message.id()) {
+            case protocol::message::Client_Hello:
+                client_hello(connection, message);
+                break;
             case protocol::message::Client_Ping:
                 client_ping(connection, message);
                 break;
@@ -143,6 +146,44 @@ void Server::handle_message(std::shared_ptr<networking::ClientConnection> connec
         m_server.get_logger()->error("Serialization error: {}", e.what());
         connection->close();
     }
+}
+
+void Server::client_hello(std::shared_ptr<networking::ClientConnection> connection, const networking::Message& message) {
+    protocol::Client_Hello payload;
+    message.read(payload);
+
+    const auto [major, minor, patch] {version_number(payload.version)};
+
+    if (minor != 6) {
+        server_hello_reject(connection, protocol::ErrorCode::IncompatibleVersion);
+        connection->close();
+        return;
+    }
+
+    server_hello_accept(connection);
+
+    m_server.get_logger()->debug("Client version: {:#06}", payload.version);
+}
+
+void Server::server_hello_accept(std::shared_ptr<networking::ClientConnection> connection) {
+    protocol::Server_HelloAccept payload;
+    payload.version = version_number();
+
+    networking::Message message {protocol::message::Server_HelloAccept};
+    message.write(payload);
+
+    m_server.send_message(connection, message);
+}
+
+void Server::server_hello_reject(std::shared_ptr<networking::ClientConnection> connection, protocol::ErrorCode error_code) {
+    protocol::Server_HelloReject payload;
+    payload.version = version_number();
+    payload.error_code = error_code;
+
+    networking::Message message {protocol::message::Server_HelloReject};
+    message.write(payload);
+
+    m_server.send_message(connection, message);
 }
 
 void Server::client_ping(std::shared_ptr<networking::ClientConnection> connection, const networking::Message& message) {
@@ -224,13 +265,13 @@ void Server::client_request_join_game_session(std::shared_ptr<networking::Client
     }
 
     if (iter->second.connection1.expired() && iter->second.connection2.expired()) {
-        server_reject_join_game_session(connection, protocol::ErrorCode::SessionExpired);
+        server_reject_join_game_session(connection, protocol::ErrorCode::ExpiredSession);
         m_server.get_logger()->warn("Client {} requested to join empty session {}", connection->get_id(), payload.session_id);
         return;
     }
 
     if (iter->second.game_mode != payload.game_mode) {
-        server_reject_join_game_session(connection, protocol::ErrorCode::SessionDifferentGame);
+        server_reject_join_game_session(connection, protocol::ErrorCode::DifferentGameSession);
         m_server.get_logger()->debug("Client {} requested to join session {} with a different game", connection->get_id(), payload.session_id);
         return;
     }
@@ -264,7 +305,7 @@ void Server::client_request_join_game_session(std::shared_ptr<networking::Client
 
         remote_connection = iter->second.connection1.lock();
     } else {
-        server_reject_join_game_session(connection, protocol::ErrorCode::SessionOccupied);
+        server_reject_join_game_session(connection, protocol::ErrorCode::OccupiedSession);
         m_server.get_logger()->warn("Client {} requested to join occupied session {}", connection->get_id(), payload.session_id);
         return;
     }

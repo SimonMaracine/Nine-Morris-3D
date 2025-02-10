@@ -5,6 +5,7 @@
 
 #include "global.hpp"
 #include "default_address.hpp"
+#include "ver.hpp"
 
 void GameScene::on_start() {
     ctx.connect_event<sm::KeyReleasedEvent, &GameScene::on_key_released>(this);
@@ -23,12 +24,16 @@ void GameScene::on_start() {
     load_icons();
     start_engine();
 
-    const auto& g {ctx.global<Global>()};
+    auto& g {ctx.global<Global>()};
 
-    if (g.options.default_address_port) {
-        connect(DEFAULT_ADDRESS, DEFAULT_PORT);
-    } else {
-        connect(g.options.address, g.options.port);
+    if (!g.first_connect) {
+        if (g.options.default_address_port) {
+            connect(DEFAULT_ADDRESS, DEFAULT_PORT);
+        } else {
+            connect(g.options.address, g.options.port);
+        }
+
+        g.first_connect = true;
     }
 
     ctx.add_task_delayed([this]() {
@@ -203,10 +208,7 @@ void GameScene::connect(const std::string& address, std::uint16_t port, bool rec
         return;
     }
 
-    // To prevent bad states and desynchronizations
-    reset_session_and_game();
-
-    g.client.disconnect();
+    disconnect();
 
     try {
         LOG_DIST_INFO("Connecting to {}:{}...", address, port);
@@ -222,6 +224,62 @@ void GameScene::connect(const std::string& address, const std::string& port, boo
         connect(address, sm::utils::string_to_unsigned_short(port), reconnect);
     } catch (const sm::RuntimeError& e) {
         LOG_DIST_ERROR("Invalid port: {}", e.what());
+    }
+}
+
+void GameScene::disconnect() {
+    auto& g {ctx.global<Global>()};
+
+    // To prevent bad states and desynchronizations
+    reset_session_and_game();
+
+    g.connection_state = ConnectionState::Disconnected;
+    g.client.disconnect();
+
+    LOG_DIST_INFO("Disconnected from server");
+}
+
+void GameScene::client_hello() {
+    protocol::Client_Hello payload;
+    payload.version = version_number();
+
+    networking::Message message {protocol::message::Client_Hello};
+
+    try {
+        message.write(payload);
+    } catch (const networking::SerializationError& e) {
+        serialization_error(e);
+        return;
+    }
+
+    auto& g {ctx.global<Global>()};
+
+    try {
+        g.client.send_message(message);
+    } catch (const networking::ConnectionError& e) {
+        connection_error(e);
+    }
+}
+
+void GameScene::client_ping() {
+    protocol::Client_Ping payload;
+    payload.time = std::chrono::system_clock::now();
+
+    networking::Message message {protocol::message::Client_Ping};
+
+    try {
+        message.write(payload);
+    } catch (const networking::SerializationError& e) {
+        serialization_error(e);
+        return;
+    }
+
+    auto& g {ctx.global<Global>()};
+
+    try {
+        g.client.send_message(message);
+    } catch (const networking::ConnectionError& e) {
+        connection_error(e);
     }
 }
 
@@ -863,7 +921,7 @@ void GameScene::connection_error(const networking::ConnectionError& e) {
 
     g.connection_state = ConnectionState::Disconnected;
 
-    m_ui.clear_modal_window(  // The user may already be blocked in a popup window
+    m_ui.clear_modal_window(  // The user may already be blocked in a modal window
         ModalWindowWaitServerAcceptGameSession |
         ModalWindowWaitRemoteJoinGameSession |
         ModalWindowWaitServerAcceptJoinGameSession
@@ -872,19 +930,11 @@ void GameScene::connection_error(const networking::ConnectionError& e) {
 }
 
 void GameScene::serialization_error(const networking::SerializationError& e) {
-    auto& g {ctx.global<Global>()};
-
     LOG_DIST_CRITICAL("Serialization error: {}", e.what());
 
-    // To prevent bad states and desynchronizations
-    reset_session_and_game();
+    disconnect();
 
-    g.connection_state = ConnectionState::Disconnected;
-
-    g.client.disconnect();
-    LOG_DIST_INFO("Disconnected from server");
-
-    m_ui.clear_modal_window(  // The user may already be blocked in a popup window
+    m_ui.clear_modal_window(  // The user may already be blocked in a modal window
         ModalWindowWaitServerAcceptGameSession |
         ModalWindowWaitRemoteJoinGameSession |
         ModalWindowWaitServerAcceptJoinGameSession
@@ -908,8 +958,9 @@ void GameScene::update_connection_state() {
                 break;
             case ConnectionState::Connecting:
                 if (g.client.connection_established()) {
-                    LOG_DIST_INFO("Connected to server");
+                    LOG_DIST_INFO("Connected to the server");
                     g.connection_state = ConnectionState::Connected;
+                    client_hello();
                 }
 
                 break;
@@ -927,6 +978,12 @@ void GameScene::update_connection_state() {
 
 void GameScene::handle_message(const networking::Message& message) {
     switch (message.id()) {
+        case protocol::message::Server_HelloAccept:
+            server_hello_accept(message);
+            break;
+        case protocol::message::Server_HelloReject:
+            server_hello_reject(message);
+            break;
         case protocol::message::Server_Ping:
             server_ping(message);
             break;
@@ -972,26 +1029,36 @@ void GameScene::handle_message(const networking::Message& message) {
     }
 }
 
-void GameScene::client_ping() {
-    auto& g {ctx.global<Global>()};
-
-    protocol::Client_Ping payload;
-    payload.time = std::chrono::system_clock::now();
-
-    networking::Message message {protocol::message::Client_Ping};
+void GameScene::server_hello_accept(const networking::Message& message) {
+    protocol::Server_HelloAccept payload;
 
     try {
-        message.write(payload);
+        message.read(payload);
     } catch (const networking::SerializationError& e) {
         serialization_error(e);
         return;
     }
 
+    LOG_DEBUG("Server version: {:#06}", payload.version);
+}
+
+void GameScene::server_hello_reject(const networking::Message& message) {
+    protocol::Server_HelloReject payload;
+
     try {
-        g.client.send_message(message);
-    } catch (const networking::ConnectionError& e) {
-        connection_error(e);
+        message.read(payload);
+    } catch (const networking::SerializationError& e) {
+        serialization_error(e);
+        return;
     }
+
+    LOG_DIST_ERROR("Server (version {:#06}) rejected the connection: {}", payload.version, protocol::error_code_string(payload.error_code));
+
+    // The server closed us down
+    // Prevent showing a connection error
+    disconnect();
+
+    m_ui.push_modal_window(ModalWindowServerRejection, protocol::error_code_string(payload.error_code));
 }
 
 void GameScene::server_ping(const networking::Message& message) {

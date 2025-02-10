@@ -87,6 +87,9 @@ public:
 
     void connect(const std::string& address, std::uint16_t port, bool reconnect = false);
     void connect(const std::string& address, const std::string& port, bool reconnect = false);
+    void disconnect();
+    void client_hello();
+    void client_ping();
     void client_request_game_session();
     void client_leave_game_session();
     void client_request_join_game_session(const std::string& session_id);
@@ -122,7 +125,8 @@ protected:
     void reset_session_and_game();
     void update_connection_state();
     void handle_message(const networking::Message& message);
-    void client_ping();
+    void server_hello_accept(const networking::Message& message);
+    void server_hello_reject(const networking::Message& message);
     void server_ping(const networking::Message& message);
     void server_accept_game_session(const networking::Message& message);
     void server_reject_game_session(const networking::Message& message);

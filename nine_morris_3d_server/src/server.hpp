@@ -23,6 +23,9 @@ private:
     void disconnected_client_from_game_session(std::shared_ptr<networking::ClientConnection> connection, protocol::SessionId session_id);
     void handle_message(std::shared_ptr<networking::ClientConnection> connection, const networking::Message& message);
 
+    void client_hello(std::shared_ptr<networking::ClientConnection> connection, const networking::Message& message);
+    void server_hello_accept(std::shared_ptr<networking::ClientConnection> connection);
+    void server_hello_reject(std::shared_ptr<networking::ClientConnection> connection, protocol::ErrorCode error_code);
     void client_ping(std::shared_ptr<networking::ClientConnection> connection, const networking::Message& message);
     void server_ping(std::shared_ptr<networking::ClientConnection> connection, protocol::TimePoint time);
     void client_request_game_session(std::shared_ptr<networking::ClientConnection> connection, const networking::Message& message);

@@ -16,9 +16,10 @@ struct Global : sm::GlobalData {
     // Saved/Loaded settings
     Options options;
 
-    // Connection to server should be global
+    // Connection to server is global, but it is only used in game scenes
     networking::Client client;
     ConnectionState connection_state {ConnectionState::Disconnected};
+    bool first_connect {false};  // Set to true after the very first automatic connection attempt
 
     float get_scale() const { return static_cast<float>(options.scale); }
 };

@@ -28,6 +28,16 @@ namespace protocol {
     */
 
     /*
+        Client_Hello
+            Send the client version to the server. The server may accept or reject the client. Should be sent
+            as the very first message.
+
+        Server_HelloAccept
+            Accept the client.
+
+        Server_HelloReject
+            Reject the client. Send an error code.
+
         Client_Ping
             Test if the server is still alive. The server sends back a reply with the same data, with
             Server_Ping.
@@ -142,6 +152,10 @@ namespace protocol {
 
     namespace message {
         enum MessageType : std::uint16_t {
+            Client_Hello,
+            Server_HelloAccept,
+            Server_HelloReject,
+
             Client_Ping,
             Server_Ping,
 
@@ -184,6 +198,7 @@ namespace protocol {
     using SessionId = std::uint16_t;
     using TimePoint = std::chrono::system_clock::time_point;
     using ClockTime = unsigned int;
+    using Version = unsigned int;
 
     using Messages = std::vector<std::pair<std::string, std::string>>;
     inline constexpr std::size_t MAX_MESSAGE_SIZE {128};
@@ -201,9 +216,10 @@ namespace protocol {
     enum class ErrorCode {
         TooManySessions,
         InvalidSessionId,
-        SessionOccupied,
-        SessionExpired,
-        SessionDifferentGame
+        OccupiedSession,
+        ExpiredSession,
+        DifferentGameSession,
+        IncompatibleVersion
     };
 
     inline const char* error_code_string(ErrorCode error_code) {
@@ -216,14 +232,17 @@ namespace protocol {
             case ErrorCode::InvalidSessionId:
                 string = "No session could be found";
                 break;
-            case ErrorCode::SessionOccupied:
+            case ErrorCode::OccupiedSession:
                 string = "The session is occupied";
                 break;
-            case ErrorCode::SessionExpired:
+            case ErrorCode::ExpiredSession:
                 string = "The session has expired";
                 break;
-            case ErrorCode::SessionDifferentGame:
+            case ErrorCode::DifferentGameSession:
                 string = "The session has a different game than the one requested";
+                break;
+            case ErrorCode::IncompatibleVersion:
+                string = "The client is incompatible with the server";
                 break;
         }
 
@@ -237,6 +256,34 @@ namespace protocol {
             return Player::White;
         }
     }
+
+    struct Client_Hello {
+        Version version {};
+
+        template<typename Archive>
+        void serialize(Archive& archive) {
+            archive(version);
+        }
+    };
+
+    struct Server_HelloAccept {
+        Version version {};
+
+        template<typename Archive>
+        void serialize(Archive& archive) {
+            archive(version);
+        }
+    };
+
+    struct Server_HelloReject {
+        Version version {};
+        ErrorCode error_code {};
+
+        template<typename Archive>
+        void serialize(Archive& archive) {
+            archive(version, error_code);
+        }
+    };
 
     struct Client_Ping {
         TimePoint time;
