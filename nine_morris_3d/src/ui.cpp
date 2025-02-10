@@ -74,6 +74,9 @@ void Ui::update(sm::Ctx& ctx, GameScene& game_scene) {
             case ModalWindowWaitServerAcceptJoinGameSession:
                 wait_server_accept_join_game_session_window(game_scene);
                 break;
+            case ModalWindowWaitRemoteRematch:
+                wait_remote_rematch_window(game_scene);
+                break;
             case ModalWindowRulesNineMensMorris:
                 rules_nine_mens_morris_window();
                 break;
@@ -128,12 +131,10 @@ void Ui::main_menu_bar(sm::Ctx& ctx, GameScene& game_scene) {
             if (ImGui::MenuItem("Resign", nullptr, nullptr, resign_available(game_scene))) {
                 game_scene.resign(resign_player(game_scene));
                 game_scene.client_resign();
-                game_scene.client_leave_game_session();
             }
             if (ImGui::MenuItem("Accept Draw", nullptr, nullptr, accept_draw_available(game_scene))) {
                 game_scene.accept_draw();
                 game_scene.client_accept_draw();
-                game_scene.client_leave_game_session();
             }
             if (ImGui::MenuItem("Offer Draw", nullptr, nullptr, offer_draw_available(game_scene))) {
                 game_scene.client_offer_draw();
@@ -142,30 +143,15 @@ void Ui::main_menu_bar(sm::Ctx& ctx, GameScene& game_scene) {
                 push_modal_window(ModalWindowGameOptions);
             }
             if (ImGui::BeginMenu("Game Mode")) {
-                bool reset {false};
-
+                // Scene on_stop takes care of resigning and leaving the session
                 if (ImGui::RadioButton("Nine Men's Morris", &m_options.game_mode, GameModeNineMensMorris)) {
                     if (std::exchange(g.options.game_mode, m_options.game_mode) != GameModeNineMensMorris) {
                         ctx.change_scene("nine_mens_morris"_H);
-                        reset = true;
                     }
                 }
                 if (ImGui::RadioButton("Twelve Men's Morris", &m_options.game_mode, GameModeTwelveMensMorris)) {
                     if (std::exchange(g.options.game_mode, m_options.game_mode) != GameModeTwelveMensMorris) {
                         ctx.change_scene("twelve_mens_morris"_H);
-                        reset = true;
-                    }
-                }
-
-                if (reset) {
-                    // Must resign first
-                    if (resign_available(game_scene)) {
-                        // Cannot display the resign game over popup
-                        game_scene.client_resign();
-                    }
-
-                    if (game_scene.get_game_session()) {
-                        game_scene.client_leave_game_session();
                     }
                 }
 
@@ -777,6 +763,23 @@ void Ui::wait_server_accept_join_game_session_window(GameScene&) {
     });
 }
 
+void Ui::wait_remote_rematch_window(GameScene& game_scene) {
+    assert(game_scene.get_game_session());
+
+    generic_modal_window("Waiting For Player", [&game_scene]() {
+        ImGui::Text("For another game to begin, the opponent has to accept a rematch as well.");
+        ImGui::Text("Once the opponnent has accepted the rematch, it cannot be canceled.");
+
+        ImGui::Dummy(ImVec2(0.0f, rem(0.5f)));
+
+        if (ImGui::Button("Cancel Rematch")) {
+            game_scene.client_cancel_rematch();
+        }
+
+        return false;
+    });
+}
+
 void Ui::rules_nine_mens_morris_window() {
     const char* text {
 R"(Each player has nine pieces, either black or white.
@@ -953,7 +956,12 @@ void Ui::set_style() {
 }
 
 bool Ui::resign_available(GameScene& game_scene) {
-    return game_scene.get_game_session() && game_scene.get_game_session()->get_remote_joined();
+    return (
+        game_scene.get_game_session() &&
+        game_scene.get_game_session()->get_remote_joined() &&
+        game_scene.get_game_state() != GameState::Ready &&
+        game_scene.get_game_state() != GameState::Over
+    );
 }
 
 PlayerColor Ui::resign_player(GameScene& game_scene) {
@@ -966,7 +974,9 @@ bool Ui::offer_draw_available(GameScene& game_scene) {
     return (
         game_scene.get_game_session() &&
         game_scene.get_game_session()->get_remote_joined() &&
-        game_scene.get_board().get_player_color() == static_cast<PlayerColor>(game_scene.get_game_options().remote_color)
+        game_scene.get_board().get_player_color() == static_cast<PlayerColor>(game_scene.get_game_options().remote_color) &&
+        game_scene.get_game_state() != GameState::Ready &&
+        game_scene.get_game_state() != GameState::Over
     );
 }
 
@@ -974,7 +984,9 @@ bool Ui::accept_draw_available(GameScene& game_scene) {
     return (
         game_scene.get_game_session() &&
         game_scene.get_game_session()->get_remote_joined() &&
-        game_scene.get_game_session()->get_remote_offered_draw()
+        game_scene.get_game_session()->get_remote_offered_draw() &&
+        game_scene.get_game_state() != GameState::Ready &&
+        game_scene.get_game_state() != GameState::Over
     );
 }
 

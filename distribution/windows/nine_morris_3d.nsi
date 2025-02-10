@@ -8,7 +8,7 @@
 
 Var StartMenuFolder
 !define ApplicationName "Nine Morris 3D"
-!define ApplicationVersion "0.5.0"
+!define ApplicationVersion "0.6.0"
 
 ; General
 

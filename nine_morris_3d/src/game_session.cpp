@@ -66,21 +66,33 @@ void GameSession::session_window(sm::Ctx& ctx, GameScene& game_scene) {
 
     if (ImGui::Begin("Session", nullptr, ImGuiWindowFlags_NoDecoration)) {
         if (m_remote_joined) {
-            ImGui::TextWrapped("Playing against %s.", m_remote_player_name.empty() ? "an unnamed opponnent" : m_remote_player_name.c_str());
+            ImGui::TextWrapped("Playing against %s.", m_remote_player_name.empty() ? "an unnamed opponent" : m_remote_player_name.c_str());
 
             if (m_remote_offered_draw) {
                 ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(255, 163, 71, 255));
-                ImGui::TextWrapped("%s has offered a draw.", m_remote_player_name.empty() ? "The opponnent" : m_remote_player_name.c_str());
+                ImGui::TextWrapped("%s has offered a draw.", m_remote_player_name.empty() ? "The opponent" : m_remote_player_name.c_str());
                 ImGui::PopStyleColor();
             }
 
             if (ImGui::IsItemHovered(ImGuiHoveredFlags_DelayShort)) {
                 ImGui::SetTooltip("You may accept the draw from the menu.");
             }
+
+            if (game_scene.get_game_state() == GameState::Over) {
+                ImGui::Dummy(ImVec2(0.0f, Ui::rem(0.1f)));
+
+                if (ImGui::Button("Rematch")) {
+                    game_scene.client_rematch();
+                }
+            }
         } else if (game_scene.get_game_state() != GameState::Ready) {
             ImGui::Image(game_scene.get_icon_wait()->get_id(), ImVec2(Ui::rem(1.0f), Ui::rem(1.0f)));
             ImGui::SameLine();
-            ImGui::TextWrapped("The opponent has disconnected. You may wait for them to rejoin.");
+            ImGui::TextWrapped("The opponent has disconnected.");
+
+            if (ImGui::IsItemHovered(ImGuiHoveredFlags_DelayShort)) {
+                ImGui::SetTooltip("You may wait for them to rejoin.");
+            }
         } else {
             ImGui::Image(game_scene.get_icon_wait()->get_id(), ImVec2(Ui::rem(1.0f), Ui::rem(1.0f)));
             ImGui::SameLine();

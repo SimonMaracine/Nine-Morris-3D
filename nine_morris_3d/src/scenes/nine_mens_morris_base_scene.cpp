@@ -140,6 +140,11 @@ void NineMensMorrisBaseScene::reset(const std::string& string, const std::vector
     m_board.enable_move_animations(true);
     m_board.enable_move_callback(true);
 
+    // After the played moves, the game might be already over
+    if (get_board().get_game_over() != GameOver::None) {
+        m_game_state = GameState::Over;
+    }
+
     // Place the pieces into their places
     m_board.setup_pieces();
 
@@ -595,10 +600,12 @@ NineMensMorrisBoard NineMensMorrisBaseScene::setup_models() {
         ctx.load_sound_data(ctx.path_assets("sounds/piece_capture1.ogg")),
         ctx.load_sound_data(ctx.path_assets("sounds/piece_capture1.ogg")),
         [this](const NineMensMorrisBoard::Move& move) {
+            // If next player is remote
             if (get_player_type() == GamePlayer::Remote) {
                 client_play_move(
                     m_board.if_player_white(m_clock.get_black_time(), m_clock.get_white_time()),
-                    NineMensMorrisBoard::move_to_string(move)
+                    NineMensMorrisBoard::move_to_string(move),
+                    m_board.get_game_over() != GameOver::None
                 );
             }
 

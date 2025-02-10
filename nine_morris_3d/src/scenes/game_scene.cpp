@@ -68,7 +68,7 @@ void GameScene::on_start() {
 
 void GameScene::on_stop() {
     if (m_game_session) {
-        if (m_game_session->get_remote_joined()) {
+        if (m_game_session->get_remote_joined() && m_game_state != GameState::Ready && m_game_state != GameState::Over) {
             client_resign();
         }
 
@@ -317,12 +317,13 @@ void GameScene::client_request_join_game_session(const std::string& session_id) 
     m_ui.push_modal_window(ModalWindowWaitServerAcceptJoinGameSession);
 }
 
-void GameScene::client_play_move(protocol::ClockTime time, const std::string& move) {
+void GameScene::client_play_move(protocol::ClockTime time, const std::string& move, bool game_over) {
     assert(m_game_session);
 
     protocol::Client_PlayMove payload;
     payload.session_id = m_game_session->get_session_id();
     payload.time = time;
+    payload.game_over = game_over;
     payload.move = move;
 
     networking::Message message {protocol::message::Client_PlayMove};
@@ -448,6 +449,57 @@ void GameScene::client_send_message(const std::string& message_) {
     payload.message = message_;
 
     networking::Message message {protocol::message::Client_SendMessage};
+
+    try {
+        message.write(payload);
+    } catch (const networking::SerializationError& e) {
+        serialization_error(e);
+        return;
+    }
+
+    auto& g {ctx.global<Global>()};
+
+    try {
+        g.client.send_message(message);
+    } catch (const networking::ConnectionError& e) {
+        connection_error(e);
+    }
+}
+
+void GameScene::client_rematch() {
+    assert(m_game_session);
+
+    protocol::Client_Rematch payload;
+    payload.session_id = m_game_session->get_session_id();
+
+    networking::Message message {protocol::message::Client_Rematch};
+
+    try {
+        message.write(payload);
+    } catch (const networking::SerializationError& e) {
+        serialization_error(e);
+        return;
+    }
+
+    auto& g {ctx.global<Global>()};
+
+    try {
+        g.client.send_message(message);
+    } catch (const networking::ConnectionError& e) {
+        connection_error(e);
+        return;
+    }
+
+    m_ui.push_modal_window(ModalWindowWaitRemoteRematch);
+}
+
+void GameScene::client_cancel_rematch() {
+    assert(m_game_session);
+
+    protocol::Client_CancelRematch payload;
+    payload.session_id = m_game_session->get_session_id();
+
+    networking::Message message {protocol::message::Client_CancelRematch};
 
     try {
         message.write(payload);
@@ -736,7 +788,7 @@ void GameScene::update_game_state() {
                 case GameTypeOnline:
                     // The session might have been already destroyed
                     if (m_game_session) {
-                        client_leave_game_session();
+                        m_game_session->set_remote_offered_draw(false);
                     }
                     break;
             }
@@ -893,7 +945,7 @@ void GameScene::handle_message(const networking::Message& message) {
         case protocol::message::Server_RemoteJoinedGameSession:
             server_remote_joined_game_session(message);
             break;
-        case protocol::message::Server_RemoteLeaveGameSession:
+        case protocol::message::Server_RemoteLeftGameSession:
             server_remote_left_game_session(message);
             break;
         case protocol::message::Server_RemotePlayedMove:
@@ -910,6 +962,12 @@ void GameScene::handle_message(const networking::Message& message) {
             break;
         case protocol::message::Server_RemoteSentMessage:
             server_remote_sent_message(message);
+            break;
+        case protocol::message::Server_Rematch:
+            server_rematch(message);
+            break;
+        case protocol::message::Server_CancelRematch:
+            server_cancel_rematch(message);
             break;
     }
 }
@@ -1014,7 +1072,15 @@ void GameScene::server_accept_join_game_session(const networking::Message& messa
     // Unblock from waiting
     m_ui.clear_modal_window(ModalWindowWaitServerAcceptJoinGameSession);
 
-    m_game_state = GameState::Start;
+    // The game has previously ended
+    if (payload.game_over) {
+        m_game_state = GameState::Over;
+    }
+
+    // The game could be already over, so don't mess up the state
+    if (m_game_state != GameState::Over) {
+        m_game_state = GameState::Start;
+    }
 }
 
 void GameScene::server_reject_join_game_session(const networking::Message& message) {
@@ -1048,10 +1114,13 @@ void GameScene::server_remote_joined_game_session(const networking::Message& mes
 
     m_game_session->remote_joined(payload.remote_name);
 
-    // Unblock from waiting
+    // Unblock from any waiting
     m_ui.clear_modal_window(ModalWindowWaitRemoteJoinGameSession);
 
-    m_game_state = GameState::Start;
+    // Remote could be just rejoining an already started game, or the game could have already ended
+    if (m_game_state == GameState::Ready) {
+        m_game_state = GameState::Start;
+    }
 }
 
 void GameScene::server_remote_left_game_session(const networking::Message&) {
@@ -1137,4 +1206,39 @@ void GameScene::server_remote_sent_message(const networking::Message& message) {
     }
 
     m_game_session->remote_sent_message(payload.message);
+}
+
+void GameScene::server_rematch(const networking::Message& message) {
+    // The user may have left the session in the meantime
+    if (!m_game_session) {
+        return;
+    }
+
+    protocol::Server_Rematch payload;
+
+    try {
+        message.read(payload);
+    } catch (const networking::SerializationError& e) {
+        serialization_error(e);
+        return;
+    }
+
+    m_game_options.remote_color = PlayerColor(payload.remote_player);
+
+    reset();
+
+    m_game_state = GameState::Start;
+
+    // Unblock from waiting
+    m_ui.clear_modal_window(ModalWindowWaitRemoteRematch);
+}
+
+void GameScene::server_cancel_rematch(const networking::Message&) {
+    // The user may have left the session in the meantime
+    if (!m_game_session) {
+        return;
+    }
+
+    // Unblock from waiting
+    m_ui.clear_modal_window(ModalWindowWaitRemoteRematch);
 }

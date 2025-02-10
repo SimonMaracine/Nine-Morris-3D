@@ -23,7 +23,8 @@ enum ModalWindow : unsigned int {
     ModalWindowWaitServerAcceptGameSession = 1u << 7,
     ModalWindowWaitRemoteJoinGameSession = 1u << 8,
     ModalWindowWaitServerAcceptJoinGameSession = 1u << 9,
-    ModalWindowRulesNineMensMorris = 1u << 10
+    ModalWindowWaitRemoteRematch = 1u << 10,
+    ModalWindowRulesNineMensMorris = 1u << 11
 };
 
 class Ui {
@@ -56,6 +57,7 @@ private:
     void wait_server_accept_game_session_window(GameScene& game_scene);
     void wait_remote_join_game_session_window(GameScene& game_scene);
     void wait_server_accept_join_game_session_window(GameScene& game_scene);
+    void wait_remote_rematch_window(GameScene& game_scene);
     void rules_nine_mens_morris_window();
     void wrapped_text_modal_window(const char* title, const char* text);
     void generic_modal_window_ok(

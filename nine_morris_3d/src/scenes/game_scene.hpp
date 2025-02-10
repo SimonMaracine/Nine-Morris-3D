@@ -90,12 +90,14 @@ public:
     void client_request_game_session();
     void client_leave_game_session();
     void client_request_join_game_session(const std::string& session_id);
-    void client_play_move(protocol::ClockTime time, const std::string& move);
+    void client_play_move(protocol::ClockTime time, const std::string& move, bool game_over);
     void client_update_turn_time(protocol::ClockTime time);
     void client_resign();
     void client_offer_draw();
     void client_accept_draw();
     void client_send_message(const std::string& message_);
+    void client_rematch();
+    void client_cancel_rematch();
 protected:
     void on_key_released(const sm::KeyReleasedEvent& event);
     void on_mouse_button_pressed(const sm::MouseButtonPressedEvent& event);
@@ -133,6 +135,8 @@ protected:
     void server_remote_offered_draw(const networking::Message& message);
     void server_remote_accepted_draw(const networking::Message& message);
     void server_remote_sent_message(const networking::Message& message);
+    void server_rematch(const networking::Message& message);
+    void server_cancel_rematch(const networking::Message& message);
 
     std::shared_ptr<PointCameraController> m_camera_controller;
     Ui m_ui;

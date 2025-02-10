@@ -31,7 +31,7 @@ private:
     void client_request_join_game_session(std::shared_ptr<networking::ClientConnection> connection, const networking::Message& message);
     void server_accept_join_game_session(std::shared_ptr<networking::ClientConnection> connection, protocol::Server_AcceptJoinGameSession&& payload);
     void server_reject_join_game_session(std::shared_ptr<networking::ClientConnection> connection, protocol::ErrorCode error_code);
-    void server_remote_joined_game_session(std::shared_ptr<networking::ClientConnection> connection, const std::string& remote_player_name);
+    void server_remote_joined_game_session(std::shared_ptr<networking::ClientConnection> connection, const std::string& remote_name);
     void client_leave_game_session(std::shared_ptr<networking::ClientConnection> connection, const networking::Message& message);
     void server_remote_left_game_session(std::shared_ptr<networking::ClientConnection> connection);
     void client_play_move(std::shared_ptr<networking::ClientConnection> connection, const networking::Message& message);
@@ -45,6 +45,10 @@ private:
     void server_remote_accepted_draw(std::shared_ptr<networking::ClientConnection> connection);
     void client_send_message(std::shared_ptr<networking::ClientConnection> connection, const networking::Message& message);
     void server_remote_sent_message(std::shared_ptr<networking::ClientConnection> connection, const std::string& message_);
+    void client_rematch(std::shared_ptr<networking::ClientConnection> connection, const networking::Message& message);
+    void server_rematch(std::shared_ptr<networking::ClientConnection> connection, protocol::Player remote_player);
+    void client_cancel_rematch(std::shared_ptr<networking::ClientConnection> connection, const networking::Message& message);
+    void server_cancel_rematch(std::shared_ptr<networking::ClientConnection> connection);
 
     static unsigned int log_target_from_str(const std::string& string);
 

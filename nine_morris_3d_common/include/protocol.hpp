@@ -13,7 +13,8 @@
 
 namespace protocol {
     /*
-        When a client has game over, it immediately destroys its session and sends Client_LeaveGameSession.
+        When a client has game over, it doesn't immediately destroy its session and it doesn't send
+        Client_LeaveGameSession.
 
         Leaving a session is either voluntarily or involuntarily.
 
@@ -21,9 +22,9 @@ namespace protocol {
         Voluntarily leaving a session means resigning, except if the other client has already left the session,
         or it hasn't even joined the session.
 
-        Involuntarily leaving the session lets the client rejoin and continue the game.
+        The client may rejoin a session after it has left, if the other client is still in the session.
 
-        When a client leaves the session, the other client is notified with Server_RemoteLeaveGameSession.
+        When a client leaves the session, the other client is notified with Server_RemoteLeftGameSession.
     */
 
     /*
@@ -40,7 +41,7 @@ namespace protocol {
             Server_AcceptGameSession and Server_RejectGameSession. Client_RequestGameSession is called
             when the client presses the start game button.
 
-            A session is destroyed by the server when the last client leaves the session.
+            A session is destroyed by the server when the last client leaves the session or disconnects.
 
         Server_AcceptGameSession
             Create a new session. The client then creates the session as well and blocks in a modal window,
@@ -58,7 +59,7 @@ namespace protocol {
         Server_AcceptJoinGameSession
             Acknowledge a game session with that specific ID. The client unblocks and the game is ready to start.
             The client receives the played moves so far, enabling it to continue an interrupted game. It also
-            receives the messages. An involuntarily disconnected client may rejoin the session.
+            receives the messages. A disconnected client may rejoin the session.
 
         Server_RejectJoinGameSession
             Fail to find a session with that specific ID. Send an error code.
@@ -71,9 +72,9 @@ namespace protocol {
             Voluntarily leave the session. It is called when the client presses the new game button, or the
             cancel game button while waiting for the remote, or when changing the game, or quitting the application.
             It is not sent when the application crashes or it disconnects from the server.
-            The remote is notified about the forfeit in any case, with Server_RemoteLeaveGameSession.
+            The remote is notified about the forfeit in any case, with Server_RemoteLeftGameSession.
 
-        Server_RemoteLeaveGameSession
+        Server_RemoteLeftGameSession
             Notify the client that the remote has either voluntarily, or involuntarily left the session.
             If the remote rejoins, the client is notified.
 
@@ -120,6 +121,23 @@ namespace protocol {
 
         Server_RemoteSentMessage
             Notify the client that the remote has sent a message.
+
+        Client_Rematch
+            Request a rematch. The client blocks in a modal window, waiting for the remote to request
+            a rematch too. It is called after a game is over, when the rematch button is pressed. The client
+            has the opportunity to cancel the request.
+
+        Server_Rematch
+            Acknowledge that both clients want a rematch. Reset the game from the session. Send this message to both.
+            Both clients then unblock and the game is ready. The clients must receive their switched colors
+            from the server.
+
+        Client_CancelRematch
+            Cancel the rematch request. Wait for the server to either confirm the cancel, or to start the
+            rematch anyway.
+
+        Server_CancelRematch
+            Approve the client's rematch request cancellation.
     */
 
     namespace message {
@@ -138,7 +156,7 @@ namespace protocol {
             Server_RemoteJoinedGameSession,
 
             Client_LeaveGameSession,
-            Server_RemoteLeaveGameSession,
+            Server_RemoteLeftGameSession,
 
             Client_PlayMove,
             Server_RemotePlayedMove,
@@ -154,7 +172,12 @@ namespace protocol {
             Server_RemoteAcceptedDraw,
 
             Client_SendMessage,
-            Server_RemoteSentMessage
+            Server_RemoteSentMessage,
+
+            Client_Rematch,
+            Server_Rematch,
+            Client_CancelRematch,
+            Server_CancelRematch
         };
     }
 
@@ -279,13 +302,14 @@ namespace protocol {
         Player remote_player {};
         ClockTime remote_time {};
         ClockTime time {};
+        bool game_over {};
         std::vector<std::string> moves;
         Messages messages;
         std::string remote_name;
 
         template<typename Archive>
         void serialize(Archive& archive) {
-            archive(session_id, remote_player, remote_time, time, moves, messages, remote_name);
+            archive(session_id, remote_player, remote_time, time, game_over, moves, messages, remote_name);
         }
     };
 
@@ -316,16 +340,17 @@ namespace protocol {
         }
     };
 
-    struct Server_RemoteLeaveGameSession {};
+    struct Server_RemoteLeftGameSession {};
 
     struct Client_PlayMove {
         SessionId session_id {};
         ClockTime time {};  // After player's turn
+        bool game_over {};
         std::string move;
 
         template<typename Archive>
         void serialize(Archive& archive) {
-            archive(session_id, time, move);
+            archive(session_id, time, game_over, move);
         }
     };
 
@@ -382,26 +407,6 @@ namespace protocol {
 
     struct Server_RemoteAcceptedDraw {};
 
-    struct Client_AcknowledgeGameOver {
-        SessionId session_id {};
-
-        template<typename Archive>
-        void serialize(Archive& archive) {
-            archive(session_id);
-        }
-    };
-
-    struct Server_AcknowledgeGameOver {};
-
-    struct Client_Rematch {
-        SessionId session_id {};
-
-        template<typename Archive>
-        void serialize(Archive& archive) {
-            archive(session_id);
-        }
-    };
-
     struct Client_SendMessage {
         SessionId session_id {};
         std::string message;
@@ -420,4 +425,33 @@ namespace protocol {
             archive(message);
         }
     };
+
+    struct Client_Rematch {
+        SessionId session_id {};
+
+        template<typename Archive>
+        void serialize(Archive& archive) {
+            archive(session_id);
+        }
+    };
+
+    struct Server_Rematch {
+        Player remote_player {};
+
+        template<typename Archive>
+        void serialize(Archive& archive) {
+            archive(remote_player);
+        }
+    };
+
+    struct Client_CancelRematch {
+        SessionId session_id {};
+
+        template<typename Archive>
+        void serialize(Archive& archive) {
+            archive(session_id);
+        }
+    };
+
+    struct Server_CancelRematch {};
 }
