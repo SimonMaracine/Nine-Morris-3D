@@ -1,8 +1,6 @@
 #include "server.hpp"
 
-static constexpr unsigned int VERSION_MAJOR {0};
-static constexpr unsigned int VERSION_MINOR {3};
-static constexpr unsigned int VERSION_PATCH {0};
+#include "ver.hpp"
 
 Server::Server(const Configuration& configuration)
     : m_server(

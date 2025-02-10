@@ -10,6 +10,8 @@
 #include <cereal/cereal.hpp>
 #include <cereal/types/chrono.hpp>
 
+#include "ver.hpp"
+
 struct Configuration {
     std::uint16_t port {7915};
     std::uint32_t max_clients {std::numeric_limits<std::uint16_t>::max()};
@@ -19,7 +21,7 @@ struct Configuration {
     std::string log_level {"info"};
 
     template<typename Archive>
-    void serialize(Archive& archive) {
+    void serialize(Archive& archive, const std::uint32_t) {
         archive(
             CEREAL_NVP(port),
             CEREAL_NVP(max_clients),
@@ -30,6 +32,8 @@ struct Configuration {
         );
     }
 };
+
+CEREAL_CLASS_VERSION(Configuration, version_number())
 
 void load_configuration(Configuration& configuration, const std::filesystem::path& file_path);
 void save_configuration(const Configuration& configuration, const std::filesystem::path& file_path);
