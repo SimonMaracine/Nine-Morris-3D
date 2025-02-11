@@ -13,20 +13,22 @@ class GameScene;
 
 enum ModalWindow : unsigned int {
     ModalWindowNone = 0,
-    ModalWindowAbout = 1u << 0,
-    ModalWindowGameOver = 1u << 1,
-    ModalWindowGameOptions = 1u << 2,
-    ModalWindowEngineError = 1u << 3,
-    ModalWindowConnectionError = 1u << 4,
-    ModalWindowServerRejection = 1u << 5,
-    ModalWindowNewGameSessionError = 1u << 6,
-    ModalWindowJoinGameSessionError = 1u << 7,
-    ModalWindowWaitServerAcceptGameSession = 1u << 8,
-    ModalWindowWaitRemoteJoinGameSession = 1u << 9,
-    ModalWindowWaitServerAcceptJoinGameSession = 1u << 10,
-    ModalWindowWaitRemoteRematch = 1u << 11,
-    ModalWindowRulesNineMensMorris = 1u << 12,
-    ModalWindowRulesTwelveMensMorris = 1u << 13
+    ModalWindowPlay = 1u << 0,
+    ModalWindowOnlinePlay = 1u << 1,
+    ModalWindowAbout = 1u << 2,
+    ModalWindowGameOver = 1u << 3,
+    ModalWindowGameOptions = 1u << 4,
+    ModalWindowEngineError = 1u << 5,
+    ModalWindowConnectionError = 1u << 6,
+    ModalWindowServerRejection = 1u << 7,
+    ModalWindowNewGameSessionError = 1u << 8,
+    ModalWindowJoinGameSessionError = 1u << 9,
+    ModalWindowWaitServerAcceptGameSession = 1u << 10,
+    ModalWindowWaitRemoteJoinGameSession = 1u << 11,
+    ModalWindowWaitServerAcceptJoinGameSession = 1u << 12,
+    ModalWindowWaitRemoteRematch = 1u << 13,
+    ModalWindowRulesNineMensMorris = 1u << 14,
+    ModalWindowRulesTwelveMensMorris = 1u << 15
 };
 
 class Ui {
@@ -50,6 +52,8 @@ private:
     void before_game_online_window(sm::Ctx& ctx, GameScene& game_scene);
     void during_game_window(GameScene& game_scene);
     void about_window();
+    void play_window();
+    void online_play_window();
     void game_over_window(GameScene& game_scene);
     void game_options_window(sm::Ctx& ctx, GameScene& game_scene);
     void engine_error_window();

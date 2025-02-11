@@ -44,6 +44,12 @@ void Ui::update(sm::Ctx& ctx, GameScene& game_scene) {
         switch (modal_window) {
             case ModalWindowNone:
                 break;
+            case ModalWindowPlay:
+                play_window();
+                break;
+            case ModalWindowOnlinePlay:
+                online_play_window();
+                break;
             case ModalWindowAbout:
                 about_window();
                 break;
@@ -443,6 +449,12 @@ void Ui::main_menu_bar(sm::Ctx& ctx, GameScene& game_scene) {
             ImGui::EndMenu();
         }
         if (ImGui::BeginMenu("Help")) {
+            if (ImGui::MenuItem("Play")) {
+                push_modal_window(ModalWindowPlay);
+            }
+            if (ImGui::MenuItem("Online Play")) {
+                push_modal_window(ModalWindowOnlinePlay);
+            }
             if (ImGui::MenuItem("About")) {
                 push_modal_window(ModalWindowAbout);
             }
@@ -644,6 +656,72 @@ void Ui::about_window() {
     });
 }
 
+void Ui::play_window() {
+    modal_window_ok_size_constraints(
+        "Help Play",
+        []() {
+            ImGui::SeparatorText("Starting A Game:");
+            ImGui::Bullet();
+            ImGui::SameLine();
+            ImGui::TextWrapped("From the menu, select the type of game you want to play: Game Mode and Game Options.");
+            ImGui::Bullet();
+            ImGui::SameLine();
+            ImGui::TextWrapped("Start the game from the right side interface.");
+            ImGui::Bullet();
+            ImGui::SameLine();
+            ImGui::TextWrapped("To play another game, simply select New Game from the menu.");
+
+            ImGui::Spacing();
+
+            ImGui::SeparatorText("Game Controls:");
+            ImGui::Bullet();
+            ImGui::SameLine();
+            ImGui::TextWrapped("Move the camera by dragging the mouse with right click, or by using the keys: W, A, S, D, R, F.");
+            ImGui::Bullet();
+            ImGui::SameLine();
+            ImGui::TextWrapped("Reset the camera to the default position by pressing the space key.");
+        },
+        glm::vec2(MIN_WIDTH - rem(1.0f), 0.0f),
+        glm::vec2(ImGui::GetMainViewport()->WorkSize.x - rem(0.5f), ImGui::GetMainViewport()->WorkSize.y - rem(0.5f))
+    );
+}
+
+void Ui::online_play_window() {
+    modal_window_ok_size_constraints(
+        "Help Online Play",
+        []() {
+            ImGui::TextWrapped(
+                "Playing online with somebody is very simple: One party has to create the game and send the code to the opponent"
+                " and the other party has to simply enter the code and join the game."
+            );
+            ImGui::TextWrapped("Before playing, know these things:");
+            ImGui::Bullet();
+            ImGui::SameLine();
+            ImGui::TextWrapped(
+                "Each player has a name that by default is empty. Configure your name from the menu by selecting"
+                " Server then Session and then Name. Your name is visible to the other player during the game"
+                " and it is purely for aesthetics."
+            );
+            ImGui::Bullet();
+            ImGui::SameLine();
+            ImGui::TextWrapped("During the game, players may choose to resign, to offer or to accept a draw. They can do so from the menu.");
+            ImGui::Bullet();
+            ImGui::SameLine();
+            ImGui::TextWrapped(
+                "After a game, players may choose to play again by selecting Rematch. In the next game they"
+                " will have swapped sides."
+            );
+            ImGui::Bullet();
+            ImGui::SameLine();
+            ImGui::TextWrapped(
+                "Please refrain from cheating. Have fun! :)"
+            );
+        },
+        glm::vec2(MIN_WIDTH - rem(1.0f), 0.0f),
+        glm::vec2(ImGui::GetMainViewport()->WorkSize.x - rem(0.5f), ImGui::GetMainViewport()->WorkSize.y - rem(0.5f))
+    );
+}
+
 void Ui::game_over_window(GameScene& game_scene) {
     modal_window_ok("Game Over", [&]() {
         const char* message {};
@@ -826,23 +904,18 @@ void Ui::rules_nine_mens_morris_window() {
             ImGui::Bullet();
             ImGui::SameLine();
             ImGui::TextWrapped("Each player has nine pieces, either black or white.");
-
             ImGui::Bullet();
             ImGui::SameLine();
             ImGui::TextWrapped("A player wins by reducing the opponent to two pieces, or by leaving them without a legal move.");
-
             ImGui::Bullet();
             ImGui::SameLine();
             ImGui::TextWrapped("When a player remains with three pieces, they can jump on the board.");
-
             ImGui::Bullet();
             ImGui::SameLine();
             ImGui::TextWrapped("A player may take a piece from a mill only if there are no other pieces available.");
-
             ImGui::Bullet();
             ImGui::SameLine();
             ImGui::TextWrapped("The game ends with a draw when fifty turns are made without mills.");
-
             ImGui::Bullet();
             ImGui::SameLine();
             ImGui::TextWrapped("The game ends with a draw when the same position happens three times.");
@@ -857,11 +930,9 @@ void Ui::rules_twelve_mens_morris_window() {
         "Twelve Men's Morris Rules",
         []() {
             ImGui::TextWrapped("Same rules apply as in nine men's morris, except the following:");
-
             ImGui::Bullet();
             ImGui::SameLine();
             ImGui::TextWrapped("Each player has twelve pieces instead of nine.");
-
             ImGui::Bullet();
             ImGui::SameLine();
             ImGui::TextWrapped("Players can make mills and move pieces along the diagonals.");
