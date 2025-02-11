@@ -188,8 +188,7 @@ namespace sm {
             scene_on_stop(m_scene_current);
 
             if (m_scene_clear_resources) {
-                LOG_INFO("Clearing resources cache...");
-
+                LOG_DEBUG("Clearing resources cache...");
                 m_ctx.m_res.clear();
             }
 
@@ -245,8 +244,10 @@ namespace sm {
     }
 
     void Application::scene_on_stop(MetaScene* meta_scene) {
-        // Long-running tasks are bound to the current scene
+        // Tasks are bound to the current scene
         m_ctx.m_tsk.wait_async();
+        m_ctx.m_tsk.update();  // MUST execute any pending immediate tasks from async tasks before clearing
+        m_ctx.m_tsk.clear();
 
         LOG_INFO("Stopping scene...");
 

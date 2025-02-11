@@ -13,8 +13,8 @@ namespace sm {
         class TaskManager;
     }
 
-    // Short-lived procedure executed in the main loop
-    // May be instantiated from any thread
+    // Short-lived procedure executed in the main loop, bound to the calling scene
+    // May be instantiated from any thread, but only immediate ones are guaranteed to execute
     // May be deffered by one frame and/or may be delayed until a certain amount of time
     // Delays are repeated, but defers are not
     class Task {

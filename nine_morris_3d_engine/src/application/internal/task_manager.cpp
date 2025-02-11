@@ -68,6 +68,13 @@ namespace sm::internal {
         }
     }
 
+    void TaskManager::clear() {
+        std::lock_guard lock {m_mutex};
+
+        m_tasks_active.clear();
+        m_tasks_next.clear();
+    }
+
     void TaskManager::update_tasks() {
         for (Task& task : m_tasks_active) {
             if (task.m_defer) {

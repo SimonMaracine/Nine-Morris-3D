@@ -12,7 +12,7 @@ namespace sm::internal {
     // Thread safe tasks API
     class TaskManager {
     public:
-        // Enqueue a normal task
+        // Enqueue a normal task (guaranteed to be executed if added from inside an async task)
         void add_immediate(Task::Function&& function);
 
         // Enqueue a delayed task
@@ -27,8 +27,11 @@ namespace sm::internal {
         // Execute tasks
         void update();
 
-        // Join asynchronous tasks; throw the last exception (if any)
+        // Join asynchronous tasks to complete; throw the last exception (if any)
         void wait_async();
+
+        // Remove all (normal) tasks
+        void clear();
     private:
         void update_tasks();
         void update_async_tasks();
