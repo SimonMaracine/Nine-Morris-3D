@@ -24,7 +24,11 @@ enum GameMode : int {
 enum Skybox : int {
     SkyboxNone,
     SkyboxField,
-    SkyboxAutumn
+    SkyboxAutumn,
+    SkyboxSummer,
+    SkyboxNight,
+    SkyboxSunset,
+    SkyboxSky
 };
 
 enum AntiAliasing : int {

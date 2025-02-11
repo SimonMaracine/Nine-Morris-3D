@@ -81,25 +81,38 @@ void LoadingScene::load_assets(sm::AsyncTask& task) {
             post_processing.size = sm::TextureSize::Half;
         }
 
+        std::string skybox;
+
         switch (g.options.skybox) {
             case SkyboxNone:
                 break;
             case SkyboxField:
-                ctx.load_texture_data(ctx.path_assets("textures/skybox/field/px.png"), post_processing);
-                ctx.load_texture_data(ctx.path_assets("textures/skybox/field/nx.png"), post_processing);
-                ctx.load_texture_data(ctx.path_assets("textures/skybox/field/py.png"), post_processing);
-                ctx.load_texture_data(ctx.path_assets("textures/skybox/field/ny.png"), post_processing);
-                ctx.load_texture_data(ctx.path_assets("textures/skybox/field/pz.png"), post_processing);
-                ctx.load_texture_data(ctx.path_assets("textures/skybox/field/nz.png"), post_processing);
+                skybox = "field";
                 break;
             case SkyboxAutumn:
-                ctx.load_texture_data(ctx.path_assets("textures/skybox/autumn/px.png"), post_processing);
-                ctx.load_texture_data(ctx.path_assets("textures/skybox/autumn/nx.png"), post_processing);
-                ctx.load_texture_data(ctx.path_assets("textures/skybox/autumn/py.png"), post_processing);
-                ctx.load_texture_data(ctx.path_assets("textures/skybox/autumn/ny.png"), post_processing);
-                ctx.load_texture_data(ctx.path_assets("textures/skybox/autumn/pz.png"), post_processing);
-                ctx.load_texture_data(ctx.path_assets("textures/skybox/autumn/nz.png"), post_processing);
+                skybox = "autumn";
                 break;
+            case SkyboxSummer:
+                skybox = "summer";
+                break;
+            case SkyboxNight:
+                skybox = "night";
+                break;
+            case SkyboxSunset:
+                skybox = "sunset";
+                break;
+            case SkyboxSky:
+                skybox = "sky";
+                break;
+        }
+
+        if (!skybox.empty()) {
+            ctx.load_texture_data(ctx.path_assets("textures/skybox/" + skybox + "/px.png"), post_processing);
+            ctx.load_texture_data(ctx.path_assets("textures/skybox/" + skybox + "/nx.png"), post_processing);
+            ctx.load_texture_data(ctx.path_assets("textures/skybox/" + skybox + "/py.png"), post_processing);
+            ctx.load_texture_data(ctx.path_assets("textures/skybox/" + skybox + "/ny.png"), post_processing);
+            ctx.load_texture_data(ctx.path_assets("textures/skybox/" + skybox + "/pz.png"), post_processing);
+            ctx.load_texture_data(ctx.path_assets("textures/skybox/" + skybox + "/nz.png"), post_processing);
         }
     }
 

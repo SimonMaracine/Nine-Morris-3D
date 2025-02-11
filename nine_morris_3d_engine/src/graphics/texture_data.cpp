@@ -9,14 +9,6 @@
 #include "nine_morris_3d_engine/application/internal/error.hpp"
 #include "nine_morris_3d_engine/application/logging.hpp"
 
-// Define these to guarantee we're only using malloc
-#define STBI_MALLOC(size) std::malloc(size)
-#define STBI_REALLOC(ptr, new_size) std::realloc(ptr, new_size)
-#define STBI_FREE(ptr) std::free(ptr)
-
-#define STBIR_MALLOC(size, user_data) (static_cast<void>(user_data), std::malloc(size))
-#define STBIR_FREE(ptr, user_data) (static_cast<void>(user_data), std::free(ptr))
-
 namespace sm {
     static constexpr int CHANNELS {4};
     static std::mutex g_mutex;

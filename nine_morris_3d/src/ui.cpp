@@ -310,6 +310,30 @@ void Ui::main_menu_bar(sm::Ctx& ctx, GameScene& game_scene) {
                             game_scene.reload_and_set_skybox();
                         }
                     }
+                    if (ImGui::RadioButton("Summer", &m_options.skybox, SkyboxSummer)) {
+                        if (std::exchange(g.options.skybox, m_options.skybox) != SkyboxSummer) {
+                            m_loading_skybox = true;
+                            game_scene.reload_and_set_skybox();
+                        }
+                    }
+                    if (ImGui::RadioButton("Night", &m_options.skybox, SkyboxNight)) {
+                        if (std::exchange(g.options.skybox, m_options.skybox) != SkyboxNight) {
+                            m_loading_skybox = true;
+                            game_scene.reload_and_set_skybox();
+                        }
+                    }
+                    if (ImGui::RadioButton("Sunset", &m_options.skybox, SkyboxSunset)) {
+                        if (std::exchange(g.options.skybox, m_options.skybox) != SkyboxSunset) {
+                            m_loading_skybox = true;
+                            game_scene.reload_and_set_skybox();
+                        }
+                    }
+                    if (ImGui::RadioButton("Sky", &m_options.skybox, SkyboxSky)) {
+                        if (std::exchange(g.options.skybox, m_options.skybox) != SkyboxSky) {
+                            m_loading_skybox = true;
+                            game_scene.reload_and_set_skybox();
+                        }
+                    }
                 }
 
                 ImGui::EndMenu();

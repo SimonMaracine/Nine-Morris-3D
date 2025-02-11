@@ -26,6 +26,11 @@ Fonts:
 Cube maps:
     https://polyhaven.com/hdris
 
+    https://polyhaven.com/a/pretoria_gardens
+    https://polyhaven.com/a/rogland_clear_night
+    https://polyhaven.com/a/goegap_road
+    https://polyhaven.com/a/industrial_sunset_02_puresky
+
 ----------------------------------------------------------------------------------------------------
 
 TOOLS I USED:

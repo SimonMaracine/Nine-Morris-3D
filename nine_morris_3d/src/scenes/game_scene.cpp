@@ -538,6 +538,30 @@ void GameScene::setup_lights() {
             ctx.render_3d()->directional_light.diffuse_color = glm::vec3(0.7f);
             ctx.render_3d()->directional_light.specular_color = glm::vec3(0.9f);
             break;
+        case SkyboxSummer:
+            ctx.render_3d()->directional_light.direction = glm::normalize(glm::vec3(-0.291f, -0.843f, -0.453f));
+            ctx.render_3d()->directional_light.ambient_color = glm::vec3(0.25f);
+            ctx.render_3d()->directional_light.diffuse_color = glm::vec3(0.75f);
+            ctx.render_3d()->directional_light.specular_color = glm::vec3(1.0f);
+            break;
+        case SkyboxNight:
+            ctx.render_3d()->directional_light.direction = glm::normalize(glm::vec3(0.159f, -0.752f, -0.639f));
+            ctx.render_3d()->directional_light.ambient_color = glm::vec3(0.1f);
+            ctx.render_3d()->directional_light.diffuse_color = glm::vec3(0.01f);
+            ctx.render_3d()->directional_light.specular_color = glm::vec3(0.01f);
+            break;
+        case SkyboxSunset:
+            ctx.render_3d()->directional_light.direction = glm::normalize(glm::vec3(-0.581f, -0.196f, -0.790f));
+            ctx.render_3d()->directional_light.ambient_color = glm::vec3(0.2f);
+            ctx.render_3d()->directional_light.diffuse_color = glm::vec3(1.0f, 1.0f, 0.9f);
+            ctx.render_3d()->directional_light.specular_color = glm::vec3(1.0f);
+            break;
+        case SkyboxSky:
+            ctx.render_3d()->directional_light.direction = glm::normalize(glm::vec3(-0.584f, -0.167f, -0.794f));
+            ctx.render_3d()->directional_light.ambient_color = glm::vec3(0.1f);
+            ctx.render_3d()->directional_light.diffuse_color = glm::vec3(0.6f, 0.6f, 0.4f);
+            ctx.render_3d()->directional_light.specular_color = glm::vec3(1.0f);
+            break;
     }
 }
 
@@ -569,25 +593,38 @@ void GameScene::reload_skybox_texture_data() const {
         post_processing.size = sm::TextureSize::Half;
     }
 
+    std::string skybox;
+
     switch (g.options.skybox) {
         case SkyboxNone:
             break;
         case SkyboxField:
-            ctx.reload_texture_data(ctx.path_assets("textures/skybox/field/px.png"), post_processing);
-            ctx.reload_texture_data(ctx.path_assets("textures/skybox/field/nx.png"), post_processing);
-            ctx.reload_texture_data(ctx.path_assets("textures/skybox/field/py.png"), post_processing);
-            ctx.reload_texture_data(ctx.path_assets("textures/skybox/field/ny.png"), post_processing);
-            ctx.reload_texture_data(ctx.path_assets("textures/skybox/field/pz.png"), post_processing);
-            ctx.reload_texture_data(ctx.path_assets("textures/skybox/field/nz.png"), post_processing);
+            skybox = "field";
             break;
         case SkyboxAutumn:
-            ctx.reload_texture_data(ctx.path_assets("textures/skybox/autumn/px.png"), post_processing);
-            ctx.reload_texture_data(ctx.path_assets("textures/skybox/autumn/nx.png"), post_processing);
-            ctx.reload_texture_data(ctx.path_assets("textures/skybox/autumn/py.png"), post_processing);
-            ctx.reload_texture_data(ctx.path_assets("textures/skybox/autumn/ny.png"), post_processing);
-            ctx.reload_texture_data(ctx.path_assets("textures/skybox/autumn/pz.png"), post_processing);
-            ctx.reload_texture_data(ctx.path_assets("textures/skybox/autumn/nz.png"), post_processing);
+            skybox = "autumn";
             break;
+        case SkyboxSummer:
+            skybox = "summer";
+            break;
+        case SkyboxNight:
+            skybox = "night";
+            break;
+        case SkyboxSunset:
+            skybox = "sunset";
+            break;
+        case SkyboxSky:
+            skybox = "sky";
+            break;
+    }
+
+    if (!skybox.empty()) {
+        ctx.reload_texture_data(ctx.path_assets("textures/skybox/" + skybox + "/px.png"), post_processing);
+        ctx.reload_texture_data(ctx.path_assets("textures/skybox/" + skybox + "/nx.png"), post_processing);
+        ctx.reload_texture_data(ctx.path_assets("textures/skybox/" + skybox + "/py.png"), post_processing);
+        ctx.reload_texture_data(ctx.path_assets("textures/skybox/" + skybox + "/ny.png"), post_processing);
+        ctx.reload_texture_data(ctx.path_assets("textures/skybox/" + skybox + "/pz.png"), post_processing);
+        ctx.reload_texture_data(ctx.path_assets("textures/skybox/" + skybox + "/nz.png"), post_processing);
     }
 }
 
@@ -633,6 +670,14 @@ std::shared_ptr<sm::GlTextureCubemap> GameScene::load_skybox_texture_cubemap(boo
             return load_or_reload("field"_H);
         case SkyboxAutumn:
             return load_or_reload("autumn"_H);
+        case SkyboxSummer:
+            return load_or_reload("summer"_H);
+        case SkyboxNight:
+            return load_or_reload("night"_H);
+        case SkyboxSunset:
+            return load_or_reload("sunset"_H);
+        case SkyboxSky:
+            return load_or_reload("sky"_H);
     }
 
     return {};
