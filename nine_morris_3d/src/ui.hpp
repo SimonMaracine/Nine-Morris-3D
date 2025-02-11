@@ -25,7 +25,8 @@ enum ModalWindow : unsigned int {
     ModalWindowWaitRemoteJoinGameSession = 1u << 9,
     ModalWindowWaitServerAcceptJoinGameSession = 1u << 10,
     ModalWindowWaitRemoteRematch = 1u << 11,
-    ModalWindowRulesNineMensMorris = 1u << 12
+    ModalWindowRulesNineMensMorris = 1u << 12,
+    ModalWindowRulesTwelveMensMorris = 1u << 13
 };
 
 class Ui {
@@ -61,14 +62,11 @@ private:
     void wait_server_accept_join_game_session_window(GameScene& game_scene);
     void wait_remote_rematch_window(GameScene& game_scene);
     void rules_nine_mens_morris_window();
-    void wrapped_text_modal_window(const char* title, const char* text);
-    void generic_modal_window_ok(
-        const char* title,
-        std::function<void()>&& contents,
-        std::function<void()>&& on_ok = []() {},
-        glm::vec2 size = {}
-    );
-    void generic_modal_window(const char* title, std::function<bool()>&& contents);
+    void rules_twelve_mens_morris_window();
+    void modal_window(const char* title, std::function<bool()>&& contents);
+    void modal_window_ok(const char* title, std::function<void()>&& contents);
+    void modal_window_ok_size(const char* title, std::function<void()>&& contents, glm::vec2 size = {});
+    void modal_window_ok_size_constraints(const char* title, std::function<void()>&& contents, glm::vec2 min_size = {}, glm::vec2 max_size = {});
 
     static void set_scale(sm::Ctx& ctx, int scale);
     static void set_scale_task(sm::Ctx& ctx, int scale);

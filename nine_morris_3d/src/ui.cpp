@@ -83,6 +83,9 @@ void Ui::update(sm::Ctx& ctx, GameScene& game_scene) {
             case ModalWindowRulesNineMensMorris:
                 rules_nine_mens_morris_window();
                 break;
+            case ModalWindowRulesTwelveMensMorris:
+                rules_twelve_mens_morris_window();
+                break;
         }
     }
 }
@@ -423,6 +426,9 @@ void Ui::main_menu_bar(sm::Ctx& ctx, GameScene& game_scene) {
                 if (ImGui::MenuItem("Nine Men's Morris")) {
                     push_modal_window(ModalWindowRulesNineMensMorris);
                 }
+                if (ImGui::MenuItem("Twelve Men's Morris")) {
+                    push_modal_window(ModalWindowRulesTwelveMensMorris);
+                }
 
                 ImGui::EndMenu();
             }
@@ -605,7 +611,7 @@ void Ui::during_game_window(GameScene& game_scene) {
 }
 
 void Ui::about_window() {
-    generic_modal_window_ok("About Nine Morris 3D", []() {
+    modal_window_ok("About Nine Morris 3D", []() {
         ImGui::Text("A 3D implementation of the board game nine men's morris");
         ImGui::Text("Version %u.%u.%u", VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH);
         ImGui::Separator();
@@ -615,7 +621,7 @@ void Ui::about_window() {
 }
 
 void Ui::game_over_window(GameScene& game_scene) {
-    generic_modal_window_ok("Game Over", [&]() {
+    modal_window_ok("Game Over", [&]() {
         const char* message {};
 
         switch (game_scene.get_board().get_game_over()) {
@@ -644,7 +650,7 @@ void Ui::game_over_window(GameScene& game_scene) {
 }
 
 void Ui::game_options_window(sm::Ctx& ctx, GameScene& game_scene) {
-    generic_modal_window_ok(
+    modal_window_ok_size(
         "Game Options",
         [&]() {
             auto& g {ctx.global<Global>()};
@@ -697,48 +703,47 @@ void Ui::game_options_window(sm::Ctx& ctx, GameScene& game_scene) {
 
             ImGui::EndDisabled();
         },
-        []() {},
         glm::vec2(rem(15.0f), 0.0f)
     );
 }
 
 void Ui::engine_error_window() {
-    generic_modal_window_ok("Engine Error", []() {
+    modal_window_ok("Engine Error", []() {
         ImGui::Text("An error occurred with the engine. It has probably crashed.");
         ImGui::Text("You may want to restart it.");
     });
 }
 
 void Ui::connection_error_window() {
-    generic_modal_window_ok("Connection Error", []() {
+    modal_window_ok("Connection Error", []() {
         ImGui::Text("An error occurred with the connection to the server.");
         ImGui::Text("You may want to reconnect.");
     });
 }
 
 void Ui::server_rejection_window(const std::string& string) {
-    generic_modal_window_ok("Server Error", [&string]() {
+    modal_window_ok("Server Error", [&string]() {
         ImGui::Text("The server rejected the connection.");
         ImGui::Text("%s.", string.c_str());
     });
 }
 
 void Ui::new_game_session_error_window(const std::string& string) {
-    generic_modal_window_ok("New Online Game Error", [&string]() {
+    modal_window_ok("New Online Game Error", [&string]() {
         ImGui::Text("Could not start a new online game.");
         ImGui::Text("%s.", string.c_str());
     });
 }
 
 void Ui::join_game_session_error_window(const std::string& string) {
-    generic_modal_window_ok("Join Online Game Error", [&string]() {
+    modal_window_ok("Join Online Game Error", [&string]() {
         ImGui::Text("Could not join the online game.");
         ImGui::Text("%s.", string.c_str());
     });
 }
 
 void Ui::wait_server_accept_game_session_window(GameScene&) {
-    generic_modal_window("Waiting For Server To Accept", []() {
+    modal_window("Waiting For Server To Accept", []() {
         ImGui::Text("The server should reply any time soon.");
 
         return false;
@@ -748,7 +753,7 @@ void Ui::wait_server_accept_game_session_window(GameScene&) {
 void Ui::wait_remote_join_game_session_window(GameScene& game_scene) {
     assert(game_scene.get_game_session());
 
-    generic_modal_window("Waiting For Player To Join", [&game_scene]() {
+    modal_window("Waiting For Player To Join", [&game_scene]() {
         ImGui::Text("An online game has been created.");
         ImGui::Text("Send your opponent the following code: %.5u", game_scene.get_game_session()->get_session_id());
 
@@ -766,7 +771,7 @@ void Ui::wait_remote_join_game_session_window(GameScene& game_scene) {
 }
 
 void Ui::wait_server_accept_join_game_session_window(GameScene&) {
-    generic_modal_window("Waiting For Server To Accept", []() {
+    modal_window("Waiting For Server To Accept", []() {
         ImGui::Text("The server should reply any time soon.");
 
         return false;
@@ -776,7 +781,7 @@ void Ui::wait_server_accept_join_game_session_window(GameScene&) {
 void Ui::wait_remote_rematch_window(GameScene& game_scene) {
     assert(game_scene.get_game_session());
 
-    generic_modal_window("Waiting For Player", [&game_scene]() {
+    modal_window("Waiting For Player", [&game_scene]() {
         ImGui::Text("For another game to begin, the opponent has to accept a rematch as well.");
         ImGui::Text("Once the opponnent has accepted the rematch, it cannot be canceled.");
 
@@ -791,40 +796,80 @@ void Ui::wait_remote_rematch_window(GameScene& game_scene) {
 }
 
 void Ui::rules_nine_mens_morris_window() {
-    const char* text {
-R"(Each player has nine pieces, either black or white.
-A player wins by reducing the opponent to two pieces, or by leaving them without a legal move.
-When a player remains with three pieces, they can jump on the board.
-A player may take a piece from a mill only if there are no other pieces available.
-The game ends with a draw when fifty turns take place without any mill.
-The game ends with a draw when the same position happens three times.)"
-    };
+    modal_window_ok_size_constraints(
+        "Nine Men's Morris Rules",
+        []() {
+            ImGui::Bullet();
+            ImGui::SameLine();
+            ImGui::TextWrapped("Each player has nine pieces, either black or white.");
 
-    wrapped_text_modal_window("Nine Men's Morris Rules", text);
+            ImGui::Bullet();
+            ImGui::SameLine();
+            ImGui::TextWrapped("A player wins by reducing the opponent to two pieces, or by leaving them without a legal move.");
+
+            ImGui::Bullet();
+            ImGui::SameLine();
+            ImGui::TextWrapped("When a player remains with three pieces, they can jump on the board.");
+
+            ImGui::Bullet();
+            ImGui::SameLine();
+            ImGui::TextWrapped("A player may take a piece from a mill only if there are no other pieces available.");
+
+            ImGui::Bullet();
+            ImGui::SameLine();
+            ImGui::TextWrapped("The game ends with a draw when fifty turns are made without mills.");
+
+            ImGui::Bullet();
+            ImGui::SameLine();
+            ImGui::TextWrapped("The game ends with a draw when the same position happens three times.");
+        },
+        glm::vec2(MIN_WIDTH - rem(1.0f), 0.0f),
+        glm::vec2(ImGui::GetMainViewport()->WorkSize.x - rem(0.5f), ImGui::GetMainViewport()->WorkSize.y - rem(0.5f))
+    );
 }
 
-void Ui::wrapped_text_modal_window(const char* title, const char* text) {
-    const auto viewport_size {ImGui::GetMainViewport()->WorkSize};
-    const bool wrapped {viewport_size.x < ImGui::CalcTextSize(text).x + ImGui::GetStyle().WindowPadding.x * 2.0f};
+void Ui::rules_twelve_mens_morris_window() {
+    modal_window_ok_size_constraints(
+        "Twelve Men's Morris Rules",
+        []() {
+            ImGui::TextWrapped("Same rules apply as in nine men's morris, except the following:");
 
-    generic_modal_window_ok(title, [=]() {
-        if (wrapped) {
-            ImGui::TextWrapped("%s", text);  // FIXME
-        } else {
-            ImGui::Text("%s", text);
+            ImGui::Bullet();
+            ImGui::SameLine();
+            ImGui::TextWrapped("Each player has twelve pieces instead of nine.");
+
+            ImGui::Bullet();
+            ImGui::SameLine();
+            ImGui::TextWrapped("Players can make mills and move pieces along the diagonals.");
+        },
+        glm::vec2(MIN_WIDTH - rem(1.0f), 0.0f),
+        glm::vec2(ImGui::GetMainViewport()->WorkSize.x - rem(0.5f), ImGui::GetMainViewport()->WorkSize.y - rem(0.5f))
+    );
+}
+
+void Ui::modal_window(const char* title, std::function<bool()>&& contents) {
+    ImGui::OpenPopup(title);
+
+    ImGui::SetNextWindowPos(ImGui::GetMainViewport()->GetWorkCenter(), 0, ImVec2(0.5f, 0.5f));
+
+    if (ImGui::BeginPopupModal(title, nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_AlwaysAutoResize)) {
+        if (contents()) {
+            ImGui::CloseCurrentPopup();
+            m_modal_window_queue.pop_front();
         }
-    });
+
+        ImGui::Dummy(ImVec2(0.0f, rem(0.5f)));
+
+        ImGui::EndPopup();
+    }
 }
 
-void Ui::generic_modal_window_ok(const char* title, std::function<void()>&& contents, std::function<void()>&& on_ok, glm::vec2 size) {
+void Ui::modal_window_ok(const char* title, std::function<void()>&& contents) {
     ImGui::OpenPopup(title);
 
     ImGui::SetNextWindowPos(ImGui::GetMainViewport()->GetWorkCenter(), ImGuiCond_Always, ImVec2(0.5f, 0.5f));
-    ImGui::SetNextWindowSize(ImVec2(size.x, size.y), ImGuiCond_Always);
 
-    const auto flags {ImGuiWindowFlags_NoResize | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoCollapse};
-
-    if (ImGui::BeginPopupModal(title, nullptr, flags)) {
+    if (ImGui::BeginPopupModal(title, nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_AlwaysAutoResize)) {
         contents();
 
         ImGui::Dummy(ImVec2(rem(8.0f), rem(0.5f)));
@@ -835,8 +880,6 @@ void Ui::generic_modal_window_ok(const char* title, std::function<void()>&& cont
         if (ImGui::Button("Ok", ImVec2(ok_button_width, 0.0f))) {
             ImGui::CloseCurrentPopup();
             m_modal_window_queue.pop_front();
-
-            on_ok();
         }
 
         ImGui::Dummy(ImVec2(0.0f, rem(0.5f)));
@@ -845,15 +888,55 @@ void Ui::generic_modal_window_ok(const char* title, std::function<void()>&& cont
     }
 }
 
-void Ui::generic_modal_window(const char* title, std::function<bool()>&& contents) {
+void Ui::modal_window_ok_size(
+    const char* title,
+    std::function<void()>&& contents,
+    glm::vec2 size
+) {
     ImGui::OpenPopup(title);
 
-    ImGui::SetNextWindowPos(ImGui::GetMainViewport()->GetWorkCenter(), 0, ImVec2(0.5f, 0.5f));
+    ImGui::SetNextWindowPos(ImGui::GetMainViewport()->GetWorkCenter(), ImGuiCond_Always, ImVec2(0.5f, 0.5f));
+    ImGui::SetNextWindowSize(ImVec2(size.x, size.y), ImGuiCond_Always);
 
-    const auto flags {ImGuiWindowFlags_NoResize | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoCollapse};
+    if (ImGui::BeginPopupModal(title, nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse)) {
+        contents();
 
-    if (ImGui::BeginPopupModal(title, nullptr, flags)) {
-        if (contents()) {
+        ImGui::Dummy(ImVec2(rem(8.0f), rem(0.5f)));
+
+        const float ok_button_width {rem(6.0f)};
+        ImGui::SetCursorPosX((ImGui::GetWindowWidth() - ok_button_width) * 0.5f);
+
+        if (ImGui::Button("Ok", ImVec2(ok_button_width, 0.0f))) {
+            ImGui::CloseCurrentPopup();
+            m_modal_window_queue.pop_front();
+        }
+
+        ImGui::Dummy(ImVec2(0.0f, rem(0.5f)));
+
+        ImGui::EndPopup();
+    }
+}
+
+void Ui::modal_window_ok_size_constraints(
+    const char* title,
+    std::function<void()>&& contents,
+    glm::vec2 min_size,
+    glm::vec2 max_size
+) {
+    ImGui::OpenPopup(title);
+
+    ImGui::SetNextWindowPos(ImGui::GetMainViewport()->GetWorkCenter(), ImGuiCond_Always, ImVec2(0.5f, 0.5f));
+    ImGui::SetNextWindowSizeConstraints(ImVec2(min_size.x, min_size.y), ImVec2(max_size.x, max_size.y));
+
+    if (ImGui::BeginPopupModal(title, nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_AlwaysAutoResize)) {
+        contents();
+
+        ImGui::Dummy(ImVec2(rem(8.0f), rem(0.5f)));
+
+        const float ok_button_width {rem(6.0f)};
+        ImGui::SetCursorPosX((ImGui::GetWindowWidth() - ok_button_width) * 0.5f);
+
+        if (ImGui::Button("Ok", ImVec2(ok_button_width, 0.0f))) {
             ImGui::CloseCurrentPopup();
             m_modal_window_queue.pop_front();
         }
