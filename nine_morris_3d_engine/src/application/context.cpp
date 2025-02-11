@@ -244,22 +244,22 @@ namespace sm {
         return m_res.mesh->get(id);
     }
 
-    std::shared_ptr<Mesh> Ctx::load_mesh(Id id, const std::filesystem::path& file_path, const std::string& mesh_name, Mesh::Type type, bool flip_winding) {
+    std::shared_ptr<Mesh> Ctx::load_mesh(Id id, const std::filesystem::path& file_path, const MeshSpecification& specification) {
         if (m_res.mesh->contains(id)) {
             return m_res.mesh->get(id);
         }
 
-        return m_res.mesh->force_load(id, utils::read_file(file_path), mesh_name, type, flip_winding);
+        return m_res.mesh->force_load(id, utils::read_file(file_path), specification);
     }
 
-    std::shared_ptr<Mesh> Ctx::load_mesh(const std::filesystem::path& file_path, const std::string& mesh_name, Mesh::Type type, bool flip_winding) {
+    std::shared_ptr<Mesh> Ctx::load_mesh(const std::filesystem::path& file_path, const MeshSpecification& specification) {
         const auto id {Id(utils::file_name(file_path))};
 
         if (m_res.mesh->contains(id)) {
             return m_res.mesh->get(id);
         }
 
-        return m_res.mesh->force_load(id, utils::read_file(file_path), mesh_name, type, flip_winding);
+        return m_res.mesh->force_load(id, utils::read_file(file_path), specification);
     }
 
     std::shared_ptr<GlVertexArray> Ctx::load_vertex_array(Id id, std::shared_ptr<Mesh> mesh) {
@@ -276,19 +276,19 @@ namespace sm {
             VertexBufferLayout layout;
 
             switch (mesh->get_type()) {
-                case Mesh::Type::P:
+                case MeshType::P:
                     layout.add(0, VertexBufferLayout::Float, 3);
                     break;
-                case Mesh::Type::PN:
+                case MeshType::PN:
                     layout.add(0, VertexBufferLayout::Float, 3);
                     layout.add(1, VertexBufferLayout::Float, 3);
                     break;
-                case Mesh::Type::PNT:
+                case MeshType::PNT:
                     layout.add(0, VertexBufferLayout::Float, 3);
                     layout.add(1, VertexBufferLayout::Float, 3);
                     layout.add(2, VertexBufferLayout::Float, 2);
                     break;
-                case Mesh::Type::PNTT:
+                case MeshType::PNTT:
                     layout.add(0, VertexBufferLayout::Float, 3);
                     layout.add(1, VertexBufferLayout::Float, 3);
                     layout.add(2, VertexBufferLayout::Float, 2);

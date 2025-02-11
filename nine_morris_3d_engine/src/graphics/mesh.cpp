@@ -1,6 +1,7 @@
 #include "nine_morris_3d_engine/graphics/mesh.hpp"
 
 #include <vector>
+#include <optional>
 #include <cstring>
 
 #include <assimp/Importer.hpp>
@@ -33,16 +34,27 @@ namespace sm {
         aiVector3D tangent;
     };
 
-    static void load_P(const aiMesh* mesh, std::vector<VertexP>& vertices, std::vector<unsigned int>& indices) {
-        for (unsigned int i {0}; i < mesh->mNumVertices; i++) {
-            VertexP vertex;
-            vertex.position = mesh->mVertices[i];
+    static std::optional<unsigned int> find_adjacent_index(const aiMesh* mesh, unsigned index_a, unsigned int index_b, unsigned int index_c) {
+        for (unsigned int i {0}; i < mesh->mNumFaces; i++) {
+            const aiFace& face {mesh->mFaces[i]};
 
-            vertices.push_back(vertex);
+            for (int edge {0}; edge < 3; edge++) {
+                unsigned int v1 {face.mIndices[edge]};  // First edge index
+                unsigned int v2 {face.mIndices[(edge + 1) % 3]};  // Second edge index
+                unsigned int vopp {face.mIndices[(edge + 2) % 3]};  // Opposite vertex index
+
+                if ((v1 == index_a && v2 == index_b || v2 == index_a && v1 == index_b) && vopp != index_c) {
+                    return vopp;
+                }
+            }
         }
 
+        return std::nullopt;
+    }
+
+    static void push_mesh_indices(const aiMesh* mesh, std::vector<unsigned int>& indices) {
         for (unsigned int i {0}; i < mesh->mNumFaces; i++) {
-            const aiFace face {mesh->mFaces[i]};
+            const aiFace& face {mesh->mFaces[i]};
 
             for (unsigned int j {0}; j < face.mNumIndices; j++) {
                 indices.push_back(face.mIndices[j]);
@@ -50,7 +62,56 @@ namespace sm {
         }
     }
 
-    static void load_PN(const aiMesh* mesh, std::vector<VertexPN>& vertices, std::vector<unsigned int>& indices) {
+    static void push_mesh_adjacent_indices(const aiMesh* mesh, std::vector<unsigned int>& indices) {
+        for (unsigned int i {0}; i < mesh->mNumFaces; i++) {
+            const aiFace& face {mesh->mFaces[i]};
+
+            for (unsigned int j {0}; j < face.mNumIndices; j++) {
+                indices.push_back(face.mIndices[j]);
+
+                unsigned int vertex_a {face.mIndices[j]};
+                unsigned int vertex_b {face.mIndices[(j + 1) % face.mNumIndices]};
+                unsigned int vertex_c {face.mIndices[(j + 2) % face.mNumIndices]};
+
+                const auto vertex_adj {find_adjacent_index(mesh, vertex_a, vertex_b, vertex_c)};
+
+                if (!vertex_adj) {
+                    SM_THROW_ERROR(internal::ResourceError, "Could not find adjacent vertex for mesh");
+                }
+
+                indices.push_back(*vertex_adj);
+            }
+        }
+    }
+
+    static void load_P(
+        const aiMesh* mesh,
+        std::vector<VertexP>& vertices,
+        std::vector<unsigned int>& indices,
+        std::vector<unsigned int>& adjacency_indices,
+        bool generate_adjacency_indices
+    ) {
+        for (unsigned int i {0}; i < mesh->mNumVertices; i++) {
+            VertexP vertex;
+            vertex.position = mesh->mVertices[i];
+
+            vertices.push_back(vertex);
+        }
+
+        push_mesh_indices(mesh, indices);
+
+        if (generate_adjacency_indices) {
+            push_mesh_adjacent_indices(mesh, adjacency_indices);
+        }
+    }
+
+    static void load_PN(
+        const aiMesh* mesh,
+        std::vector<VertexPN>& vertices,
+        std::vector<unsigned int>& indices,
+        std::vector<unsigned int>& adjacency_indices,
+        bool generate_adjacency_indices
+    ) {
         for (unsigned int i {0}; i < mesh->mNumVertices; i++) {
             VertexPN vertex;
             vertex.position = mesh->mVertices[i];
@@ -59,16 +120,20 @@ namespace sm {
             vertices.push_back(vertex);
         }
 
-        for (unsigned int i {0}; i < mesh->mNumFaces; i++) {
-            const aiFace face {mesh->mFaces[i]};
+        push_mesh_indices(mesh, indices);
 
-            for (unsigned int j {0}; j < face.mNumIndices; j++) {
-                indices.push_back(face.mIndices[j]);
-            }
+        if (generate_adjacency_indices) {
+            push_mesh_adjacent_indices(mesh, adjacency_indices);
         }
     }
 
-    static void load_PNT(const aiMesh* mesh, std::vector<VertexPNT>& vertices, std::vector<unsigned int>& indices) {
+    static void load_PNT(
+        const aiMesh* mesh,
+        std::vector<VertexPNT>& vertices,
+        std::vector<unsigned int>& indices,
+        std::vector<unsigned int>& adjacency_indices,
+        bool generate_adjacency_indices
+    ) {
         for (unsigned int i {0}; i < mesh->mNumVertices; i++) {
             VertexPNT vertex;
             vertex.position = mesh->mVertices[i];
@@ -79,16 +144,20 @@ namespace sm {
             vertices.push_back(vertex);
         }
 
-        for (unsigned int i {0}; i < mesh->mNumFaces; i++) {
-            const aiFace face {mesh->mFaces[i]};
+        push_mesh_indices(mesh, indices);
 
-            for (unsigned int j {0}; j < face.mNumIndices; j++) {
-                indices.push_back(face.mIndices[j]);
-            }
+        if (generate_adjacency_indices) {
+            push_mesh_adjacent_indices(mesh, adjacency_indices);
         }
     }
 
-    static void load_PNTT(const aiMesh* mesh, std::vector<VertexPNTT>& vertices, std::vector<unsigned int>& indices) {
+    static void load_PNTT(
+        const aiMesh* mesh,
+        std::vector<VertexPNTT>& vertices,
+        std::vector<unsigned int>& indices,
+        std::vector<unsigned int>& adjacency_indices,
+        bool generate_adjacency_indices
+    ) {
         for (unsigned int i {0}; i < mesh->mNumVertices; i++) {
             VertexPNTT vertex;
             vertex.position = mesh->mVertices[i];
@@ -100,12 +169,10 @@ namespace sm {
             vertices.push_back(vertex);
         }
 
-        for (unsigned int i {0}; i < mesh->mNumFaces; i++) {
-            const aiFace face {mesh->mFaces[i]};
+        push_mesh_indices(mesh, indices);
 
-            for (unsigned int j {0}; j < face.mNumIndices; j++) {
-                indices.push_back(face.mIndices[j]);
-            }
+        if (generate_adjacency_indices) {
+            push_mesh_adjacent_indices(mesh, adjacency_indices);
         }
     }
 
@@ -129,19 +196,19 @@ namespace sm {
         return nullptr;
     }
 
-    Mesh::Mesh(const std::string& buffer, const std::string& object_name, Type type, bool flip_winding)
-        : m_type(type) {
+    Mesh::Mesh(const std::string& buffer, const MeshSpecification& specification)
+        : m_type(specification.type) {
         unsigned int flags {static_cast<unsigned int>(aiProcess_ValidateDataStructure | aiProcess_GenBoundingBoxes)};
 
-        if (flip_winding) {
+        if (specification.flip_winding) {
             flags |= aiProcess_FlipWindingOrder;
         }
 
-        if (type == Type::PNTT) {
+        if (specification.type == MeshType::PNTT) {
             flags |= aiProcess_CalcTangentSpace;
         }
 
-        if (type != Type::P) {
+        if (specification.type != MeshType::P) {
             flags |= aiProcess_GenNormals;
         }
 
@@ -154,13 +221,13 @@ namespace sm {
         }
 
         const aiNode* root_node {scene->mRootNode};
-        const aiMesh* mesh {find_mesh(root_node, object_name, scene)};
+        const aiMesh* mesh {find_mesh(root_node, specification.object_name, scene)};
 
         if (mesh == nullptr) {
-            SM_THROW_ERROR(internal::ResourceError, "Model file does not contain `{}` mesh", object_name);
+            SM_THROW_ERROR(internal::ResourceError, "Model file does not contain `{}` mesh", specification.object_name);
         }
 
-        load(type, mesh);
+        load(specification, mesh);
 
         m_aabb.min = glm::vec3(mesh->mAABB.mMin.x, mesh->mAABB.mMin.y, mesh->mAABB.mMin.z);
         m_aabb.max = glm::vec3(mesh->mAABB.mMax.x, mesh->mAABB.mMax.y, mesh->mAABB.mMax.z);
@@ -174,6 +241,10 @@ namespace sm {
         return m_indices.get();
     }
 
+    const unsigned char* Mesh::get_adjacency_indices() const {
+        return m_adjacency_indices.get();
+    }
+
     std::size_t Mesh::get_vertices_size() const {
         return m_vertices_size;
     }
@@ -182,96 +253,85 @@ namespace sm {
         return m_indices_size;
     }
 
+    std::size_t Mesh::get_adjacency_indices_size() const {
+        return m_adjacency_indices_size;
+    }
+
     const utils::AABB& Mesh::get_aabb() const {
         return m_aabb;
     }
 
-    Mesh::Type Mesh::get_type() const {
+    MeshType Mesh::get_type() const {
         return m_type;
     }
 
-    void Mesh::load(Type type, const void* pmesh) {
+    void Mesh::load(const MeshSpecification& specification, const void* pmesh) {
         const aiMesh* mesh {static_cast<const aiMesh*>(pmesh)};
 
-        switch (type) {
-            case Type::P: {
+        std::vector<unsigned int> indices;
+        std::vector<unsigned int> adjacency_indices;
+
+        switch (specification.type) {
+            case MeshType::P: {
                 std::vector<VertexP> vertices;
-                std::vector<unsigned int> indices;
-
-                load_P(mesh, vertices, indices);
-
-                allocate(
-                    vertices.data(),
-                    vertices.size() * sizeof(VertexP),
-                    indices.data(),
-                    indices.size() * sizeof(unsigned int)
-                );
+                load_P(mesh, vertices, indices, adjacency_indices, specification.generate_adjacency_indices);
+                allocate_vertices(vertices.data(), vertices.size() * sizeof(VertexP));
 
                 LOG_DEBUG("Loaded P model data");
 
                 break;
             }
-            case Type::PN: {
+            case MeshType::PN: {
                 std::vector<VertexPN> vertices;
-                std::vector<unsigned int> indices;
-
-                load_PN(mesh, vertices, indices);
-
-                allocate(
-                    vertices.data(),
-                    vertices.size() * sizeof(VertexPN),
-                    indices.data(),
-                    indices.size() * sizeof(unsigned int)
-                );
+                load_PN(mesh, vertices, indices, adjacency_indices, specification.generate_adjacency_indices);
+                allocate_vertices(vertices.data(), vertices.size() * sizeof(VertexPN));
 
                 LOG_DEBUG("Loaded PN model data");
 
                 break;
             }
-            case Type::PNT: {
+            case MeshType::PNT: {
                 std::vector<VertexPNT> vertices;
-                std::vector<unsigned int> indices;
-
-                load_PNT(mesh, vertices, indices);
-
-                allocate(
-                    vertices.data(),
-                    vertices.size() * sizeof(VertexPNT),
-                    indices.data(),
-                    indices.size() * sizeof(unsigned int)
-                );
+                load_PNT(mesh, vertices, indices, adjacency_indices, specification.generate_adjacency_indices);
+                allocate_vertices(vertices.data(), vertices.size() * sizeof(VertexPNT));
 
                 LOG_DEBUG("Loaded PNT model data");
 
                 break;
             }
-            case Type::PNTT: {
+            case MeshType::PNTT: {
                 std::vector<VertexPNTT> vertices;
-                std::vector<unsigned int> indices;
-
-                load_PNTT(mesh, vertices, indices);
-
-                allocate(
-                    vertices.data(),
-                    vertices.size() * sizeof(VertexPNTT),
-                    indices.data(),
-                    indices.size() * sizeof(unsigned int)
-                );
+                load_PNTT(mesh, vertices, indices, adjacency_indices, specification.generate_adjacency_indices);
+                allocate_vertices(vertices.data(), vertices.size() * sizeof(VertexPNTT));
 
                 LOG_DEBUG("Loaded PNTT model data");
 
                 break;
             }
         }
+
+        allocate_indices(indices.data(), indices.size() * sizeof(unsigned int));
+
+        if (specification.generate_adjacency_indices) {
+            allocate_adjacency_indices(adjacency_indices.data(), adjacency_indices.size() * sizeof(unsigned int));
+        }
     }
 
-    void Mesh::allocate(const void* vertices, std::size_t vertices_size, const void* indices, std::size_t indices_size) {
-        m_vertices = std::make_unique<unsigned char[]>(vertices_size);
-        std::memcpy(m_vertices.get(), vertices, vertices_size);
-        m_vertices_size = vertices_size;
+    void Mesh::allocate_vertices(const void* source, std::size_t size) {
+        m_vertices = std::make_unique<unsigned char[]>(size);
+        std::memcpy(m_vertices.get(), source, size);
+        m_vertices_size = size;
+    }
 
-        m_indices = std::make_unique<unsigned char[]>(indices_size);
-        std::memcpy(m_indices.get(), indices, indices_size);
-        m_indices_size = indices_size;
+    void Mesh::allocate_indices(const void* source, std::size_t size) {
+        m_indices = std::make_unique<unsigned char[]>(size);
+        std::memcpy(m_indices.get(), source, size);
+        m_indices_size = size;
+    }
+
+    void Mesh::allocate_adjacency_indices(const void* source, std::size_t size) {
+        m_adjacency_indices = std::make_unique<unsigned char[]>(size);
+        std::memcpy(m_adjacency_indices.get(), source, size);
+        m_adjacency_indices_size = size;
     }
 }
