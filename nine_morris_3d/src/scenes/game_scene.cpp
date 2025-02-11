@@ -245,20 +245,11 @@ void GameScene::client_hello() {
 
     networking::Message message {protocol::message::Client_Hello};
 
-    try {
-        message.write(payload);
-    } catch (const networking::SerializationError& e) {
-        serialization_error(e);
+    if (!try_write_message(message, payload)) {
         return;
     }
 
-    auto& g {ctx.global<Global>()};
-
-    try {
-        g.client.send_message(message);
-    } catch (const networking::ConnectionError& e) {
-        connection_error(e);
-    }
+    try_send_message(message);
 }
 
 void GameScene::client_ping() {
@@ -267,20 +258,11 @@ void GameScene::client_ping() {
 
     networking::Message message {protocol::message::Client_Ping};
 
-    try {
-        message.write(payload);
-    } catch (const networking::SerializationError& e) {
-        serialization_error(e);
+    if (!try_write_message(message, payload)) {
         return;
     }
 
-    auto& g {ctx.global<Global>()};
-
-    try {
-        g.client.send_message(message);
-    } catch (const networking::ConnectionError& e) {
-        connection_error(e);
-    }
+    try_send_message(message);
 }
 
 void GameScene::client_request_game_session() {
@@ -294,17 +276,11 @@ void GameScene::client_request_game_session() {
 
     networking::Message message {protocol::message::Client_RequestGameSession};
 
-    try {
-        message.write(payload);
-    } catch (const networking::SerializationError& e) {
-        serialization_error(e);
+    if (!try_write_message(message, payload)) {
         return;
     }
 
-    try {
-        g.client.send_message(message);
-    } catch (const networking::ConnectionError& e) {
-        connection_error(e);
+    if (!try_send_message(message)) {
         return;
     }
 
@@ -320,19 +296,11 @@ void GameScene::client_leave_game_session() {
 
     networking::Message message {protocol::message::Client_LeaveGameSession};
 
-    try {
-        message.write(payload);
-    } catch (const networking::SerializationError& e) {
-        serialization_error(e);
+    if (!try_write_message(message, payload)) {
         return;
     }
 
-    auto& g {ctx.global<Global>()};
-
-    try {
-        g.client.send_message(message);
-    } catch (const networking::ConnectionError& e) {
-        connection_error(e);
+    if (!try_send_message(message)) {
         return;
     }
 
@@ -357,17 +325,11 @@ void GameScene::client_request_join_game_session(const std::string& session_id) 
 
     networking::Message message {protocol::message::Client_RequestJoinGameSession};
 
-    try {
-        message.write(payload);
-    } catch (const networking::SerializationError& e) {
-        serialization_error(e);
+    if (!try_write_message(message, payload)) {
         return;
     }
 
-    try {
-        g.client.send_message(message);
-    } catch (const networking::ConnectionError& e) {
-        connection_error(e);
+    if (!try_send_message(message)) {
         return;
     }
 
@@ -386,20 +348,11 @@ void GameScene::client_play_move(protocol::ClockTime time, const std::string& mo
 
     networking::Message message {protocol::message::Client_PlayMove};
 
-    try {
-        message.write(payload);
-    } catch (const networking::SerializationError& e) {
-        serialization_error(e);
+    if (!try_write_message(message, payload)) {
         return;
     }
 
-    auto& g {ctx.global<Global>()};
-
-    try {
-        g.client.send_message(message);
-    } catch (const networking::ConnectionError& e) {
-        connection_error(e);
-    }
+    try_send_message(message);
 }
 
 void GameScene::client_update_turn_time(protocol::ClockTime time) {
@@ -411,20 +364,11 @@ void GameScene::client_update_turn_time(protocol::ClockTime time) {
 
     networking::Message message {protocol::message::Client_UpdateTurnTime};
 
-    try {
-        message.write(payload);
-    } catch (const networking::SerializationError& e) {
-        serialization_error(e);
+    if (!try_write_message(message, payload)) {
         return;
     }
 
-    auto& g {ctx.global<Global>()};
-
-    try {
-        g.client.send_message(message);
-    } catch (const networking::ConnectionError& e) {
-        connection_error(e);
-    }
+    try_send_message(message);
 }
 
 void GameScene::client_resign() {
@@ -435,20 +379,11 @@ void GameScene::client_resign() {
 
     networking::Message message {protocol::message::Client_Resign};
 
-    try {
-        message.write(payload);
-    } catch (const networking::SerializationError& e) {
-        serialization_error(e);
+    if (!try_write_message(message, payload)) {
         return;
     }
 
-    auto& g {ctx.global<Global>()};
-
-    try {
-        g.client.send_message(message);
-    } catch (const networking::ConnectionError& e) {
-        connection_error(e);
-    }
+    try_send_message(message);
 }
 
 void GameScene::client_offer_draw() {
@@ -459,20 +394,11 @@ void GameScene::client_offer_draw() {
 
     networking::Message message {protocol::message::Client_OfferDraw};
 
-    try {
-        message.write(payload);
-    } catch (const networking::SerializationError& e) {
-        serialization_error(e);
+    if (!try_write_message(message, payload)) {
         return;
     }
 
-    auto& g {ctx.global<Global>()};
-
-    try {
-        g.client.send_message(message);
-    } catch (const networking::ConnectionError& e) {
-        connection_error(e);
-    }
+    try_send_message(message);
 }
 
 void GameScene::client_accept_draw() {
@@ -483,20 +409,11 @@ void GameScene::client_accept_draw() {
 
     networking::Message message {protocol::message::Client_AcceptDraw};
 
-    try {
-        message.write(payload);
-    } catch (const networking::SerializationError& e) {
-        serialization_error(e);
+    if (!try_write_message(message, payload)) {
         return;
     }
 
-    auto& g {ctx.global<Global>()};
-
-    try {
-        g.client.send_message(message);
-    } catch (const networking::ConnectionError& e) {
-        connection_error(e);
-    }
+    try_send_message(message);
 }
 
 void GameScene::client_send_message(const std::string& message_) {
@@ -508,20 +425,11 @@ void GameScene::client_send_message(const std::string& message_) {
 
     networking::Message message {protocol::message::Client_SendMessage};
 
-    try {
-        message.write(payload);
-    } catch (const networking::SerializationError& e) {
-        serialization_error(e);
+    if (!try_write_message(message, payload)) {
         return;
     }
 
-    auto& g {ctx.global<Global>()};
-
-    try {
-        g.client.send_message(message);
-    } catch (const networking::ConnectionError& e) {
-        connection_error(e);
-    }
+    try_send_message(message);
 }
 
 void GameScene::client_rematch() {
@@ -532,19 +440,11 @@ void GameScene::client_rematch() {
 
     networking::Message message {protocol::message::Client_Rematch};
 
-    try {
-        message.write(payload);
-    } catch (const networking::SerializationError& e) {
-        serialization_error(e);
+    if (!try_write_message(message, payload)) {
         return;
     }
 
-    auto& g {ctx.global<Global>()};
-
-    try {
-        g.client.send_message(message);
-    } catch (const networking::ConnectionError& e) {
-        connection_error(e);
+    if (!try_send_message(message)) {
         return;
     }
 
@@ -559,20 +459,11 @@ void GameScene::client_cancel_rematch() {
 
     networking::Message message {protocol::message::Client_CancelRematch};
 
-    try {
-        message.write(payload);
-    } catch (const networking::SerializationError& e) {
-        serialization_error(e);
+    if (!try_write_message(message, payload)) {
         return;
     }
 
-    auto& g {ctx.global<Global>()};
-
-    try {
-        g.client.send_message(message);
-    } catch (const networking::ConnectionError& e) {
-        connection_error(e);
-    }
+    try_send_message(message);
 }
 
 void GameScene::on_key_released(const sm::KeyReleasedEvent& event) {
@@ -942,6 +833,41 @@ void GameScene::serialization_error(const networking::SerializationError& e) {
     m_ui.push_modal_window(ModalWindowConnectionError);
 }
 
+bool GameScene::try_write_message(networking::Message& message, auto payload) {
+    try {
+        message.write(payload);
+    } catch (const networking::SerializationError& e) {
+        serialization_error(e);
+        return false;
+    }
+
+    return true;
+}
+
+bool GameScene::try_read_message(const networking::Message& message, auto& payload) {
+    try {
+        message.read(payload);
+    } catch (const networking::SerializationError& e) {
+        serialization_error(e);
+        return false;
+    }
+
+    return true;
+}
+
+bool GameScene::try_send_message(const networking::Message& message) {
+    auto& g {ctx.global<Global>()};
+
+    try {
+        g.client.send_message(message);
+    } catch (const networking::ConnectionError& e) {
+        connection_error(e);
+        return false;
+    }
+
+    return true;
+}
+
 void GameScene::reset_session_and_game() {
     if (m_game_session) {
         m_game_session.reset();
@@ -1032,10 +958,7 @@ void GameScene::handle_message(const networking::Message& message) {
 void GameScene::server_hello_accept(const networking::Message& message) {
     protocol::Server_HelloAccept payload;
 
-    try {
-        message.read(payload);
-    } catch (const networking::SerializationError& e) {
-        serialization_error(e);
+    if (!try_read_message(message, payload)) {
         return;
     }
 
@@ -1045,10 +968,7 @@ void GameScene::server_hello_accept(const networking::Message& message) {
 void GameScene::server_hello_reject(const networking::Message& message) {
     protocol::Server_HelloReject payload;
 
-    try {
-        message.read(payload);
-    } catch (const networking::SerializationError& e) {
-        serialization_error(e);
+    if (!try_read_message(message, payload)) {
         return;
     }
 
@@ -1077,10 +997,7 @@ void GameScene::server_ping(const networking::Message& message) {
 void GameScene::server_accept_game_session(const networking::Message& message) {
     protocol::Server_AcceptGameSession payload;
 
-    try {
-        message.read(payload);
-    } catch (const networking::SerializationError& e) {
-        serialization_error(e);
+    if (!try_read_message(message, payload)) {
         return;
     }
 
@@ -1093,10 +1010,7 @@ void GameScene::server_accept_game_session(const networking::Message& message) {
 void GameScene::server_reject_game_session(const networking::Message& message) {
     protocol::Server_RejectGameSession payload;
 
-    try{
-        message.read(payload);
-    } catch (const networking::SerializationError& e) {
-        serialization_error(e);
+    if (!try_read_message(message, payload)) {
         return;
     }
 
@@ -1107,10 +1021,7 @@ void GameScene::server_reject_game_session(const networking::Message& message) {
 void GameScene::server_accept_join_game_session(const networking::Message& message) {
     protocol::Server_AcceptJoinGameSession payload;
 
-    try {
-        message.read(payload);
-    } catch (const networking::SerializationError& e) {
-        serialization_error(e);
+    if (!try_read_message(message, payload)) {
         return;
     }
 
@@ -1153,10 +1064,7 @@ void GameScene::server_accept_join_game_session(const networking::Message& messa
 void GameScene::server_reject_join_game_session(const networking::Message& message) {
     protocol::Server_RejectJoinGameSession payload;
 
-    try {
-        message.read(payload);
-    } catch (const networking::SerializationError& e) {
-        serialization_error(e);
+    if (!try_read_message(message, payload)) {
         return;
     }
 
@@ -1172,10 +1080,7 @@ void GameScene::server_remote_joined_game_session(const networking::Message& mes
 
     protocol::Server_RemoteJoinedGameSession payload;
 
-    try {
-        message.read(payload);
-    } catch (const networking::SerializationError& e) {
-        serialization_error(e);
+    if (!try_read_message(message, payload)) {
         return;
     }
 
@@ -1207,10 +1112,7 @@ void GameScene::server_remote_played_move(const networking::Message& message) {
 
     protocol::Server_RemotePlayedMove payload;
 
-    try {
-        message.read(payload);
-    } catch (const networking::SerializationError& e) {
-        serialization_error(e);
+    if (!try_read_message(message, payload)) {
         return;
     }
 
@@ -1265,10 +1167,7 @@ void GameScene::server_remote_sent_message(const networking::Message& message) {
 
     protocol::Server_RemoteSentMessage payload;
 
-    try {
-        message.read(payload);
-    } catch (const networking::SerializationError& e) {
-        serialization_error(e);
+    if (!try_read_message(message, payload)) {
         return;
     }
 
@@ -1283,10 +1182,7 @@ void GameScene::server_rematch(const networking::Message& message) {
 
     protocol::Server_Rematch payload;
 
-    try {
-        message.read(payload);
-    } catch (const networking::SerializationError& e) {
-        serialization_error(e);
+    if (!try_read_message(message, payload)) {
         return;
     }
 

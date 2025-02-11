@@ -122,6 +122,9 @@ protected:
 
     void connection_error(const networking::ConnectionError& e);
     void serialization_error(const networking::SerializationError& e);
+    bool try_write_message(networking::Message& message, auto payload);
+    bool try_read_message(const networking::Message& message, auto& payload);
+    bool try_send_message(const networking::Message& message);
     void reset_session_and_game();
     void update_connection_state();
     void handle_message(const networking::Message& message);
@@ -143,6 +146,7 @@ protected:
     void server_cancel_rematch(const networking::Message& message);
 
     std::shared_ptr<PointCameraController> m_camera_controller;
+    std::unique_ptr<Engine> m_engine;
     Ui m_ui;
 
     std::shared_ptr<sm::GlTexture> m_icon_wait;
@@ -156,5 +160,4 @@ protected:
     GameOptions m_game_options;
     Clock m_clock;
     MoveList m_move_list;
-    std::unique_ptr<Engine> m_engine;
 };
