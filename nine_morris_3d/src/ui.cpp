@@ -297,6 +297,10 @@ void Ui::main_menu_bar(sm::Ctx& ctx, GameScene& game_scene) {
                     ImGui::RadioButton("None", false);
                     ImGui::RadioButton("Field", false);
                     ImGui::RadioButton("Autumn", false);
+                    ImGui::RadioButton("Summer", false);
+                    ImGui::RadioButton("Night", false);
+                    ImGui::RadioButton("Sunset", false);
+                    ImGui::RadioButton("Sky", false);
                 } else {
                     if (ImGui::RadioButton("None", &m_options.skybox, SkyboxNone)) {
                         if (std::exchange(g.options.skybox, m_options.skybox) != SkyboxNone) {
@@ -455,9 +459,6 @@ void Ui::main_menu_bar(sm::Ctx& ctx, GameScene& game_scene) {
             if (ImGui::MenuItem("Online Play")) {
                 push_modal_window(ModalWindowOnlinePlay);
             }
-            if (ImGui::MenuItem("About")) {
-                push_modal_window(ModalWindowAbout);
-            }
             if (ImGui::BeginMenu("Game Rules")) {
                 if (ImGui::MenuItem("Nine Men's Morris")) {
                     push_modal_window(ModalWindowRulesNineMensMorris);
@@ -467,6 +468,9 @@ void Ui::main_menu_bar(sm::Ctx& ctx, GameScene& game_scene) {
                 }
 
                 ImGui::EndMenu();
+            }
+            if (ImGui::MenuItem("About")) {
+                push_modal_window(ModalWindowAbout);
             }
             if (ImGui::MenuItem("Log Information")) {
                 sm::utils::write_file(ctx.path_logs("nine_morris_3d.txt"), ctx.get_information(), true);
