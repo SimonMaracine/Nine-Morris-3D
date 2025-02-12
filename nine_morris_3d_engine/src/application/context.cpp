@@ -298,6 +298,7 @@ namespace sm {
 
             va->add_vertex_buffer(vertex_buffer, layout);
             va->add_index_buffer(index_buffer);
+            va->bind_index_buffer(0);
         });
 
         return vertex_array;

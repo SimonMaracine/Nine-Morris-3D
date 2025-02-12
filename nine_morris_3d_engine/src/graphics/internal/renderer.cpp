@@ -165,6 +165,7 @@ namespace sm::internal {
 
                 va->add_vertex_buffer(vertex_buffer, layout);
                 va->add_index_buffer(index_buffer);
+                va->bind_index_buffer(0);
             });
 
             m_storage.wquad_vertex_buffer = vertex_buffer;
@@ -474,7 +475,7 @@ namespace sm::internal {
         model_node->m_material->bind_and_upload();
         model_node->m_material->get_shader()->upload_uniform_mat4("u_model_matrix"_H, context.transform);
 
-        opengl::draw_elements(model_node->m_vertex_array->get_index_buffer()->get_index_count());
+        opengl::draw_elements(model_node->m_vertex_array->get_index_buffer(0)->get_index_count());
 
         // Don't unbind the vertex array
     }
@@ -524,7 +525,7 @@ namespace sm::internal {
             model_node->m_material->bind_and_upload();
             model_node->m_material->get_shader()->upload_uniform_mat4("u_model_matrix"_H, context.transform);
 
-            opengl::draw_elements(model_node->m_vertex_array->get_index_buffer()->get_index_count());
+            opengl::draw_elements(model_node->m_vertex_array->get_index_buffer(0)->get_index_count());
         }
 
         opengl::stencil_mask(0x00);
@@ -541,7 +542,7 @@ namespace sm::internal {
             m_storage.outline_shader->upload_uniform_mat4("u_model_matrix"_H, glm::scale(context.transform, glm::vec3(model_node->outline_thickness)));
             m_storage.outline_shader->upload_uniform_vec3("u_color"_H, color);
 
-            opengl::draw_elements(model_node->m_vertex_array->get_index_buffer()->get_index_count());
+            opengl::draw_elements(model_node->m_vertex_array->get_index_buffer(0)->get_index_count());
 
             GlVertexArray::unbind();
         }
@@ -570,7 +571,7 @@ namespace sm::internal {
 
             m_storage.shadow_shader->upload_uniform_mat4("u_model_matrix"_H, context.transform);
 
-            opengl::draw_elements(model_node->m_vertex_array->get_index_buffer()->get_index_count());
+            opengl::draw_elements(model_node->m_vertex_array->get_index_buffer(0)->get_index_count());
 
             return false;
         });
