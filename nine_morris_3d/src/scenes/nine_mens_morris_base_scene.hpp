@@ -27,18 +27,18 @@ public:
     GamePlayer get_player_type() const override;
     std::string get_setup_position() const override;
     void reset(const std::vector<std::string>& moves = {}) override;
-    void reset(const std::string& string, const std::vector<std::string>& moves = {}) override;
+    void reset_board(const std::string& string) override;
+    bool second_player_starting() override;
+    unsigned int clock_time(int time_enum) override;
     void play_move(const std::string& string) override;
     void timeout(PlayerColor color) override;
     void resign(PlayerColor color) override;
     void accept_draw() override;
     void time_control_options_window() override;
-
+    void start_engine() override;
     void load_game_icons() override;
     void reload_scene_texture_data() const override;
     void reload_and_set_scene_textures() override;
-
-    void start_engine() override;
 
     virtual bool twelve_mens_morris() const = 0;
 private:

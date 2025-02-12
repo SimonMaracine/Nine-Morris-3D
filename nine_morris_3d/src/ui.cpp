@@ -432,9 +432,9 @@ void Ui::main_menu_bar(sm::Ctx& ctx, GameScene& game_scene) {
             }
             if (ImGui::MenuItem("Reconnect")) {
                 if (g.options.default_address_port) {
-                    game_scene.connect(DEFAULT_ADDRESS, DEFAULT_PORT, true);
+                    game_scene.connect(DEFAULT_ADDRESS, DEFAULT_PORT);
                 } else {
-                    game_scene.connect(g.options.address, g.options.port, true);
+                    game_scene.connect(g.options.address, g.options.port);
                 }
             }
 

@@ -170,6 +170,53 @@ void GameScene::reload_and_set_textures() {
     });
 }
 
+void GameScene::reset(const std::string& string, const std::vector<std::string>& moves) {
+    if (m_engine) {
+        try {
+            m_engine->stop_thinking();  // Stop the engine first
+            m_engine->new_game();
+            m_engine->synchronize();
+        } catch (const EngineError& e) {
+            engine_error(e);
+            // Reset the other stuff anyway
+        }
+    }
+
+    reset_board(string);
+
+    m_game_state = GameState::Ready;
+    m_clock.reset(clock_time(m_game_options.time_enum));
+    m_move_list.clear();
+
+    if (second_player_starting()) {
+        m_clock.switch_turn();
+        m_move_list.skip_first(true);
+    }
+
+    // Play the moves offscreen
+    get_board().enable_move_callback(false);
+    get_board().enable_move_animations(false);
+
+    for (const auto& move : moves) {
+        play_move(move);
+        m_clock.switch_turn();
+        m_move_list.push(move);
+    }
+
+    get_board().enable_move_animations(true);
+    get_board().enable_move_callback(true);
+
+    // After the played moves, the game might be already over
+    if (get_board().get_game_over() != GameOver::None) {
+        m_game_state = GameState::Over;
+    }
+
+    // Place the pieces into their places
+    get_board().setup_pieces();
+
+    reset_camera_position();
+}
+
 void GameScene::reset_camera_position() {
     const auto& g {ctx.global<Global>()};
 
@@ -200,13 +247,8 @@ void GameScene::reset_camera_position() {
     }
 }
 
-void GameScene::connect(const std::string& address, std::uint16_t port, bool reconnect) {
+void GameScene::connect(const std::string& address, std::uint16_t port) {
     auto& g {ctx.global<Global>()};
-
-    // This prevents unwanted disconnections and reconnections
-    if (!reconnect && g.connection_state == ConnectionState::Connected) {
-        return;
-    }
 
     disconnect();
 
@@ -219,9 +261,9 @@ void GameScene::connect(const std::string& address, std::uint16_t port, bool rec
     }
 }
 
-void GameScene::connect(const std::string& address, const std::string& port, bool reconnect) {
+void GameScene::connect(const std::string& address, const std::string& port) {
     try {
-        connect(address, sm::utils::string_to_unsigned_short(port), reconnect);
+        connect(address, sm::utils::string_to_unsigned_short(port));
     } catch (const sm::RuntimeError& e) {
         LOG_DIST_ERROR("Invalid port: {}", e.what());
     }

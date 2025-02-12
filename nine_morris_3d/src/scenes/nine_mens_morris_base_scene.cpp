@@ -73,82 +73,43 @@ std::string NineMensMorrisBaseScene::get_setup_position() const {
 }
 
 void NineMensMorrisBaseScene::reset(const std::vector<std::string>& moves) {
-    reset("w:w:b:1", moves);
+    GameScene::reset("w:w:b:1", moves);
 }
 
-void NineMensMorrisBaseScene::reset(const std::string& string, const std::vector<std::string>& moves) {
-    if (m_engine) {
-        try {
-            m_engine->stop_thinking();  // Stop the engine first
-            m_engine->new_game();
-            m_engine->synchronize();
-        } catch (const EngineError& e) {
-            engine_error(e);
-            // Reset the other stuff anyway
-        }
-    }
-
+void NineMensMorrisBaseScene::reset_board(const std::string& string) {
     try {
         m_board.reset(NineMensMorrisBoard::position_from_string(string));
     } catch (const BoardError& e) {
         SM_THROW_ERROR(sm::ApplicationError, "Invalid input: {}", e.what());  // TODO fail gracefully
     }
+}
 
-    const auto clock_time {[this](int time_enum) -> unsigned int {
-        unsigned int time_centiseconds {};
+bool NineMensMorrisBaseScene::second_player_starting() {
+    return m_board.get_setup_position().player == NineMensMorrisBoard::Player::Black;
+}
 
-        switch (time_enum) {
-            case NineMensMorrisTime1min:
-                time_centiseconds = Clock::as_centiseconds(1);
-                break;
-            case NineMensMorrisTime3min:
-                time_centiseconds = Clock::as_centiseconds(3);
-                break;
-            case NineMensMorrisTime10min:
-                time_centiseconds = Clock::as_centiseconds(10);
-                break;
-            case NineMensMorrisTime60min:
-                time_centiseconds = Clock::as_centiseconds(60);
-                break;
-            case NineMensMorrisTimeCustom:
-                time_centiseconds = Clock::as_centiseconds(m_game_options.custom_time);
-                break;
-        }
+unsigned int NineMensMorrisBaseScene::clock_time(int time_enum) {
+    unsigned int time_centiseconds {};
 
-        return time_centiseconds;
-    }};
-
-    m_game_state = GameState::Ready;
-    m_clock.reset(clock_time(m_game_options.time_enum));
-    m_move_list.clear();
-
-    if (m_board.get_setup_position().player == NineMensMorrisBoard::Player::Black) {
-        m_clock.switch_turn();
-        m_move_list.skip_first(true);
+    switch (time_enum) {
+        case NineMensMorrisTime1min:
+            time_centiseconds = Clock::as_centiseconds(1);
+            break;
+        case NineMensMorrisTime3min:
+            time_centiseconds = Clock::as_centiseconds(3);
+            break;
+        case NineMensMorrisTime10min:
+            time_centiseconds = Clock::as_centiseconds(10);
+            break;
+        case NineMensMorrisTime60min:
+            time_centiseconds = Clock::as_centiseconds(60);
+            break;
+        case NineMensMorrisTimeCustom:
+            time_centiseconds = Clock::as_centiseconds(m_game_options.custom_time);
+            break;
     }
 
-    // Play the moves offscreen
-    m_board.enable_move_callback(false);
-    m_board.enable_move_animations(false);
-
-    for (const auto& move : moves) {
-        play_move(move);
-        m_clock.switch_turn();
-        m_move_list.push(move);
-    }
-
-    m_board.enable_move_animations(true);
-    m_board.enable_move_callback(true);
-
-    // After the played moves, the game might be already over
-    if (get_board().get_game_over() != GameOver::None) {
-        m_game_state = GameState::Over;
-    }
-
-    // Place the pieces into their places
-    m_board.setup_pieces();
-
-    reset_camera_position();
+    return time_centiseconds;
 }
 
 void NineMensMorrisBaseScene::play_move(const std::string& string) {
@@ -226,6 +187,52 @@ void NineMensMorrisBaseScene::time_control_options_window() {
             m_clock.reset(Clock::as_centiseconds(m_game_options.custom_time));
         }
         ImGui::PopItemWidth();
+    }
+}
+
+void NineMensMorrisBaseScene::start_engine() {
+    assert(!m_engine);
+
+    m_engine = std::make_unique<GbgpEngine>();
+#ifndef SM_BUILD_DISTRIBUTION
+    m_engine->set_log_output(true, "nine_mens_morris_engine.log");
+#endif
+
+#if defined(SM_BUILD_DISTRIBUTION) && defined(SM_PLATFORM_LINUX)
+    const bool search_executable {true};
+#else
+    const bool search_executable {false};
+#endif
+
+    try {
+#ifdef SM_PLATFORM_WINDOWS
+        m_engine->initialize("nine_morris_3d_engine_muhle_intelligence.exe", search_executable);
+#else
+        m_engine->initialize("nine_morris_3d_engine_muhle_intelligence", search_executable);
+#endif
+
+#ifndef SM_BUILD_DISTRIBUTION
+        m_engine->set_debug(true);
+#endif
+        m_engine->new_game();
+        m_engine->synchronize();
+    } catch (const EngineError& e) {
+        engine_error(e);
+        return;
+    }
+
+    const auto iter {std::find_if(m_engine->get_options().cbegin(), m_engine->get_options().cend(), [](const auto& option) {
+        return option.name == "TwelveMensMorris";
+    })};
+
+    if (iter == m_engine->get_options().cend()) {
+        SM_THROW_ERROR(sm::ApplicationError, "Engine doesn't support twelve men's morris");
+    }
+
+    try {
+        m_engine->set_option("TwelveMensMorris", twelve_mens_morris() ? "true" : "false");
+    } catch (const EngineError& e) {
+        engine_error(e);
     }
 }
 
@@ -319,52 +326,6 @@ void NineMensMorrisBaseScene::reload_and_set_scene_textures() {
             piece_normal,
             1
         );
-    }
-}
-
-void NineMensMorrisBaseScene::start_engine() {
-    assert(!m_engine);
-
-    m_engine = std::make_unique<GbgpEngine>();
-#ifndef SM_BUILD_DISTRIBUTION
-    m_engine->set_log_output(true, "nine_mens_morris_engine.log");
-#endif
-
-#if defined(SM_BUILD_DISTRIBUTION) && defined(SM_PLATFORM_LINUX)
-    const bool search_executable {true};
-#else
-    const bool search_executable {false};
-#endif
-
-    try {
-#ifdef SM_PLATFORM_WINDOWS
-        m_engine->initialize("nine_morris_3d_engine_muhle_intelligence.exe", search_executable);
-#else
-        m_engine->initialize("nine_morris_3d_engine_muhle_intelligence", search_executable);
-#endif
-
-#ifndef SM_BUILD_DISTRIBUTION
-        m_engine->set_debug(true);
-#endif
-        m_engine->new_game();
-        m_engine->synchronize();
-    } catch (const EngineError& e) {
-        engine_error(e);
-        return;
-    }
-
-    const auto iter {std::find_if(m_engine->get_options().cbegin(), m_engine->get_options().cend(), [](const auto& option) {
-        return option.name == "TwelveMensMorris";
-    })};
-
-    if (iter == m_engine->get_options().cend()) {
-        SM_THROW_ERROR(sm::ApplicationError, "Engine doesn't support twelve men's morris");
-    }
-
-    try {
-        m_engine->set_option("TwelveMensMorris", twelve_mens_morris() ? "true" : "false");
-    } catch (const EngineError& e) {
-        engine_error(e);
     }
 }
 

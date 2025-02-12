@@ -57,12 +57,18 @@ public:
     virtual GamePlayer get_player_type() const = 0;
     virtual std::string get_setup_position() const = 0;
     virtual void reset(const std::vector<std::string>& moves = {}) = 0;
-    virtual void reset(const std::string& string, const std::vector<std::string>& moves = {}) = 0;
+    virtual void reset_board(const std::string& string) = 0;
+    virtual bool second_player_starting() = 0;
+    virtual unsigned int clock_time(int time_enum) = 0;
     virtual void play_move(const std::string& string) = 0;
     virtual void timeout(PlayerColor color) = 0;
     virtual void resign(PlayerColor color) = 0;
     virtual void accept_draw() = 0;
     virtual void time_control_options_window() = 0;
+    virtual void start_engine() = 0;
+    virtual void load_game_icons() = 0;
+    virtual void reload_scene_texture_data() const = 0;
+    virtual void reload_and_set_scene_textures() = 0;
 
     std::shared_ptr<PointCameraController> get_camera_controller() const { return m_camera_controller; }
     GameState& get_game_state() { return m_game_state; }
@@ -75,18 +81,14 @@ public:
     std::shared_ptr<sm::GlTexture> get_icon_white() const { return m_icon_white; }
     std::shared_ptr<sm::GlTexture> get_icon_black() const { return m_icon_black; }
 
-    virtual void load_game_icons() = 0;
-    virtual void reload_scene_texture_data() const = 0;
-    virtual void reload_and_set_scene_textures() = 0;
     void reload_and_set_skybox();
     void reload_and_set_textures();
 
+    void reset(const std::string& string, const std::vector<std::string>& moves = {});
     void reset_camera_position();
 
-    virtual void start_engine() = 0;
-
-    void connect(const std::string& address, std::uint16_t port, bool reconnect = false);
-    void connect(const std::string& address, const std::string& port, bool reconnect = false);
+    void connect(const std::string& address, std::uint16_t port);
+    void connect(const std::string& address, const std::string& port);
     void disconnect();
     void client_hello();
     void client_ping();
