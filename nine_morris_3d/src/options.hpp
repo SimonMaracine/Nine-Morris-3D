@@ -62,8 +62,7 @@ enum Scale : int {
 struct Options {
     int game_type {GameTypeLocalHumanVsHuman};
     int game_mode {GameModeNineMensMorris};
-    float master_volume {1.0f};
-    float music_volume {0.7f};
+    float audio_volume {1.0f};
     int skybox {SkyboxField};
     int anti_aliasing {AntiAliasing2x};
     int anisotropic_filtering {AnisotropicFiltering4x};
@@ -75,7 +74,6 @@ struct Options {
     char address[253 + 1] {};
     char port[5 + 1] {};
     bool default_address_port {true};
-    bool enable_music {false};
     bool vsync {true};
 
     template<typename Archive>
@@ -83,8 +81,7 @@ struct Options {
         archive(
             game_type,
             game_mode,
-            master_volume,
-            music_volume,
+            audio_volume,
             skybox,
             anti_aliasing,
             anisotropic_filtering,
@@ -96,7 +93,6 @@ struct Options {
             address,
             port,
             default_address_port,
-            enable_music,
             vsync
         );
     }

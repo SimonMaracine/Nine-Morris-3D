@@ -23,11 +23,7 @@ static void validate(Options& options) {
             goto corrupted;
     }
 
-    if (options.master_volume < 0.0f || options.master_volume > 1.0f) {
-        goto corrupted;
-    }
-
-    if (options.music_volume < 0.0f || options.music_volume > 1.0f) {
+    if (options.audio_volume < 0.0f || options.audio_volume > 1.0f) {
         goto corrupted;
     }
 

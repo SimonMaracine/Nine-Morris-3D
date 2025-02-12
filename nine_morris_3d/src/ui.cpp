@@ -44,8 +44,8 @@ void Ui::update(sm::Ctx& ctx, GameScene& game_scene) {
         switch (modal_window) {
             case ModalWindowNone:
                 break;
-            case ModalWindowPlay:
-                play_window();
+            case ModalWindowGeneralPlay:
+                general_play_window();
                 break;
             case ModalWindowOnlinePlay:
                 online_play_window();
@@ -266,28 +266,16 @@ void Ui::main_menu_bar(sm::Ctx& ctx, GameScene& game_scene) {
                 ImGui::EndMenu();
             }
             if (ImGui::BeginMenu("Audio")) {
-                if (ImGui::BeginMenu("Master Volume")) {
+                if (ImGui::BeginMenu("Volume")) {
                     ImGui::PushItemWidth(rem(5.0f));
-                    if (ImGui::SliderFloat("##", &m_options.master_volume, 0.0f, 1.0f, "%.01f")) {
-                        g.options.master_volume = m_options.master_volume;
+                    if (ImGui::SliderFloat("##", &m_options.audio_volume, 0.0f, 1.0f, "%.01f")) {
+                        g.options.audio_volume = m_options.audio_volume;
 
-                        sm::Ctx::set_audio_volume(g.options.master_volume);
+                        sm::Ctx::set_audio_volume(g.options.audio_volume);
                     }
                     ImGui::PopItemWidth();
 
                     ImGui::EndMenu();
-                }
-                if (ImGui::BeginMenu("Music Volume")) {
-                    ImGui::PushItemWidth(rem(5.0f));
-                    if (ImGui::SliderFloat("##", &m_options.music_volume, 0.0f, 1.0f, "%.01f")) {
-                        // TODO
-                    }
-                    ImGui::PopItemWidth();
-
-                    ImGui::EndMenu();
-                }
-                if (ImGui::MenuItem("Enable Music", nullptr, &m_options.enable_music)) {
-                    // TODO
                 }
 
                 ImGui::EndMenu();
@@ -453,8 +441,8 @@ void Ui::main_menu_bar(sm::Ctx& ctx, GameScene& game_scene) {
             ImGui::EndMenu();
         }
         if (ImGui::BeginMenu("Help")) {
-            if (ImGui::MenuItem("Play")) {
-                push_modal_window(ModalWindowPlay);
+            if (ImGui::MenuItem("General Play")) {
+                push_modal_window(ModalWindowGeneralPlay);
             }
             if (ImGui::MenuItem("Online Play")) {
                 push_modal_window(ModalWindowOnlinePlay);
@@ -660,9 +648,9 @@ void Ui::about_window() {
     });
 }
 
-void Ui::play_window() {
+void Ui::general_play_window() {
     modal_window_ok_size_constraints(
-        "Help Play",
+        "Help General Play",
         []() {
             ImGui::SeparatorText("Starting A Game:");
             ImGui::Bullet();
@@ -680,6 +668,9 @@ void Ui::play_window() {
             ImGui::SeparatorText("Game Controls:");
             ImGui::Bullet();
             ImGui::SameLine();
+            ImGui::TextWrapped("Interact with the board and pieces by using the left mouse click.");
+            ImGui::Bullet();
+            ImGui::SameLine();
             ImGui::TextWrapped("Move the camera by dragging the mouse with right click, or by using the keys: W, A, S, D, R, F.");
             ImGui::Bullet();
             ImGui::SameLine();
@@ -694,11 +685,13 @@ void Ui::online_play_window() {
     modal_window_ok_size_constraints(
         "Help Online Play",
         []() {
+            ImGui::Bullet();
+            ImGui::SameLine();
             ImGui::TextWrapped(
                 "Playing online with somebody is very simple: One party has to create the game and send the code to the opponent"
                 " and the other party has to simply enter the code and join the game."
             );
-            ImGui::TextWrapped("Before playing, know these things:");
+            ImGui::TextWrapped("Before playing, though, know these things:");
             ImGui::Bullet();
             ImGui::SameLine();
             ImGui::TextWrapped(
