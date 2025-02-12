@@ -38,25 +38,20 @@ namespace sm {
 
         const unsigned char* get_vertices() const;
         const unsigned char* get_indices() const;
-        const unsigned char* get_adjacency_indices() const;
         std::size_t get_vertices_size() const;
         std::size_t get_indices_size() const;
-        std::size_t get_adjacency_indices_size() const;
         const utils::AABB& get_aabb() const;
         MeshType get_type() const;
     private:
         void load(const MeshSpecification& specification, const void* pmesh);
         void allocate_vertices(const void* source, std::size_t size);
         void allocate_indices(const void* source, std::size_t size);
-        void allocate_adjacency_indices(const void* source, std::size_t size);
 
         // Raw data
         std::unique_ptr<unsigned char[]> m_vertices;
         std::unique_ptr<unsigned char[]> m_indices;
-        std::unique_ptr<unsigned char[]> m_adjacency_indices;
         std::size_t m_vertices_size {};
         std::size_t m_indices_size {};
-        std::size_t m_adjacency_indices_size {};
 
         utils::AABB m_aabb;
 

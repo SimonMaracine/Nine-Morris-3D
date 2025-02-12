@@ -444,8 +444,10 @@ NineMensMorrisBoard::NodeModels NineMensMorrisBaseScene::setup_nodes() const {
 
 NineMensMorrisBoard::PieceModels NineMensMorrisBaseScene::setup_white_pieces() const {
     const auto mesh {ctx.get_mesh("piece_white.obj"_H)};
+    const auto mesh_adj {ctx.get_mesh("piece_white.obj.adj"_H)};
 
     const auto vertex_array {ctx.load_vertex_array("piece_white"_H, mesh)};
+    const auto vertex_array_adj {ctx.load_vertex_array("piece_white_adj"_H, mesh_adj)};
 
     const auto diffuse {load_piece_white_diffuse_texture()};
     const auto normal {load_piece_normal_texture()};
@@ -461,7 +463,7 @@ NineMensMorrisBoard::PieceModels NineMensMorrisBaseScene::setup_white_pieces() c
         material_instance->set_float("u_material.shininess"_H, 8.0f);
         material_instance->set_texture("u_material.normal"_H, normal, 1);
 
-        models.push_back(std::make_shared<sm::ModelNode>(mesh, vertex_array, material_instance));
+        models.push_back(std::make_shared<sm::OutlinedModelNode>(mesh, vertex_array, material_instance, mesh_adj, vertex_array_adj));
     }
 
     return models;
@@ -469,8 +471,10 @@ NineMensMorrisBoard::PieceModels NineMensMorrisBaseScene::setup_white_pieces() c
 
 NineMensMorrisBoard::PieceModels NineMensMorrisBaseScene::setup_black_pieces() const {
     const auto mesh {ctx.get_mesh("piece_black.obj"_H)};
+    const auto mesh_adj {ctx.get_mesh("piece_black.obj.adj"_H)};
 
     const auto vertex_array {ctx.load_vertex_array("piece_black"_H, mesh)};
+    const auto vertex_array_adj {ctx.load_vertex_array("piece_black_adj"_H, mesh_adj)};
 
     const auto diffuse {load_piece_black_diffuse_texture()};
     const auto normal {load_piece_normal_texture()};
@@ -486,7 +490,7 @@ NineMensMorrisBoard::PieceModels NineMensMorrisBaseScene::setup_black_pieces() c
         material_instance->set_float("u_material.shininess"_H, 8.0f);
         material_instance->set_texture("u_material.normal"_H, normal, 1);
 
-        models.push_back(std::make_shared<sm::ModelNode>(mesh, vertex_array, material_instance));
+        models.push_back(std::make_shared<sm::OutlinedModelNode>(mesh, vertex_array, material_instance, mesh_adj, vertex_array_adj));
     }
 
     return models;

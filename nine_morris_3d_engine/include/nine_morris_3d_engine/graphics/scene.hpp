@@ -57,6 +57,7 @@ namespace sm {
     enum class SceneNode3DType {
         Root3D,
         Model,
+        OutlinedModel,
         PointLight
     };
 
@@ -207,16 +208,36 @@ namespace sm {
         glm::vec3 rotation {};
         float scale {1.0f};
 
-        NodeFlag outline {Inherited};
-        glm::vec3 outline_color {1.0f};
-        float outline_thickness {1.1f};
-
         NodeFlag disable_back_face_culling {Inherited};
         NodeFlag cast_shadow {Inherited};
     private:
         std::shared_ptr<Mesh> m_mesh;
         std::shared_ptr<GlVertexArray> m_vertex_array;
         std::shared_ptr<MaterialInstance> m_material;
+
+        friend class internal::Renderer;
+    };
+
+    class OutlinedModelNode : public ModelNode {
+    public:
+        OutlinedModelNode(
+            std::shared_ptr<Mesh> mesh,
+            std::shared_ptr<GlVertexArray> vertex_array,
+            std::shared_ptr<MaterialInstance> material,
+            std::shared_ptr<Mesh> outline_mesh,
+            std::shared_ptr<GlVertexArray> outline_vertex_array
+        )
+            : ModelNode(mesh, vertex_array, material), m_outline_mesh(outline_mesh), m_outline_vertex_array(outline_vertex_array) {}
+
+        SceneNode3DType type() const override {
+            return SceneNode3DType::OutlinedModel;
+        }
+
+        NodeFlag outline {Inherited};
+        glm::vec3 outline_color {1.0f};
+    private:
+        std::shared_ptr<Mesh> m_outline_mesh;
+        std::shared_ptr<GlVertexArray> m_outline_vertex_array;
 
         friend class internal::Renderer;
     };

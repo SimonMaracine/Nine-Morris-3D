@@ -24,7 +24,6 @@ using namespace resmanager::literals;
 namespace sm::internal {
     Renderer::Renderer(int width, int height, const FileSystem& fs, const ShaderLibrary& shd) {
         opengl::initialize_default();
-        opengl::initialize_stencil();
         opengl::enable_depth_test();
 
         {
@@ -97,6 +96,7 @@ namespace sm::internal {
         {
             m_storage.outline_shader = std::make_shared<GlShader>(
                 utils::read_file(fs.path_engine_assets("shaders/internal/outline.vert")),
+                utils::read_file(fs.path_engine_assets("shaders/internal/outline.geom")),
                 utils::read_file(fs.path_engine_assets("shaders/internal/outline.frag"))
             );
 
@@ -242,7 +242,7 @@ namespace sm::internal {
 
         // Draw normal things
         m_storage.scene_framebuffer->bind();
-        opengl::clear(opengl::Buffers::CDS);
+        opengl::clear(opengl::Buffers::CD);
         opengl::viewport(
             m_storage.scene_framebuffer->get_specification().width,
             m_storage.scene_framebuffer->get_specification().height
@@ -250,9 +250,8 @@ namespace sm::internal {
 
         opengl::bind_texture_2d(m_storage.shadow_map_framebuffer->get_depth_attachment(), SHADOW_MAP_UNIT);
 
-        // I sincerely have no idea why outlined objects need to be rendered first; it seems the opposite
-        draw_models_outlined(scene);
         draw_models(scene);
+        draw_models_outlined(scene);
 
         // Skybox is rendered last, but with its depth values modified to keep it in the background
         if (scene.root_node_3d->skybox.texture != nullptr) {
@@ -481,74 +480,56 @@ namespace sm::internal {
     }
 
     void Renderer::draw_models_outlined(const Scene& scene) {
-        std::vector<std::pair<const ModelNode*, Context3D>> model_nodes;
+        scene.root_node_3d->traverse([this, &scene](const SceneNode3D* node, Context3D& context) {
+            auto outlined_model_node {dynamic_cast<const OutlinedModelNode*>(node)};
 
-        scene.root_node_3d->traverse([this, &model_nodes](const SceneNode3D* node, Context3D& context) {
-            auto model_node {dynamic_cast<const ModelNode*>(node)};
-
-            if (model_node == nullptr) {
+            if (outlined_model_node == nullptr) {
                 return false;
             }
 
             if (context.outline) {
-                model_nodes.emplace_back(model_node, context);
+                draw_model_outlined(scene, outlined_model_node, context);
             }
 
             return false;
         });
-
-        std::sort(model_nodes.begin(), model_nodes.end(), [&](const auto& lhs, const auto& rhs) {
-            const float distance_left {glm::distance(
-                glm::vec3(lhs.second.transform * glm::vec4(0.0f, 0.0f, 0.0f, 1.0f)),
-                scene.root_node_3d->m_camera_position
-            )};
-            const float distance_right {glm::distance(
-                glm::vec3(rhs.second.transform * glm::vec4(0.0f, 0.0f, 0.0f, 1.0f)),
-                scene.root_node_3d->m_camera_position
-            )};
-
-            return distance_left < distance_right;
-        });
-
-        for (const auto& model_node : model_nodes) {
-            draw_model_outlined(model_node.first, model_node.second);
-        }
     }
 
-    void Renderer::draw_model_outlined(const ModelNode* model_node, const Context3D& context) {
-        // Don't disable and enable depth testing
-
-        opengl::stencil_mask(0xFF);
-
+    void Renderer::draw_model_outlined(const Scene& scene, const OutlinedModelNode* outlined_model_node, const Context3D& context) {
         {
-            model_node->m_vertex_array->bind();
-            model_node->m_material->bind_and_upload();
-            model_node->m_material->get_shader()->upload_uniform_mat4("u_model_matrix"_H, context.transform);
+            outlined_model_node->m_vertex_array->bind();
+            outlined_model_node->m_material->bind_and_upload();
+            outlined_model_node->m_material->get_shader()->upload_uniform_mat4("u_model_matrix"_H, context.transform);
 
-            opengl::draw_elements(model_node->m_vertex_array->get_index_buffer(0)->get_index_count());
+            opengl::draw_elements(outlined_model_node->m_vertex_array->get_index_buffer(0)->get_index_count());
         }
 
-        opengl::stencil_mask(0x00);
-        opengl::stencil_function(opengl::Function::NotEqual, 1, 0xFF);
+        opengl::disable_back_face_culling();
 
         {
-            // Vertex array is already bound
+            outlined_model_node->m_outline_vertex_array->bind();
 
             const glm::vec3 color {
-                m_color_correction ? glm::convertSRGBToLinear(model_node->outline_color) : model_node->outline_color
+                m_color_correction ? glm::convertSRGBToLinear(outlined_model_node->outline_color) : outlined_model_node->outline_color
             };
 
+            const float distance {glm::distance(
+                glm::vec3(context.transform * glm::vec4(0.0f, 0.0f, 0.0f, 1.0f)),
+                scene.root_node_3d->m_camera_position
+            )};
+
             m_storage.outline_shader->bind();
-            m_storage.outline_shader->upload_uniform_mat4("u_model_matrix"_H, glm::scale(context.transform, glm::vec3(model_node->outline_thickness)));
+            m_storage.outline_shader->upload_uniform_mat4("u_model_matrix"_H, context.transform);
+            m_storage.outline_shader->upload_uniform_float("u_width"_H, utils::map(distance, 5.0f, 20.0f, 0.004f, 0.001f));
+            m_storage.outline_shader->upload_uniform_float("u_overhang"_H, 0.03f);
             m_storage.outline_shader->upload_uniform_vec3("u_color"_H, color);
 
-            opengl::draw_elements(model_node->m_vertex_array->get_index_buffer(0)->get_index_count());
+            opengl::draw_elements_adjacency(outlined_model_node->m_outline_vertex_array->get_index_buffer(0)->get_index_count());
 
             GlVertexArray::unbind();
         }
 
-        opengl::stencil_mask(0xFF);
-        opengl::stencil_function(opengl::Function::Always, 1, 0xFF);
+        opengl::enable_back_face_culling();
     }
 
     void Renderer::draw_models_to_shadow_map(const Scene& scene) {
@@ -878,7 +859,7 @@ namespace sm::internal {
             Attachment(AttachmentFormat::Rgba8Float, AttachmentType::Renderbuffer)
         };
         specification.depth_attachment = Attachment(
-            AttachmentFormat::Depth24Stencil8, AttachmentType::Renderbuffer
+            AttachmentFormat::Depth32, AttachmentType::Renderbuffer
         );
         specification.samples = samples;
 

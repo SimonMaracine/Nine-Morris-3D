@@ -175,14 +175,22 @@ void LoadingScene::load_assets(sm::AsyncTask& task) {
 
     {
         sm::MeshSpecification specification;
-        specification.object_name = "White_Piece";
         specification.type = sm::MeshType::PNTT;
 
+        specification.object_name = "White_Piece";
         ctx.load_mesh(ctx.path_assets("models/piece/piece_white.obj"), specification);
 
         specification.object_name = "Black_Piece";
-
         ctx.load_mesh(ctx.path_assets("models/piece/piece_black.obj"), specification);
+
+        specification.type = sm::MeshType::P;
+        specification.generate_adjacency_indices = true;
+
+        specification.object_name = "White_Piece";
+        ctx.load_mesh("piece_white.obj.adj"_H, ctx.path_assets("models/piece/piece_white.obj"), specification);
+
+        specification.object_name = "Black_Piece";
+        ctx.load_mesh("piece_black.obj.adj"_H, ctx.path_assets("models/piece/piece_black.obj"), specification);
 
         sm::TexturePostProcessing post_processing;
 

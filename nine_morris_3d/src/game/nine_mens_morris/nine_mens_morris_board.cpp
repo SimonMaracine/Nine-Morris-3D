@@ -772,11 +772,11 @@ void NineMensMorrisBoard::initialize_objects() {
     }
 
     for (int i {0}; i < m_pieces.size() / 2; i++) {
-        white_pieces.push_back(m_pieces[i].get_model());
+        white_pieces.push_back(m_pieces[i].get_model<sm::OutlinedModelNode>());
     }
 
     for (int i {m_pieces.size() / 2}; i < m_pieces.size(); i++) {
-        black_pieces.push_back(m_pieces[i].get_model());
+        black_pieces.push_back(m_pieces[i].get_model<sm::OutlinedModelNode>());
     }
 
     initialize_objects(nodes, white_pieces, black_pieces);
@@ -807,7 +807,7 @@ void NineMensMorrisBoard::update_nodes_highlight(std::function<bool()>&& highlig
 void NineMensMorrisBoard::update_pieces_highlight(std::function<bool(const PieceObj&)>&& highlight, bool enabled) {
     if (!enabled) {
         for (PieceObj& piece : m_pieces) {
-            piece.get_model()->outline = sm::NodeFlag::Inherited;
+            piece.get_model<sm::OutlinedModelNode>()->outline = sm::NodeFlag::Inherited;
         }
 
         return;
@@ -815,10 +815,10 @@ void NineMensMorrisBoard::update_pieces_highlight(std::function<bool(const Piece
 
     for (PieceObj& piece : m_pieces) {
         if (piece.get_id() == m_hover_id && highlight(piece)) {
-            piece.get_model()->outline = sm::NodeFlag::Enabled;
-            piece.get_model()->outline_color = m_capture_piece ? GRAY : ORANGE;
+        piece.get_model<sm::OutlinedModelNode>()->outline = sm::NodeFlag::Enabled;
+        piece.get_model<sm::OutlinedModelNode>()->outline_color = m_capture_piece ? GRAY : ORANGE;
         } else {
-            piece.get_model()->outline = sm::NodeFlag::Inherited;
+            piece.get_model<sm::OutlinedModelNode>()->outline = sm::NodeFlag::Inherited;
         }
     }
 
@@ -827,8 +827,8 @@ void NineMensMorrisBoard::update_pieces_highlight(std::function<bool(const Piece
         const int piece_id {m_nodes[m_select_id].piece_id};
 
         if (piece_id != -1) {
-            m_pieces[piece_id - NODES].get_model()->outline = sm::NodeFlag::Enabled;
-            m_pieces[piece_id - NODES].get_model()->outline_color = RED;
+            m_pieces[piece_id - NODES].get_model<sm::OutlinedModelNode>()->outline = sm::NodeFlag::Enabled;
+            m_pieces[piece_id - NODES].get_model<sm::OutlinedModelNode>()->outline_color = RED;
         }
     }
 }
