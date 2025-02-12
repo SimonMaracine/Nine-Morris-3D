@@ -90,7 +90,7 @@ namespace sm::internal {
         void draw_model(const ModelNode* model_node, const Context3D& context);
 
         void draw_models_outlined(const Scene& scene);
-        void draw_model_outlined(const ModelNode* model_node, const Context3D& context);
+        void draw_model_outlined(const Scene& scene, const OutlinedModelNode* outlined_model_node, const Context3D& context);
 
         void draw_models_to_shadow_map(const Scene& scene);
         void draw_skybox(const Scene& scene);

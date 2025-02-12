@@ -37,6 +37,7 @@ namespace sm::internal {
                 case SceneNode3DType::Root3D:
                     break;
                 case SceneNode3DType::Model:
+                case SceneNode3DType::OutlinedModel:
                     m_model_nodes.push_back(static_cast<ModelNode*>(node));
                     break;
                 case SceneNode3DType::PointLight:

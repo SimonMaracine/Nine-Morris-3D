@@ -29,6 +29,23 @@ namespace sm {
         LOG_DEBUG("Created GL shader {}", m_program);
     }
 
+    GlShader::GlShader(const std::string& source_vertex, const std::string& source_geometry, const std::string& source_fragment) {
+        const unsigned int vertex_shader {compile_shader(source_vertex, GL_VERTEX_SHADER)};
+        const unsigned int geometry_shader {compile_shader(source_geometry, GL_GEOMETRY_SHADER)};
+        const unsigned int fragment_shader {compile_shader(source_fragment, GL_FRAGMENT_SHADER)};
+        create_program(vertex_shader, geometry_shader, fragment_shader);
+
+        if (!check_linking(m_program)) {
+            SM_THROW_ERROR(internal::ResourceError, "Could not link shader program {}", m_program);
+        }
+
+        delete_intermediates(vertex_shader, geometry_shader, fragment_shader);
+        const auto uniforms {introspect_program()};
+        check_and_cache_uniforms(uniforms);
+
+        LOG_DEBUG("Created GL shader {}", m_program);
+    }
+
     GlShader::~GlShader() {
         glDeleteProgram(m_program);
 
@@ -231,6 +248,19 @@ namespace sm {
         glValidateProgram(m_program);
     }
 
+    void GlShader::create_program(unsigned int vertex_shader, unsigned int geometry_shader, unsigned int fragment_shader) {
+        assert(vertex_shader != 0);
+        assert(geometry_shader != 0);
+        assert(fragment_shader != 0);
+
+        m_program = glCreateProgram();
+        glAttachShader(m_program, vertex_shader);
+        glAttachShader(m_program, geometry_shader);
+        glAttachShader(m_program, fragment_shader);
+        glLinkProgram(m_program);
+        glValidateProgram(m_program);
+    }
+
     void GlShader::delete_intermediates(unsigned int vertex_shader, unsigned int fragment_shader) {
         assert(m_program != 0);
         assert(vertex_shader != 0);
@@ -239,6 +269,20 @@ namespace sm {
         glDetachShader(m_program, vertex_shader);
         glDetachShader(m_program, fragment_shader);
         glDeleteShader(vertex_shader);
+        glDeleteShader(fragment_shader);
+    }
+
+    void GlShader::delete_intermediates(unsigned int vertex_shader, unsigned int geometry_shader, unsigned int fragment_shader) {
+        assert(m_program != 0);
+        assert(vertex_shader != 0);
+        assert(geometry_shader != 0);
+        assert(fragment_shader != 0);
+
+        glDetachShader(m_program, vertex_shader);
+        glDetachShader(m_program, geometry_shader);
+        glDetachShader(m_program, fragment_shader);
+        glDeleteShader(vertex_shader);
+        glDeleteShader(geometry_shader);
         glDeleteShader(fragment_shader);
     }
 
@@ -270,6 +314,9 @@ namespace sm {
             switch (type) {
                 case GL_VERTEX_SHADER:
                     type_name = "Vertex";
+                    break;
+                case GL_GEOMETRY_SHADER:
+                    type_name = "Geometry";
                     break;
                 case GL_FRAGMENT_SHADER:
                     type_name = "Fragment";

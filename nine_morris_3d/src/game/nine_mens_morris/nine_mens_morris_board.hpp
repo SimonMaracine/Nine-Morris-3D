@@ -82,7 +82,7 @@ public:
     };
 
     using NodeModels = sm::utils::Array<std::shared_ptr<sm::ModelNode>, int, NODES>;
-    using PieceModels = sm::utils::Array<std::shared_ptr<sm::ModelNode>, int, PIECES / 2>;
+    using PieceModels = sm::utils::Array<std::shared_ptr<sm::OutlinedModelNode>, int, PIECES / 2>;
 
     using Nodes = std::array<NodeObj, NODES>;
     using Pieces = sm::utils::Array<PieceObj, int, PIECES>;

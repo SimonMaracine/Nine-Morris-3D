@@ -41,16 +41,16 @@ namespace sm {
 
     void SceneNode3D::traverse(const std::function<bool(const SceneNode3D*, Context3D&)>& process) const {
         traverse<Context3D>(Context3D(), [&](const SceneNode3D* node, Context3D& context) {
-            if (auto model_node {dynamic_cast<const ModelNode*>(node)}; model_node != nullptr) {
-                context.transform = glm::translate(context.transform, model_node->position);
-                context.transform = glm::rotate(context.transform, glm::radians(model_node->rotation.x), glm::vec3(1.0f, 0.0f, 0.0f));
-                context.transform = glm::rotate(context.transform, glm::radians(model_node->rotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
-                context.transform = glm::rotate(context.transform, glm::radians(model_node->rotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
-                context.transform = glm::scale(context.transform, glm::vec3(model_node->scale));
+            if (auto outlined_model_node {dynamic_cast<const OutlinedModelNode*>(node)}; outlined_model_node != nullptr) {
+                context.transform = glm::translate(context.transform, outlined_model_node->position);
+                context.transform = glm::rotate(context.transform, glm::radians(outlined_model_node->rotation.x), glm::vec3(1.0f, 0.0f, 0.0f));
+                context.transform = glm::rotate(context.transform, glm::radians(outlined_model_node->rotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
+                context.transform = glm::rotate(context.transform, glm::radians(outlined_model_node->rotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
+                context.transform = glm::scale(context.transform, glm::vec3(outlined_model_node->scale));
 
-                context.transform_scale *= model_node->scale;
+                context.transform_scale *= outlined_model_node->scale;
 
-                switch (model_node->outline) {
+                switch (outlined_model_node->outline) {
                     case NodeFlag::Inherited:
                         break;
                     case NodeFlag::Enabled:
@@ -60,6 +60,36 @@ namespace sm {
                         context.outline = false;
                         break;
                 }
+
+                switch (outlined_model_node->disable_back_face_culling) {
+                    case NodeFlag::Inherited:
+                        break;
+                    case NodeFlag::Enabled:
+                        context.disable_back_face_culling = true;
+                        break;
+                    case NodeFlag::Disabled:
+                        context.disable_back_face_culling = false;
+                        break;
+                }
+
+                switch (outlined_model_node->cast_shadow) {
+                    case NodeFlag::Inherited:
+                        break;
+                    case NodeFlag::Enabled:
+                        context.cast_shadow = true;
+                        break;
+                    case NodeFlag::Disabled:
+                        context.cast_shadow = false;
+                        break;
+                }
+            } else if (auto model_node {dynamic_cast<const ModelNode*>(node)}; model_node != nullptr) {
+                context.transform = glm::translate(context.transform, model_node->position);
+                context.transform = glm::rotate(context.transform, glm::radians(model_node->rotation.x), glm::vec3(1.0f, 0.0f, 0.0f));
+                context.transform = glm::rotate(context.transform, glm::radians(model_node->rotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
+                context.transform = glm::rotate(context.transform, glm::radians(model_node->rotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
+                context.transform = glm::scale(context.transform, glm::vec3(model_node->scale));
+
+                context.transform_scale *= model_node->scale;
 
                 switch (model_node->disable_back_face_culling) {
                     case NodeFlag::Inherited:

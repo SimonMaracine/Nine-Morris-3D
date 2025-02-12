@@ -39,6 +39,7 @@ namespace sm::internal {
         void draw_arrays_lines(int count);
         void draw_elements(int count);
         void draw_elements_instanced(int count, int instance_count);
+        void draw_elements_adjacency(int count);
 
         // Depth test state
         void disable_depth_test();

@@ -35,14 +35,18 @@ namespace sm {
         configuration(this);
         unbind();
 
+        if (!m_index_buffers.empty()) {
+            assert(m_index_buffer_index != INVALID_INDEX_BUFFER);
+        }
+
         // Unbind index buffer after vertex array
         GlIndexBuffer::unbind();
     }
 
-    void GlVertexArray::add_vertex_buffer(std::shared_ptr<GlVertexBuffer> buffer, const VertexBufferLayout& layout) {
+    void GlVertexArray::add_vertex_buffer(std::shared_ptr<GlVertexBuffer> vertex_buffer, const VertexBufferLayout& layout) {
         assert(layout.elements.size() > 0);
 
-        buffer->bind();
+        vertex_buffer->bind();
 
         std::size_t offset {0};
 
@@ -80,18 +84,25 @@ namespace sm {
             offset += element.size * VertexBufferLayout::VertexElement::get_size(element.type);
         }
 
-        m_vertex_buffers.push_back(buffer);
+        m_vertex_buffers.push_back(vertex_buffer);
 
         GlVertexBuffer::unbind();
     }
 
-    void GlVertexArray::add_index_buffer(std::shared_ptr<GlIndexBuffer> buffer) {
-        buffer->bind();
-
-        m_index_buffer = buffer;
+    void GlVertexArray::add_index_buffer(std::shared_ptr<GlIndexBuffer> index_buffer) {
+        m_index_buffers.push_back(index_buffer);
     }
 
-    const GlIndexBuffer* GlVertexArray::get_index_buffer() const {
-        return m_index_buffer.get();
+    void GlVertexArray::bind_index_buffer(std::size_t index) {
+        assert(m_index_buffers.size() > index);
+
+        m_index_buffers[index]->bind();
+        m_index_buffer_index = index;
+    }
+
+    std::shared_ptr<GlIndexBuffer> GlVertexArray::get_index_buffer(std::size_t index) const {
+        assert(m_index_buffers.size() > index);
+
+        return m_index_buffers[index];
     }
 }

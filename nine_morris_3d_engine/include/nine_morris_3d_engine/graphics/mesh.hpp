@@ -7,21 +7,28 @@
 #include "nine_morris_3d_engine/other/utilities.hpp"
 
 namespace sm {
+    // Position, normals, texture coordinates, tangents
+    enum class MeshType {
+        P,
+        PN,
+        PNT,
+        PNTT
+    };
+
+    static constexpr const char* MESH_DEFAULT_OBJECT {"defaultobject"};
+
+    struct MeshSpecification {
+        std::string object_name {MESH_DEFAULT_OBJECT};
+        MeshType type {MeshType::P};
+        bool generate_adjacency_indices {false};
+        bool flip_winding {false};
+    };
+
     // Resource representing a mesh with vertices and indices
     // It is used to create a vertex array
     class Mesh {
     public:
-        // Position, normals, texture coordinates, tangents
-        enum class Type {
-            P,
-            PN,
-            PNT,
-            PNTT
-        };
-
-        static constexpr const char* DEFAULT_OBJECT {"defaultobject"};
-
-        Mesh(const std::string& buffer, const std::string& object_name, Type type, bool flip_winding = false);
+        Mesh(const std::string& buffer, const MeshSpecification& specification);
         ~Mesh() = default;
 
         Mesh(const Mesh&) = delete;
@@ -34,10 +41,11 @@ namespace sm {
         std::size_t get_vertices_size() const;
         std::size_t get_indices_size() const;
         const utils::AABB& get_aabb() const;
-        Type get_type() const;
+        MeshType get_type() const;
     private:
-        void load(Type type, const void* pmesh);
-        void allocate(const void* vertices, std::size_t vertices_size, const void* indices, std::size_t indices_size);
+        void load(const MeshSpecification& specification, const void* pmesh);
+        void allocate_vertices(const void* source, std::size_t size);
+        void allocate_indices(const void* source, std::size_t size);
 
         // Raw data
         std::unique_ptr<unsigned char[]> m_vertices;
@@ -47,6 +55,6 @@ namespace sm {
 
         utils::AABB m_aabb;
 
-        Type m_type;
+        MeshType m_type;
     };
 }

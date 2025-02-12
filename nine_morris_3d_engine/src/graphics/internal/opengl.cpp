@@ -68,6 +68,10 @@ namespace sm::internal {
         glDrawElementsInstanced(GL_TRIANGLES, count, GL_UNSIGNED_INT, nullptr, instance_count);
     }
 
+    void opengl::draw_elements_adjacency(int count) {
+        glDrawElements(GL_TRIANGLES_ADJACENCY, count, GL_UNSIGNED_INT, nullptr);
+    }
+
     void opengl::disable_depth_test() {
         glDisable(GL_DEPTH_TEST);
     }

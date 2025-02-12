@@ -17,7 +17,11 @@ public:
     HoverableObj& operator=(HoverableObj&&) = default;
 
     int get_id() const { return m_id; }
-    std::shared_ptr<sm::ModelNode> get_model() const { return m_model; }
+
+    template<typename Node = sm::ModelNode>
+    std::shared_ptr<Node> get_model() const {
+        return std::dynamic_pointer_cast<Node>(m_model);
+    }
 protected:
     int m_id {-1};
     std::shared_ptr<sm::ModelNode> m_model;

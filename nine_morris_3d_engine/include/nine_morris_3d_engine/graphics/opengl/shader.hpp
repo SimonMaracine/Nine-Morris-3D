@@ -21,6 +21,7 @@ namespace sm {
     class GlShader {
     public:
         GlShader(const std::string& source_vertex, const std::string& source_fragment);
+        GlShader(const std::string& source_vertex, const std::string& source_geometry, const std::string& source_fragment);
         ~GlShader();
 
         GlShader(const GlShader&) = delete;
@@ -53,7 +54,9 @@ namespace sm {
         std::vector<std::string> introspect_program();
 
         void create_program(unsigned int vertex_shader, unsigned int fragment_shader);
+        void create_program(unsigned int vertex_shader, unsigned int geometry_shader, unsigned int fragment_shader);
         void delete_intermediates(unsigned int vertex_shader, unsigned int fragment_shader);
+        void delete_intermediates(unsigned int vertex_shader, unsigned int geometry_shader, unsigned int fragment_shader);
         static unsigned int compile_shader(const std::string& source, unsigned int type);
         static bool check_compilation(unsigned int shader, unsigned int type);
         bool check_linking(unsigned int program) const;
