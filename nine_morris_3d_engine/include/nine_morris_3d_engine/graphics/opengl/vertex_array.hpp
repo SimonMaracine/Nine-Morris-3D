@@ -28,7 +28,7 @@ namespace sm {
         // Configure this vertex array by binding it, calling the function and unbinding it
         void configure(const Configuration& configuration);
 
-        // Setup and store a vertex buffer containing various attributes
+        // Bind and store a vertex buffer containing various attributes
         void add_vertex_buffer(std::shared_ptr<GlVertexBuffer> vertex_buffer, const VertexBufferLayout& layout);
 
         // Store an index buffer; this doesn't change any OpenGL state
