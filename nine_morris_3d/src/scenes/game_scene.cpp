@@ -67,6 +67,8 @@ void GameScene::on_start() {
 
         return sm::Task::Result::Repeat;
     }, 3.0);
+
+    sm::Ctx::play_audio_sound(m_sound_new_game);
 }
 
 void GameScene::on_stop() {
@@ -212,6 +214,7 @@ void GameScene::reset(const std::string& string, const std::vector<std::string>&
     // Place the pieces into their places
     get_board().setup_pieces();
 
+    // The correct colors should be set before calling reset()
     reset_camera_position();
 
     sm::Ctx::play_audio_sound(m_sound_new_game);
@@ -267,6 +270,9 @@ void GameScene::connect(const std::string& address, const std::string& port) {
 
 void GameScene::connect() {
     auto& g {ctx.global<Global>()};
+
+    // To prevent bad states and desynchronizations
+    reset_session_and_game();
 
     try {
         g.client.connect();
@@ -631,6 +637,7 @@ void GameScene::load_sounds() {
     m_sound_game_start = ctx.load_sound_data(ctx.path_assets("sounds/ui/game_start.ogg"));
     m_sound_game_over = ctx.load_sound_data(ctx.path_assets("sounds/ui/game_over.ogg"));
     m_sound_message = ctx.load_sound_data(ctx.path_assets("sounds/ui/message.ogg"));
+    m_sound_draw = ctx.load_sound_data(ctx.path_assets("sounds/ui/draw.ogg"));
 }
 
 void GameScene::reload_skybox_texture_data() const {
@@ -745,6 +752,7 @@ void GameScene::update_game_state() {
             m_clock.start();
             m_game_state = GameState::NextTurn;
 
+            reset_camera_position();
             sm::Ctx::play_audio_sound(m_sound_game_start);
 
             break;
@@ -1120,15 +1128,16 @@ void GameScene::server_accept_join_game_session(const networking::Message& messa
         return;
     }
 
-    reset(payload.moves);
-
     m_game_session = GameSession(payload.session_id);
     m_game_session->remote_joined(payload.remote_name);
     m_game_session->set_messages(payload.messages);
 
     m_game_options.remote_color = PlayerColor(payload.remote_player);
 
-    switch (PlayerColor(payload.remote_player)) {
+    // This also resets the camera; call it after setting the color
+    reset(payload.moves);
+
+    switch (m_game_options.remote_color) {
         case PlayerColorWhite:
             m_clock.set_white_time(payload.remote_time);
             m_clock.set_black_time(payload.time);
@@ -1138,9 +1147,6 @@ void GameScene::server_accept_join_game_session(const networking::Message& messa
             m_clock.set_white_time(payload.time);
             break;
     }
-
-    // Need to reposition the camera in the correct place
-    reset_camera_position();
 
     // Unblock from waiting
     m_ui.clear_modal_window(ModalWindowWaitServerAcceptJoinGameSession);
@@ -1242,6 +1248,8 @@ void GameScene::server_remote_offered_draw(const networking::Message&) {
     }
 
     m_game_session->set_remote_offered_draw(true);
+
+    sm::Ctx::play_audio_sound(m_sound_draw);
 }
 
 void GameScene::server_remote_accepted_draw(const networking::Message&) {

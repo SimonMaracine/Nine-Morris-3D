@@ -161,6 +161,7 @@ protected:
     std::shared_ptr<sm::SoundData> m_sound_game_start;
     std::shared_ptr<sm::SoundData> m_sound_game_over;
     std::shared_ptr<sm::SoundData> m_sound_message;
+    std::shared_ptr<sm::SoundData> m_sound_draw;
 
     GameState m_game_state {GameState::Ready};
     glm::vec3 m_white_camera_position {};
