@@ -31,6 +31,10 @@ Cube maps:
     https://polyhaven.com/a/goegap_road
     https://polyhaven.com/a/industrial_sunset_02_puresky
 
+Sounds:
+    https://opengameart.org/content/interface-sounds-starter-pack
+    https://opengameart.org/content/ui-sounds
+
 ----------------------------------------------------------------------------------------------------
 
 TOOLS I USED:

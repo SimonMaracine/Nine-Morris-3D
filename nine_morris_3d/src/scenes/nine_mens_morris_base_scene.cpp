@@ -556,14 +556,14 @@ NineMensMorrisBoard NineMensMorrisBaseScene::setup_models() {
         setup_nodes(),
         setup_white_pieces(),
         setup_black_pieces(),
-        ctx.load_sound_data(ctx.path_assets("sounds/piece_place1.ogg")),
-        ctx.load_sound_data(ctx.path_assets("sounds/piece_place2.ogg")),
-        ctx.load_sound_data(ctx.path_assets("sounds/piece_place3.ogg")),
-        ctx.load_sound_data(ctx.path_assets("sounds/piece_move1.ogg")),
-        ctx.load_sound_data(ctx.path_assets("sounds/piece_move2.ogg")),
-        ctx.load_sound_data(ctx.path_assets("sounds/piece_move3.ogg")),
-        ctx.load_sound_data(ctx.path_assets("sounds/piece_capture1.ogg")),
-        ctx.load_sound_data(ctx.path_assets("sounds/piece_capture1.ogg")),
+        ctx.load_sound_data(ctx.path_assets("sounds/nine_mens_morris/piece_place1.ogg")),
+        ctx.load_sound_data(ctx.path_assets("sounds/nine_mens_morris/piece_place2.ogg")),
+        ctx.load_sound_data(ctx.path_assets("sounds/nine_mens_morris/piece_place3.ogg")),
+        ctx.load_sound_data(ctx.path_assets("sounds/nine_mens_morris/piece_move1.ogg")),
+        ctx.load_sound_data(ctx.path_assets("sounds/nine_mens_morris/piece_move2.ogg")),
+        ctx.load_sound_data(ctx.path_assets("sounds/nine_mens_morris/piece_move3.ogg")),
+        ctx.load_sound_data(ctx.path_assets("sounds/nine_mens_morris/piece_capture1.ogg")),
+        ctx.load_sound_data(ctx.path_assets("sounds/nine_mens_morris/piece_capture1.ogg")),
         [this](const NineMensMorrisBoard::Move& move) {
             // If next player is remote
             if (get_player_type() == GamePlayer::Remote) {

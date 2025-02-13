@@ -10,6 +10,7 @@ shaders/common/vert/tangent_space.glsl
 shaders/internal/debug.frag
 shaders/internal/debug.vert
 shaders/internal/outline.frag
+shaders/internal/outline.geom
 shaders/internal/outline.vert
 shaders/internal/quad.frag
 shaders/internal/quad.vert

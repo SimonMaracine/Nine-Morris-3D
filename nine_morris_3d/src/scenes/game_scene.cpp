@@ -21,6 +21,7 @@ void GameScene::on_start() {
 
     scene_setup();
     load_icons();
+    load_sounds();
     start_engine();
 
     auto& g {ctx.global<Global>()};
@@ -212,6 +213,8 @@ void GameScene::reset(const std::string& string, const std::vector<std::string>&
     get_board().setup_pieces();
 
     reset_camera_position();
+
+    sm::Ctx::play_audio_sound(m_sound_new_game);
 }
 
 void GameScene::reset_camera_position() {
@@ -623,6 +626,13 @@ void GameScene::load_icons() {
     );
 }
 
+void GameScene::load_sounds() {
+    m_sound_new_game = ctx.load_sound_data(ctx.path_assets("sounds/ui/new_game.ogg"));
+    m_sound_game_start = ctx.load_sound_data(ctx.path_assets("sounds/ui/game_start.ogg"));
+    m_sound_game_over = ctx.load_sound_data(ctx.path_assets("sounds/ui/game_over.ogg"));
+    m_sound_message = ctx.load_sound_data(ctx.path_assets("sounds/ui/message.ogg"));
+}
+
 void GameScene::reload_skybox_texture_data() const {
     // Global options must have been set to the desired skybox
 
@@ -735,6 +745,8 @@ void GameScene::update_game_state() {
             m_clock.start();
             m_game_state = GameState::NextTurn;
 
+            sm::Ctx::play_audio_sound(m_sound_game_start);
+
             break;
         case GameState::NextTurn: {
             switch (get_player_type()) {
@@ -832,6 +844,8 @@ void GameScene::update_game_state() {
             m_ui.push_modal_window(ModalWindowGameOver);
             m_clock.stop();
             m_game_state = GameState::Over;
+
+            sm::Ctx::play_audio_sound(m_sound_game_over);
 
             break;
         case GameState::Over:
@@ -1253,6 +1267,8 @@ void GameScene::server_remote_sent_message(const networking::Message& message) {
     }
 
     m_game_session->remote_sent_message(payload.message);
+
+    sm::Ctx::play_audio_sound(m_sound_message);
 }
 
 void GameScene::server_rematch(const networking::Message& message) {

@@ -94,14 +94,14 @@ public:
         const NodeModels& nodes,
         const PieceModels& white_pieces,
         const PieceModels& black_pieces,
-        std::shared_ptr<sm::SoundData> piece_place1,
-        std::shared_ptr<sm::SoundData> piece_place2,
-        std::shared_ptr<sm::SoundData> piece_place3,
-        std::shared_ptr<sm::SoundData> piece_move1,
-        std::shared_ptr<sm::SoundData> piece_move2,
-        std::shared_ptr<sm::SoundData> piece_move3,
-        std::shared_ptr<sm::SoundData> piece_capture1,
-        std::shared_ptr<sm::SoundData> piece_capture2,
+        std::shared_ptr<sm::SoundData> sound_piece_place1,
+        std::shared_ptr<sm::SoundData> sound_piece_place2,
+        std::shared_ptr<sm::SoundData> sound_piece_place3,
+        std::shared_ptr<sm::SoundData> sound_piece_move1,
+        std::shared_ptr<sm::SoundData> sound_piece_move2,
+        std::shared_ptr<sm::SoundData> sound_piece_move3,
+        std::shared_ptr<sm::SoundData> sound_piece_capture1,
+        std::shared_ptr<sm::SoundData> sound_piece_capture2,
         std::function<void(const Move&)>&& move_callback
     );
 
@@ -213,12 +213,12 @@ private:
     Pieces m_pieces;
 
     // Sounds
-    std::shared_ptr<sm::SoundData> m_piece_place1;
-    std::shared_ptr<sm::SoundData> m_piece_place2;
-    std::shared_ptr<sm::SoundData> m_piece_place3;
-    std::shared_ptr<sm::SoundData> m_piece_move1;
-    std::shared_ptr<sm::SoundData> m_piece_move2;
-    std::shared_ptr<sm::SoundData> m_piece_move3;
-    std::shared_ptr<sm::SoundData> m_piece_capture1;
-    std::shared_ptr<sm::SoundData> m_piece_capture2;
+    std::shared_ptr<sm::SoundData> m_sound_piece_place1;
+    std::shared_ptr<sm::SoundData> m_sound_piece_place2;
+    std::shared_ptr<sm::SoundData> m_sound_piece_place3;
+    std::shared_ptr<sm::SoundData> m_sound_piece_move1;
+    std::shared_ptr<sm::SoundData> m_sound_piece_move2;
+    std::shared_ptr<sm::SoundData> m_sound_piece_move3;
+    std::shared_ptr<sm::SoundData> m_sound_piece_capture1;
+    std::shared_ptr<sm::SoundData> m_sound_piece_capture2;
 };

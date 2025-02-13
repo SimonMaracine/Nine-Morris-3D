@@ -114,6 +114,7 @@ protected:
     void setup_lights();
 
     void load_icons();
+    void load_sounds();
     void reload_skybox_texture_data() const;
     std::shared_ptr<sm::GlTextureCubemap> load_skybox_texture_cubemap(bool reload = false) const;
 
@@ -155,6 +156,11 @@ protected:
     std::shared_ptr<sm::GlTexture> m_icon_wait;
     std::shared_ptr<sm::GlTexture> m_icon_white;
     std::shared_ptr<sm::GlTexture> m_icon_black;
+
+    std::shared_ptr<sm::SoundData> m_sound_new_game;
+    std::shared_ptr<sm::SoundData> m_sound_game_start;
+    std::shared_ptr<sm::SoundData> m_sound_game_over;
+    std::shared_ptr<sm::SoundData> m_sound_message;
 
     GameState m_game_state {GameState::Ready};
     glm::vec3 m_white_camera_position {};
