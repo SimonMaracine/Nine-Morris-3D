@@ -72,10 +72,10 @@ void GameSession::session_window(sm::Ctx& ctx, GameScene& game_scene) {
                 ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(255, 163, 71, 255));
                 ImGui::TextWrapped("%s has offered a draw.", m_remote_player_name.empty() ? "The opponent" : m_remote_player_name.c_str());
                 ImGui::PopStyleColor();
-            }
 
-            if (ImGui::IsItemHovered(ImGuiHoveredFlags_DelayShort)) {
-                ImGui::SetTooltip("You may accept the draw from the menu.");
+                if (ImGui::IsItemHovered(ImGuiHoveredFlags_DelayShort)) {
+                    ImGui::SetTooltip("You may accept the draw from the menu.");
+                }
             }
 
             if (game_scene.get_game_state() == GameState::Over) {
