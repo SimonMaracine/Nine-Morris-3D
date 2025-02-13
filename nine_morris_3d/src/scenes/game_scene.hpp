@@ -89,6 +89,7 @@ public:
 
     void connect(const std::string& address, std::uint16_t port);
     void connect(const std::string& address, const std::string& port);
+    void connect();
     void disconnect();
     void client_hello();
     void client_ping();

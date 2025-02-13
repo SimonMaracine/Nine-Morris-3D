@@ -14,7 +14,6 @@
 #include "global.hpp"
 #include "game_options.hpp"
 #include "ver.hpp"
-#include "default_address.hpp"
 #include "window_size.hpp"
 
 void Ui::initialize(sm::Ctx& ctx) {
@@ -372,7 +371,7 @@ void Ui::main_menu_bar(sm::Ctx& ctx, GameScene& game_scene) {
             if (ImGui::BeginMenu("Status")) {
                 const char* status {};
 
-                switch (g.connection_state) {
+                switch (g.client.get_connection_state()) {
                     case ConnectionState::Disconnected:
                         status = "Disconnected";
                         break;
@@ -432,7 +431,7 @@ void Ui::main_menu_bar(sm::Ctx& ctx, GameScene& game_scene) {
             }
             if (ImGui::MenuItem("Reconnect")) {
                 if (g.options.default_address_port) {
-                    game_scene.connect(DEFAULT_ADDRESS, DEFAULT_PORT);
+                    game_scene.connect();
                 } else {
                     game_scene.connect(g.options.address, g.options.port);
                 }
@@ -579,7 +578,7 @@ void Ui::before_game_online_window(sm::Ctx& ctx, GameScene& game_scene) {
     assert(g.options.game_type == GameTypeOnline);
 
     // The connection may be down, so don't allow play
-    ImGui::BeginDisabled(g.connection_state == ConnectionState::Disconnected);
+    ImGui::BeginDisabled(g.client.get_connection_state() == ConnectionState::Disconnected);
 
     ImGui::BeginDisabled(static_cast<bool>(game_scene.get_game_session()));
     if (ImGui::Button("Start Game")) {

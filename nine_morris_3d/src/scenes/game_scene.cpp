@@ -4,7 +4,6 @@
 #include <protocol.hpp>
 
 #include "global.hpp"
-#include "default_address.hpp"
 #include "ver.hpp"
 
 void GameScene::on_start() {
@@ -26,20 +25,18 @@ void GameScene::on_start() {
 
     auto& g {ctx.global<Global>()};
 
-    if (!g.first_connect) {
+    if (!g.client.get_attempted_connection()) {
         if (g.options.default_address_port) {
-            connect(DEFAULT_ADDRESS, DEFAULT_PORT);
+            connect();
         } else {
             connect(g.options.address, g.options.port);
         }
-
-        g.first_connect = true;
     }
 
     ctx.add_task_delayed([this]() {
         const auto& g {ctx.global<Global>()};
 
-        if (g.connection_state == ConnectionState::Connected) {
+        if (g.client.get_connection_state() == ConnectionState::Connected) {
             client_ping();
         }
 
@@ -49,7 +46,7 @@ void GameScene::on_start() {
     ctx.add_task_delayed([this]() {
         const auto& g {ctx.global<Global>()};
 
-        if (g.connection_state != ConnectionState::Connected) {
+        if (g.client.get_connection_state() != ConnectionState::Connected) {
             return sm::Task::Result::Repeat;
         }
 
@@ -250,12 +247,8 @@ void GameScene::reset_camera_position() {
 void GameScene::connect(const std::string& address, std::uint16_t port) {
     auto& g {ctx.global<Global>()};
 
-    disconnect();
-
     try {
-        LOG_DIST_INFO("Connecting to {}:{}...", address, port);
         g.client.connect(address, port);
-        g.connection_state = ConnectionState::Connecting;
     } catch (const networking::ConnectionError& e) {
         connection_error(e);
     }
@@ -269,16 +262,23 @@ void GameScene::connect(const std::string& address, const std::string& port) {
     }
 }
 
+void GameScene::connect() {
+    auto& g {ctx.global<Global>()};
+
+    try {
+        g.client.connect();
+    } catch (const networking::ConnectionError& e) {
+        connection_error(e);
+    }
+}
+
 void GameScene::disconnect() {
     auto& g {ctx.global<Global>()};
 
     // To prevent bad states and desynchronizations
     reset_session_and_game();
 
-    g.connection_state = ConnectionState::Disconnected;
     g.client.disconnect();
-
-    LOG_DIST_INFO("Disconnected from server");
 }
 
 void GameScene::client_hello() {
@@ -890,19 +890,16 @@ void GameScene::assert_engine_game_over() {
 }
 
 void GameScene::connection_error(const networking::ConnectionError& e) {
-    auto& g {ctx.global<Global>()};
-
     LOG_DIST_ERROR("Connection error: {}", e.what());
 
     // To prevent bad states and desynchronizations
     reset_session_and_game();
 
-    g.connection_state = ConnectionState::Disconnected;
-
     m_ui.clear_modal_window(  // The user may already be blocked in a modal window
         ModalWindowWaitServerAcceptGameSession |
         ModalWindowWaitRemoteJoinGameSession |
-        ModalWindowWaitServerAcceptJoinGameSession
+        ModalWindowWaitServerAcceptJoinGameSession |
+        ModalWindowWaitRemoteRematch
     );
     m_ui.push_modal_window(ModalWindowConnectionError);
 }
@@ -915,7 +912,8 @@ void GameScene::serialization_error(const networking::SerializationError& e) {
     m_ui.clear_modal_window(  // The user may already be blocked in a modal window
         ModalWindowWaitServerAcceptGameSession |
         ModalWindowWaitRemoteJoinGameSession |
-        ModalWindowWaitServerAcceptJoinGameSession
+        ModalWindowWaitServerAcceptJoinGameSession |
+        ModalWindowWaitRemoteRematch
     );
     m_ui.push_modal_window(ModalWindowConnectionError);
 }
@@ -966,22 +964,18 @@ void GameScene::update_connection_state() {
     auto& g {ctx.global<Global>()};
 
     try {
-        switch (g.connection_state) {
+        switch (g.client.get_connection_state()) {
             case ConnectionState::Disconnected:
                 break;
             case ConnectionState::Connecting:
                 if (g.client.connection_established()) {
-                    LOG_DIST_INFO("Connected to the server");
-                    g.connection_state = ConnectionState::Connected;
                     client_hello();
                 }
-
                 break;
             case ConnectionState::Connected:
                 while (g.client.available_messages()) {
                     handle_message(g.client.next_message());
                 }
-
                 break;
         }
     } catch (const networking::ConnectionError& e) {
