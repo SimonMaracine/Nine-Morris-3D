@@ -14,8 +14,9 @@ struct GameSession {
     std::vector<std::string> moves;
     protocol::Messages messages;
     protocol::Player player1 {};
-    protocol::ClockTime time1 {0};
-    protocol::ClockTime time2 {0};
+    protocol::ClockTime time1 {};
+    protocol::ClockTime time2 {};
+    protocol::ClockTime initial_time {};  // Stays constant during the whole session
     protocol::GameMode game_mode {};
     bool game_over {false};
     bool rematch1 {false};

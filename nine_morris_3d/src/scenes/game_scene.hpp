@@ -62,6 +62,7 @@ public:
     virtual void reset_board(const std::string& string) = 0;
     virtual bool second_player_starting() = 0;
     virtual unsigned int clock_time(int time_enum) = 0;
+    virtual void set_time_control_options(unsigned int time) = 0;
     virtual void play_move(const std::string& string) = 0;
     virtual void timeout(PlayerColor color) = 0;
     virtual void resign(PlayerColor color) = 0;

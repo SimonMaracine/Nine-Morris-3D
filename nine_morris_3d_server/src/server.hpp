@@ -49,7 +49,7 @@ private:
     void client_send_message(std::shared_ptr<networking::ClientConnection> connection, const networking::Message& message);
     void server_remote_sent_message(std::shared_ptr<networking::ClientConnection> connection, const std::string& message_);
     void client_rematch(std::shared_ptr<networking::ClientConnection> connection, const networking::Message& message);
-    void server_rematch(std::shared_ptr<networking::ClientConnection> connection, protocol::Player remote_player);
+    void server_rematch(std::shared_ptr<networking::ClientConnection> connection, protocol::Player remote_player, protocol::ClockTime initial_time);
     void client_cancel_rematch(std::shared_ptr<networking::ClientConnection> connection, const networking::Message& message);
     void server_cancel_rematch(std::shared_ptr<networking::ClientConnection> connection);
 

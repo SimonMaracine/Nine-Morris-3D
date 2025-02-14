@@ -306,12 +306,12 @@ namespace protocol {
     struct Client_RequestGameSession {
         std::string player_name;
         Player remote_player {};
-        ClockTime time {};  // Both players' times
-        protocol::GameMode game_mode {};
+        ClockTime initial_time {};
+        GameMode game_mode {};
 
         template<typename Archive>
         void serialize(Archive& archive) {
-            archive(player_name, remote_player, time, game_mode);
+            archive(player_name, remote_player, initial_time, game_mode);
         }
     };
 
@@ -336,7 +336,7 @@ namespace protocol {
     struct Client_RequestJoinGameSession {
         SessionId session_id {};
         std::string player_name;
-        protocol::GameMode game_mode {};
+        GameMode game_mode {};
 
         template<typename Archive>
         void serialize(Archive& archive) {
@@ -347,6 +347,7 @@ namespace protocol {
     struct Server_AcceptJoinGameSession {
         SessionId session_id {};  // Not really needed, but simplifies implementation
         Player remote_player {};
+        ClockTime initial_time {};
         ClockTime remote_time {};
         ClockTime time {};
         bool game_over {};
@@ -356,7 +357,7 @@ namespace protocol {
 
         template<typename Archive>
         void serialize(Archive& archive) {
-            archive(session_id, remote_player, remote_time, time, game_over, moves, messages, remote_name);
+            archive(session_id, remote_player, initial_time, remote_time, time, game_over, moves, messages, remote_name);
         }
     };
 
@@ -484,10 +485,11 @@ namespace protocol {
 
     struct Server_Rematch {
         Player remote_player {};
+        ClockTime initial_time {};
 
         template<typename Archive>
         void serialize(Archive& archive) {
-            archive(remote_player);
+            archive(remote_player, initial_time);
         }
     };
 

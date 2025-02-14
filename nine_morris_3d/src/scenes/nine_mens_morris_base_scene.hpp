@@ -30,6 +30,7 @@ public:
     void reset_board(const std::string& string) override;
     bool second_player_starting() override;
     unsigned int clock_time(int time_enum) override;
+    void set_time_control_options(unsigned int time) override;
     void play_move(const std::string& string) override;
     void timeout(PlayerColor color) override;
     void resign(PlayerColor color) override;

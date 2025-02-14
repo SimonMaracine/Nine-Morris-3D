@@ -17,7 +17,14 @@ public:
     void set_black_time(unsigned int black_time) { m_black_time = black_time; }
 
     static std::tuple<unsigned int, unsigned int, unsigned int> split_time(unsigned int time);
-    static unsigned int as_centiseconds(unsigned int minutes);
+
+    static constexpr unsigned int as_centiseconds(unsigned int minutes) {
+        return 1000 * 60 * minutes;
+    }
+
+    static constexpr unsigned int as_minutes(unsigned int centiseconds) {
+        return centiseconds / 1000 / 60;
+    }
 private:
     static void set_time(std::chrono::steady_clock::time_point& last_time);
     static void update_time(unsigned int& time, std::chrono::steady_clock::time_point& last_time);

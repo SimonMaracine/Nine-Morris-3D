@@ -705,7 +705,7 @@ void Ui::online_play_window() {
             ImGui::SameLine();
             ImGui::TextWrapped(
                 "After a game, players may choose to play again by selecting Rematch. In the next game they"
-                " will have swapped sides."
+                " will have swapped sides, and will play with the same time controls."
             );
             ImGui::Bullet();
             ImGui::SameLine();

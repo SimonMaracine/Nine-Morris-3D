@@ -322,7 +322,7 @@ void GameScene::client_request_game_session() {
     protocol::Client_RequestGameSession payload;
     payload.player_name = g.options.name;
     payload.remote_player = protocol::Player(m_game_options.remote_color);
-    payload.time = m_clock.get_white_time();  // Players have equal time
+    payload.initial_time = m_clock.get_white_time();  // Players have equal time
     payload.game_mode = protocol::GameMode(g.options.game_mode);
 
     networking::Message message {protocol::message::Client_RequestGameSession};
@@ -1148,6 +1148,7 @@ void GameScene::server_accept_join_game_session(const networking::Message& messa
     m_game_session->set_messages(payload.messages);
 
     m_game_options.remote_color = PlayerColor(payload.remote_player);
+    set_time_control_options(payload.initial_time);
 
     // This also resets the camera; call it after setting the color
     reset(payload.moves);
@@ -1307,6 +1308,7 @@ void GameScene::server_rematch(const networking::Message& message) {
     }
 
     m_game_options.remote_color = PlayerColor(payload.remote_player);
+    set_time_control_options(payload.initial_time);  // Also reset the time, just to be sure...
 
     // Call this after setting the color
     reset();

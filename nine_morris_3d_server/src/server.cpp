@@ -221,8 +221,9 @@ void Server::client_request_game_session(std::shared_ptr<networking::ClientConne
     game_session.connection1 = connection;
     game_session.name1 = payload.player_name;
     game_session.player1 = protocol::opponent(payload.remote_player);
-    game_session.time1 = payload.time;
-    game_session.time2 = payload.time;
+    game_session.time1 = payload.initial_time;
+    game_session.time2 = payload.initial_time;
+    game_session.initial_time = payload.initial_time;
     game_session.game_mode = payload.game_mode;
 
     m_clients_sessions[connection->get_id()] = *session_id;
@@ -279,7 +280,8 @@ void Server::client_request_join_game_session(std::shared_ptr<networking::Client
     std::shared_ptr<networking::ClientConnection> remote_connection;
 
     protocol::Server_AcceptJoinGameSession payload_accept;
-    payload_accept.session_id = payload.session_id;
+    payload_accept.session_id = iter->first;
+    payload_accept.initial_time = iter->second.initial_time;
     payload_accept.game_over = iter->second.game_over;
     payload_accept.moves = iter->second.moves;
     payload_accept.messages = iter->second.messages;
@@ -615,25 +617,26 @@ void Server::client_rematch(std::shared_ptr<networking::ClientConnection> connec
 
         // Restart game
         iter->second.moves.clear();
-        iter->second.time1 = 0;
-        iter->second.time2 = 0;
+        iter->second.time1 = iter->second.initial_time;
+        iter->second.time2 = iter->second.initial_time;
         iter->second.game_over = false;
         iter->second.rematch1 = false;
         iter->second.rematch2 = false;
 
         if (auto connection1 {iter->second.connection1.lock()}) {
-            server_rematch(connection1, protocol::opponent(iter->second.player1));
+            server_rematch(connection1, protocol::opponent(iter->second.player1), iter->second.initial_time);
         }
 
         if (auto connection2 {iter->second.connection2.lock()}) {
-            server_rematch(connection2, iter->second.player1);
+            server_rematch(connection2, iter->second.player1, iter->second.initial_time);
         }
     }
 }
 
-void Server::server_rematch(std::shared_ptr<networking::ClientConnection> connection, protocol::Player remote_player) {
+void Server::server_rematch(std::shared_ptr<networking::ClientConnection> connection, protocol::Player remote_player, protocol::ClockTime initial_time) {
     protocol::Server_Rematch payload;
     payload.remote_player = remote_player;
+    payload.initial_time = initial_time;
 
     networking::Message message {protocol::message::Server_Rematch};
     message.write(payload);

@@ -112,6 +112,27 @@ unsigned int NineMensMorrisBaseScene::clock_time(int time_enum) {
     return time_centiseconds;
 }
 
+void NineMensMorrisBaseScene::set_time_control_options(unsigned int time) {
+    switch (time) {
+        case Clock::as_centiseconds(1):
+            m_game_options.time_enum = NineMensMorrisTime1min;
+            break;
+        case Clock::as_centiseconds(3):
+            m_game_options.time_enum = NineMensMorrisTime3min;
+            break;
+        case Clock::as_centiseconds(10):
+            m_game_options.time_enum = NineMensMorrisTime10min;
+            break;
+        case Clock::as_centiseconds(60):
+            m_game_options.time_enum = NineMensMorrisTime60min;
+            break;
+        default:
+            m_game_options.time_enum = NineMensMorrisTimeCustom;
+            m_game_options.custom_time = Clock::as_minutes(time);
+            break;
+    }
+}
+
 void NineMensMorrisBaseScene::play_move(const std::string& string) {
     try {
         m_board.play_move(NineMensMorrisBoard::move_from_string(string));
