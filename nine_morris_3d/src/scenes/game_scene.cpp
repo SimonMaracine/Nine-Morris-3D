@@ -749,11 +749,26 @@ void GameScene::update_game_state() {
         case GameState::Ready:
             break;
         case GameState::Start:
-            m_clock.start();
-            m_game_state = GameState::NextTurn;
+            // We only want to actually start the clocks and the game after a short period
+            ctx.add_task_delayed([this]() {
+                // The state could have changed in the meantime
+                if (m_game_state == GameState::Set) {
+                    m_game_state = GameState::Go;
+                }
+
+                return sm::Task::Result::Done;
+            }, 2.0);
 
             reset_camera_position();
             sm::Ctx::play_audio_sound(m_sound_game_start);
+            m_game_state = GameState::Set;
+
+            break;
+        case GameState::Set:
+            break;
+        case GameState::Go:
+            m_clock.start();
+            m_game_state = GameState::NextTurn;
 
             break;
         case GameState::NextTurn: {
@@ -1293,6 +1308,7 @@ void GameScene::server_rematch(const networking::Message& message) {
 
     m_game_options.remote_color = PlayerColor(payload.remote_player);
 
+    // Call this after setting the color
     reset();
 
     m_game_state = GameState::Start;

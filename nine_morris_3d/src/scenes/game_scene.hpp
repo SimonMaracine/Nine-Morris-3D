@@ -19,6 +19,8 @@
 enum class GameState {
     Ready,
     Start,
+    Set,
+    Go,
     NextTurn,
     HumanThinking,
     ComputerStartThinking,
