@@ -89,41 +89,41 @@ bool NineMensMorrisBaseScene::second_player_starting() {
 }
 
 unsigned int NineMensMorrisBaseScene::clock_time(int time_enum) {
-    unsigned int time_centiseconds {};
+    unsigned int time {};
 
     switch (time_enum) {
         case NineMensMorrisTime1min:
-            time_centiseconds = Clock::as_centiseconds(1);
+            time = Clock::as_milliseconds(1);
             break;
         case NineMensMorrisTime3min:
-            time_centiseconds = Clock::as_centiseconds(3);
+            time = Clock::as_milliseconds(3);
             break;
         case NineMensMorrisTime10min:
-            time_centiseconds = Clock::as_centiseconds(10);
+            time = Clock::as_milliseconds(10);
             break;
         case NineMensMorrisTime60min:
-            time_centiseconds = Clock::as_centiseconds(60);
+            time = Clock::as_milliseconds(60);
             break;
         case NineMensMorrisTimeCustom:
-            time_centiseconds = Clock::as_centiseconds(m_game_options.custom_time);
+            time = Clock::as_milliseconds(m_game_options.custom_time);
             break;
     }
 
-    return time_centiseconds;
+    return time;
 }
 
 void NineMensMorrisBaseScene::set_time_control_options(unsigned int time) {
     switch (time) {
-        case Clock::as_centiseconds(1):
+        case Clock::as_milliseconds(1):
             m_game_options.time_enum = NineMensMorrisTime1min;
             break;
-        case Clock::as_centiseconds(3):
+        case Clock::as_milliseconds(3):
             m_game_options.time_enum = NineMensMorrisTime3min;
             break;
-        case Clock::as_centiseconds(10):
+        case Clock::as_milliseconds(10):
             m_game_options.time_enum = NineMensMorrisTime10min;
             break;
-        case Clock::as_centiseconds(60):
+        case Clock::as_milliseconds(60):
             m_game_options.time_enum = NineMensMorrisTime60min;
             break;
         default:
@@ -175,37 +175,37 @@ void NineMensMorrisBaseScene::accept_draw() {
 
 void NineMensMorrisBaseScene::time_control_options_window() {
     if (ImGui::RadioButton("1 min", &m_game_options.time_enum, NineMensMorrisTime1min)) {
-        m_clock.reset(Clock::as_centiseconds(1));
+        m_clock.reset(Clock::as_milliseconds(1));
     }
 
     ImGui::SameLine();
 
     if (ImGui::RadioButton("3 min", &m_game_options.time_enum, NineMensMorrisTime3min)) {
-        m_clock.reset(Clock::as_centiseconds(3));
+        m_clock.reset(Clock::as_milliseconds(3));
     }
 
     ImGui::SameLine();
 
     if (ImGui::RadioButton("10 min", &m_game_options.time_enum, NineMensMorrisTime10min)) {
-        m_clock.reset(Clock::as_centiseconds(10));
+        m_clock.reset(Clock::as_milliseconds(10));
     }
 
     if (ImGui::RadioButton("60 min", &m_game_options.time_enum, NineMensMorrisTime60min)) {
-        m_clock.reset(Clock::as_centiseconds(60));
+        m_clock.reset(Clock::as_milliseconds(60));
     }
 
     ImGui::SameLine();
 
     if (ImGui::RadioButton("Custom", &m_game_options.time_enum, NineMensMorrisTimeCustom)) {
         m_game_options.custom_time = std::clamp(m_game_options.custom_time, 0, 999);
-        m_clock.reset(Clock::as_centiseconds(m_game_options.custom_time));
+        m_clock.reset(Clock::as_milliseconds(m_game_options.custom_time));
     }
 
     if (m_game_options.time_enum == NineMensMorrisTimeCustom) {
         ImGui::PushItemWidth(Ui::rem(6.0f));
         if (ImGui::InputInt("##", &m_game_options.custom_time)) {
             m_game_options.custom_time = std::clamp(m_game_options.custom_time, 0, 999);
-            m_clock.reset(Clock::as_centiseconds(m_game_options.custom_time));
+            m_clock.reset(Clock::as_milliseconds(m_game_options.custom_time));
         }
         ImGui::PopItemWidth();
     }

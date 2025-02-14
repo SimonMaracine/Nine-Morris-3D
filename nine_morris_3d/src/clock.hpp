@@ -19,12 +19,12 @@ public:
 
     static std::tuple<unsigned int, unsigned int, unsigned int> split_time(unsigned int time);
 
-    static constexpr unsigned int as_centiseconds(unsigned int minutes) {
+    static constexpr unsigned int as_milliseconds(unsigned int minutes) {
         return 1000 * 60 * minutes;
     }
 
-    static constexpr unsigned int as_minutes(unsigned int centiseconds) {
-        return centiseconds / 1000 / 60;
+    static constexpr unsigned int as_minutes(unsigned int milliseconds) {
+        return milliseconds / 1000 / 60;
     }
 private:
     static void set_time(std::chrono::steady_clock::time_point& last_time);
