@@ -8,5 +8,6 @@ struct NineMensMorrisScene : NineMensMorrisBaseScene {
 
     SM_SCENE_NAME("nine_mens_morris")
 
+    std::filesystem::path saved_games_file_path() const override { return ctx.path_saved_data("nine_mens_morris.dat"); }
     bool twelve_mens_morris() const override { return false; }
 };

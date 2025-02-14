@@ -18,17 +18,18 @@ enum ModalWindow : unsigned int {
     ModalWindowAbout = 1u << 2,
     ModalWindowGameOver = 1u << 3,
     ModalWindowGameOptions = 1u << 4,
-    ModalWindowEngineError = 1u << 5,
-    ModalWindowConnectionError = 1u << 6,
-    ModalWindowServerRejection = 1u << 7,
-    ModalWindowNewGameSessionError = 1u << 8,
-    ModalWindowJoinGameSessionError = 1u << 9,
-    ModalWindowWaitServerAcceptGameSession = 1u << 10,
-    ModalWindowWaitRemoteJoinGameSession = 1u << 11,
-    ModalWindowWaitServerAcceptJoinGameSession = 1u << 12,
-    ModalWindowWaitRemoteRematch = 1u << 13,
-    ModalWindowRulesNineMensMorris = 1u << 14,
-    ModalWindowRulesTwelveMensMorris = 1u << 15
+    ModalWindowAnalyze = 1u << 5,
+    ModalWindowEngineError = 1u << 6,
+    ModalWindowConnectionError = 1u << 7,
+    ModalWindowServerRejection = 1u << 8,
+    ModalWindowNewGameSessionError = 1u << 9,
+    ModalWindowJoinGameSessionError = 1u << 10,
+    ModalWindowWaitServerAcceptGameSession = 1u << 11,
+    ModalWindowWaitRemoteJoinGameSession = 1u << 12,
+    ModalWindowWaitServerAcceptJoinGameSession = 1u << 13,
+    ModalWindowWaitRemoteRematch = 1u << 14,
+    ModalWindowRulesNineMensMorris = 1u << 15,
+    ModalWindowRulesTwelveMensMorris = 1u << 16
 };
 
 class Ui {
@@ -56,6 +57,7 @@ private:
     void online_play_window();
     void game_over_window(GameScene& game_scene);
     void game_options_window(sm::Ctx& ctx, GameScene& game_scene);
+    void analyze_window(GameScene& game_scene);
     void engine_error_window();
     void connection_error_window();
     void server_rejection_window(const std::string& string);

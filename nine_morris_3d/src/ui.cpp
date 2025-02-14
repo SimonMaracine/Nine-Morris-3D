@@ -58,6 +58,9 @@ void Ui::update(sm::Ctx& ctx, GameScene& game_scene) {
             case ModalWindowGameOptions:
                 game_options_window(ctx, game_scene);
                 break;
+            case ModalWindowAnalyze:
+                analyze_window(game_scene);
+                break;
             case ModalWindowEngineError:
                 engine_error_window();
                 break;
@@ -167,6 +170,9 @@ void Ui::main_menu_bar(sm::Ctx& ctx, GameScene& game_scene) {
                 }
 
                 ImGui::EndMenu();
+            }
+            if (ImGui::MenuItem("Analyze")) {
+                push_modal_window(ModalWindowAnalyze);
             }
             if (ImGui::MenuItem("Exit")) {
                 ctx.running = false;
@@ -800,6 +806,39 @@ void Ui::game_options_window(sm::Ctx& ctx, GameScene& game_scene) {
             game_scene.time_control_options_window();
 
             ImGui::EndDisabled();
+        },
+        glm::vec2(rem(15.0f), 0.0f)
+    );
+}
+
+void Ui::analyze_window(GameScene& game_scene) {
+    modal_window_ok_size(
+        "Analyze Games",
+        [&]() {
+            if (ImGui::BeginTable("Games", 6)) {
+                const auto& saved_games {game_scene.get_saved_games().get()};
+
+                for (std::size_t i {0}; i < saved_games.size(); i++) {
+                    ImGui::TableNextRow();
+                    ImGui::TableSetColumnIndex(0);
+                    ImGui::Text("%lu.", i);
+                    ImGui::TableSetColumnIndex(1);
+                    ImGui::Text("%s", saved_games[i].date_time.c_str());
+                    ImGui::TableSetColumnIndex(2);
+                    ImGui::Text("%s", to_string(saved_games[i].game_type));
+                    ImGui::TableSetColumnIndex(3);
+                    ImGui::Text("%lu moves", saved_games[i].moves.size() / 2);
+                    ImGui::TableSetColumnIndex(4);
+                    ImGui::Text("%s", to_string(saved_games[i].ending));
+                    ImGui::TableSetColumnIndex(5);
+
+                    if (ImGui::Button("Analyze")) {
+
+                    }
+                }
+
+                ImGui::EndTable();
+            }
         },
         glm::vec2(rem(15.0f), 0.0f)
     );

@@ -15,6 +15,12 @@ void GameScene::on_start() {
 
     m_ui.initialize(ctx);
 
+    try {
+        m_saved_games.load(saved_games_file_path());
+    } catch (const SavedGamesError& e) {
+        LOG_DIST_ERROR("Could not load games: {}", e.what());
+    }
+
     setup_camera();
     setup_skybox();
     setup_lights();
@@ -81,6 +87,12 @@ void GameScene::on_stop() {
     }
 
     stop_engine();
+
+    try {
+        m_saved_games.save(saved_games_file_path());
+    } catch (const SavedGamesError& e) {
+        LOG_DIST_ERROR("Could not save games: {}", e.what());
+    }
 
     m_camera_controller->disconnect_events(ctx);
     ctx.disconnect_events(this);

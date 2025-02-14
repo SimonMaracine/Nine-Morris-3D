@@ -48,9 +48,6 @@ void game_start(sm::Ctx& ctx) {
 void game_stop(sm::Ctx& ctx) {
     auto& g {ctx.global<Global>()};
 
-    // It's better to disconnect explicitly
-    g.client.disconnect();
-
     try {
         save_options(g.options, ctx.path_saved_data(OPTIONS_FILE_NAME));
     } catch (const OptionsError& e) {

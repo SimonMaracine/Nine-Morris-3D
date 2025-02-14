@@ -1,8 +1,8 @@
 #pragma once
 
 #include <string>
-#include <memory>
 #include <optional>
+#include <filesystem>
 
 #include <nine_morris_3d_engine/nine_morris_3d.hpp>
 #include <networking/client.hpp>
@@ -15,6 +15,7 @@
 #include "move_list.hpp"
 #include "game_session.hpp"
 #include "game_options.hpp"
+#include "saved_games.hpp"
 
 enum class GameState {
     Ready,
@@ -72,14 +73,16 @@ public:
     virtual void load_game_icons() = 0;
     virtual void reload_scene_texture_data() const = 0;
     virtual void reload_and_set_scene_textures() = 0;
+    virtual std::filesystem::path saved_games_file_path() const = 0;
 
     std::shared_ptr<PointCameraController> get_camera_controller() const { return m_camera_controller; }
+    const std::unique_ptr<Engine>& get_engine() const { return m_engine; }
     GameState& get_game_state() { return m_game_state; }
     GameOptions& get_game_options() { return m_game_options; }
     std::optional<GameSession>& get_game_session() { return m_game_session; }
     const Clock& get_clock() const { return m_clock; }
     const MoveList& get_move_list() const { return m_move_list; }
-    const std::unique_ptr<Engine>& get_engine() const { return m_engine; }
+    const SavedGames& get_saved_games() const { return m_saved_games; }
     std::shared_ptr<sm::GlTexture> get_icon_wait() const { return m_icon_wait; }
     std::shared_ptr<sm::GlTexture> get_icon_white() const { return m_icon_white; }
     std::shared_ptr<sm::GlTexture> get_icon_black() const { return m_icon_black; }
@@ -175,4 +178,5 @@ protected:
     GameOptions m_game_options;
     Clock m_clock;
     MoveList m_move_list;
+    SavedGames m_saved_games;
 };
