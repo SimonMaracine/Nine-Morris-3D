@@ -123,6 +123,9 @@ void Server::handle_message(std::shared_ptr<networking::ClientConnection> connec
             case protocol::message::Client_UpdateTurnTime:
                 client_update_turn_time(connection, message);
                 break;
+            case protocol::message::Client_Timeout:
+                client_timeout(connection, message);
+                break;
             case protocol::message::Client_Resign:
                 client_resign(connection, message);
                 break;
@@ -444,6 +447,41 @@ void Server::client_update_turn_time(std::shared_ptr<networking::ClientConnectio
     } else {
         m_server.get_logger()->warn("Client {} updated time in session {} in which it wasn't active", connection->get_id(), payload.session_id);
     }
+}
+
+void Server::client_timeout(std::shared_ptr<networking::ClientConnection> connection, const networking::Message& message) {
+    protocol::Client_Timeout payload;
+    message.read(payload);
+
+    const auto iter {m_game_sessions.find(payload.session_id)};
+
+    if (iter == m_game_sessions.end()) {
+        m_server.get_logger()->warn("Session {} reported by client {} doesn't exist", connection->get_id(), payload.session_id);
+        return;
+    }
+
+    iter->second.game_over = true;
+
+    std::shared_ptr<networking::ClientConnection> remote_connection;
+
+    if (iter->second.connection1.lock() == connection) {
+        remote_connection = iter->second.connection2.lock();
+    } else if (iter->second.connection2.lock() == connection) {
+        remote_connection = iter->second.connection1.lock();
+    } else {
+        m_server.get_logger()->warn("Client {} timed out in session {} in which it wasn't active", connection->get_id(), payload.session_id);
+        return;
+    }
+
+    if (remote_connection) {
+        server_remote_timed_out(remote_connection);
+    }
+}
+
+void Server::server_remote_timed_out(std::shared_ptr<networking::ClientConnection> connection) {
+    networking::Message message {protocol::message::Server_RemoteTimedOut};
+
+    m_server.send_message(connection, message);
 }
 
 void Server::client_resign(std::shared_ptr<networking::ClientConnection> connection, const networking::Message& message) {

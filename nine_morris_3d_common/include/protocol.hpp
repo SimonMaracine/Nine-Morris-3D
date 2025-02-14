@@ -103,6 +103,14 @@ namespace protocol {
             have lost the time, and when it rejoined, it would have extra time. This protocol assures that the
             clocks on the server are almost correct.
 
+        Client_Timeout
+            Notify the server that the client has ran out of time. The server thus knows that it's game over and
+            notifies the remote with Server_RemoteTimedOut. The remote doens't know otherwise when the client
+            times out.
+
+        Server_RemoteTimedOut
+            Notify the client that the remote has timed out. The client then should set remote's clock to 0.
+
         Client_Resign
             End the game by losing. It is called when the client presses the resign button, or when it voluntarily
             leaves the session while the remote is still present in the session. The server notifies the remote
@@ -176,6 +184,9 @@ namespace protocol {
             Server_RemotePlayedMove,
 
             Client_UpdateTurnTime,
+
+            Client_Timeout,
+            Server_RemoteTimedOut,
 
             Client_Resign,
             Server_RemoteResigned,
@@ -421,6 +432,17 @@ namespace protocol {
             archive(session_id, time);
         }
     };
+
+    struct Client_Timeout {
+        SessionId session_id {};
+
+        template<typename Archive>
+        void serialize(Archive& archive) {
+            archive(session_id);
+        }
+    };
+
+    struct Server_RemoteTimedOut {};
 
     struct Client_Resign {
         SessionId session_id {};

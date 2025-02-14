@@ -101,13 +101,39 @@ void GameScene::on_update() {
 
     m_clock.update();
 
+    const auto& g {ctx.global<Global>()};
+
+    // Clamp the remote's clock such that it never reaches 0, because they handle their clock
+    // When their clock actually reaches 0, we will get notified by the server
+    if (g.options.game_type == GameTypeOnline) {
+        if (get_player_type() == GamePlayer::Remote) {
+            switch (m_game_options.remote_color) {
+                case PlayerColorWhite:
+                    m_clock.set_white_time(std::max(m_clock.get_white_time(), 1u));
+                    break;
+                case PlayerColorBlack:
+                    m_clock.set_black_time(std::max(m_clock.get_black_time(), 1u));
+                    break;
+            }
+        }
+    }
+
+    // Remote's clock should never reach 0, only our clock may reach 0 and send timout
     if (m_game_state != GameState::Ready && m_game_state != GameState::Over) {
         if (m_clock.get_white_time() == 0) {
             timeout(PlayerColorWhite);
+
+            if (m_game_session) {
+                client_timeout();
+            }
         }
 
         if (m_clock.get_black_time() == 0) {
             timeout(PlayerColorBlack);
+
+            if (m_game_session) {
+                client_timeout();
+            }
         }
     }
 
@@ -414,6 +440,21 @@ void GameScene::client_update_turn_time(protocol::ClockTime time) {
     payload.time = time;
 
     networking::Message message {protocol::message::Client_UpdateTurnTime};
+
+    if (!try_write_message(message, payload)) {
+        return;
+    }
+
+    try_send_message(message);
+}
+
+void GameScene::client_timeout() {
+    assert(m_game_session);
+
+    protocol::Client_Timeout payload;
+    payload.session_id = m_game_session->get_session_id();
+
+    networking::Message message {protocol::message::Client_Timeout};
 
     if (!try_write_message(message, payload)) {
         return;
@@ -1052,6 +1093,9 @@ void GameScene::handle_message(const networking::Message& message) {
         case protocol::message::Server_RemotePlayedMove:
             server_remote_played_move(message);
             break;
+        case protocol::message::Server_RemoteTimedOut:
+            server_remote_timed_out(message);
+            break;
         case protocol::message::Server_RemoteResigned:
             server_remote_resigned(message);
             break;
@@ -1248,9 +1292,35 @@ void GameScene::server_remote_played_move(const networking::Message& message) {
     play_move(payload.move);
 }
 
+void GameScene::server_remote_timed_out(const networking::Message&) {
+    // The user may have left the session in the meantime
+    if (!m_game_session) {
+        return;
+    }
+
+    // The game could be already over
+    if (m_game_state == GameState::Ready || m_game_state == GameState::Over) {
+        return;
+    }
+
+    switch (m_game_options.remote_color) {
+        case PlayerColorWhite:
+            timeout(PlayerColorWhite);
+            break;
+        case PlayerColorBlack:
+            timeout(PlayerColorBlack);
+            break;
+    }
+}
+
 void GameScene::server_remote_resigned(const networking::Message&) {
     // The user may have left the session in the meantime
     if (!m_game_session) {
+        return;
+    }
+
+    // The game could be already over
+    if (m_game_state == GameState::Ready || m_game_state == GameState::Over) {
         return;
     }
 
@@ -1263,6 +1333,11 @@ void GameScene::server_remote_offered_draw(const networking::Message&) {
         return;
     }
 
+    // The game could be already over
+    if (m_game_state == GameState::Ready || m_game_state == GameState::Over) {
+        return;
+    }
+
     m_game_session->set_remote_offered_draw(true);
 
     sm::Ctx::play_audio_sound(m_sound_draw);
@@ -1271,6 +1346,11 @@ void GameScene::server_remote_offered_draw(const networking::Message&) {
 void GameScene::server_remote_accepted_draw(const networking::Message&) {
     // The user may have left the session in the meantime
     if (!m_game_session) {
+        return;
+    }
+
+    // The game could be already over
+    if (m_game_state == GameState::Ready || m_game_state == GameState::Over) {
         return;
     }
 

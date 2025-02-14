@@ -101,6 +101,7 @@ public:
     void client_request_join_game_session(const std::string& session_id);
     void client_play_move(protocol::ClockTime time, const std::string& move, bool game_over);
     void client_update_turn_time(protocol::ClockTime time);
+    void client_timeout();
     void client_resign();
     void client_offer_draw();
     void client_accept_draw();
@@ -145,6 +146,7 @@ protected:
     void server_remote_joined_game_session(const networking::Message& message);
     void server_remote_left_game_session(const networking::Message& message);
     void server_remote_played_move(const networking::Message& message);
+    void server_remote_timed_out(const networking::Message& message);
     void server_remote_resigned(const networking::Message& message);
     void server_remote_offered_draw(const networking::Message& message);
     void server_remote_accepted_draw(const networking::Message& message);

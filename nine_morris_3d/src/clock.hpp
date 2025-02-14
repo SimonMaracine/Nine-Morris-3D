@@ -11,6 +11,7 @@ public:
     void update();
     void switch_turn();
 
+    // Get and set the time in milliseconds
     unsigned int get_white_time() const { return m_white_time; }
     unsigned int get_black_time() const { return m_black_time; }
     void set_white_time(unsigned int white_time) { m_white_time = white_time; }

@@ -46,14 +46,10 @@ void Clock::switch_turn() {
 }
 
 std::tuple<unsigned int, unsigned int, unsigned int> Clock::split_time(unsigned int time) {
-    const auto result1 {std::div(static_cast<long long>(time), (1000ll * 60ll))};
-    const auto result2 {std::div(result1.rem, 1000ll)};
+    const auto result_minutes {std::div(static_cast<long long>(time), 1000ll * 60ll)};
+    const auto result_seconds {std::div(static_cast<long long>(result_minutes.rem), 1000ll)};
 
-    const auto minutes {static_cast<unsigned int>(result1.quot)};
-    const auto seconds {static_cast<unsigned int>(result2.quot)};
-    const auto centiseconds {static_cast<unsigned int>(result2.rem / 10)};
-
-    return std::make_tuple(minutes, seconds, centiseconds);
+    return std::make_tuple(result_minutes.quot, result_seconds.quot, result_seconds.rem / 10);
 }
 
 void Clock::set_time(std::chrono::steady_clock::time_point& last_time) {
