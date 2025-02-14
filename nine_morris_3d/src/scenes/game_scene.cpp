@@ -225,6 +225,7 @@ void GameScene::reset(const std::string& string, const std::vector<std::string>&
     m_game_state = GameState::Ready;
     m_clock.reset(clock_time(m_game_options.time_enum));
     m_move_list.clear();
+    m_current_game = {};
 
     if (second_player_starting()) {
         m_clock.switch_turn();
@@ -262,10 +263,10 @@ void GameScene::reset_camera_position() {
     const auto& g {ctx.global<Global>()};
 
     switch (g.options.game_type) {
-        case GameTypeLocalHumanVsHuman:
+        case GameTypeLocal:
             m_camera_controller->go_towards_position(m_white_camera_position);
             break;
-        case GameTypeLocalHumanVsComputer:
+        case GameTypeLocalVsComputer:
             switch (static_cast<PlayerColor>(m_game_options.computer_color)) {
                 case PlayerColorWhite:
                     m_camera_controller->go_towards_position(m_black_camera_position);
@@ -812,6 +813,15 @@ void GameScene::update_game_state() {
                 return sm::Task::Result::Done;
             }, 2.0);
 
+            // Save this game
+            m_current_game.initial_time = m_clock.get_white_time();
+            m_current_game.game_type = static_cast<SavedGame::GameType>(g.options.game_type);
+            m_current_game.initial_position = get_setup_position();
+            {
+                const auto current_time {std::time(nullptr)};
+                m_current_game.date_time = std::ctime(&current_time);
+            }
+
             reset_camera_position();
             sm::Ctx::play_audio_sound(m_sound_game_start);
             m_game_state = GameState::Set;
@@ -906,7 +916,7 @@ void GameScene::update_game_state() {
             break;
         case GameState::Stop:
             switch (g.options.game_type) {
-                case GameTypeLocalHumanVsComputer:
+                case GameTypeLocalVsComputer:
                     assert_engine_game_over();
                     break;
                 case GameTypeOnline:
@@ -916,6 +926,11 @@ void GameScene::update_game_state() {
                     }
                     break;
             }
+
+            // Save this game
+            m_current_game.ending = static_cast<SavedGame::Ending>(static_cast<int>(get_board().get_game_over()) - 1);
+            m_saved_games.add_saved_game(std::move(m_current_game));
+            m_current_game = {};
 
             m_ui.push_modal_window(ModalWindowGameOver);
             m_clock.stop();

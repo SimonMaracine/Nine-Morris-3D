@@ -19,7 +19,7 @@ struct SavedGame {
     enum class Ending {
         WinnerWhite,
         WinnerBlack,
-        Tie
+        Draw
     };
 
     unsigned int initial_time {};
@@ -43,39 +43,39 @@ struct SavedGame {
 };
 
 inline const char* to_string(SavedGame::GameType game_type) {
-    const char* result {};
+    const char* string {};
 
     switch (game_type) {
         case SavedGame::GameType::Local:
-            result = "Local";
+            string = "Local";
             break;
         case SavedGame::GameType::LocalVsComputer:
-            result = "Local vs Computer";
+            string = "Local vs Computer";
             break;
         case SavedGame::GameType::Online:
-            result = "Online";
+            string = "Online";
             break;
     }
 
-    return result;
+    return string;
 }
 
 inline const char* to_string(SavedGame::Ending ending) {
-    const char* result {};
+    const char* string {};
 
     switch (ending) {
         case SavedGame::Ending::WinnerWhite:
-            result = "Winner White";
+            string = "Win White";
             break;
         case SavedGame::Ending::WinnerBlack:
-            result = "Winner Black";
+            string = "Win Black";
             break;
-        case SavedGame::Ending::Tie:
-            result = "Tie";
+        case SavedGame::Ending::Draw:
+            string = "Draw";
             break;
     }
 
-    return result;
+    return string;
 }
 
 CEREAL_CLASS_VERSION(SavedGame, version_number())

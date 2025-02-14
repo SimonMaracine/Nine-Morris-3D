@@ -179,4 +179,5 @@ protected:
     Clock m_clock;
     MoveList m_move_list;
     SavedGames m_saved_games;
+    SavedGame m_current_game;
 };

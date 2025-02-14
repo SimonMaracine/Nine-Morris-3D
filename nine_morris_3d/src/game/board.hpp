@@ -14,7 +14,7 @@
 // Type that keeps track of the state and result of a game
 class GameOver {
 public:
-    enum Type {
+    enum Type : int {
         None,
         WinnerWhite,
         WinnerBlack,

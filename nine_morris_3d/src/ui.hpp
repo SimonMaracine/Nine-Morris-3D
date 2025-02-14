@@ -18,7 +18,7 @@ enum ModalWindow : unsigned int {
     ModalWindowAbout = 1u << 2,
     ModalWindowGameOver = 1u << 3,
     ModalWindowGameOptions = 1u << 4,
-    ModalWindowAnalyze = 1u << 5,
+    ModalWindowAnalyzeGames = 1u << 5,
     ModalWindowEngineError = 1u << 6,
     ModalWindowConnectionError = 1u << 7,
     ModalWindowServerRejection = 1u << 8,
@@ -57,7 +57,7 @@ private:
     void online_play_window();
     void game_over_window(GameScene& game_scene);
     void game_options_window(sm::Ctx& ctx, GameScene& game_scene);
-    void analyze_window(GameScene& game_scene);
+    void analyze_games_window(GameScene& game_scene);
     void engine_error_window();
     void connection_error_window();
     void server_rejection_window(const std::string& string);

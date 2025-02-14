@@ -58,8 +58,8 @@ void Ui::update(sm::Ctx& ctx, GameScene& game_scene) {
             case ModalWindowGameOptions:
                 game_options_window(ctx, game_scene);
                 break;
-            case ModalWindowAnalyze:
-                analyze_window(game_scene);
+            case ModalWindowAnalyzeGames:
+                analyze_games_window(game_scene);
                 break;
             case ModalWindowEngineError:
                 engine_error_window();
@@ -171,8 +171,8 @@ void Ui::main_menu_bar(sm::Ctx& ctx, GameScene& game_scene) {
 
                 ImGui::EndMenu();
             }
-            if (ImGui::MenuItem("Analyze")) {
-                push_modal_window(ModalWindowAnalyze);
+            if (ImGui::MenuItem("Analyze Games")) {
+                push_modal_window(ModalWindowAnalyzeGames);
             }
             if (ImGui::MenuItem("Exit")) {
                 ctx.running = false;
@@ -529,8 +529,8 @@ void Ui::before_game_window(sm::Ctx& ctx, GameScene& game_scene) {
     const auto& g {ctx.global<Global>()};
 
     switch (g.options.game_type) {
-        case GameTypeLocalHumanVsHuman:
-        case GameTypeLocalHumanVsComputer:
+        case GameTypeLocal:
+        case GameTypeLocalVsComputer:
             before_game_local_window(ctx, game_scene);
             break;
         case GameTypeOnline:
@@ -551,7 +551,7 @@ void Ui::before_game_local_window(sm::Ctx& ctx, GameScene& game_scene) {
     const auto& g {ctx.global<Global>()};
 
     // The engine may be down, so don't allow play
-    ImGui::BeginDisabled(g.options.game_type == GameTypeLocalHumanVsComputer && !game_scene.get_engine());
+    ImGui::BeginDisabled(g.options.game_type == GameTypeLocalVsComputer && !game_scene.get_engine());
     if (ImGui::Button("Start Game")) {
         game_scene.get_game_state() = GameState::Start;
     }
@@ -562,10 +562,10 @@ void Ui::before_game_local_window(sm::Ctx& ctx, GameScene& game_scene) {
     ImGui::Dummy(ImVec2(0.0f, rem(0.1f)));
 
     switch (g.options.game_type) {
-        case GameTypeLocalHumanVsHuman:
+        case GameTypeLocal:
             ImGui::TextWrapped("Local game between two human players");
             break;
-        case GameTypeLocalHumanVsComputer:
+        case GameTypeLocalVsComputer:
             ImGui::TextWrapped("Local game between human and computer player");
             ImGui::TextWrapped(
                 "Computer plays as %s",
@@ -763,11 +763,11 @@ void Ui::game_options_window(sm::Ctx& ctx, GameScene& game_scene) {
             ImGui::BeginDisabled(game_scene.get_game_state() != GameState::Ready);
 
             ImGui::SeparatorText("Game Type");
-            if (ImGui::RadioButton("Local", &g.options.game_type, GameTypeLocalHumanVsHuman)) {
+            if (ImGui::RadioButton("Local", &g.options.game_type, GameTypeLocal)) {
                 game_scene.reset_camera_position();
             }
             ImGui::SameLine();
-            if (ImGui::RadioButton("Local vs Computer", &g.options.game_type, GameTypeLocalHumanVsComputer)) {
+            if (ImGui::RadioButton("Local vs Computer", &g.options.game_type, GameTypeLocalVsComputer)) {
                 game_scene.reset_camera_position();
             }
             if (ImGui::RadioButton("Online", &g.options.game_type, GameTypeOnline)) {
@@ -776,9 +776,9 @@ void Ui::game_options_window(sm::Ctx& ctx, GameScene& game_scene) {
             ImGui::Dummy(ImVec2(0.0f, rem(0.4f)));
 
             switch (g.options.game_type) {
-                case GameTypeLocalHumanVsHuman:
+                case GameTypeLocal:
                     break;
-                case GameTypeLocalHumanVsComputer:
+                case GameTypeLocalVsComputer:
                     ImGui::SeparatorText("Computer Plays As");
                     if (ImGui::RadioButton("White", &game_options.computer_color, PlayerColorWhite)) {
                         game_scene.reset_camera_position();
@@ -811,36 +811,49 @@ void Ui::game_options_window(sm::Ctx& ctx, GameScene& game_scene) {
     );
 }
 
-void Ui::analyze_window(GameScene& game_scene) {
+void Ui::analyze_games_window(GameScene& game_scene) {
     modal_window_ok_size(
         "Analyze Games",
         [&]() {
-            if (ImGui::BeginTable("Games", 6)) {
+            ImGui::TextWrapped("Select from the table the game that you want to analyze.");
+
+            ImGui::Dummy(ImVec2(0.0f, Ui::rem(0.5f)));
+
+            if (ImGui::BeginTable("Games", 5, ImGuiTableFlags_SizingStretchProp | ImGuiTableFlags_PadOuterX)) {
+                ImGui::TableSetupColumn("Index");
+                ImGui::TableSetupColumn("Date & Time");
+                ImGui::TableSetupColumn("Type");
+                ImGui::TableSetupColumn("Moves");
+                ImGui::TableSetupColumn("Result");
+                ImGui::TableHeadersRow();
+
                 const auto& saved_games {game_scene.get_saved_games().get()};
 
                 for (std::size_t i {0}; i < saved_games.size(); i++) {
                     ImGui::TableNextRow();
                     ImGui::TableSetColumnIndex(0);
-                    ImGui::Text("%lu.", i);
+
+                    char buffer[16] {};
+                    std::snprintf(buffer, sizeof(buffer), "%lu.", i + 1);
+
+                    if (ImGui::Selectable(buffer, false, ImGuiSelectableFlags_SpanAllColumns | ImGuiSelectableFlags_NoAutoClosePopups)) {
+                        LOG_DEBUG("selected row {}", i);
+                    }
+
                     ImGui::TableSetColumnIndex(1);
                     ImGui::Text("%s", saved_games[i].date_time.c_str());
                     ImGui::TableSetColumnIndex(2);
                     ImGui::Text("%s", to_string(saved_games[i].game_type));
                     ImGui::TableSetColumnIndex(3);
-                    ImGui::Text("%lu moves", saved_games[i].moves.size() / 2);
+                    ImGui::Text("%lu", saved_games[i].moves.size() / 2 + (saved_games[i].moves.size() % 2 == 1 ? 1 : 0));
                     ImGui::TableSetColumnIndex(4);
                     ImGui::Text("%s", to_string(saved_games[i].ending));
-                    ImGui::TableSetColumnIndex(5);
-
-                    if (ImGui::Button("Analyze")) {
-
-                    }
                 }
 
                 ImGui::EndTable();
             }
         },
-        glm::vec2(rem(15.0f), 0.0f)
+        glm::vec2(rem(25.0f), 0.0f)
     );
 }
 

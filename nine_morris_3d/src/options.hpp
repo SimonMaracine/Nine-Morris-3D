@@ -11,8 +11,8 @@
 inline constexpr const char* OPTIONS_FILE_NAME {"options.dat"};
 
 enum GameType : int {
-    GameTypeLocalHumanVsHuman,
-    GameTypeLocalHumanVsComputer,
+    GameTypeLocal,
+    GameTypeLocalVsComputer,
     GameTypeOnline
 };
 
@@ -60,7 +60,7 @@ enum Scale : int {
 
 // Structure representing data saved and loaded from disk
 struct Options {
-    int game_type {GameTypeLocalHumanVsHuman};
+    int game_type {GameTypeLocal};
     int game_mode {GameModeNineMensMorris};
     float audio_volume {1.0f};
     int skybox {SkyboxField};

@@ -7,8 +7,8 @@ using namespace std::string_literals;
 
 static void validate(Options& options) {
     switch (static_cast<GameType>(options.game_type)) {
-        case GameTypeLocalHumanVsHuman:
-        case GameTypeLocalHumanVsComputer:
+        case GameTypeLocal:
+        case GameTypeLocalVsComputer:
         case GameTypeOnline:
             break;
         default:

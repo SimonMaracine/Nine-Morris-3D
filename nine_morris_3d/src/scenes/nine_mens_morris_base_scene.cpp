@@ -42,10 +42,10 @@ GamePlayer NineMensMorrisBaseScene::get_player_type() const {
     GamePlayer player {};
 
     switch (g.options.game_type) {
-        case GameTypeLocalHumanVsHuman:
+        case GameTypeLocal:
             player = GamePlayer::Human;
             break;
-        case GameTypeLocalHumanVsComputer:
+        case GameTypeLocalVsComputer:
             player = (
                 m_game_options.computer_color == m_board.if_player_white(PlayerColorWhite, PlayerColorBlack)
                 ?
@@ -594,6 +594,11 @@ NineMensMorrisBoard NineMensMorrisBaseScene::setup_models() {
                     m_board.get_game_over() != GameOver::None
                 );
             }
+
+            m_current_game.moves.emplace_back(
+                NineMensMorrisBoard::move_to_string(move),
+                m_board.if_player_white(m_clock.get_black_time(), m_clock.get_white_time())
+            );
 
             m_move_list.push(NineMensMorrisBoard::move_to_string(move));
             m_game_state = GameState::FinishTurn;
