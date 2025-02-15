@@ -3,7 +3,7 @@
 #include <string>
 #include <vector>
 
-class MoveList {
+class MovesList {
 public:
     void push(const std::string& string);
     void clear();

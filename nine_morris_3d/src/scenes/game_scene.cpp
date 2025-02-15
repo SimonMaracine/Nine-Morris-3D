@@ -224,12 +224,12 @@ void GameScene::reset(const std::string& string, const std::vector<std::string>&
 
     m_game_state = GameState::Ready;
     m_clock.reset(clock_time(m_game_options.time_enum));
-    m_move_list.clear();
+    m_moves_list.clear();
     m_current_game = {};
 
     if (second_player_starting()) {
         m_clock.switch_turn();
-        m_move_list.skip_first(true);
+        m_moves_list.skip_first(true);
     }
 
     // Play the moves offscreen
@@ -239,7 +239,7 @@ void GameScene::reset(const std::string& string, const std::vector<std::string>&
     for (const auto& move : moves) {
         play_move(move);
         m_clock.switch_turn();
-        m_move_list.push(move);
+        m_moves_list.push(move);
     }
 
     get_board().enable_move_animations(true);
@@ -857,7 +857,7 @@ void GameScene::update_game_state() {
             try {
                 m_engine->start_thinking(
                     get_setup_position(),
-                    m_move_list.get_moves(),
+                    m_moves_list.get_moves(),
                     m_clock.get_white_time(),
                     m_clock.get_black_time(),
                     std::nullopt
@@ -970,7 +970,7 @@ void GameScene::assert_engine_game_over() {
     try {
         m_engine->start_thinking(
             get_setup_position(),
-            m_move_list.get_moves(),
+            m_moves_list.get_moves(),
             std::nullopt,
             std::nullopt,
             100

@@ -600,7 +600,7 @@ NineMensMorrisBoard NineMensMorrisBaseScene::setup_models() {
                 m_board.if_player_white(m_clock.get_black_time(), m_clock.get_white_time())
             );
 
-            m_move_list.push(NineMensMorrisBoard::move_to_string(move));
+            m_moves_list.push(NineMensMorrisBoard::move_to_string(move));
             m_game_state = GameState::FinishTurn;
         }
     );

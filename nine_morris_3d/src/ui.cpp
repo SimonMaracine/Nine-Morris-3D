@@ -640,7 +640,7 @@ void Ui::during_game_window(GameScene& game_scene) {
     ImGui::Separator();
     ImGui::Dummy(ImVec2(0.0f, rem(0.1f)));
 
-    game_scene.get_move_list().moves_window();
+    game_scene.get_moves_list().moves_window();
 }
 
 void Ui::about_window() {

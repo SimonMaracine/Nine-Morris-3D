@@ -12,7 +12,7 @@
 #include "point_camera_controller.hpp"
 #include "ui.hpp"
 #include "clock.hpp"
-#include "move_list.hpp"
+#include "moves_list.hpp"
 #include "game_session.hpp"
 #include "game_options.hpp"
 #include "saved_games.hpp"
@@ -81,7 +81,7 @@ public:
     GameOptions& get_game_options() { return m_game_options; }
     std::optional<GameSession>& get_game_session() { return m_game_session; }
     const Clock& get_clock() const { return m_clock; }
-    const MoveList& get_move_list() const { return m_move_list; }
+    const MovesList& get_moves_list() const { return m_moves_list; }
     const SavedGames& get_saved_games() const { return m_saved_games; }
     std::shared_ptr<sm::GlTexture> get_icon_wait() const { return m_icon_wait; }
     std::shared_ptr<sm::GlTexture> get_icon_white() const { return m_icon_white; }
@@ -177,7 +177,7 @@ protected:
     std::optional<GameSession> m_game_session;
     GameOptions m_game_options;
     Clock m_clock;
-    MoveList m_move_list;
+    MovesList m_moves_list;
     SavedGames m_saved_games;
     SavedGame m_current_game;
 };

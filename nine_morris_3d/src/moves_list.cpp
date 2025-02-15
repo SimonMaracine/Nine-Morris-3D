@@ -1,23 +1,23 @@
-#include "move_list.hpp"
+#include "moves_list.hpp"
 
 #include <nine_morris_3d_engine/external/imgui.h++>
 
 #include "ui.hpp"
 
-void MoveList::push(const std::string& string) {
+void MovesList::push(const std::string& string) {
     m_moves.push_back(string);
 }
 
-void MoveList::clear() {
+void MovesList::clear() {
     m_moves.clear();
     m_skip_first = false;
 }
 
-void MoveList::skip_first(bool skip) {
+void MovesList::skip_first(bool skip) {
     m_skip_first = skip;
 }
 
-void MoveList::moves_window() const {
+void MovesList::moves_window() const {
     if (ImGui::BeginChild("Move List")) {
         if (ImGui::BeginTable("Move Table", 3)) {
             ImGui::TableSetupColumn("Move", ImGuiTableColumnFlags_WidthFixed, Ui::rem(2.0f));
