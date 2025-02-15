@@ -24,13 +24,14 @@ public:
     void scene_imgui_update() override;
 
     BoardObj& get_board() override;
+    const BoardObj& get_board() const override;
     GamePlayer get_player_type() const override;
     std::string get_setup_position() const override;
-    void reset(const std::vector<std::string>& moves = {}) override;
+    void reset(const TimedMoves& moves = {}) override;
     void reset_board(const std::string& string) override;
     bool second_player_starting() override;
-    unsigned int clock_time(int time_enum) override;
-    void set_time_control_options(unsigned int time) override;
+    Clock::Time clock_time(int time_enum) override;
+    void set_time_control_options(Clock::Time time) override;
     void play_move(const std::string& string) override;
     void timeout(PlayerColor color) override;
     void resign(PlayerColor color) override;

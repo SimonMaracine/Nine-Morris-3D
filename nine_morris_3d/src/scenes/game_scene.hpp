@@ -3,6 +3,8 @@
 #include <string>
 #include <optional>
 #include <filesystem>
+#include <vector>
+#include <utility>
 
 #include <nine_morris_3d_engine/nine_morris_3d.hpp>
 #include <networking/client.hpp>
@@ -17,6 +19,7 @@
 #include "game_options.hpp"
 #include "saved_games.hpp"
 #include "game_analysis.hpp"
+#include "player_color.hpp"
 
 enum class GameState {
     Ready,
@@ -41,6 +44,9 @@ enum class GamePlayer {
     Remote
 };
 
+// Moves with player's time after the move attached
+using TimedMoves = std::vector<std::pair<std::string, Clock::Time>>;
+
 // Base class for scenes representing games
 class GameScene : public sm::ApplicationScene {
 public:
@@ -59,13 +65,14 @@ public:
     virtual void scene_imgui_update() = 0;
 
     virtual BoardObj& get_board() = 0;
+    virtual const BoardObj& get_board() const = 0;
     virtual GamePlayer get_player_type() const = 0;
     virtual std::string get_setup_position() const = 0;
-    virtual void reset(const std::vector<std::string>& moves = {}) = 0;
+    virtual void reset(const TimedMoves& moves = {}) = 0;
     virtual void reset_board(const std::string& string) = 0;
     virtual bool second_player_starting() = 0;
-    virtual unsigned int clock_time(int time_enum) = 0;
-    virtual void set_time_control_options(unsigned int time) = 0;
+    virtual Clock::Time clock_time(int time_enum) = 0;
+    virtual void set_time_control_options(Clock::Time time) = 0;
     virtual void play_move(const std::string& string) = 0;
     virtual void timeout(PlayerColor color) = 0;
     virtual void resign(PlayerColor color) = 0;
@@ -93,9 +100,16 @@ public:
     void reload_and_set_skybox();
     void reload_and_set_textures();
 
-    void reset(const std::string& string, const std::vector<std::string>& moves = {});
+    bool resign_available() const;
+    PlayerColor resign_player() const;
+    bool offer_draw_available() const;
+    bool accept_draw_available() const;
+    bool game_in_progress() const;
+
+    void reset(const std::string& string, const TimedMoves& moves = {});
     void reset_camera_position();
     void analyze_game(std::size_t index);
+    void resign_leave_session_and_reset();
 
     void connect(const std::string& address, std::uint16_t port);
     void connect(const std::string& address, const std::string& port);
@@ -106,7 +120,7 @@ public:
     void client_request_game_session();
     void client_leave_game_session();
     void client_request_join_game_session(const std::string& session_id);
-    void client_play_move(protocol::ClockTime time, const std::string& move, bool game_over);
+    void client_play_move(const std::string& move, protocol::ClockTime time, bool game_over);
     void client_update_turn_time(protocol::ClockTime time);
     void client_timeout();
     void client_resign();
@@ -130,6 +144,13 @@ protected:
     std::shared_ptr<sm::GlTextureCubemap> load_skybox_texture_cubemap(bool reload = false) const;
 
     void update_game_state();
+    void game_state_start();
+    void game_state_go();
+    void game_state_next_turn();
+    void game_state_computer_start_thinking();
+    void game_state_computer_thinking();
+    void game_state_finish_turn();
+    void game_state_stop();
 
     void engine_error(const EngineError& e);
     void stop_engine();
@@ -182,7 +203,7 @@ protected:
     GameOptions m_game_options;
     Clock m_clock;
     MovesList m_moves_list;
-    SavedGames m_saved_games;
-    SavedGame m_current_game;
+    SavedGames m_saved_games;  // All saved games
+    SavedGame m_current_game;  // Used to save the game after is over
     std::optional<GameAnalysis> m_game_analysis;
 };

@@ -2,11 +2,13 @@
 
 #include <cstdlib>
 
-void Clock::reset(unsigned int time) {
+void Clock::reset(Time time) {
     m_running = false;
     m_player_white = true;
     m_white_time = time;
     m_black_time = time;
+    m_white_time_point = time;
+    m_black_time_point = time;
 }
 
 void Clock::start() {
@@ -45,7 +47,7 @@ void Clock::switch_turn() {
     }
 }
 
-std::tuple<unsigned int, unsigned int, unsigned int> Clock::split_time(unsigned int time) {
+std::tuple<Clock::Time, Clock::Time, Clock::Time> Clock::split_time(Time time) {
     const auto result_minutes {std::div(static_cast<long long>(time), 1000ll * 60ll)};
     const auto result_seconds {std::div(static_cast<long long>(result_minutes.rem), 1000ll)};
 
@@ -56,7 +58,7 @@ void Clock::set_time(std::chrono::steady_clock::time_point& last_time) {
     last_time = std::chrono::steady_clock::now();
 }
 
-void Clock::update_time(unsigned int& time, std::chrono::steady_clock::time_point& last_time) {
+void Clock::update_time(Time& time, std::chrono::steady_clock::time_point& last_time) {
     const auto now {std::chrono::steady_clock::now()};
 
     auto delta {(now - last_time).count()};

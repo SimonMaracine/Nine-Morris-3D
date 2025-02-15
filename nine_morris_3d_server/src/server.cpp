@@ -397,7 +397,7 @@ void Server::client_play_move(std::shared_ptr<networking::ClientConnection> conn
         return;
     }
 
-    iter->second.moves.push_back(payload.move);
+    iter->second.moves.emplace_back(payload.move, payload.time);
     iter->second.game_over = payload.game_over;
 
     std::shared_ptr<networking::ClientConnection> remote_connection;

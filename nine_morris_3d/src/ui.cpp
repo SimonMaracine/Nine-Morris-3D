@@ -130,27 +130,17 @@ void Ui::main_menu_bar(sm::Ctx& ctx, GameScene& game_scene) {
     if (ImGui::BeginMainMenuBar()) {
         if (ImGui::BeginMenu("Game")) {
             if (ImGui::MenuItem("New Game")) {
-                // Must resign first
-                if (resign_available(game_scene)) {
-                    // Cannot display the resign game over popup
-                    game_scene.client_resign();
-                }
-
-                if (game_scene.get_game_session()) {
-                    game_scene.client_leave_game_session();
-                }
-
-                game_scene.reset();
+                game_scene.resign_leave_session_and_reset();
             }
-            if (ImGui::MenuItem("Resign", nullptr, nullptr, resign_available(game_scene))) {
-                game_scene.resign(resign_player(game_scene));
+            if (ImGui::MenuItem("Resign", nullptr, nullptr, game_scene.resign_available())) {
+                game_scene.resign(game_scene.resign_player());
                 game_scene.client_resign();
             }
-            if (ImGui::MenuItem("Accept Draw", nullptr, nullptr, accept_draw_available(game_scene))) {
+            if (ImGui::MenuItem("Accept Draw", nullptr, nullptr, game_scene.accept_draw_available())) {
                 game_scene.accept_draw();
                 game_scene.client_accept_draw();
             }
-            if (ImGui::MenuItem("Offer Draw", nullptr, nullptr, offer_draw_available(game_scene))) {
+            if (ImGui::MenuItem("Offer Draw", nullptr, nullptr, game_scene.offer_draw_available())) {
                 game_scene.client_offer_draw();
             }
             if (ImGui::MenuItem("Game Options")) {
@@ -646,16 +636,18 @@ void Ui::during_game_window(GameScene& game_scene) {
 }
 
 void Ui::analyze_game_window(GameScene& game_scene) {
+    assert(game_scene.get_game_analysis());
+
     auto& game_analysis {game_scene.get_game_analysis()};
     const SavedGame& saved_game {game_scene.get_saved_games().get().at(game_analysis->get_index())};
 
     const auto set_clock_time {[](GameScene& game_scene, auto& game_analysis, unsigned int time) {
         switch (game_scene.get_board().get_player_color()) {
             case PlayerColorWhite:
-                game_analysis->clock_white = time;
+                game_analysis->time_white = time;
                 break;
             case PlayerColorBlack:
-                game_analysis->clock_black = time;
+                game_analysis->time_black = time;
                 break;
         }
     }};
@@ -666,8 +658,8 @@ void Ui::analyze_game_window(GameScene& game_scene) {
 
         game_scene.reset_board(saved_game.initial_position);
         game_scene.get_moves_list().clear();
-        game_analysis->clock_white = saved_game.initial_time;
-        game_analysis->clock_black = saved_game.initial_time;
+        game_analysis->time_white = saved_game.initial_time;
+        game_analysis->time_black = saved_game.initial_time;
 
         // Play the moves offscreen
         game_scene.get_board().enable_move_callback(false);
@@ -712,13 +704,13 @@ void Ui::analyze_game_window(GameScene& game_scene) {
     {
         ImGui::Image(game_scene.get_icon_black()->get_id(), ImVec2(rem(1.0f), rem(1.0f)));
         ImGui::SameLine();
-        const auto [minutes, seconds, centiseconds] {Clock::split_time(game_analysis->clock_white)};
+        const auto [minutes, seconds, centiseconds] {Clock::split_time(game_analysis->time_white)};
         ImGui::Text("%u:%02u.%02u", minutes, seconds, centiseconds);
     }
     {
         ImGui::Image(game_scene.get_icon_white()->get_id(), ImVec2(rem(1.0f), rem(1.0f)));
         ImGui::SameLine();
-        const auto [minutes, seconds, centiseconds] {Clock::split_time(game_analysis->clock_black)};
+        const auto [minutes, seconds, centiseconds] {Clock::split_time(game_analysis->time_black)};
         ImGui::Text("%u:%02u.%02u", minutes, seconds, centiseconds);
     }
 
@@ -923,6 +915,7 @@ void Ui::analyze_games_window(GameScene& game_scene) {
                     std::snprintf(buffer, sizeof(buffer), "%lu.", i + 1);
 
                     if (ImGui::Selectable(buffer, false, ImGuiSelectableFlags_SpanAllColumns | ImGuiSelectableFlags_NoAutoClosePopups)) {
+                        game_scene.resign_leave_session_and_reset();
                         game_scene.analyze_game(i);
                         clear_modal_window(ModalWindowAnalyzeGames);
                     }
@@ -1311,42 +1304,7 @@ void Ui::set_style() {
     style.DisplaySafeAreaPadding = ImVec2(4.0f, 4.0f);
 }
 
-bool Ui::resign_available(GameScene& game_scene) {
-    return (
-        game_scene.get_game_session() &&
-        game_scene.get_game_session()->get_remote_joined() &&
-        game_scene.get_game_state() != GameState::Ready &&
-        game_scene.get_game_state() != GameState::Over
-    );
-}
-
-PlayerColor Ui::resign_player(GameScene& game_scene) {
-    assert(game_scene.get_game_session());
-
-    return opponent(static_cast<PlayerColor>(game_scene.get_game_options().remote_color));
-}
-
-bool Ui::offer_draw_available(GameScene& game_scene) {
-    return (
-        game_scene.get_game_session() &&
-        game_scene.get_game_session()->get_remote_joined() &&
-        game_scene.get_board().get_player_color() == static_cast<PlayerColor>(game_scene.get_game_options().remote_color) &&
-        game_scene.get_game_state() != GameState::Ready &&
-        game_scene.get_game_state() != GameState::Over
-    );
-}
-
-bool Ui::accept_draw_available(GameScene& game_scene) {
-    return (
-        game_scene.get_game_session() &&
-        game_scene.get_game_session()->get_remote_joined() &&
-        game_scene.get_game_session()->get_remote_offered_draw() &&
-        game_scene.get_game_state() != GameState::Ready &&
-        game_scene.get_game_state() != GameState::Over
-    );
-}
-
-bool Ui::join_game_available(GameScene& game_scene) {
+bool Ui::join_game_available(GameScene& game_scene) const {
     return (
         !game_scene.get_game_session() &&
         !std::any_of(std::cbegin(m_session_id), std::prev(std::cend(m_session_id)), [](char c) { return c == 0; })

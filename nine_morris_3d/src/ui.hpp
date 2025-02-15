@@ -7,7 +7,6 @@
 #include <nine_morris_3d_engine/nine_morris_3d.hpp>
 
 #include "options.hpp"
-#include "player_color.hpp"
 
 class GameScene;
 
@@ -83,11 +82,7 @@ private:
     static void create_font(sm::Ctx& ctx, int scale);
     static void set_style();
 
-    static bool resign_available(GameScene& game_scene);
-    static PlayerColor resign_player(GameScene& game_scene);
-    static bool offer_draw_available(GameScene& game_scene);
-    static bool accept_draw_available(GameScene& game_scene);
-    bool join_game_available(GameScene& game_scene);
+    bool join_game_available(GameScene& game_scene) const;
 
     // Multiple modal windows may request attention at a time; put them in a queue
     std::deque<std::pair<ModalWindow, std::string>> m_modal_window_queue;

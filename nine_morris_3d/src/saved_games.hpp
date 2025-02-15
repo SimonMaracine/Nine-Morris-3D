@@ -7,6 +7,7 @@
 
 #include <nine_morris_3d_engine/external/cereal.h++>
 
+#include "clock.hpp"
 #include "ver.hpp"
 
 struct SavedGame {
@@ -22,11 +23,11 @@ struct SavedGame {
         Draw
     };
 
-    unsigned int initial_time {};
+    Clock::Time initial_time {};
     GameType game_type {};
     Ending ending {};
     std::string initial_position;
-    std::vector<std::pair<std::string, unsigned int>> moves;
+    std::vector<std::pair<std::string, Clock::Time>> moves;
     std::string date_time;
 
     template<typename Archive>

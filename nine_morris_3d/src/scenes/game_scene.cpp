@@ -63,7 +63,7 @@ void GameScene::on_start() {
             return sm::Task::Result::Repeat;
         }
 
-        if (m_game_state == GameState::Ready || m_game_state == GameState::Over) {
+        if (!game_in_progress()) {
             return sm::Task::Result::Repeat;
         }
 
@@ -80,21 +80,8 @@ void GameScene::on_start() {
 }
 
 void GameScene::on_stop() {
-    if (m_game_session) {
-        if (m_game_session->get_remote_joined() && m_game_state != GameState::Ready && m_game_state != GameState::Over) {
-            client_resign();
-        }
-
-        client_leave_game_session();
-    }
-
+    resign_leave_session_and_reset();
     stop_engine();
-
-    try {
-        m_saved_games.save(saved_games_file_path());
-    } catch (const SavedGamesError& e) {
-        LOG_DIST_ERROR("Could not save games: {}", e.what());
-    }
 
     m_camera_controller->disconnect_events(ctx);
     ctx.disconnect_events(this);
@@ -133,7 +120,7 @@ void GameScene::on_update() {
     }
 
     // Remote's clock should never reach 0, only our clock may reach 0 and send timout
-    if (m_game_state != GameState::Ready && m_game_state != GameState::Over) {
+    if (game_in_progress()) {
         if (m_clock.get_white_time() == 0) {
             timeout(PlayerColorWhite);
 
@@ -210,7 +197,43 @@ void GameScene::reload_and_set_textures() {
     });
 }
 
-void GameScene::reset(const std::string& string, const std::vector<std::string>& moves) {
+bool GameScene::resign_available() const {
+    return (
+        m_game_session &&
+        m_game_session->get_remote_joined() &&
+        game_in_progress()
+    );
+}
+
+PlayerColor GameScene::resign_player() const {
+    assert(m_game_session);
+
+    return opponent(static_cast<PlayerColor>(m_game_options.remote_color));
+}
+
+bool GameScene::offer_draw_available() const {
+    return (
+        m_game_session &&
+        m_game_session->get_remote_joined() &&
+        get_board().get_player_color() == static_cast<PlayerColor>(m_game_options.remote_color) &&
+        game_in_progress()
+    );
+}
+
+bool GameScene::accept_draw_available() const {
+    return (
+        m_game_session &&
+        m_game_session->get_remote_joined() &&
+        m_game_session->get_remote_offered_draw() &&
+        game_in_progress()
+    );
+}
+
+bool GameScene::game_in_progress() const {
+    return m_game_state != GameState::Ready && m_game_state != GameState::Over;
+}
+
+void GameScene::reset(const std::string& string, const TimedMoves& moves) {
     if (m_engine) {
         try {
             m_engine->stop_thinking();  // Stop the engine first
@@ -229,7 +252,7 @@ void GameScene::reset(const std::string& string, const std::vector<std::string>&
     m_moves_list.clear();
     m_game_session.reset();
     m_game_analysis.reset();
-    m_current_game = {};
+    m_current_game = {};  // Must reset the current game here
 
     if (second_player_starting()) {
         m_clock.switch_turn();
@@ -241,9 +264,10 @@ void GameScene::reset(const std::string& string, const std::vector<std::string>&
     get_board().enable_move_animations(false);
 
     for (const auto& move : moves) {
-        play_move(move);
+        play_move(move.first);
         m_clock.switch_turn();
-        m_moves_list.push(move);
+        m_moves_list.push(move.first);
+        m_current_game.moves.emplace_back(move.first, move.second);  // Remember the previously played moves
     }
 
     get_board().enable_move_animations(true);
@@ -301,10 +325,26 @@ void GameScene::reset_camera_position() {
 
 void GameScene::analyze_game(std::size_t index) {
     reset(m_saved_games.get().at(index).initial_position);
-    m_game_state = GameState::Analyze;
+
     m_game_analysis = GameAnalysis(index);
-    m_game_analysis->clock_white = m_saved_games.get().at(index).initial_time;
-    m_game_analysis->clock_black = m_saved_games.get().at(index).initial_time;
+    m_game_analysis->time_white = m_saved_games.get().at(index).initial_time;
+    m_game_analysis->time_black = m_saved_games.get().at(index).initial_time;
+
+    m_game_state = GameState::Analyze;
+}
+
+void GameScene::resign_leave_session_and_reset() {
+    // Must resign first
+    if (resign_available()) {
+        // Cannot display the resign game over popup
+        client_resign();
+    }
+
+    if (m_game_session) {
+        client_leave_game_session();
+    }
+
+    reset();
 }
 
 void GameScene::connect(const std::string& address, std::uint16_t port) {
@@ -445,7 +485,7 @@ void GameScene::client_request_join_game_session(const std::string& session_id) 
     m_ui.push_modal_window(ModalWindowWaitServerAcceptJoinGameSession);
 }
 
-void GameScene::client_play_move(protocol::ClockTime time, const std::string& move, bool game_over) {
+void GameScene::client_play_move(const std::string& move, protocol::ClockTime time, bool game_over) {
     assert(m_game_session);
 
     protocol::Client_PlayMove payload;
@@ -815,153 +855,201 @@ std::shared_ptr<sm::GlTextureCubemap> GameScene::load_skybox_texture_cubemap(boo
 }
 
 void GameScene::update_game_state() {
-    const auto& g {ctx.global<Global>()};
-
     switch (m_game_state) {
         case GameState::Ready:
             break;
         case GameState::Start:
-            // We only want to actually start the clocks and the game after a short period
-            ctx.add_task_delayed([this]() {
-                // The state could have changed in the meantime
-                if (m_game_state == GameState::Set) {
-                    m_game_state = GameState::Go;
-                }
-
-                return sm::Task::Result::Done;
-            }, 2.0);
-
-            // Save this game
-            m_current_game.initial_time = clock_time(m_game_options.time_enum);
-            m_current_game.game_type = static_cast<SavedGame::GameType>(g.options.game_type);
-            m_current_game.initial_position = get_setup_position();
-
-            reset_camera_position();
-            sm::Ctx::play_audio_sound(m_sound_game_start);
-            m_game_state = GameState::Set;
-
+            game_state_start();
             break;
         case GameState::Set:
             break;
         case GameState::Go:
-            m_clock.start();
-            m_game_state = GameState::NextTurn;
-
+            game_state_go();
             break;
-        case GameState::NextTurn: {
-            switch (get_player_type()) {
-                case GamePlayer::Human:
-                    m_game_state = GameState::HumanThinking;
-                    break;
-                case GamePlayer::Computer:
-                    m_game_state = GameState::ComputerStartThinking;
-                    break;
-                case GamePlayer::Remote:
-                    m_game_state = GameState::RemoteThinking;
-                    break;
-            }
-
+        case GameState::NextTurn:
+            game_state_next_turn();
             break;
-        }
         case GameState::HumanThinking:
             break;
         case GameState::ComputerStartThinking:
-            assert(m_engine);
-
-            try {
-                m_engine->start_thinking(
-                    get_setup_position(),
-                    m_moves_list.get_moves(),
-                    m_clock.get_white_time(),
-                    m_clock.get_black_time(),
-                    std::nullopt
-                );
-            } catch (const EngineError& e) {
-                engine_error(e);
-                m_game_state = GameState::Stop;
-                break;
-            }
-
-            m_game_state = GameState::ComputerThinking;
-
+            game_state_computer_start_thinking();
             break;
-        case GameState::ComputerThinking: {
-            assert(m_engine);
-
-            std::optional<std::string> best_move;
-
-            try {
-                best_move = m_engine->done_thinking();
-            } catch (const EngineError& e) {
-                engine_error(e);
-                m_game_state = GameState::Stop;
-                break;
-            }
-
-            if (best_move) {
-                if (m_engine->is_null_move(*best_move)) {
-                    if (get_board().get_game_over() == GameOver::None) {
-                        SM_THROW_ERROR(sm::ApplicationError, "The engine calls game over, but the GUI doesn't agree");
-                    }
-                } else {
-                    play_move(*best_move);
-                }
-            }
-
+        case GameState::ComputerThinking:
+            game_state_computer_thinking();
             break;
-        }
         case GameState::RemoteThinking:
             break;
         case GameState::FinishTurn:
-            if (get_board().is_turn_finished()) {
-                m_clock.switch_turn();
-
-                if (m_game_session) {
-                    m_game_session->set_remote_offered_draw(false);
-                }
-
-                if (get_board().get_game_over() != GameOver::None) {
-                    m_game_state = GameState::Stop;
-                } else {
-                    m_game_state = GameState::NextTurn;
-                }
-            }
-
+            game_state_finish_turn();
             break;
         case GameState::Stop:
-            switch (g.options.game_type) {
-                case GameTypeLocalVsComputer:
-                    assert_engine_game_over();
-                    break;
-                case GameTypeOnline:
-                    // The session might have been already destroyed
-                    if (m_game_session) {
-                        m_game_session->set_remote_offered_draw(false);
-                    }
-                    break;
-            }
-
-            // Save this game
-            {
-                const auto current_time {std::time(nullptr)};
-                m_current_game.date_time = std::ctime(&current_time);
-            }
-            m_current_game.ending = static_cast<SavedGame::Ending>(static_cast<int>(get_board().get_game_over()) - 1);
-            m_saved_games.add_saved_game(std::move(m_current_game));
-            m_current_game = {};
-
-            m_ui.push_modal_window(ModalWindowGameOver);
-            m_clock.stop();
-            m_game_state = GameState::Over;
-
-            sm::Ctx::play_audio_sound(m_sound_game_over);
-
+            game_state_stop();
             break;
         case GameState::Over:
             break;
         case GameState::Analyze:
             break;
     }
+}
+
+void GameScene::game_state_start() {
+    const auto& g {ctx.global<Global>()};
+
+    // We only want to actually start the clocks and the game after a short period
+    ctx.add_task_delayed([this]() {
+        // The state could have changed in the meantime
+        if (m_game_state == GameState::Set) {
+            m_game_state = GameState::Go;
+        }
+
+        return sm::Task::Result::Done;
+    }, 2.0);
+
+    // Save current game
+    m_current_game.initial_time = clock_time(m_game_options.time_enum);
+    m_current_game.game_type = static_cast<SavedGame::GameType>(g.options.game_type);
+    m_current_game.initial_position = get_setup_position();
+
+    reset_camera_position();
+    sm::Ctx::play_audio_sound(m_sound_game_start);
+    m_game_state = GameState::Set;
+}
+
+void GameScene::game_state_go() {
+    m_clock.start();
+    m_game_state = GameState::NextTurn;
+}
+
+void GameScene::game_state_next_turn() {
+    switch (get_player_type()) {
+        case GamePlayer::Human:
+            m_game_state = GameState::HumanThinking;
+            break;
+        case GamePlayer::Computer:
+            m_game_state = GameState::ComputerStartThinking;
+            break;
+        case GamePlayer::Remote:
+            m_game_state = GameState::RemoteThinking;
+            break;
+    }
+}
+
+void GameScene::game_state_computer_start_thinking() {
+    assert(m_engine);
+
+    try {
+        m_engine->start_thinking(
+            get_setup_position(),
+            m_moves_list.get_moves(),
+            m_clock.get_white_time(),
+            m_clock.get_black_time(),
+            std::nullopt
+        );
+    } catch (const EngineError& e) {
+        engine_error(e);
+        m_game_state = GameState::Stop;
+        return;
+    }
+
+    m_game_state = GameState::ComputerThinking;
+}
+
+void GameScene::game_state_computer_thinking() {
+    assert(m_engine);
+
+    std::optional<std::string> best_move;
+
+    try {
+        best_move = m_engine->done_thinking();
+    } catch (const EngineError& e) {
+        engine_error(e);
+        m_game_state = GameState::Stop;
+        return;
+    }
+
+    if (best_move) {
+        if (m_engine->is_null_move(*best_move)) {
+            if (get_board().get_game_over() == GameOver::None) {
+                SM_THROW_ERROR(sm::ApplicationError, "The engine calls game over, but the GUI doesn't agree");
+            }
+        } else {
+            play_move(*best_move);
+        }
+    }
+}
+
+void GameScene::game_state_finish_turn() {
+    if (get_board().is_turn_finished()) {
+        m_clock.switch_turn();
+
+        if (m_game_session) {
+            m_game_session->set_remote_offered_draw(false);
+        }
+
+        const auto& move {m_moves_list.get_moves().back()};
+        const auto time {get_board().get_player_color() == PlayerColorWhite ? m_clock.get_black_time() : m_clock.get_white_time()};
+
+        if (m_game_session) {
+            // If the next player is the remote or is us
+            if (get_player_type() == GamePlayer::Remote) {
+                client_play_move(move, time, get_board().get_game_over() != GameOver::None);
+            } else {
+                // Turn the clock back to where it should be
+                // The stored time comes from a message from the server
+                switch (get_board().get_player_color()) {
+                    case PlayerColorWhite:
+                        m_clock.reset_black_to_time_point();
+                        break;
+                    case PlayerColorBlack:
+                        m_clock.reset_white_to_time_point();
+                        break;
+                }
+            }
+        }
+
+        m_current_game.moves.emplace_back(move, time);
+
+        if (get_board().get_game_over() != GameOver::None) {
+            m_game_state = GameState::Stop;
+        } else {
+            m_game_state = GameState::NextTurn;
+        }
+    }
+}
+
+void GameScene::game_state_stop() {
+    const auto& g {ctx.global<Global>()};
+
+    switch (g.options.game_type) {
+        case GameTypeLocalVsComputer:
+            assert_engine_game_over();
+            break;
+        case GameTypeOnline:
+            // The session might have been already destroyed
+            if (m_game_session) {
+                m_game_session->set_remote_offered_draw(false);
+            }
+            break;
+    }
+
+    // Save current game
+    const auto current_time {std::time(nullptr)};
+    m_current_game.date_time = std::ctime(&current_time);
+    m_current_game.ending = static_cast<SavedGame::Ending>(static_cast<int>(get_board().get_game_over()) - 1);
+    m_saved_games.add_saved_game(std::move(m_current_game));
+    m_current_game = {};
+
+    try {
+        m_saved_games.save(saved_games_file_path());
+    } catch (const SavedGamesError& e) {
+        LOG_DIST_ERROR("Could not save games: {}", e.what());
+    }
+
+    m_ui.push_modal_window(ModalWindowGameOver);
+    m_clock.stop();
+    m_game_state = GameState::Over;
+
+    sm::Ctx::play_audio_sound(m_sound_game_over);
 }
 
 void GameScene::engine_error(const EngineError& e) {
@@ -1078,9 +1166,8 @@ bool GameScene::try_send_message(const networking::Message& message) {
     return true;
 }
 
-void GameScene::reset_session_and_game() {
+void GameScene::reset_session_and_game() {  // FIXME
     if (m_game_session) {
-        m_game_session.reset();
         reset();
     }
 }
@@ -1234,15 +1321,16 @@ void GameScene::server_accept_join_game_session(const networking::Message& messa
         return;
     }
 
-    m_game_session = GameSession(payload.session_id);
-    m_game_session->remote_joined(payload.remote_name);
-    m_game_session->set_messages(payload.messages);
-
     m_game_options.remote_color = PlayerColor(payload.remote_player);
     set_time_control_options(payload.initial_time);
 
-    // This also resets the camera; call it after setting the color
+    // This resets the camera; call it after setting the color
+    // This resets the session; call it before creating the session
     reset(payload.moves);
+
+    m_game_session = GameSession(payload.session_id);
+    m_game_session->remote_joined(payload.remote_name);
+    m_game_session->set_messages(payload.messages);
 
     switch (m_game_options.remote_color) {
         case PlayerColorWhite:
@@ -1326,13 +1414,15 @@ void GameScene::server_remote_played_move(const networking::Message& message) {
 
     assert(m_game_state == GameState::RemoteThinking);
 
-    // This ensures that clock remain in sync
+    // This ensures that clocks remain in sync
+    // Store this time in the clock
+    // After the move is made, the clock will reset the time to this stored
     switch (get_board().get_player_color()) {
         case PlayerColorWhite:
-            m_clock.set_white_time(payload.time);
+            m_clock.set_white_time_point(payload.time);
             break;
         case PlayerColorBlack:
-            m_clock.set_black_time(payload.time);
+            m_clock.set_black_time_point(payload.time);
             break;
     }
 
@@ -1437,8 +1527,14 @@ void GameScene::server_rematch(const networking::Message& message) {
     m_game_options.remote_color = PlayerColor(payload.remote_player);
     set_time_control_options(payload.initial_time);  // Also reset the time, just to be sure...
 
+    // The session is getting destroyed by reset(); save it first
+    const auto game_session {std::move(*m_game_session)};
+
     // Call this after setting the color
     reset();
+
+    // Restore the session, arrgh
+    m_game_session = std::move(game_session);
 
     m_game_state = GameState::Start;
 

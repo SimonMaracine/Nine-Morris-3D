@@ -3,6 +3,7 @@
 #include <string>
 #include <vector>
 #include <chrono>
+#include <utility>
 #include <cstdint>
 #include <cstddef>
 
@@ -362,7 +363,7 @@ namespace protocol {
         ClockTime remote_time {};
         ClockTime time {};
         bool game_over {};
-        std::vector<std::string> moves;
+        std::vector<std::pair<std::string, ClockTime>> moves;
         Messages messages;
         std::string remote_name;
 

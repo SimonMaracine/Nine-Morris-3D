@@ -36,6 +36,10 @@ BoardObj& NineMensMorrisBaseScene::get_board() {
     return m_board;
 }
 
+const BoardObj& NineMensMorrisBaseScene::get_board() const {
+    return m_board;
+}
+
 GamePlayer NineMensMorrisBaseScene::get_player_type() const {
     const auto& g {ctx.global<Global>()};
 
@@ -72,7 +76,7 @@ std::string NineMensMorrisBaseScene::get_setup_position() const {
     return NineMensMorrisBoard::position_to_string(m_board.get_setup_position());
 }
 
-void NineMensMorrisBaseScene::reset(const std::vector<std::string>& moves) {
+void NineMensMorrisBaseScene::reset(const TimedMoves& moves) {
     GameScene::reset("w:w:b:1", moves);
 }
 
@@ -88,8 +92,8 @@ bool NineMensMorrisBaseScene::second_player_starting() {
     return m_board.get_setup_position().player == NineMensMorrisBoard::Player::Black;
 }
 
-unsigned int NineMensMorrisBaseScene::clock_time(int time_enum) {
-    unsigned int time {};
+Clock::Time NineMensMorrisBaseScene::clock_time(int time_enum) {
+    Clock::Time time {};
 
     switch (time_enum) {
         case NineMensMorrisTime1min:
@@ -112,7 +116,7 @@ unsigned int NineMensMorrisBaseScene::clock_time(int time_enum) {
     return time;
 }
 
-void NineMensMorrisBaseScene::set_time_control_options(unsigned int time) {
+void NineMensMorrisBaseScene::set_time_control_options(Clock::Time time) {
     switch (time) {
         case Clock::as_milliseconds(1):
             m_game_options.time_enum = NineMensMorrisTime1min;
@@ -586,21 +590,7 @@ NineMensMorrisBoard NineMensMorrisBaseScene::initialize_board() {
         ctx.load_sound_data(ctx.path_assets("sounds/nine_mens_morris/piece_capture1.ogg")),
         ctx.load_sound_data(ctx.path_assets("sounds/nine_mens_morris/piece_capture1.ogg")),
         [this](const NineMensMorrisBoard::Move& move) {
-            // If next player is remote
-            if (get_player_type() == GamePlayer::Remote) {
-                client_play_move(
-                    m_board.if_player_white(m_clock.get_black_time(), m_clock.get_white_time()),  // FIXME the time is wrong; should be after animation
-                    NineMensMorrisBoard::move_to_string(move),
-                    m_board.get_game_over() != GameOver::None
-                );
-            }
-
-            m_current_game.moves.emplace_back(
-                NineMensMorrisBoard::move_to_string(move),
-                m_board.if_player_white(m_clock.get_black_time(), m_clock.get_white_time())  // FIXME the time is wrong; should be after animation
-            );
-
-            m_moves_list.push(NineMensMorrisBoard::move_to_string(move));
+            m_moves_list.push(NineMensMorrisBoard::move_to_string(move));  // This last move will be read soon
             m_game_state = GameState::FinishTurn;
         }
     );
