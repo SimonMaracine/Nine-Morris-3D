@@ -56,7 +56,7 @@ private:
     std::shared_ptr<sm::GlTexture> load_piece_black_diffuse_texture(bool reload = false) const;
     std::shared_ptr<sm::GlTexture> load_piece_normal_texture(bool reload = false) const;
 
-    NineMensMorrisBoard setup_models();
+    NineMensMorrisBoard initialize_board();
     int pieces_count() const;
 
     NineMensMorrisBoard m_board;

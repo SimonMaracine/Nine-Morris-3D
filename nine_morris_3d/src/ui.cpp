@@ -515,7 +515,9 @@ void Ui::game_window(sm::Ctx& ctx, GameScene& game_scene) {
     ImGui::SetNextWindowSize(ImVec2(width, height), ImGuiCond_Always);
 
     if (ImGui::Begin("Game", nullptr, ImGuiWindowFlags_NoDecoration)) {
-        if (game_scene.get_game_state() != GameState::Ready) {
+        if (game_scene.get_game_state() == GameState::Analyze) {
+            analyze_game_window(game_scene);
+        } else if (game_scene.get_game_state() != GameState::Ready) {
             during_game_window(game_scene);
         } else {
             before_game_window(ctx, game_scene);
@@ -633,6 +635,90 @@ void Ui::during_game_window(GameScene& game_scene) {
         ImGui::Image(game_scene.get_icon_white()->get_id(), ImVec2(rem(1.0f), rem(1.0f)));
         ImGui::SameLine();
         const auto [minutes, seconds, centiseconds] {Clock::split_time(game_scene.get_clock().get_white_time())};
+        ImGui::Text("%u:%02u.%02u", minutes, seconds, centiseconds);
+    }
+
+    ImGui::Dummy(ImVec2(0.0f, rem(0.1f)));
+    ImGui::Separator();
+    ImGui::Dummy(ImVec2(0.0f, rem(0.1f)));
+
+    game_scene.get_moves_list().moves_window();
+}
+
+void Ui::analyze_game_window(GameScene& game_scene) {
+    auto& game_analysis {game_scene.get_game_analysis()};
+    const SavedGame& saved_game {game_scene.get_saved_games().get().at(game_analysis->get_index())};
+
+    const auto set_clock_time {[](GameScene& game_scene, auto& game_analysis, unsigned int time) {
+        switch (game_scene.get_board().get_player_color()) {
+            case PlayerColorWhite:
+                game_analysis->clock_white = time;
+                break;
+            case PlayerColorBlack:
+                game_analysis->clock_black = time;
+                break;
+        }
+    }};
+
+    ImGui::BeginDisabled(game_analysis->ply == 0);
+    if (ImGui::Button("Previous")) {
+        game_analysis->ply--;
+
+        game_scene.reset_board(saved_game.initial_position);
+        game_scene.get_moves_list().clear();
+        game_analysis->clock_white = saved_game.initial_time;
+        game_analysis->clock_black = saved_game.initial_time;
+
+        // Play the moves offscreen
+        game_scene.get_board().enable_move_callback(false);
+        game_scene.get_board().enable_move_animations(false);
+
+        for (std::size_t i {0}; i < game_analysis->ply; i++) {
+            const auto& [move, time] {saved_game.moves.at(i)};
+
+            game_scene.play_move(move);
+            game_scene.get_moves_list().push(move);
+            set_clock_time(game_scene, game_analysis, time);
+        }
+
+        game_scene.get_board().enable_move_animations(true);
+        game_scene.get_board().enable_move_callback(true);
+
+        // Place the pieces into their places without animation
+        game_scene.get_board().setup_pieces(false);
+
+    }
+    ImGui::EndDisabled();
+
+    ImGui::SameLine();
+
+    ImGui::BeginDisabled(game_analysis->ply == saved_game.moves.size() || !game_scene.get_board().is_turn_finished());
+    if (ImGui::Button("Next")) {
+        const auto& [move, time] {saved_game.moves.at(game_analysis->ply)};
+
+        game_scene.get_board().enable_move_callback(false);
+        game_scene.play_move(move);
+        game_scene.get_board().enable_move_callback(true);
+
+        game_scene.get_moves_list().push(move);
+        set_clock_time(game_scene, game_analysis, time);
+
+        game_analysis->ply++;
+    }
+    ImGui::EndDisabled();
+
+    ImGui::Dummy(ImVec2(0.0f, rem(0.1f)));
+
+    {
+        ImGui::Image(game_scene.get_icon_black()->get_id(), ImVec2(rem(1.0f), rem(1.0f)));
+        ImGui::SameLine();
+        const auto [minutes, seconds, centiseconds] {Clock::split_time(game_analysis->clock_white)};
+        ImGui::Text("%u:%02u.%02u", minutes, seconds, centiseconds);
+    }
+    {
+        ImGui::Image(game_scene.get_icon_white()->get_id(), ImVec2(rem(1.0f), rem(1.0f)));
+        ImGui::SameLine();
+        const auto [minutes, seconds, centiseconds] {Clock::split_time(game_analysis->clock_black)};
         ImGui::Text("%u:%02u.%02u", minutes, seconds, centiseconds);
     }
 
@@ -833,11 +919,12 @@ void Ui::analyze_games_window(GameScene& game_scene) {
                     ImGui::TableNextRow();
                     ImGui::TableSetColumnIndex(0);
 
-                    char buffer[16] {};
+                    char buffer[22] {};
                     std::snprintf(buffer, sizeof(buffer), "%lu.", i + 1);
 
                     if (ImGui::Selectable(buffer, false, ImGuiSelectableFlags_SpanAllColumns | ImGuiSelectableFlags_NoAutoClosePopups)) {
-                        LOG_DEBUG("selected row {}", i);
+                        game_scene.analyze_game(i);
+                        clear_modal_window(ModalWindowAnalyzeGames);
                     }
 
                     ImGui::TableSetColumnIndex(1);

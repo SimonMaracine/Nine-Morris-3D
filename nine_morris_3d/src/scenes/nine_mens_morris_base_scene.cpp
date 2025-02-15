@@ -11,7 +11,7 @@
 #include "global.hpp"
 
 void NineMensMorrisBaseScene::scene_setup() {
-    m_board = setup_models();
+    m_board = initialize_board();
     m_game_options.time_enum = NineMensMorrisTime10min;
 }
 
@@ -570,7 +570,7 @@ std::shared_ptr<sm::GlTexture> NineMensMorrisBaseScene::load_piece_normal_textur
     }
 }
 
-NineMensMorrisBoard NineMensMorrisBaseScene::setup_models() {
+NineMensMorrisBoard NineMensMorrisBaseScene::initialize_board() {
     return NineMensMorrisBoard(
         setup_board(),
         setup_paint(),
@@ -589,7 +589,7 @@ NineMensMorrisBoard NineMensMorrisBaseScene::setup_models() {
             // If next player is remote
             if (get_player_type() == GamePlayer::Remote) {
                 client_play_move(
-                    m_board.if_player_white(m_clock.get_black_time(), m_clock.get_white_time()),
+                    m_board.if_player_white(m_clock.get_black_time(), m_clock.get_white_time()),  // FIXME the time is wrong; should be after animation
                     NineMensMorrisBoard::move_to_string(move),
                     m_board.get_game_over() != GameOver::None
                 );
@@ -597,7 +597,7 @@ NineMensMorrisBoard NineMensMorrisBaseScene::setup_models() {
 
             m_current_game.moves.emplace_back(
                 NineMensMorrisBoard::move_to_string(move),
-                m_board.if_player_white(m_clock.get_black_time(), m_clock.get_white_time())
+                m_board.if_player_white(m_clock.get_black_time(), m_clock.get_white_time())  // FIXME the time is wrong; should be after animation
             );
 
             m_moves_list.push(NineMensMorrisBoard::move_to_string(move));

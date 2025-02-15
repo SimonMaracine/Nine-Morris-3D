@@ -309,7 +309,7 @@ bool NineMensMorrisBoard::is_turn_finished() const {
     return true;
 }
 
-void NineMensMorrisBoard::setup_pieces() {
+void NineMensMorrisBoard::setup_pieces(bool animate) {
     initialize_objects();
 
     for (int i {0}; i < 24; i++) {
@@ -322,7 +322,22 @@ void NineMensMorrisBoard::setup_pieces() {
         m_pieces[PIECE(id)].node_id = i;
         m_nodes[i].piece_id = id;
 
-        do_place_animation(m_pieces[PIECE(id)], m_nodes[i], [](PieceObj&) {});
+        if (animate) {
+            do_place_animation(m_pieces[PIECE(id)], m_nodes[i], [](PieceObj&) {});
+        } else {
+            m_pieces[PIECE(id)].get_model()->position = (
+                glm::vec3(m_nodes[i].get_model()->position.x, PIECE_Y_POSITION_BOARD, m_nodes[i].get_model()->position.z)
+            );
+        }
+    }
+
+    // For the second phase, avoid floating, previously taken pieces
+    if (m_position.plies >= 18) {
+        for (PieceObj& piece : m_pieces) {
+            if (piece.node_id == -1) {
+                piece.active = false;
+            }
+        }
     }
 }
 

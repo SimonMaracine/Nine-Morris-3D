@@ -1,5 +1,7 @@
 #include "scenes/game_scene.hpp"
 
+#include <ctime>
+
 #include <nine_morris_3d_engine/external/resmanager.h++>
 #include <protocol.hpp>
 
@@ -225,6 +227,8 @@ void GameScene::reset(const std::string& string, const std::vector<std::string>&
     m_game_state = GameState::Ready;
     m_clock.reset(clock_time(m_game_options.time_enum));
     m_moves_list.clear();
+    m_game_session.reset();
+    m_game_analysis.reset();
     m_current_game = {};
 
     if (second_player_starting()) {
@@ -262,6 +266,12 @@ void GameScene::reset(const std::string& string, const std::vector<std::string>&
 void GameScene::reset_camera_position() {
     const auto& g {ctx.global<Global>()};
 
+    // In analyze mode, game options are irrelevant
+    if (m_game_state == GameState::Analyze) {
+        m_camera_controller->go_towards_position(m_white_camera_position);
+        return;
+    }
+
     switch (g.options.game_type) {
         case GameTypeLocal:
             m_camera_controller->go_towards_position(m_white_camera_position);
@@ -287,6 +297,14 @@ void GameScene::reset_camera_position() {
             }
             break;
     }
+}
+
+void GameScene::analyze_game(std::size_t index) {
+    reset(m_saved_games.get().at(index).initial_position);
+    m_game_state = GameState::Analyze;
+    m_game_analysis = GameAnalysis(index);
+    m_game_analysis->clock_white = m_saved_games.get().at(index).initial_time;
+    m_game_analysis->clock_black = m_saved_games.get().at(index).initial_time;
 }
 
 void GameScene::connect(const std::string& address, std::uint16_t port) {
@@ -361,7 +379,7 @@ void GameScene::client_request_game_session() {
     protocol::Client_RequestGameSession payload;
     payload.player_name = g.options.name;
     payload.remote_player = protocol::Player(m_game_options.remote_color);
-    payload.initial_time = m_clock.get_white_time();  // Players have equal time
+    payload.initial_time = clock_time(m_game_options.time_enum);
     payload.game_mode = protocol::GameMode(g.options.game_mode);
 
     networking::Message message {protocol::message::Client_RequestGameSession};
@@ -814,13 +832,9 @@ void GameScene::update_game_state() {
             }, 2.0);
 
             // Save this game
-            m_current_game.initial_time = m_clock.get_white_time();
+            m_current_game.initial_time = clock_time(m_game_options.time_enum);
             m_current_game.game_type = static_cast<SavedGame::GameType>(g.options.game_type);
             m_current_game.initial_position = get_setup_position();
-            {
-                const auto current_time {std::time(nullptr)};
-                m_current_game.date_time = std::ctime(&current_time);
-            }
 
             reset_camera_position();
             sm::Ctx::play_audio_sound(m_sound_game_start);
@@ -928,6 +942,10 @@ void GameScene::update_game_state() {
             }
 
             // Save this game
+            {
+                const auto current_time {std::time(nullptr)};
+                m_current_game.date_time = std::ctime(&current_time);
+            }
             m_current_game.ending = static_cast<SavedGame::Ending>(static_cast<int>(get_board().get_game_over()) - 1);
             m_saved_games.add_saved_game(std::move(m_current_game));
             m_current_game = {};
@@ -940,6 +958,8 @@ void GameScene::update_game_state() {
 
             break;
         case GameState::Over:
+            break;
+        case GameState::Analyze:
             break;
     }
 }

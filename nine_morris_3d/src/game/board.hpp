@@ -49,7 +49,7 @@ public:
     virtual const GameOver& get_game_over() const = 0;
     virtual PlayerColor get_player_color() const = 0;
     virtual bool is_turn_finished() const = 0;
-    virtual void setup_pieces() = 0;
+    virtual void setup_pieces(bool animate = true) = 0;
 
     void user_click_press();
     void user_click_release();

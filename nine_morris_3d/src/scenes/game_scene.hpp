@@ -16,6 +16,7 @@
 #include "game_session.hpp"
 #include "game_options.hpp"
 #include "saved_games.hpp"
+#include "game_analysis.hpp"
 
 enum class GameState {
     Ready,
@@ -29,7 +30,8 @@ enum class GameState {
     RemoteThinking,
     FinishTurn,
     Stop,
-    Over
+    Over,
+    Analyze
 };
 
 // Type of player
@@ -80,8 +82,9 @@ public:
     GameState& get_game_state() { return m_game_state; }
     GameOptions& get_game_options() { return m_game_options; }
     std::optional<GameSession>& get_game_session() { return m_game_session; }
+    std::optional<GameAnalysis>& get_game_analysis() { return m_game_analysis; }
     const Clock& get_clock() const { return m_clock; }
-    const MovesList& get_moves_list() const { return m_moves_list; }
+    MovesList& get_moves_list() { return m_moves_list; }
     const SavedGames& get_saved_games() const { return m_saved_games; }
     std::shared_ptr<sm::GlTexture> get_icon_wait() const { return m_icon_wait; }
     std::shared_ptr<sm::GlTexture> get_icon_white() const { return m_icon_white; }
@@ -92,6 +95,7 @@ public:
 
     void reset(const std::string& string, const std::vector<std::string>& moves = {});
     void reset_camera_position();
+    void analyze_game(std::size_t index);
 
     void connect(const std::string& address, std::uint16_t port);
     void connect(const std::string& address, const std::string& port);
@@ -180,4 +184,5 @@ protected:
     MovesList m_moves_list;
     SavedGames m_saved_games;
     SavedGame m_current_game;
+    std::optional<GameAnalysis> m_game_analysis;
 };

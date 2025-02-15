@@ -109,7 +109,7 @@ public:
     const GameOver& get_game_over() const override;
     PlayerColor get_player_color() const override;
     bool is_turn_finished() const override;
-    void setup_pieces() override;
+    void setup_pieces(bool animate = true) override;
 
     Player get_player() const { return m_position.player; }
     const Position& get_setup_position() const { return m_setup_position; }
