@@ -36,8 +36,8 @@ void GameSession::session_window(sm::Ctx& ctx, GameScene& game_scene) {
         static_cast<float>(ctx.get_window_height()),
         static_cast<float>(MIN_HEIGHT),
         static_cast<float>(MAX_HEIGHT),
-        Ui::rem(9.0f),
-        Ui::rem(13.0f)
+        Ui::rem(10.0f),
+        Ui::rem(14.0f)
     )};
 
     const float left_offset {sm::utils::map(

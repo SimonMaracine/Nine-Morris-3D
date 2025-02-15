@@ -161,7 +161,7 @@ protected:
     bool try_write_message(networking::Message& message, auto payload);
     bool try_read_message(const networking::Message& message, auto& payload);
     bool try_send_message(const networking::Message& message);
-    void reset_session_and_game();
+    void reset_game_if_session();
     void update_connection_state();
     void handle_message(const networking::Message& message);
     void server_hello_accept(const networking::Message& message);

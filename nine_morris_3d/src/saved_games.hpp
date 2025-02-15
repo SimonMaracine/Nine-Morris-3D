@@ -48,13 +48,13 @@ inline const char* to_string(SavedGame::GameType game_type) {
 
     switch (game_type) {
         case SavedGame::GameType::Local:
-            string = "Local";
+            string = "local";
             break;
         case SavedGame::GameType::LocalVsComputer:
-            string = "Local vs Computer";
+            string = "local vs computer";
             break;
         case SavedGame::GameType::Online:
-            string = "Online";
+            string = "online";
             break;
     }
 
@@ -66,13 +66,13 @@ inline const char* to_string(SavedGame::Ending ending) {
 
     switch (ending) {
         case SavedGame::Ending::WinnerWhite:
-            string = "Win White";
+            string = "1-0";
             break;
         case SavedGame::Ending::WinnerBlack:
-            string = "Win Black";
+            string = "0-1";
             break;
         case SavedGame::Ending::Draw:
-            string = "Draw";
+            string = "1/2-1/2";
             break;
     }
 

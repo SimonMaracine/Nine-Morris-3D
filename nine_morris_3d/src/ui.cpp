@@ -794,6 +794,13 @@ void Ui::online_play_window() {
             ImGui::Bullet();
             ImGui::SameLine();
             ImGui::TextWrapped(
+                "If one somehow gets disconnected from the server or the game crashes, as long as the remote"
+                " doesn't leave the game, they can simply rejoin with the same code and continue the game"
+                " from where they left off."
+            );
+            ImGui::Bullet();
+            ImGui::SameLine();
+            ImGui::TextWrapped(
                 "Please refrain from cheating. Have fun! :)"
             );
         },
@@ -893,45 +900,51 @@ void Ui::analyze_games_window(GameScene& game_scene) {
     modal_window_ok_size(
         "Analyze Games",
         [&]() {
-            ImGui::TextWrapped("Select from the table the game that you want to analyze.");
+            ImGui::TextWrapped("Select the game that you want to analyze.");
 
             ImGui::Dummy(ImVec2(0.0f, Ui::rem(0.5f)));
 
-            if (ImGui::BeginTable("Games", 5, ImGuiTableFlags_SizingStretchProp | ImGuiTableFlags_PadOuterX)) {
-                ImGui::TableSetupColumn("Index");
-                ImGui::TableSetupColumn("Date & Time");
-                ImGui::TableSetupColumn("Type");
-                ImGui::TableSetupColumn("Moves");
-                ImGui::TableSetupColumn("Result");
-                ImGui::TableHeadersRow();
+            ImGui::SetNextWindowSizeConstraints(ImVec2(0.0f, 0.0f), ImVec2(FLT_MAX, rem(15.0f)));
 
-                const auto& saved_games {game_scene.get_saved_games().get()};
+            if (ImGui::BeginChild("Games", {}, ImGuiChildFlags_AutoResizeY)) {
+                if (ImGui::BeginTable("Games", 5, ImGuiTableFlags_SizingStretchProp | ImGuiTableFlags_PadOuterX)) {
+                    ImGui::TableSetupColumn("Index", ImGuiTableColumnFlags_NoHeaderLabel);
+                    ImGui::TableSetupColumn("Date & Time");
+                    ImGui::TableSetupColumn("Type");
+                    ImGui::TableSetupColumn("Moves");
+                    ImGui::TableSetupColumn("Result");
+                    ImGui::TableHeadersRow();
 
-                for (std::size_t i {0}; i < saved_games.size(); i++) {
-                    ImGui::TableNextRow();
-                    ImGui::TableSetColumnIndex(0);
+                    const auto& saved_games {game_scene.get_saved_games().get()};
 
-                    char buffer[22] {};
-                    std::snprintf(buffer, sizeof(buffer), "%lu.", i + 1);
+                    for (std::size_t i {0}; i < saved_games.size(); i++) {
+                        ImGui::TableNextRow();
+                        ImGui::TableSetColumnIndex(0);
 
-                    if (ImGui::Selectable(buffer, false, ImGuiSelectableFlags_SpanAllColumns | ImGuiSelectableFlags_NoAutoClosePopups)) {
-                        game_scene.resign_leave_session_and_reset();
-                        game_scene.analyze_game(i);
-                        clear_modal_window(ModalWindowAnalyzeGames);
+                        char buffer[22] {};
+                        std::snprintf(buffer, sizeof(buffer), "%lu.", i + 1);
+
+                        if (ImGui::Selectable(buffer, false, ImGuiSelectableFlags_SpanAllColumns | ImGuiSelectableFlags_NoAutoClosePopups)) {
+                            game_scene.resign_leave_session_and_reset();
+                            game_scene.analyze_game(i);
+                            clear_modal_window(ModalWindowAnalyzeGames);
+                        }
+
+                        ImGui::TableSetColumnIndex(1);
+                        ImGui::Text("%s", saved_games[i].date_time.c_str());
+                        ImGui::TableSetColumnIndex(2);
+                        ImGui::Text("%s", to_string(saved_games[i].game_type));
+                        ImGui::TableSetColumnIndex(3);
+                        ImGui::Text("%lu", saved_games[i].moves.size() / 2 + (saved_games[i].moves.size() % 2 == 1 ? 1 : 0));
+                        ImGui::TableSetColumnIndex(4);
+                        ImGui::Text("%s", to_string(saved_games[i].ending));
                     }
 
-                    ImGui::TableSetColumnIndex(1);
-                    ImGui::Text("%s", saved_games[i].date_time.c_str());
-                    ImGui::TableSetColumnIndex(2);
-                    ImGui::Text("%s", to_string(saved_games[i].game_type));
-                    ImGui::TableSetColumnIndex(3);
-                    ImGui::Text("%lu", saved_games[i].moves.size() / 2 + (saved_games[i].moves.size() % 2 == 1 ? 1 : 0));
-                    ImGui::TableSetColumnIndex(4);
-                    ImGui::Text("%s", to_string(saved_games[i].ending));
+                    ImGui::EndTable();
                 }
-
-                ImGui::EndTable();
             }
+
+            ImGui::EndChild();
         },
         glm::vec2(rem(25.0f), 0.0f)
     );

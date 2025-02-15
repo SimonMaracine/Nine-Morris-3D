@@ -369,7 +369,7 @@ void GameScene::connect() {
     auto& g {ctx.global<Global>()};
 
     // To prevent bad states and desynchronizations
-    reset_session_and_game();
+    reset_game_if_session();
 
     try {
         g.client.connect();
@@ -382,7 +382,7 @@ void GameScene::disconnect() {
     auto& g {ctx.global<Global>()};
 
     // To prevent bad states and desynchronizations
-    reset_session_and_game();
+    reset_game_if_session();
 
     g.client.disconnect();
 }
@@ -1022,7 +1022,10 @@ void GameScene::game_state_stop() {
 
     switch (g.options.game_type) {
         case GameTypeLocalVsComputer:
-            assert_engine_game_over();
+            // Don't crash, if timeout occurs
+            if (m_clock.get_white_time() != 0 && m_clock.get_black_time() != 0) {
+                assert_engine_game_over();
+            }
             break;
         case GameTypeOnline:
             // The session might have been already destroyed
@@ -1106,7 +1109,7 @@ void GameScene::connection_error(const networking::ConnectionError& e) {
     LOG_DIST_ERROR("Connection error: {}", e.what());
 
     // To prevent bad states and desynchronizations
-    reset_session_and_game();
+    reset_game_if_session();
 
     m_ui.clear_modal_window(  // The user may already be blocked in a modal window
         ModalWindowWaitServerAcceptGameSession |
@@ -1166,7 +1169,7 @@ bool GameScene::try_send_message(const networking::Message& message) {
     return true;
 }
 
-void GameScene::reset_session_and_game() {  // FIXME
+void GameScene::reset_game_if_session() {
     if (m_game_session) {
         reset();
     }
