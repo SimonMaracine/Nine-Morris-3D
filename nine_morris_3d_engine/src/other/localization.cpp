@@ -9,8 +9,6 @@
 #include "nine_morris_3d_engine/application/logging.hpp"
 #include "nine_morris_3d_engine/other/utilities.hpp"
 
-using namespace std::string_literals;
-
 namespace sm {
     static struct Localization {
         using Language = Id;
@@ -114,8 +112,6 @@ namespace sm {
         g_localization.language = id;
     }
 
-    // FIXME handle errors
-
     static const char* get_text_translations(const Localization::Translations& translations) {
         const auto iter {translations.find(g_localization.language)};
 
@@ -123,7 +119,11 @@ namespace sm {
             return iter->second.c_str();
         }
 
-        return translations.at(g_localization.default_language).c_str();
+        try {
+            return translations.at(g_localization.default_language).c_str();
+        } catch (const std::out_of_range& e) {
+            SM_THROW_ERROR(internal::ResourceError, "Could not find text in catalog: {}", e.what());
+        }
     }
 
     const char* localization::get_text(Id id) {
@@ -132,15 +132,18 @@ namespace sm {
 
     const char* localization::get_text(const char* string) {
         for (const auto& [_, translations] : g_localization.catalog) {
-            // Compare the full string
-            if (translations.at(g_localization.default_language) != string) {
+            try {
+                // Compare the full string
+                if (translations.at(g_localization.default_language) != string) {
+                    continue;
+                }
+            } catch (...) {
                 continue;
             }
 
             return get_text_translations(translations);
         }
 
-        // This will crash
-        return nullptr;
+        SM_THROW_ERROR(internal::ResourceError, "Could not find text in catalog");
     }
 }

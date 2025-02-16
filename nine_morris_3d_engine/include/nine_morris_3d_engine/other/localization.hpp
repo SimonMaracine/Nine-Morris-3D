@@ -26,7 +26,7 @@ namespace sm {
     namespace localization {
         // Load the file containing the text and the translations
         // There must be at least one "translation", the default one, usually english
-        // It should be catastrophic, if an erro occurrs
+        // It should be catastrophic, if an error occurrs
         void load_catalog(const std::filesystem::path& file_path);
 
         // Set the preferred language
