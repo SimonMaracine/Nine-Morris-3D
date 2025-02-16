@@ -131,31 +131,31 @@ void Ui::main_menu_bar(sm::Ctx& ctx, GameScene& game_scene) {
 
     if (ImGui::BeginMainMenuBar()) {
         if (ImGui::BeginMenu("Game"_L)) {
-            if (ImGui::MenuItem("New Game")) {
+            if (ImGui::MenuItem("New Game"_L)) {
                 game_scene.resign_leave_session_and_reset();
             }
-            if (ImGui::MenuItem("Resign", nullptr, nullptr, game_scene.resign_available())) {
+            if (ImGui::MenuItem("Resign"_L, nullptr, nullptr, game_scene.resign_available())) {
                 game_scene.resign(game_scene.resign_player());
                 game_scene.client_resign();
             }
-            if (ImGui::MenuItem("Accept Draw", nullptr, nullptr, game_scene.accept_draw_available())) {
+            if (ImGui::MenuItem("Accept Draw"_L, nullptr, nullptr, game_scene.accept_draw_available())) {
                 game_scene.accept_draw();
                 game_scene.client_accept_draw();
             }
-            if (ImGui::MenuItem("Offer Draw", nullptr, nullptr, game_scene.offer_draw_available())) {
+            if (ImGui::MenuItem("Offer Draw"_L, nullptr, nullptr, game_scene.offer_draw_available())) {
                 game_scene.client_offer_draw();
             }
-            if (ImGui::MenuItem("Game Options")) {
+            if (ImGui::MenuItem("Game Options"_L)) {
                 push_modal_window(ModalWindowGameOptions);
             }
-            if (ImGui::BeginMenu("Game Mode")) {
+            if (ImGui::BeginMenu("Game Mode"_L)) {
                 // Scene on_stop takes care of resigning and leaving the session
-                if (ImGui::RadioButton("Nine Men's Morris", &m_options.game_mode, GameModeNineMensMorris)) {
+                if (ImGui::RadioButton("Nine Men's Morris"_L, &m_options.game_mode, GameModeNineMensMorris)) {
                     if (std::exchange(g.options.game_mode, m_options.game_mode) != GameModeNineMensMorris) {
                         ctx.change_scene("nine_mens_morris"_H);
                     }
                 }
-                if (ImGui::RadioButton("Twelve Men's Morris", &m_options.game_mode, GameModeTwelveMensMorris)) {
+                if (ImGui::RadioButton("Twelve Men's Morris"_L, &m_options.game_mode, GameModeTwelveMensMorris)) {
                     if (std::exchange(g.options.game_mode, m_options.game_mode) != GameModeTwelveMensMorris) {
                         ctx.change_scene("twelve_mens_morris"_H);
                     }
@@ -163,18 +163,32 @@ void Ui::main_menu_bar(sm::Ctx& ctx, GameScene& game_scene) {
 
                 ImGui::EndMenu();
             }
-            if (ImGui::MenuItem("Analyze Games")) {
+            if (ImGui::MenuItem("Analyze Games"_L)) {
                 push_modal_window(ModalWindowAnalyzeGames);
             }
-            if (ImGui::MenuItem("Exit")) {
+            if (ImGui::MenuItem("Exit"_L)) {
                 ctx.running = false;
             }
 
             ImGui::EndMenu();
         }
-        if (ImGui::BeginMenu("Options")) {
-            if (ImGui::BeginMenu("Graphics")) {
-                if (ImGui::BeginMenu("Scale")) {
+        if (ImGui::BeginMenu("Options"_L)) {
+            if (ImGui::BeginMenu("Language"_L)) {
+                if (ImGui::RadioButton("English"_L, &m_options.language, LanguageEnglish)) {
+                    g.options.language = m_options.language;
+
+                    sm::localization::set_language("en"_H);
+                }
+                if (ImGui::RadioButton("Romanian"_L, &m_options.language, LanguageRomanian)) {
+                    g.options.language = m_options.language;
+
+                    sm::localization::set_language("ro"_H);
+                }
+
+                ImGui::EndMenu();
+            }
+            if (ImGui::BeginMenu("Graphics"_L)) {
+                if (ImGui::BeginMenu("Scale"_L)) {
                     if (ImGui::RadioButton("100%", &m_options.scale, Scale100)) {
                         if (std::exchange(g.options.scale, m_options.scale) != Scale100) {
                             set_scale_task(ctx, g.options.scale);
@@ -188,8 +202,8 @@ void Ui::main_menu_bar(sm::Ctx& ctx, GameScene& game_scene) {
 
                     ImGui::EndMenu();
                 }
-                if (ImGui::BeginMenu("Anti-Aliasing")) {
-                    if (ImGui::RadioButton("Off", &m_options.anti_aliasing, AntiAliasingOff)) {
+                if (ImGui::BeginMenu("Anti-Aliasing"_L)) {
+                    if (ImGui::RadioButton("Off"_L, &m_options.anti_aliasing, AntiAliasingOff)) {
                         if (std::exchange(g.options.anti_aliasing, m_options.anti_aliasing) != AntiAliasingOff) {
                             set_anti_aliasing_task(ctx, g.options.anti_aliasing);
                         }
@@ -207,8 +221,8 @@ void Ui::main_menu_bar(sm::Ctx& ctx, GameScene& game_scene) {
 
                     ImGui::EndMenu();
                 }
-                if (ImGui::BeginMenu("Anisotropic Filtering")) {
-                    if (ImGui::RadioButton("Off", &m_options.anisotropic_filtering, AnisotropicFilteringOff)) {
+                if (ImGui::BeginMenu("Anisotropic Filtering"_L)) {
+                    if (ImGui::RadioButton("Off"_L, &m_options.anisotropic_filtering, AnisotropicFilteringOff)) {
                         if (std::exchange(g.options.anisotropic_filtering, m_options.anisotropic_filtering) != AnisotropicFilteringOff) {
                             set_anisotropic_filtering_task(ctx, game_scene);
                         }
@@ -226,13 +240,13 @@ void Ui::main_menu_bar(sm::Ctx& ctx, GameScene& game_scene) {
 
                     ImGui::EndMenu();
                 }
-                if (ImGui::BeginMenu("Texture Quality")) {
-                    if (ImGui::RadioButton("Half", &m_options.texture_quality, TextureQualityHalf)) {
+                if (ImGui::BeginMenu("Texture Quality"_L)) {
+                    if (ImGui::RadioButton("Half"_L, &m_options.texture_quality, TextureQualityHalf)) {
                         if (std::exchange(g.options.texture_quality, m_options.texture_quality) != TextureQualityHalf) {
                             game_scene.reload_and_set_textures();
                         }
                     }
-                    if (ImGui::RadioButton("Full", &m_options.texture_quality, TextureQualityFull)) {
+                    if (ImGui::RadioButton("Full"_L, &m_options.texture_quality, TextureQualityFull)) {
                         if (std::exchange(g.options.texture_quality, m_options.texture_quality) != TextureQualityFull) {
                             game_scene.reload_and_set_textures();
                         }
@@ -240,13 +254,13 @@ void Ui::main_menu_bar(sm::Ctx& ctx, GameScene& game_scene) {
 
                     ImGui::EndMenu();
                 }
-                if (ImGui::BeginMenu("Shadow Quality")) {
-                    if (ImGui::RadioButton("Half", &m_options.shadow_quality, ShadowQualityHalf)) {
+                if (ImGui::BeginMenu("Shadow Quality"_L)) {
+                    if (ImGui::RadioButton("Half"_L, &m_options.shadow_quality, ShadowQualityHalf)) {
                         if (std::exchange(g.options.shadow_quality, m_options.shadow_quality) != ShadowQualityHalf) {
                             set_shadow_quality_task(ctx, g.options.shadow_quality);
                         }
                     }
-                    if (ImGui::RadioButton("Full", &m_options.shadow_quality, ShadowQualityFull)) {
+                    if (ImGui::RadioButton("Full"_L, &m_options.shadow_quality, ShadowQualityFull)) {
                         if (std::exchange(g.options.shadow_quality, m_options.shadow_quality) != ShadowQualityFull) {
                             set_shadow_quality_task(ctx, g.options.shadow_quality);
                         }
@@ -254,7 +268,7 @@ void Ui::main_menu_bar(sm::Ctx& ctx, GameScene& game_scene) {
 
                     ImGui::EndMenu();
                 }
-                if (ImGui::MenuItem("VSync", nullptr, &m_options.vsync)) {
+                if (ImGui::MenuItem("VSync"_L, nullptr, &m_options.vsync)) {
                     g.options.vsync = m_options.vsync;
 
                     ctx.set_window_vsync(g.options.vsync);
@@ -262,8 +276,8 @@ void Ui::main_menu_bar(sm::Ctx& ctx, GameScene& game_scene) {
 
                 ImGui::EndMenu();
             }
-            if (ImGui::BeginMenu("Audio")) {
-                if (ImGui::BeginMenu("Volume")) {
+            if (ImGui::BeginMenu("Audio"_L)) {
+                if (ImGui::BeginMenu("Volume"_L)) {
                     ImGui::PushItemWidth(rem(5.0f));
                     if (ImGui::SliderFloat("##", &m_options.audio_volume, 0.0f, 1.0f, "%.01f")) {
                         g.options.audio_volume = m_options.audio_volume;
@@ -277,53 +291,53 @@ void Ui::main_menu_bar(sm::Ctx& ctx, GameScene& game_scene) {
 
                 ImGui::EndMenu();
             }
-            if (ImGui::BeginMenu("Skybox")) {
+            if (ImGui::BeginMenu("Skybox"_L)) {
                 if (m_loading_skybox) {
-                    ImGui::RadioButton("None", false);
-                    ImGui::RadioButton("Field", false);
-                    ImGui::RadioButton("Autumn", false);
-                    ImGui::RadioButton("Summer", false);
-                    ImGui::RadioButton("Night", false);
-                    ImGui::RadioButton("Sunset", false);
-                    ImGui::RadioButton("Sky", false);
+                    ImGui::RadioButton("None"_L, false);
+                    ImGui::RadioButton("Field"_L, false);
+                    ImGui::RadioButton("Autumn"_L, false);
+                    ImGui::RadioButton("Summer"_L, false);
+                    ImGui::RadioButton("Night"_L, false);
+                    ImGui::RadioButton("Sunset"_L, false);
+                    ImGui::RadioButton("Sky"_L, false);
                 } else {
-                    if (ImGui::RadioButton("None", &m_options.skybox, SkyboxNone)) {
+                    if (ImGui::RadioButton("None"_L, &m_options.skybox, SkyboxNone)) {
                         if (std::exchange(g.options.skybox, m_options.skybox) != SkyboxNone) {
                             m_loading_skybox = true;
                             game_scene.reload_and_set_skybox();
                         }
                     }
-                    if (ImGui::RadioButton("Field", &m_options.skybox, SkyboxField)) {
+                    if (ImGui::RadioButton("Field"_L, &m_options.skybox, SkyboxField)) {
                         if (std::exchange(g.options.skybox, m_options.skybox) != SkyboxField) {
                             m_loading_skybox = true;
                             game_scene.reload_and_set_skybox();
                         }
                     }
-                    if (ImGui::RadioButton("Autumn", &m_options.skybox, SkyboxAutumn)) {
+                    if (ImGui::RadioButton("Autumn"_L, &m_options.skybox, SkyboxAutumn)) {
                         if (std::exchange(g.options.skybox, m_options.skybox) != SkyboxAutumn) {
                             m_loading_skybox = true;
                             game_scene.reload_and_set_skybox();
                         }
                     }
-                    if (ImGui::RadioButton("Summer", &m_options.skybox, SkyboxSummer)) {
+                    if (ImGui::RadioButton("Summer"_L, &m_options.skybox, SkyboxSummer)) {
                         if (std::exchange(g.options.skybox, m_options.skybox) != SkyboxSummer) {
                             m_loading_skybox = true;
                             game_scene.reload_and_set_skybox();
                         }
                     }
-                    if (ImGui::RadioButton("Night", &m_options.skybox, SkyboxNight)) {
+                    if (ImGui::RadioButton("Night"_L, &m_options.skybox, SkyboxNight)) {
                         if (std::exchange(g.options.skybox, m_options.skybox) != SkyboxNight) {
                             m_loading_skybox = true;
                             game_scene.reload_and_set_skybox();
                         }
                     }
-                    if (ImGui::RadioButton("Sunset", &m_options.skybox, SkyboxSunset)) {
+                    if (ImGui::RadioButton("Sunset"_L, &m_options.skybox, SkyboxSunset)) {
                         if (std::exchange(g.options.skybox, m_options.skybox) != SkyboxSunset) {
                             m_loading_skybox = true;
                             game_scene.reload_and_set_skybox();
                         }
                     }
-                    if (ImGui::RadioButton("Sky", &m_options.skybox, SkyboxSky)) {
+                    if (ImGui::RadioButton("Sky"_L, &m_options.skybox, SkyboxSky)) {
                         if (std::exchange(g.options.skybox, m_options.skybox) != SkyboxSky) {
                             m_loading_skybox = true;
                             game_scene.reload_and_set_skybox();
@@ -333,7 +347,7 @@ void Ui::main_menu_bar(sm::Ctx& ctx, GameScene& game_scene) {
 
                 ImGui::EndMenu();
             }
-            if (ImGui::BeginMenu("Camera Sensitivity")) {
+            if (ImGui::BeginMenu("Camera Sensitivity"_L)) {
                 ImGui::PushItemWidth(rem(5.0f));
                 if (ImGui::SliderFloat("##", &m_options.camera_sensitivity, 0.5f, 2.0f, "%.01f")) {
                     g.options.camera_sensitivity = m_options.camera_sensitivity;
@@ -344,54 +358,40 @@ void Ui::main_menu_bar(sm::Ctx& ctx, GameScene& game_scene) {
 
                 ImGui::EndMenu();
             }
-            if (ImGui::BeginMenu("Language"_L)) {
-                if (ImGui::RadioButton("English"_L, &m_options.language, LanguageEnglish)) {
-                    g.options.language = m_options.language;
-
-                    sm::localization::set_language("en"_H);
-                }
-                if (ImGui::RadioButton("Romanian"_L, &m_options.language, LanguageRomanian)) {
-                    g.options.language = m_options.language;
-
-                    sm::localization::set_language("ro"_H);
-                }
-
-                ImGui::EndMenu();
-            }
-            ImGui::MenuItem("Show Information", nullptr, &m_show_information);
+            ImGui::MenuItem("Show Information"_L, nullptr, &m_show_information);
 
             ImGui::EndMenu();
         }
-        if (ImGui::BeginMenu("Engine")) {
-            if (ImGui::BeginMenu("Name", static_cast<bool>(game_scene.get_engine()))) {
+        if (ImGui::BeginMenu("Engine"_L)) {
+            if (ImGui::BeginMenu("Name"_L, static_cast<bool>(game_scene.get_engine()))) {
                 ImGui::Text("%s", game_scene.get_engine()->get_name().c_str());
 
                 ImGui::EndMenu();
             }
-            if (ImGui::BeginMenu("Author", static_cast<bool>(game_scene.get_engine()))) {
+            if (ImGui::BeginMenu("Author"_L, static_cast<bool>(game_scene.get_engine()))) {
                 ImGui::Text("%s", game_scene.get_engine()->get_author().c_str());
 
                 ImGui::EndMenu();
             }
-            if (ImGui::MenuItem("Restart", nullptr, nullptr, !game_scene.get_engine())) {
+            if (ImGui::MenuItem("Restart"_L, nullptr, nullptr, !game_scene.get_engine())) {
                 game_scene.start_engine();
             }
 
             ImGui::EndMenu();
         }
-        if (ImGui::BeginMenu("Server")) {
-            if (ImGui::BeginMenu("Status")) {
+        if (ImGui::BeginMenu("Server"_L)) {
+            if (ImGui::BeginMenu("Status"_L)) {
                 const char* status {};
 
                 switch (g.client.get_connection_state()) {
                     case ConnectionState::Disconnected:
-                        status = "Disconnected";
+                        status = "Disconnected"_L;
                         break;
                     case ConnectionState::Connecting:
-                        status = "Connecting";
+                        status = "Connecting"_L;
                         break;
                     case ConnectionState::Connected:
-                        status = "Connected";
+                        status = "Connected"_L;
                         break;
                 }
 
@@ -399,41 +399,41 @@ void Ui::main_menu_bar(sm::Ctx& ctx, GameScene& game_scene) {
 
                 ImGui::EndMenu();
             }
-            if (ImGui::BeginMenu("Session")) {
-                if (ImGui::BeginMenu("Code", static_cast<bool>(game_scene.get_game_session()))) {
+            if (ImGui::BeginMenu("Session"_L)) {
+                if (ImGui::BeginMenu("Code"_L, static_cast<bool>(game_scene.get_game_session()))) {
                     ImGui::Text("%.5u", game_scene.get_game_session()->get_session_id());
 
                     ImGui::EndMenu();
                 }
 
                 ImGui::PushItemWidth(rem(6.0f));
-                if (ImGui::InputText("Name", m_options.name, sizeof(m_options.name))) {
+                if (ImGui::InputText("Name"_L, m_options.name, sizeof(m_options.name))) {
                     std::memcpy(g.options.name, m_options.name, sizeof(m_options.name));
                 }
                 ImGui::PopItemWidth();
 
                 if (ImGui::IsItemHovered(ImGuiHoveredFlags_DelayNormal)) {
-                    ImGui::SetTooltip("Your name appears to other players.");
+                    ImGui::SetTooltip("session_name_tooltip"_L);
                 }
 
                 ImGui::EndMenu();
             }
-            if (ImGui::BeginMenu("Address")) {
-                if (ImGui::Checkbox("Default", &m_options.default_address_port)) {
+            if (ImGui::BeginMenu("Address"_L)) {
+                if (ImGui::Checkbox("Default"_L, &m_options.default_address_port)) {
                     g.options.default_address_port = m_options.default_address_port;
                 }
                 ImGui::PushItemWidth(rem(5.0f));
                 if (g.options.default_address_port) {
                     ImGui::BeginDisabled();
-                    ImGui::InputText("Address", m_options.address, sizeof(m_options.address));
-                    ImGui::InputText("Port", m_options.port, sizeof(m_options.port));
+                    ImGui::InputText("Address"_L, m_options.address, sizeof(m_options.address));
+                    ImGui::InputText("Port"_L, m_options.port, sizeof(m_options.port));
                     ImGui::EndDisabled();
                 } else {
-                    if (ImGui::InputText("Address", m_options.address, sizeof(m_options.address))) {
+                    if (ImGui::InputText("Address"_L, m_options.address, sizeof(m_options.address))) {
                         std::memcpy(g.options.address, m_options.address, sizeof(m_options.address));
                     }
 
-                    if (ImGui::InputText("Port", m_options.port, sizeof(m_options.port))) {
+                    if (ImGui::InputText("Port"_L, m_options.port, sizeof(m_options.port))) {
                         std::memcpy(g.options.port, m_options.port, sizeof(m_options.port));
                     }
                 }
@@ -441,7 +441,7 @@ void Ui::main_menu_bar(sm::Ctx& ctx, GameScene& game_scene) {
 
                 ImGui::EndMenu();
             }
-            if (ImGui::MenuItem("Reconnect")) {
+            if (ImGui::MenuItem("Reconnect"_L)) {
                 if (g.options.default_address_port) {
                     game_scene.connect();
                 } else {
@@ -451,27 +451,27 @@ void Ui::main_menu_bar(sm::Ctx& ctx, GameScene& game_scene) {
 
             ImGui::EndMenu();
         }
-        if (ImGui::BeginMenu("Help")) {
-            if (ImGui::MenuItem("General Play")) {
+        if (ImGui::BeginMenu("Help"_L)) {
+            if (ImGui::MenuItem("General Play"_L)) {
                 push_modal_window(ModalWindowGeneralPlay);
             }
-            if (ImGui::MenuItem("Online Play")) {
+            if (ImGui::MenuItem("Online Play"_L)) {
                 push_modal_window(ModalWindowOnlinePlay);
             }
-            if (ImGui::BeginMenu("Game Rules")) {
-                if (ImGui::MenuItem("Nine Men's Morris")) {
+            if (ImGui::BeginMenu("Game Rules"_L)) {
+                if (ImGui::MenuItem("Nine Men's Morris"_L)) {
                     push_modal_window(ModalWindowRulesNineMensMorris);
                 }
-                if (ImGui::MenuItem("Twelve Men's Morris")) {
+                if (ImGui::MenuItem("Twelve Men's Morris"_L)) {
                     push_modal_window(ModalWindowRulesTwelveMensMorris);
                 }
 
                 ImGui::EndMenu();
             }
-            if (ImGui::MenuItem("About")) {
+            if (ImGui::MenuItem("About"_L)) {
                 push_modal_window(ModalWindowAbout);
             }
-            if (ImGui::MenuItem("Log Information")) {
+            if (ImGui::MenuItem("Log Information"_L)) {
                 sm::utils::write_file(ctx.path_logs("nine_morris_3d.txt"), ctx.get_information(), true);
             }
             if (ImGui::IsItemHovered(ImGuiHoveredFlags_DelayNormal)) {
@@ -520,7 +520,7 @@ void Ui::game_window(sm::Ctx& ctx, GameScene& game_scene) {
 
     ImGui::SetNextWindowSize(ImVec2(width, height), ImGuiCond_Always);
 
-    if (ImGui::Begin("Game", nullptr, ImGuiWindowFlags_NoDecoration)) {
+    if (ImGui::Begin("##Game", nullptr, ImGuiWindowFlags_NoDecoration)) {
         if (game_scene.get_game_state() == GameState::Analyze) {
             analyze_game_window(game_scene);
         } else if (game_scene.get_game_state() != GameState::Ready) {
@@ -549,9 +549,9 @@ void Ui::before_game_window(sm::Ctx& ctx, GameScene& game_scene) {
     const auto minutes {std::get<0>(Clock::split_time(game_scene.get_clock().get_white_time()))};
 
     if (minutes == 1) {
-        ImGui::TextWrapped("%u minute", minutes);
+        ImGui::TextWrapped("%u minute"_L, minutes);
     } else {
-        ImGui::TextWrapped("%u minutes", minutes);
+        ImGui::TextWrapped("%u minutes"_L, minutes);
     }
 }
 
@@ -560,7 +560,7 @@ void Ui::before_game_local_window(sm::Ctx& ctx, GameScene& game_scene) {
 
     // The engine may be down, so don't allow play
     ImGui::BeginDisabled(g.options.game_type == GameTypeLocalVsComputer && !game_scene.get_engine());
-    if (ImGui::Button("Start Game")) {
+    if (ImGui::Button("Start Game"_L)) {
         game_scene.get_game_state() = GameState::Start;
     }
     ImGui::EndDisabled();
@@ -571,12 +571,13 @@ void Ui::before_game_local_window(sm::Ctx& ctx, GameScene& game_scene) {
 
     switch (g.options.game_type) {
         case GameTypeLocal:
-            ImGui::TextWrapped("Local game between two human players");
+            ImGui::TextWrapped("local_game_two_humans_description"_L);
             break;
         case GameTypeLocalVsComputer:
-            ImGui::TextWrapped("Local game between human and computer player");
+            ImGui::TextWrapped("local_game_human_computer_description"_L);
             ImGui::TextWrapped(
-                "Computer plays as %s",
+                "%s %s",
+                "Computer plays as"_L,
                 to_string(static_cast<PlayerColor>(game_scene.get_game_options().computer_color))
             );
             break;
@@ -595,14 +596,14 @@ void Ui::before_game_online_window(sm::Ctx& ctx, GameScene& game_scene) {
     ImGui::BeginDisabled(g.client.get_connection_state() == ConnectionState::Disconnected);
 
     ImGui::BeginDisabled(static_cast<bool>(game_scene.get_game_session()));
-    if (ImGui::Button("Start Game")) {
+    if (ImGui::Button("Start Game"_L)) {
         game_scene.client_request_game_session();
     }
     ImGui::EndDisabled();
 
     // The user must enter 5 digits
     ImGui::BeginDisabled(!join_game_available(game_scene));
-    if (ImGui::Button("Join Game")) {
+    if (ImGui::Button("Join Game"_L)) {
         game_scene.client_request_join_game_session(m_session_id);
     }
     ImGui::EndDisabled();
@@ -610,7 +611,7 @@ void Ui::before_game_online_window(sm::Ctx& ctx, GameScene& game_scene) {
     ImGui::SameLine();
 
     ImGui::PushItemWidth(rem(3.0f));
-    if (ImGui::InputText("Code", m_session_id, sizeof(m_session_id), ImGuiInputTextFlags_EnterReturnsTrue)) {
+    if (ImGui::InputText("Code"_L, m_session_id, sizeof(m_session_id), ImGuiInputTextFlags_EnterReturnsTrue)) {
         if (join_game_available(game_scene)) {
             game_scene.client_request_join_game_session(m_session_id);
         }
@@ -623,9 +624,10 @@ void Ui::before_game_online_window(sm::Ctx& ctx, GameScene& game_scene) {
     ImGui::Separator();
     ImGui::Dummy(ImVec2(0.0f, rem(0.1f)));
 
-    ImGui::TextWrapped("Online game between two human players");
+    ImGui::TextWrapped("online_hame_two_humans_description"_L);
     ImGui::TextWrapped(
-        "Remote plays as %s",
+        "%s %s",
+        "Remote plays as"_L,
         to_string(static_cast<PlayerColor>(game_scene.get_game_options().remote_color))
     );
 }
@@ -669,7 +671,7 @@ void Ui::analyze_game_window(GameScene& game_scene) {
     }};
 
     ImGui::BeginDisabled(game_analysis->ply == 0);
-    if (ImGui::Button("Previous")) {
+    if (ImGui::Button("Previous"_L)) {
         game_analysis->ply--;
 
         game_scene.reset_board(saved_game.initial_position);
@@ -701,7 +703,7 @@ void Ui::analyze_game_window(GameScene& game_scene) {
     ImGui::SameLine();
 
     ImGui::BeginDisabled(game_analysis->ply == saved_game.moves.size() || !game_scene.get_board().is_turn_finished());
-    if (ImGui::Button("Next")) {
+    if (ImGui::Button("Next"_L)) {
         const auto& [move, time] {saved_game.moves.at(game_analysis->ply)};
 
         game_scene.get_board().enable_move_callback(false);
@@ -738,42 +740,42 @@ void Ui::analyze_game_window(GameScene& game_scene) {
 }
 
 void Ui::about_window() {
-    modal_window_ok("About Nine Morris 3D", []() {
-        ImGui::Text("A 3D implementation of the board game nine men's morris");
-        ImGui::Text("Version %u.%u.%u", VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH);
+    modal_window_ok("About Nine Morris 3D"_L, []() {
+        ImGui::Text("about_description"_L);
+        ImGui::Text("Version %u.%u.%u"_L, VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH);
         ImGui::Separator();
-        ImGui::Text("All programming by:");
+        ImGui::Text("All programming by:"_L);
         ImGui::Text("Simon <simonmara.dev@gmail.com>");
     });
 }
 
 void Ui::general_play_window() {
     modal_window_ok_size_constraints(
-        "Help General Play",
+        "Help General Play"_L,
         []() {
-            ImGui::SeparatorText("Starting A Game:");
+            ImGui::SeparatorText("Starting A Game:"_L);
             ImGui::Bullet();
             ImGui::SameLine();
-            ImGui::TextWrapped("From the menu, select the type of game you want to play: Game Mode and Game Options.");
+            ImGui::TextWrapped("help_general_play_starting_a_game1"_L);
             ImGui::Bullet();
             ImGui::SameLine();
-            ImGui::TextWrapped("Start the game from the right side interface.");
+            ImGui::TextWrapped("help_general_play_starting_a_game2"_L);
             ImGui::Bullet();
             ImGui::SameLine();
-            ImGui::TextWrapped("To play another game, simply select New Game from the menu.");
+            ImGui::TextWrapped("help_general_play_starting_a_game3"_L);
 
             ImGui::Spacing();
 
-            ImGui::SeparatorText("Game Controls:");
+            ImGui::SeparatorText("Game Controls:"_L);
             ImGui::Bullet();
             ImGui::SameLine();
-            ImGui::TextWrapped("Interact with the board and pieces by using the left mouse click.");
+            ImGui::TextWrapped("help_general_play_game_controls1"_L);
             ImGui::Bullet();
             ImGui::SameLine();
-            ImGui::TextWrapped("Move the camera by dragging the mouse with right click, or by using the keys: W, A, S, D, R, F.");
+            ImGui::TextWrapped("help_general_play_game_controls2"_L);
             ImGui::Bullet();
             ImGui::SameLine();
-            ImGui::TextWrapped("Reset the camera to the default position by pressing the space key.");
+            ImGui::TextWrapped("help_general_play_game_controls3"_L);
         },
         glm::vec2(MIN_WIDTH - rem(1.0f), 0.0f),
         glm::vec2(ImGui::GetMainViewport()->WorkSize.x - rem(0.5f), ImGui::GetMainViewport()->WorkSize.y - rem(0.5f))
@@ -782,43 +784,27 @@ void Ui::general_play_window() {
 
 void Ui::online_play_window() {
     modal_window_ok_size_constraints(
-        "Help Online Play",
+        "Help Online Play"_L,
         []() {
             ImGui::Bullet();
             ImGui::SameLine();
-            ImGui::TextWrapped(
-                "Playing online with somebody is very simple: One party has to create the game and send the code to the opponent"
-                " and the other party has to simply enter the code and join the game."
-            );
-            ImGui::TextWrapped("Before playing, though, know these things:");
+            ImGui::TextWrapped("help_general_play1"_L);
+            ImGui::TextWrapped("help_general_play2"_L);
             ImGui::Bullet();
             ImGui::SameLine();
-            ImGui::TextWrapped(
-                "Each player has a name that by default is empty. Configure your name from the menu by selecting"
-                " Server then Session and then Name. Your name is visible to the other player during the game"
-                " and it is purely for aesthetics."
-            );
+            ImGui::TextWrapped("help_general_play3"_L);
             ImGui::Bullet();
             ImGui::SameLine();
-            ImGui::TextWrapped("During the game, players may choose to resign, to offer or to accept a draw. They can do so from the menu.");
+            ImGui::TextWrapped("help_general_play4"_L);
             ImGui::Bullet();
             ImGui::SameLine();
-            ImGui::TextWrapped(
-                "After a game, players may choose to play again by selecting Rematch. In the next game they"
-                " will have swapped sides, and will play with the same time controls."
-            );
+            ImGui::TextWrapped("help_general_play5"_L);
             ImGui::Bullet();
             ImGui::SameLine();
-            ImGui::TextWrapped(
-                "If one somehow gets disconnected from the server or the game crashes, as long as the remote"
-                " doesn't leave the game, they can simply rejoin with the same code and continue the game"
-                " from where they left off."
-            );
+            ImGui::TextWrapped("help_general_play6"_L);
             ImGui::Bullet();
             ImGui::SameLine();
-            ImGui::TextWrapped(
-                "Please refrain from cheating. Have fun! :)"
-            );
+            ImGui::TextWrapped("help_general_play7"_L);
         },
         glm::vec2(MIN_WIDTH - rem(1.0f), 0.0f),
         glm::vec2(ImGui::GetMainViewport()->WorkSize.x - rem(0.5f), ImGui::GetMainViewport()->WorkSize.y - rem(0.5f))
@@ -826,7 +812,7 @@ void Ui::online_play_window() {
 }
 
 void Ui::game_over_window(GameScene& game_scene) {
-    modal_window_ok("Game Over", [&]() {
+    modal_window_ok("Game Over"_L, [&]() {
         const char* message {};
 
         switch (game_scene.get_board().get_game_over()) {
@@ -834,13 +820,13 @@ void Ui::game_over_window(GameScene& game_scene) {
                 assert(false);
                 break;
             case GameOver::WinnerWhite:
-                message = "White player wins!";
+                message = "White player wins!"_L;
                 break;
             case GameOver::WinnerBlack:
-                message = "Black player wins!";
+                message = "Black player wins!"_L;
                 break;
             case GameOver::Draw:
-                message = "Draw!";
+                message = "Draw!"_L;
                 break;
         }
 
@@ -856,22 +842,22 @@ void Ui::game_over_window(GameScene& game_scene) {
 
 void Ui::game_options_window(sm::Ctx& ctx, GameScene& game_scene) {
     modal_window_ok_size(
-        "Game Options",
+        "Game Options"_L,
         [&]() {
             auto& g {ctx.global<Global>()};
             GameOptions& game_options {game_scene.get_game_options()};
 
             ImGui::BeginDisabled(game_scene.get_game_state() != GameState::Ready);
 
-            ImGui::SeparatorText("Game Type");
-            if (ImGui::RadioButton("Local", &g.options.game_type, GameTypeLocal)) {
+            ImGui::SeparatorText("Game Type"_L);
+            if (ImGui::RadioButton("Local"_L, &g.options.game_type, GameTypeLocal)) {
                 game_scene.reset_camera_position();
             }
             ImGui::SameLine();
-            if (ImGui::RadioButton("Local vs Computer", &g.options.game_type, GameTypeLocalVsComputer)) {
+            if (ImGui::RadioButton("Local vs Computer"_L, &g.options.game_type, GameTypeLocalVsComputer)) {
                 game_scene.reset_camera_position();
             }
-            if (ImGui::RadioButton("Online", &g.options.game_type, GameTypeOnline)) {
+            if (ImGui::RadioButton("Online"_L, &g.options.game_type, GameTypeOnline)) {
                 game_scene.reset_camera_position();
             }
             ImGui::Dummy(ImVec2(0.0f, rem(0.4f)));
@@ -880,30 +866,30 @@ void Ui::game_options_window(sm::Ctx& ctx, GameScene& game_scene) {
                 case GameTypeLocal:
                     break;
                 case GameTypeLocalVsComputer:
-                    ImGui::SeparatorText("Computer Plays As");
-                    if (ImGui::RadioButton("White", &game_options.computer_color, PlayerColorWhite)) {
+                    ImGui::SeparatorText("Computer Plays As"_L);
+                    if (ImGui::RadioButton("White"_L, &game_options.computer_color, PlayerColorWhite)) {
                         game_scene.reset_camera_position();
                     }
                     ImGui::SameLine();
-                    if (ImGui::RadioButton("Black", &game_options.computer_color, PlayerColorBlack)) {
+                    if (ImGui::RadioButton("Black"_L, &game_options.computer_color, PlayerColorBlack)) {
                         game_scene.reset_camera_position();
                     }
                     ImGui::Dummy(ImVec2(0.0f, rem(0.4f)));
                     break;
                 case GameTypeOnline:
-                    ImGui::SeparatorText("Remote Plays As");
-                    if (ImGui::RadioButton("White", &game_options.remote_color, PlayerColorWhite)) {
+                    ImGui::SeparatorText("Remote Plays As"_L);
+                    if (ImGui::RadioButton("White"_L, &game_options.remote_color, PlayerColorWhite)) {
                         game_scene.reset_camera_position();
                     }
                     ImGui::SameLine();
-                    if (ImGui::RadioButton("Black", &game_options.remote_color, PlayerColorBlack)) {
+                    if (ImGui::RadioButton("Black"_L, &game_options.remote_color, PlayerColorBlack)) {
                         game_scene.reset_camera_position();
                     }
                     ImGui::Dummy(ImVec2(0.0f, rem(0.4f)));
                     break;
             }
 
-            ImGui::SeparatorText("Time Control");
+            ImGui::SeparatorText("Time Control"_L);
             game_scene.time_control_options_window();
 
             ImGui::EndDisabled();
@@ -914,21 +900,21 @@ void Ui::game_options_window(sm::Ctx& ctx, GameScene& game_scene) {
 
 void Ui::analyze_games_window(GameScene& game_scene) {
     modal_window_ok_size(
-        "Analyze Games",
+        "Analyze Games"_L,
         [&]() {
-            ImGui::TextWrapped("Select the game that you want to analyze.");
+            ImGui::TextWrapped("analyze_games_tip"_L);
 
             ImGui::Dummy(ImVec2(0.0f, Ui::rem(0.5f)));
 
             ImGui::SetNextWindowSizeConstraints(ImVec2(0.0f, 0.0f), ImVec2(FLT_MAX, rem(15.0f)));
 
-            if (ImGui::BeginChild("Games", {}, ImGuiChildFlags_AutoResizeY)) {
-                if (ImGui::BeginTable("Games", 5, ImGuiTableFlags_SizingStretchProp | ImGuiTableFlags_PadOuterX)) {
-                    ImGui::TableSetupColumn("Index", ImGuiTableColumnFlags_NoHeaderLabel);
-                    ImGui::TableSetupColumn("Date & Time");
-                    ImGui::TableSetupColumn("Type");
-                    ImGui::TableSetupColumn("Moves");
-                    ImGui::TableSetupColumn("Result");
+            if (ImGui::BeginChild("##Games", {}, ImGuiChildFlags_AutoResizeY)) {
+                if (ImGui::BeginTable("##GamesTable", 5, ImGuiTableFlags_SizingStretchProp | ImGuiTableFlags_PadOuterX)) {
+                    ImGui::TableSetupColumn("##Index", ImGuiTableColumnFlags_NoHeaderLabel);
+                    ImGui::TableSetupColumn("Date & Time"_L);
+                    ImGui::TableSetupColumn("Type"_L);
+                    ImGui::TableSetupColumn("Moves"_L);
+                    ImGui::TableSetupColumn("Result"_L);
                     ImGui::TableHeadersRow();
 
                     const auto& saved_games {game_scene.get_saved_games().get()};
@@ -967,43 +953,43 @@ void Ui::analyze_games_window(GameScene& game_scene) {
 }
 
 void Ui::engine_error_window() {
-    modal_window_ok("Engine Error", []() {
-        ImGui::Text("An error occurred with the engine. It has probably crashed.");
-        ImGui::Text("You may want to restart it.");
+    modal_window_ok("Engine Error"_L, []() {
+        ImGui::Text("engine_error_description1"_L);
+        ImGui::Text("engine_error_description2"_L);
     });
 }
 
 void Ui::connection_error_window() {
-    modal_window_ok("Connection Error", []() {
-        ImGui::Text("An error occurred with the connection to the server.");
-        ImGui::Text("You may want to reconnect.");
+    modal_window_ok("Connection Error"_L, []() {
+        ImGui::Text("connection_error_description1"_L);
+        ImGui::Text("connection_error_description2"_L);
     });
 }
 
 void Ui::server_rejection_window(const std::string& string) {
-    modal_window_ok("Server Error", [&string]() {
-        ImGui::Text("The server rejected the connection.");
+    modal_window_ok("Server Error"_L, [&string]() {
+        ImGui::Text("server_error_description"_L);
         ImGui::Text("%s.", string.c_str());
     });
 }
 
 void Ui::new_game_session_error_window(const std::string& string) {
-    modal_window_ok("New Online Game Error", [&string]() {
-        ImGui::Text("Could not start a new online game.");
+    modal_window_ok("New Online Game Error"_L, [&string]() {
+        ImGui::Text("new_online_game_error_description"_L);
         ImGui::Text("%s.", string.c_str());
     });
 }
 
 void Ui::join_game_session_error_window(const std::string& string) {
-    modal_window_ok("Join Online Game Error", [&string]() {
-        ImGui::Text("Could not join the online game.");
+    modal_window_ok("Join Online Game Error"_L, [&string]() {
+        ImGui::Text("join_online_game_error_description"_L);
         ImGui::Text("%s.", string.c_str());
     });
 }
 
 void Ui::wait_server_accept_game_session_window(GameScene&) {
-    modal_window("Waiting For Server To Accept", []() {
-        ImGui::Text("The server should reply any time soon.");
+    modal_window("Waiting For Server To Accept"_L, []() {
+        ImGui::Text("waiting_for_server_to_accept_description"_L);
 
         return false;
     });
@@ -1012,13 +998,13 @@ void Ui::wait_server_accept_game_session_window(GameScene&) {
 void Ui::wait_remote_join_game_session_window(GameScene& game_scene) {
     assert(game_scene.get_game_session());
 
-    modal_window("Waiting For Player To Join", [&game_scene]() {
-        ImGui::Text("An online game has been created.");
-        ImGui::Text("Send your opponent the following code: %.5u", game_scene.get_game_session()->get_session_id());
+    modal_window("Waiting For Player To Join"_L, [&game_scene]() {
+        ImGui::Text("waiting_for_player_to_join_description1"_L);
+        ImGui::Text("%s: %.5u", "waiting_for_player_to_join_description2"_L, game_scene.get_game_session()->get_session_id());
 
         ImGui::Dummy(ImVec2(0.0f, rem(0.5f)));
 
-        if (ImGui::Button("Cancel Game")) {
+        if (ImGui::Button("Cancel Game"_L)) {
             // If the other user has already joined, it will still be notified by our forfeit
             game_scene.client_leave_game_session();
 
@@ -1030,8 +1016,8 @@ void Ui::wait_remote_join_game_session_window(GameScene& game_scene) {
 }
 
 void Ui::wait_server_accept_join_game_session_window(GameScene&) {
-    modal_window("Waiting For Server To Accept", []() {
-        ImGui::Text("The server should reply any time soon.");
+    modal_window("Waiting For Server To Accept"_L, []() {
+        ImGui::Text("waiting_for_server_to_accept_description"_L);
 
         return false;
     });
@@ -1040,13 +1026,13 @@ void Ui::wait_server_accept_join_game_session_window(GameScene&) {
 void Ui::wait_remote_rematch_window(GameScene& game_scene) {
     assert(game_scene.get_game_session());
 
-    modal_window("Waiting For Player", [&game_scene]() {
-        ImGui::Text("For another game to begin, the opponent has to accept a rematch as well.");
-        ImGui::Text("Once the opponnent has accepted the rematch, it cannot be canceled.");
+    modal_window("Waiting For Player"_L, [&game_scene]() {
+        ImGui::Text("waiting_for_player_description1"_L);
+        ImGui::Text("waiting_for_player_description2"_L);
 
         ImGui::Dummy(ImVec2(0.0f, rem(0.5f)));
 
-        if (ImGui::Button("Cancel Rematch")) {
+        if (ImGui::Button("Cancel Rematch"_L)) {
             game_scene.client_cancel_rematch();
         }
 
@@ -1056,26 +1042,26 @@ void Ui::wait_remote_rematch_window(GameScene& game_scene) {
 
 void Ui::rules_nine_mens_morris_window() {
     modal_window_ok_size_constraints(
-        "Nine Men's Morris Rules",
+        "Nine Men's Morris Rules"_L,
         []() {
             ImGui::Bullet();
             ImGui::SameLine();
-            ImGui::TextWrapped("Each player has nine pieces, either black or white.");
+            ImGui::TextWrapped("nine_mens_morris_rules1"_L);
             ImGui::Bullet();
             ImGui::SameLine();
-            ImGui::TextWrapped("A player wins by reducing the opponent to two pieces, or by leaving them without a legal move.");
+            ImGui::TextWrapped("nine_mens_morris_rules2"_L);
             ImGui::Bullet();
             ImGui::SameLine();
-            ImGui::TextWrapped("When a player remains with three pieces, they can jump on the board.");
+            ImGui::TextWrapped("nine_mens_morris_rules3"_L);
             ImGui::Bullet();
             ImGui::SameLine();
-            ImGui::TextWrapped("A player may take a piece from a mill only if there are no other pieces available.");
+            ImGui::TextWrapped("nine_mens_morris_rules4"_L);
             ImGui::Bullet();
             ImGui::SameLine();
-            ImGui::TextWrapped("The game ends with a draw when fifty turns are made without mills.");
+            ImGui::TextWrapped("nine_mens_morris_rules5"_L);
             ImGui::Bullet();
             ImGui::SameLine();
-            ImGui::TextWrapped("The game ends with a draw when the same position happens three times.");
+            ImGui::TextWrapped("nine_mens_morris_rules6"_L);
         },
         glm::vec2(MIN_WIDTH - rem(1.0f), 0.0f),
         glm::vec2(ImGui::GetMainViewport()->WorkSize.x - rem(0.5f), ImGui::GetMainViewport()->WorkSize.y - rem(0.5f))
@@ -1084,15 +1070,15 @@ void Ui::rules_nine_mens_morris_window() {
 
 void Ui::rules_twelve_mens_morris_window() {
     modal_window_ok_size_constraints(
-        "Twelve Men's Morris Rules",
+        "Twelve Men's Morris Rules"_L,
         []() {
-            ImGui::TextWrapped("Same rules apply as in nine men's morris, except the following:");
+            ImGui::TextWrapped("twelve_mens_morris_rules1"_L);
             ImGui::Bullet();
             ImGui::SameLine();
-            ImGui::TextWrapped("Each player has twelve pieces instead of nine.");
+            ImGui::TextWrapped("twelve_mens_morris_rules2"_L);
             ImGui::Bullet();
             ImGui::SameLine();
-            ImGui::TextWrapped("Players can make mills and move pieces along the diagonals.");
+            ImGui::TextWrapped("twelve_mens_morris_rules3"_L);
         },
         glm::vec2(MIN_WIDTH - rem(1.0f), 0.0f),
         glm::vec2(ImGui::GetMainViewport()->WorkSize.x - rem(0.5f), ImGui::GetMainViewport()->WorkSize.y - rem(0.5f))
@@ -1129,7 +1115,7 @@ void Ui::modal_window_ok(const char* title, std::function<void()>&& contents) {
         const float ok_button_width {rem(6.0f)};
         ImGui::SetCursorPosX((ImGui::GetWindowWidth() - ok_button_width) * 0.5f);
 
-        if (ImGui::Button("Ok", ImVec2(ok_button_width, 0.0f))) {
+        if (ImGui::Button("Okay"_L, ImVec2(ok_button_width, 0.0f))) {
             ImGui::CloseCurrentPopup();
             m_modal_window_queue.pop_front();
         }
@@ -1158,7 +1144,7 @@ void Ui::modal_window_ok_size(
         const float ok_button_width {rem(6.0f)};
         ImGui::SetCursorPosX((ImGui::GetWindowWidth() - ok_button_width) * 0.5f);
 
-        if (ImGui::Button("Ok", ImVec2(ok_button_width, 0.0f))) {
+        if (ImGui::Button("Okay"_L, ImVec2(ok_button_width, 0.0f))) {
             ImGui::CloseCurrentPopup();
             m_modal_window_queue.pop_front();
         }
@@ -1188,7 +1174,7 @@ void Ui::modal_window_ok_size_constraints(
         const float ok_button_width {rem(6.0f)};
         ImGui::SetCursorPosX((ImGui::GetWindowWidth() - ok_button_width) * 0.5f);
 
-        if (ImGui::Button("Ok", ImVec2(ok_button_width, 0.0f))) {
+        if (ImGui::Button("Okay"_L, ImVec2(ok_button_width, 0.0f))) {
             ImGui::CloseCurrentPopup();
             m_modal_window_queue.pop_front();
         }
@@ -1251,7 +1237,7 @@ void Ui::create_font(sm::Ctx& ctx, int scale) {
 
     ImFontGlyphRangesBuilder builder;
     builder.AddRanges(io.Fonts->GetGlyphRangesDefault());
-    builder.AddText(reinterpret_cast<const char*>(u8"ă"));
+    builder.AddText(reinterpret_cast<const char*>(u8"ăîâșțĂÎÂȘȚ„”"));
     ImVector<ImWchar> ranges;
     builder.BuildRanges(&ranges);
 

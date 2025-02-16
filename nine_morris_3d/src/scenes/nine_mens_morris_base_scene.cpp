@@ -10,6 +10,8 @@
 #include "game/ray.hpp"
 #include "global.hpp"
 
+using namespace sm::localization_literals;
+
 void NineMensMorrisBaseScene::scene_setup() {
     m_board = initialize_board();
     m_game_options.time_enum = NineMensMorrisTime10min;
@@ -178,29 +180,29 @@ void NineMensMorrisBaseScene::accept_draw() {
 }
 
 void NineMensMorrisBaseScene::time_control_options_window() {
-    if (ImGui::RadioButton("1 min", &m_game_options.time_enum, NineMensMorrisTime1min)) {
+    if (ImGui::RadioButton("1 min"_L, &m_game_options.time_enum, NineMensMorrisTime1min)) {
         m_clock.reset(Clock::as_milliseconds(1));
     }
 
     ImGui::SameLine();
 
-    if (ImGui::RadioButton("3 min", &m_game_options.time_enum, NineMensMorrisTime3min)) {
+    if (ImGui::RadioButton("3 min"_L, &m_game_options.time_enum, NineMensMorrisTime3min)) {
         m_clock.reset(Clock::as_milliseconds(3));
     }
 
     ImGui::SameLine();
 
-    if (ImGui::RadioButton("10 min", &m_game_options.time_enum, NineMensMorrisTime10min)) {
+    if (ImGui::RadioButton("10 min"_L, &m_game_options.time_enum, NineMensMorrisTime10min)) {
         m_clock.reset(Clock::as_milliseconds(10));
     }
 
-    if (ImGui::RadioButton("60 min", &m_game_options.time_enum, NineMensMorrisTime60min)) {
+    if (ImGui::RadioButton("60 min"_L, &m_game_options.time_enum, NineMensMorrisTime60min)) {
         m_clock.reset(Clock::as_milliseconds(60));
     }
 
     ImGui::SameLine();
 
-    if (ImGui::RadioButton("Custom", &m_game_options.time_enum, NineMensMorrisTimeCustom)) {
+    if (ImGui::RadioButton("Custom"_L, &m_game_options.time_enum, NineMensMorrisTimeCustom)) {
         m_game_options.custom_time = std::clamp(m_game_options.custom_time, 0, 999);
         m_clock.reset(Clock::as_milliseconds(m_game_options.custom_time));
     }

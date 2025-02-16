@@ -4,6 +4,8 @@
 #include "options.hpp"
 #include "window_size.hpp"
 
+#include "nine_morris_3d_engine/external/resmanager.h++"
+
 void game_start(sm::Ctx& ctx) {
     auto& g {ctx.global<Global>()};
 
@@ -16,6 +18,15 @@ void game_start(sm::Ctx& ctx) {
         g.options = Options();
 
         LOG_DIST_ERROR("Could not load options: {}", e.what());
+    }
+
+    switch (g.options.language) {
+        case LanguageEnglish:
+            sm::localization::set_language("en"_H);
+            break;
+        case LanguageRomanian:
+            sm::localization::set_language("ro"_H);
+            break;
     }
 
     ctx.set_window_vsync(g.options.vsync);

@@ -1277,7 +1277,7 @@ void GameScene::server_hello_reject(const networking::Message& message) {
     // Prevent showing a connection error
     disconnect();
 
-    m_ui.push_modal_window(ModalWindowServerRejection, protocol::error_code_string(payload.error_code));
+    m_ui.push_modal_window(ModalWindowServerRejection, sm::localization::get_text(protocol::error_code_string(payload.error_code)));
 }
 
 void GameScene::server_ping(const networking::Message& message) {
@@ -1314,7 +1314,7 @@ void GameScene::server_reject_game_session(const networking::Message& message) {
     }
 
     m_ui.clear_modal_window(ModalWindowWaitServerAcceptGameSession);
-    m_ui.push_modal_window(ModalWindowNewGameSessionError, protocol::error_code_string(payload.error_code));
+    m_ui.push_modal_window(ModalWindowNewGameSessionError, sm::localization::get_text(protocol::error_code_string(payload.error_code)));
 }
 
 void GameScene::server_accept_join_game_session(const networking::Message& message) {
@@ -1368,7 +1368,7 @@ void GameScene::server_reject_join_game_session(const networking::Message& messa
     }
 
     m_ui.clear_modal_window(ModalWindowWaitServerAcceptJoinGameSession);
-    m_ui.push_modal_window(ModalWindowJoinGameSessionError, protocol::error_code_string(payload.error_code));
+    m_ui.push_modal_window(ModalWindowJoinGameSessionError, sm::localization::get_text(protocol::error_code_string(payload.error_code)));
 }
 
 void GameScene::server_remote_joined_game_session(const networking::Message& message) {

@@ -68,21 +68,21 @@ namespace sm {
         }
 
         if (!document.HasMember("default_language")) {
-            SM_THROW_ERROR(internal::ResourceError, "Missing member");
+            SM_THROW_ERROR(internal::ResourceError, "Missing member: `default_language`");
         }
 
         if (!document["default_language"].IsString()) {
-            SM_THROW_ERROR(internal::ResourceError, "Invalid member");
+            SM_THROW_ERROR(internal::ResourceError, "Invalid member: `default_language`");
         }
 
         catalog_file.default_language = document["default_language"].GetString();
 
         if (!document.HasMember("catalog")) {
-            SM_THROW_ERROR(internal::ResourceError, "Missing member");
+            SM_THROW_ERROR(internal::ResourceError, "Missing member: `catalog`");
         }
 
         if (!document["catalog"].IsObject()) {
-            SM_THROW_ERROR(internal::ResourceError, "Invalid member");
+            SM_THROW_ERROR(internal::ResourceError, "Invalid member: `catalog`");
         }
 
         const auto& catalog {document["catalog"].GetObject()};

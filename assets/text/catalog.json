@@ -5,6 +5,50 @@
             "en": "Game",
             "ro": "Joc"
         },
+        "New Game": {
+            "en": "New Game",
+            "ro": "Joc nou"
+        },
+        "Resign": {
+            "en": "Resign",
+            "ro": "Renunță"
+        },
+        "Accept Draw": {
+            "en": "Accept Draw",
+            "ro": "Acceptă remiză"
+        },
+        "Offer Draw": {
+            "en": "Offer Draw",
+            "ro": "Oferă remiză"
+        },
+        "Game Options": {
+            "en": "Game Options",
+            "ro": "Opțiuni joc"
+        },
+        "Game Mode": {
+            "en": "Game Mode",
+            "ro": "Mod de joc"
+        },
+        "Nine Men's Morris": {
+            "en": "Nine Men's Morris",
+            "ro": "Moară"
+        },
+        "Twelve Men's Morris": {
+            "en": "Twelve Men's Morris",
+            "ro": "Moară de doisprezece"
+        },
+        "Analyze Games": {
+            "en": "Analyze Games",
+            "ro": "Analizează jocuri"
+        },
+        "Exit": {
+            "en": "Exit",
+            "ro": "Ieșire"
+        },
+        "Options": {
+            "en": "Options",
+            "ro": "Opțiuni"
+        },
         "Language": {
             "en": "Language",
             "ro": "Limbă"
@@ -16,6 +60,593 @@
         "Romanian": {
             "en": "Romanian",
             "ro": "Română"
+        },
+        "Graphics": {
+            "en": "Graphics",
+            "ro": "Grafică"
+        },
+        "Scale": {
+            "en": "Scale",
+            "ro": "Dimensiune"
+        },
+        "Anti-Aliasing": {
+            "en": "Anti-Aliasing",
+            "ro": "Anti-aliasing"
+        },
+        "Off": {
+            "en": "Off",
+            "ro": "Oprit"
+        },
+        "Anisotropic Filtering": {
+            "en": "Anisotropic Filtering",
+            "ro": "Anisotropic filtering"
+        },
+        "Texture Quality": {
+            "en": "Texture Quality",
+            "ro": "Calitate textură"
+        },
+        "Half": {
+            "en": "Half",
+            "ro": "Jumătate"
+        },
+        "Full": {
+            "en": "Full",
+            "ro": "Întreg"
+        },
+        "Shadow Quality": {
+            "en": "Shadow Quality",
+            "ro": "Calitate umbră"
+        },
+        "VSync": {
+            "en": "VSync",
+            "ro": "Sincronizare verticală"
+        },
+        "Audio": {
+            "en": "Audio",
+            "ro": "Audio"
+        },
+        "Volume": {
+            "en": "Volume",
+            "ro": "Volum"
+        },
+        "Skybox": {
+            "en": "Skybox",
+            "ro": "Skybox"
+        },
+        "None": {
+            "en": "None",
+            "ro": "Niciunul"
+        },
+        "Field": {
+            "en": "Field",
+            "ro": "Câmp"
+        },
+        "Autumn": {
+            "en": "Autumn",
+            "ro": "Toamnă"
+        },
+        "Summer": {
+            "en": "Summer",
+            "ro": "Vară"
+        },
+        "Night": {
+            "en": "Night",
+            "ro": "Noapte"
+        },
+        "Sunset": {
+            "en": "Sunset",
+            "ro": "Apus"
+        },
+        "Sky": {
+            "en": "Sky",
+            "ro": "Cer"
+        },
+        "Camera Sensitivity": {
+            "en": "Camera Sensitivity",
+            "ro": "Sensibilitate cameră"
+        },
+        "Show Information": {
+            "en": "Show Information",
+            "ro": "Afișează informații"
+        },
+        "Engine": {
+            "en": "Engine",
+            "ro": "Motor"
+        },
+        "Name": {
+            "en": "Name",
+            "ro": "Nume"
+        },
+        "Author": {
+            "en": "Author",
+            "ro": "Autor"
+        },
+        "Restart": {
+            "en": "Restart",
+            "ro": "Repornire"
+        },
+        "Server": {
+            "en": "Server",
+            "ro": "Server"
+        },
+        "Status": {
+            "en": "Status",
+            "ro": "Stare"
+        },
+        "Disconnected": {
+            "en": "Disconnected",
+            "ro": "Deconectat"
+        },
+        "Connecting": {
+            "en": "Connecting",
+            "ro": "În curs de conectare"
+        },
+        "Connected": {
+            "en": "Connected",
+            "ro": "Conectat"
+        },
+        "Session": {
+            "en": "Session",
+            "ro": "Sesiune"
+        },
+        "Code": {
+            "en": "Code",
+            "ro": "Cod"
+        },
+        "session_name_tooltip": {
+            "en": "Your name appears to other players.",
+            "ro": "Numele tău apare în fața altor jucători."
+        },
+        "Address": {
+            "en": "Address",
+            "ro": "Adresă"
+        },
+        "Default": {
+            "en": "Default",
+            "ro": "Prestabilit"
+        },
+        "Port": {
+            "en": "Port",
+            "ro": "Port"
+        },
+        "Reconnect": {
+            "en": "Reconnect",
+            "ro": "Reconectare"
+        },
+        "Help": {
+            "en": "Help",
+            "ro": "Ajutor"
+        },
+        "General Play": {
+            "en": "General Play",
+            "ro": "Joc general"
+        },
+        "Online Play": {
+            "en": "Online Play",
+            "ro": "Joc online"
+        },
+        "Game Rules": {
+            "en": "Game Rules",
+            "ro": "Reguli jocuri"
+        },
+        "About": {
+            "en": "About",
+            "ro": "Despre"
+        },
+        "Log Information": {
+            "en": "Log Information",
+            "ro": "Înregistrează informații"
+        },
+        "%u minute": {
+            "en": "%u minute",
+            "ro": "%u minut"
+        },
+        "%u minutes": {
+            "en": "%u minutes",
+            "ro": "%u minute"
+        },
+        "Start Game": {
+            "en": "Start Game",
+            "ro": "Începe jocul"
+        },
+        "local_game_two_humans_description": {
+            "en": "Local game between two human players",
+            "ro": "Joc local între doi oameni"
+        },
+        "local_game_human_computer_description": {
+            "en": "Local game between human and computer player",
+            "ro": "Joc local între om și calculator"
+        },
+        "Computer plays as": {
+            "en": "Computer plays as",
+            "ro": "Calculatorul joacă ca"
+        },
+        "Join Game": {
+            "en": "Join Game",
+            "ro": "Alătură-te jocului"
+        },
+        "online_hame_two_humans_description": {
+            "en": "Online game between two human players",
+            "ro": "Joc online între doi oameni"
+        },
+        "Remote plays as": {
+            "en": "Remote plays as",
+            "ro": "Distantul joacă ca"
+        },
+        "Previous": {
+            "en": "Previous",
+            "ro": "Înapoi"
+        },
+        "Next": {
+            "en": "Next",
+            "ro": "Înainte"
+        },
+        "About Nine Morris 3D": {
+            "en": "About Nine Morris 3D",
+            "ro": "Despre Nine Morris 3D"
+        },
+        "about_description": {
+            "en": "A 3D implementation of the board game nine men's morris",
+            "ro": "O implementare în 3D a jocului de masă moară"
+        },
+        "Version %u.%u.%u": {
+            "en": "Version %u.%u.%u",
+            "ro": "Versinea %u.%u.%u"
+        },
+        "All programming by:": {
+            "en": "All programming by:",
+            "ro": "Toată programarea de către:"
+        },
+        "Help General Play": {
+            "en": "Help General Play",
+            "ro": "Ajutor joc general"
+        },
+        "Starting A Game:": {
+            "en": "Starting A Game:",
+            "ro": "Începând un joc:"
+        },
+        "help_general_play_starting_a_game1": {
+            "en": "From the menu, select the type of game you want to play: Game Mode and Game Options.",
+            "ro": "De la meniu, selectează tipul jocului pe care dorești să îl joci: Mod de joc și Opțiuni joc."
+        },
+        "help_general_play_starting_a_game2": {
+            "en": "Start the game from the right side interface.",
+            "ro": "Începe jocul din interfața din partea dreaptă."
+        },
+        "help_general_play_starting_a_game3": {
+            "en": "To play another game, simply select New Game from the menu.",
+            "ro": "Ca să te joci un alt joc, pur și simplu selectează Joc nou de la meniu."
+        },
+        "Game Controls:": {
+            "en": "Game Controls:",
+            "ro": "Control joc:"
+        },
+        "help_general_play_game_controls1": {
+            "en": "Interact with the board and pieces by using the left mouse click.",
+            "ro": "Interacționează cu tabla sau cu piesele folosind click-ul stâng al mouse-ului."
+        },
+        "help_general_play_game_controls2": {
+            "en": "Move the camera by dragging the mouse with right click, or by using the keys: W, A, S, D, R, F.",
+            "ro": "Mișcă camera trăgând cu click-ul drept al mouse-ului, sau folosind tastele: W, A, S, D, R, F."
+        },
+        "help_general_play_game_controls3": {
+            "en": "Reset the camera to the default position by pressing the space key.",
+            "ro": "Resetează camera la poziția prestabilită apăsând tasta space."
+        },
+        "Help Online Play": {
+            "en": "Help Online Play",
+            "ro": "Ajutor joc online"
+        },
+        "help_general_play1": {
+            "en": "Playing online with somebody is very simple: One party has to create the game and send the code to the opponent and the other party has to simply enter the code and join the game.",
+            "ro": "Jucarea online cu cineva este foarte simplă: O parte trebuie să creeze un joc și să trimită codul oponentului, iar cealaltă parte trebuie pur și simplu să insereze codul și să se alăture jocului."
+        },
+        "help_general_play2": {
+            "en": "Before playing, though, know these things:",
+            "ro": "Înainte de joc, totuși, să cunoști următoarele aspecte:"
+        },
+        "help_general_play3": {
+            "en": "Each player has a name that by default is empty. Configure your name from the menu by selecting Server, then Session and then Name. Your name is visible to the other player during the game and it is purely for aesthetics.",
+            "ro": "Fiecare jucător are un nume care este inițial gol. Configurează-ți numele de la meniu selectând Server, apoi Sesiune, iar apoi Nume. Numele tău este vizibil oponentului în timpul jocului și joacă un rol pur estetic."
+        },
+        "help_general_play4": {
+            "en": "During the game, players may choose to resign, to offer or to accept a draw. They can do so from the menu.",
+            "ro": "În timpul jocului, jucătorii pot alege să renunțe, să ofere sau să accepte remiză. Ei pot face asta de la meniu."
+        },
+        "help_general_play5": {
+            "en": "After a game, players may choose to play again by selecting Rematch. In the next game they will have swapped sides and will play with the same time controls.",
+            "ro": "După un joc, jucătorii pot alege să se joace din nou selectând Revanșă. În jocul următor, ei vor avea culorile inversate și vor juca cu aceleași setări de timp."
+        },
+        "help_general_play6": {
+            "en": "If one somehow gets disconnected from the server or the game crashes, as long as the remote doesn't leave the game, they can simply rejoin with the same code and continue the game from where they left off.",
+            "ro": "Dacă cineva cumva se deconectează de la server sau dacă jocul îi eșuează, atâta timp cât celălalt jucător nu părăsește jocul, acesta/aceasta poate pur și simplu să se realăture jocului cu același cod și să continue jocul de unde a rămas."
+        },
+        "help_general_play7": {
+            "en": "Please refrain from cheating. Have fun! :)",
+            "ro": "Te rog, nu trișa. Distracție plăcută! :)"
+        },
+        "Game Over": {
+            "en": "Game Over",
+            "ro": "Joc încheiat"
+        },
+        "White player wins!": {
+            "en": "White player wins!",
+            "ro": "Jucătorul alb câștigă!"
+        },
+        "Black player wins!": {
+            "en": "Black player wins!",
+            "ro": "Jucătorul negru câștigă!"
+        },
+        "Draw!": {
+            "en": "Draw!",
+            "ro": "Remiză!"
+        },
+        "Game Type": {
+            "en": "Game Type",
+            "ro": "Tipul jocului"
+        },
+        "Local": {
+            "en": "Local",
+            "ro": "Local"
+        },
+        "Local vs Computer": {
+            "en": "Local vs Computer",
+            "ro": "Local contra calculator"
+        },
+        "Online": {
+            "en": "Online",
+            "ro": "Online"
+        },
+        "Computer Plays As": {
+            "en": "Computer Plays As",
+            "ro": "Calculatorul joacă ca"
+        },
+        "White": {
+            "en": "White",
+            "ro": "Alb"
+        },
+        "Black": {
+            "en": "Black",
+            "ro": "Negru"
+        },
+        "Remote Plays As": {
+            "en": "Remote Plays As",
+            "ro": "Distantul joacă ca"
+        },
+        "Time Control": {
+            "en": "Time Control",
+            "ro": "Setări de timp"
+        },
+        "analyze_games_tip": {
+            "en": "Select the game that you want to analyze.",
+            "ro": "Selectează jocul pe care dorești să îl analizezi."
+        },
+        "Date & Time": {
+            "en": "Date & Time",
+            "ro": "Dată și timp"
+        },
+        "Type": {
+            "en": "Type",
+            "ro": "Tip"
+        },
+        "Moves": {
+            "en": "Moves",
+            "ro": "Mutări"
+        },
+        "Result": {
+            "en": "Result",
+            "ro": "Rezultat"
+        },
+        "Engine Error": {
+            "en": "Engine Error",
+            "ro": "Eroare motor"
+        },
+        "engine_error_description1": {
+            "en": "An error occurred with the engine. It has probably crashed.",
+            "ro": "S-a ivit o eroare la motor. Probabil a eșuat."
+        },
+        "engine_error_description2": {
+            "en": "You may want to restart it.",
+            "ro": "Ai dori poate să îl repornești."
+        },
+        "Connection Error": {
+            "en": "Connection Error",
+            "ro": "Eroare conexiune"
+        },
+        "connection_error_description1": {
+            "en": "An error occurred with the connection to the server.",
+            "ro": "S-a ivit o eroare la conexiunea către server."
+        },
+        "connection_error_description2": {
+            "en": "You may want to reconnect.",
+            "ro": "Ai dori poate să te reconectezi."
+        },
+        "Server Error": {
+            "en": "Server Error",
+            "ro": "Eroare server"
+        },
+        "server_error_description": {
+            "en": "The server has rejected the connection.",
+            "ro": "Server-ul a refuzat conexiunea."
+        },
+        "New Online Game Error": {
+            "en": "New Online Game Error",
+            "ro": "Eroare joc online nou"
+        },
+        "new_online_game_error_description": {
+            "en": "Could not create a new online game.",
+            "ro": "Nu s-a putut crea un nou joc online."
+        },
+        "Join Online Game Error": {
+            "en": "Join Online Game Error",
+            "ro": "Eroare alăturare joc online"
+        },
+        "join_online_game_error_description": {
+            "en": "Could not join the online game.",
+            "ro": "Nu s-a putut alătura jocului online."
+        },
+        "Waiting For Server To Accept": {
+            "en": "Waiting For Server To Accept",
+            "ro": "Așteptând ca server-ul să accepte"
+        },
+        "waiting_for_server_to_accept_description": {
+            "en": "The server should reply any time soon.",
+            "ro": "Server-ul ar trebui să răspundă curând."
+        },
+        "Waiting For Player To Join": {
+            "en": "Waiting For Player To Join",
+            "ro": "Așteptând ca jucătorul să se alăture"
+        },
+        "waiting_for_player_to_join_description1": {
+            "en": "An online game has been created.",
+            "ro": "Un joc online a fost creat."
+        },
+        "waiting_for_player_to_join_description2": {
+            "en": "Send your opponent the following code",
+            "ro": "Trimite-i oponentului următorul cod"
+        },
+        "Cancel Game": {
+            "en": "Cancel Game",
+            "ro": "Anulează jocul"
+        },
+        "Waiting For Player": {
+            "en": "Waiting For Player",
+            "ro": "Așteptând jucătorul"
+        },
+        "waiting_for_player_description1": {
+            "en": "For another game to begin, the opponent has to accept a rematch as well.",
+            "ro": "Pentru ca un alt joc să înceapă, oponentul trebuie să accepte revanșa."
+        },
+        "waiting_for_player_description2": {
+            "en": "Once the opponnent has accepted the rematch, it cannot be canceled.",
+            "ro": "Din momentul în care oponentul acceptă revanșa, ea nu mai poate fi anulată."
+        },
+        "Cancel Rematch": {
+            "en": "Cancel Rematch",
+            "ro": "Anulează revanșa"
+        },
+        "Nine Men's Morris Rules": {
+            "en": "Nine Men's Morris Rules",
+            "ro": "Reguli moară"
+        },
+        "nine_mens_morris_rules1": {
+            "en": "Each player has nine pieces, either black or white."
+        },
+        "nine_mens_morris_rules2": {
+            "en": "A player wins by reducing the opponent to two pieces, or by leaving them without a legal move."
+        },
+        "nine_mens_morris_rules3": {
+            "en": "When a player remains with three pieces, they can jump on the board."
+        },
+        "nine_mens_morris_rules4": {
+            "en": "A player may take a piece from a mill only if there are no other pieces available."
+        },
+        "nine_mens_morris_rules5": {
+            "en": "The game ends with a draw when fifty turns are made without mills."
+        },
+        "nine_mens_morris_rules6": {
+            "en": "The game ends with a draw when the same position happens three times."
+        },
+        "Twelve Men's Morris Rules": {
+            "en": "Twelve Men's Morris Rules",
+            "ro": "Reguli moară de doisprezece"
+        },
+        "twelve_mens_morris_rules1": {
+            "en": "Same rules apply as in nine men's morris, except the following:"
+        },
+        "twelve_mens_morris_rules2": {
+            "en": "Each player has twelve pieces instead of nine."
+        },
+        "twelve_mens_morris_rules3": {
+            "en": "Players can make mills and move pieces along the diagonals."
+        },
+        "Okay": {
+            "en": "Okay",
+            "ro": "Bine"
+        },
+        "Playing against": {
+            "en": "Playing against",
+            "ro": "Jucând contra"
+        },
+        "an unnamed opponent": {
+            "en": "an unnamed opponent",
+            "ro": "un oponent anonim"
+        },
+        "The opponent": {
+            "en": "The opponent",
+            "ro": "Oponentul"
+        },
+        "has offered a draw": {
+            "en": "has offered a draw",
+            "ro": "a oferit o remiză"
+        },
+        "remote_offered_draw_tooltip": {
+            "en": "You may accept the draw from the menu.",
+            "ro": "Poți accepta remiza de la meniu."
+        },
+        "Rematch": {
+            "en": "Rematch",
+            "ro": "Revanșă"
+        },
+        "The opponent has disconnected.": {
+            "en": "The opponent has disconnected.",
+            "ro": "Oponentul s-a deconectat."
+        },
+        "opponent_disconnected_tooltip": {
+            "en": "You may wait for them to rejoin.",
+            "ro": "Poți aștepta ca oponentul să se realăture."
+        },
+        "Waiting for the opponent...": {
+            "en": "Waiting for the opponent...",
+            "ro": "Așteptând oponentul..."
+        },
+        "Send": {
+            "en": "Send",
+            "ro": "Trimite"
+        },
+        "There is no room for another session": {
+            "en": "There is no more room for another session",
+            "ro": "Nu mai este loc pentru încă o sesiune"
+        },
+        "No session could be found": {
+            "en": "No session could be found",
+            "ro": "Nu s-a putut găsi sesiunea"
+        },
+        "The session is occupied": {
+            "en": "The session is occupied",
+            "ro": "Sesiunea este ocupată"
+        },
+        "The session has expired": {
+            "en": "The session has expired",
+            "ro": "Sesiunea a expirat"
+        },
+        "The session has a different game than the one requested": {
+            "en": "The session has a different game than the one requested",
+            "ro": "Sesiunea are un alt joc decât cel cerut"
+        },
+        "The client is incompatible with the server": {
+            "en": "The client is incompatible with the server",
+            "ro": "Clientul este incompatibil cu server-ul"
+        },
+        "1 min": {
+            "en": "1 min",
+            "ro": "1 min"
+        },
+        "3 min": {
+            "en": "3 min",
+            "ro": "3 min"
+        },
+        "10 min": {
+            "en": "10 min",
+            "ro": "10 min"
+        },
+        "60 min": {
+            "en": "60 min",
+            "ro": "60 min"
+        },
+        "Custom": {
+            "en": "Custom",
+            "ro": "Personalizat"
         }
     }
 }

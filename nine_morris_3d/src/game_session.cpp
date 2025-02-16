@@ -9,6 +9,8 @@
 #include "global.hpp"
 #include "window_size.hpp"
 
+using namespace sm::localization_literals;
+
 void GameSession::remote_joined(const std::string& player_name) {
     m_remote_joined = true;
     m_remote_player_name = player_name;
@@ -64,39 +66,39 @@ void GameSession::session_window(sm::Ctx& ctx, GameScene& game_scene) {
 
     ImGui::SetNextWindowSize(ImVec2(width, height), ImGuiCond_Always);
 
-    if (ImGui::Begin("Session", nullptr, ImGuiWindowFlags_NoDecoration)) {
+    if (ImGui::Begin("##Session", nullptr, ImGuiWindowFlags_NoDecoration)) {
         if (m_remote_joined) {
-            ImGui::TextWrapped("Playing against %s.", m_remote_player_name.empty() ? "an unnamed opponent" : m_remote_player_name.c_str());
+            ImGui::TextWrapped("%s %s.", "Playing against"_L, m_remote_player_name.empty() ? "an unnamed opponent"_L : m_remote_player_name.c_str());
 
             if (m_remote_offered_draw) {
                 ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(255, 163, 71, 255));
-                ImGui::TextWrapped("%s has offered a draw.", m_remote_player_name.empty() ? "The opponent" : m_remote_player_name.c_str());
+                ImGui::TextWrapped("%s %s.", m_remote_player_name.empty() ? "The opponent"_L : m_remote_player_name.c_str(), "has offered a draw"_L);
                 ImGui::PopStyleColor();
 
                 if (ImGui::IsItemHovered(ImGuiHoveredFlags_DelayShort)) {
-                    ImGui::SetTooltip("You may accept the draw from the menu.");
+                    ImGui::SetTooltip("remote_offered_draw_tooltip"_L);
                 }
             }
 
             if (game_scene.get_game_state() == GameState::Over) {
                 ImGui::Dummy(ImVec2(0.0f, Ui::rem(0.1f)));
 
-                if (ImGui::Button("Rematch")) {
+                if (ImGui::Button("Rematch"_L)) {
                     game_scene.client_rematch();
                 }
             }
         } else if (game_scene.get_game_state() != GameState::Ready) {
             ImGui::Image(game_scene.get_icon_wait()->get_id(), ImVec2(Ui::rem(1.0f), Ui::rem(1.0f)));
             ImGui::SameLine();
-            ImGui::TextWrapped("The opponent has disconnected.");
+            ImGui::TextWrapped("The opponent has disconnected."_L);
 
             if (ImGui::IsItemHovered(ImGuiHoveredFlags_DelayShort)) {
-                ImGui::SetTooltip("You may wait for them to rejoin.");
+                ImGui::SetTooltip("opponent_disconnected_tooltip"_L);
             }
         } else {
             ImGui::Image(game_scene.get_icon_wait()->get_id(), ImVec2(Ui::rem(1.0f), Ui::rem(1.0f)));
             ImGui::SameLine();
-            ImGui::TextWrapped("Waiting for the opponent...");
+            ImGui::TextWrapped("Waiting for the opponent..."_L);
         }
 
         ImGui::Dummy(ImVec2(0.0f, Ui::rem(0.1f)));
@@ -105,7 +107,7 @@ void GameSession::session_window(sm::Ctx& ctx, GameScene& game_scene) {
 
         const float chat_height {Ui::rem(2.5f)};
 
-        if (ImGui::BeginChild("Messages", ImVec2(0.0f, ImGui::GetContentRegionAvail().y - chat_height))) {
+        if (ImGui::BeginChild("##Messages", ImVec2(0.0f, ImGui::GetContentRegionAvail().y - chat_height))) {
             std::string last_name {!m_messages.empty() ? m_messages.front().first : ""};
 
             for (const auto& message : m_messages) {
@@ -133,11 +135,11 @@ void GameSession::session_window(sm::Ctx& ctx, GameScene& game_scene) {
 
         const auto& g {ctx.global<Global>()};
 
-        const float button_width {Ui::rem(3.0f)};
+        const float button_width {ImGui::CalcTextSize("Send"_L).x};
         const auto size {ImVec2(ImGui::GetContentRegionAvail().x - button_width, ImGui::GetContentRegionAvail().y)};
         const auto flags {ImGuiInputTextFlags_CtrlEnterForNewLine | ImGuiInputTextFlags_EnterReturnsTrue};
 
-        if (ImGui::InputTextMultiline("##", m_message_buffer, sizeof(m_message_buffer), size, flags)) {
+        if (ImGui::InputTextMultiline("##MessageBox", m_message_buffer, sizeof(m_message_buffer), size, flags)) {
             if (send_message_available()) {
                 game_scene.client_send_message(m_message_buffer);
                 m_messages.emplace_back(g.options.name, m_message_buffer);
@@ -149,7 +151,7 @@ void GameSession::session_window(sm::Ctx& ctx, GameScene& game_scene) {
         ImGui::SameLine();
 
         ImGui::BeginDisabled(!send_message_available());
-        if (ImGui::Button("Send", ImGui::GetContentRegionAvail())) {
+        if (ImGui::Button("Send"_L, ImGui::GetContentRegionAvail())) {
             game_scene.client_send_message(m_message_buffer);
             m_messages.emplace_back(g.options.name, m_message_buffer);
             std::memset(m_message_buffer, 0, sizeof(m_message_buffer));

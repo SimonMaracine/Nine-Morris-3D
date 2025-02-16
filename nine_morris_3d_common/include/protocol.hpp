@@ -239,7 +239,7 @@ namespace protocol {
 
         switch (error_code) {
             case ErrorCode::TooManySessions:
-                string = "There is no room for another session";
+                string = "There is no more room for another session";
                 break;
             case ErrorCode::InvalidSessionId:
                 string = "No session could be found";
