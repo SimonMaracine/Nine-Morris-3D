@@ -32,7 +32,7 @@ namespace sm::internal {
             : RuntimeError(message) {}
 
         const char* type() const override {
-            return "application";
+            return "Application";
         }
     };
 
@@ -44,7 +44,7 @@ namespace sm::internal {
             : RuntimeError(message) {}
 
         const char* type() const override {
-            return "video";
+            return "Video";
         }
     };
 
@@ -56,7 +56,7 @@ namespace sm::internal {
             : RuntimeError(message) {}
 
         const char* type() const override {
-            return "audio";
+            return "Audio";
         }
     };
 
@@ -68,7 +68,7 @@ namespace sm::internal {
             : RuntimeError(message) {}
 
         const char* type() const override {
-            return "resource";
+            return "Resource";
         }
     };
 
@@ -80,7 +80,7 @@ namespace sm::internal {
             : RuntimeError(message) {}
 
         const char* type() const override {
-            return "other";
+            return "Other";
         }
     };
 }

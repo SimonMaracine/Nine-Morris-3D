@@ -31,6 +31,10 @@ static void validate(Options& options) {
         case SkyboxNone:
         case SkyboxField:
         case SkyboxAutumn:
+        case SkyboxSummer:
+        case SkyboxNight:
+        case SkyboxSunset:
+        case SkyboxSky:
             break;
         default:
             goto corrupted;
@@ -73,6 +77,14 @@ static void validate(Options& options) {
     switch (static_cast<Scale>(options.scale)) {
         case Scale100:
         case Scale200:
+            break;
+        default:
+            goto corrupted;
+    }
+
+    switch (static_cast<Language>(options.language)) {
+        case LanguageEnglish:
+        case LanguageRomanian:
             break;
         default:
             goto corrupted;

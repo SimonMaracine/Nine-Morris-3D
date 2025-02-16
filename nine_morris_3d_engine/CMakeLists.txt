@@ -50,6 +50,7 @@ add_library(nine_morris_3d_engine STATIC
     "src/graphics/texture_data.cpp"
     "src/other/internal/resources_cache.cpp"
     "src/other/dependencies.cpp"
+    "src/other/localization.cpp"
     "src/other/utilities.cpp"
 
     "include/nine_morris_3d_engine/application/internal/error.hpp"
@@ -109,6 +110,7 @@ add_library(nine_morris_3d_engine STATIC
     "include/nine_morris_3d_engine/other/internal/resources_cache.hpp"
     "include/nine_morris_3d_engine/other/camera_controller.hpp"
     "include/nine_morris_3d_engine/other/dependencies.hpp"
+    "include/nine_morris_3d_engine/other/localization.hpp"
     "include/nine_morris_3d_engine/other/utilities.hpp"
     "include/nine_morris_3d_engine/entry_point.hpp"
     "include/nine_morris_3d_engine/nine_morris_3d.hpp"

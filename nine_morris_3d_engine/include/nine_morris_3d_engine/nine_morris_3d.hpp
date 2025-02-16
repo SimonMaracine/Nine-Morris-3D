@@ -34,4 +34,5 @@
 #include "nine_morris_3d_engine/graphics/texture_data.hpp"
 #include "nine_morris_3d_engine/other/camera_controller.hpp"
 #include "nine_morris_3d_engine/other/dependencies.hpp"
+#include "nine_morris_3d_engine/other/localization.hpp"
 #include "nine_morris_3d_engine/other/utilities.hpp"

@@ -58,6 +58,11 @@ enum Scale : int {
     Scale200 = 2
 };
 
+enum Language : int {
+    LanguageEnglish,
+    LanguageRomanian
+};
+
 // Structure representing data saved and loaded from disk
 struct Options {
     int game_type {GameTypeLocal};
@@ -69,6 +74,7 @@ struct Options {
     int texture_quality {TextureQualityFull};
     int shadow_quality {ShadowQualityFull};
     int scale {Scale100};
+    int language {LanguageEnglish};
     float camera_sensitivity {1.0f};
     char name[15 + 1] {};
     char address[253 + 1] {};
@@ -88,6 +94,7 @@ struct Options {
             texture_quality,
             shadow_quality,
             scale,
+            language,
             camera_sensitivity,
             name,
             address,

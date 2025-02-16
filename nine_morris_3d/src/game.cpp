@@ -7,6 +7,8 @@
 void game_start(sm::Ctx& ctx) {
     auto& g {ctx.global<Global>()};
 
+    sm::localization::load_catalog(ctx.path_assets("text/catalog.json"));
+
     try {
         load_options(g.options, ctx.path_saved_data(OPTIONS_FILE_NAME));
     } catch (const OptionsError& e) {

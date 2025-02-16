@@ -1,0 +1,21 @@
+{
+    "default_language": "en",
+    "catalog": {
+        "Game": {
+            "en": "Game",
+            "ro": "Joc"
+        },
+        "Language": {
+            "en": "Language",
+            "ro": "Limbă"
+        },
+        "English": {
+            "en": "English",
+            "ro": "Engleză"
+        },
+        "Romanian": {
+            "en": "Romanian",
+            "ro": "Română"
+        }
+    }
+}

@@ -16,6 +16,8 @@
 #include "ver.hpp"
 #include "window_size.hpp"
 
+using namespace sm::localization_literals;
+
 void Ui::initialize(sm::Ctx& ctx) {
     const auto& g {ctx.global<Global>()};
 
@@ -128,7 +130,7 @@ void Ui::main_menu_bar(sm::Ctx& ctx, GameScene& game_scene) {
     auto& g {ctx.global<Global>()};
 
     if (ImGui::BeginMainMenuBar()) {
-        if (ImGui::BeginMenu("Game")) {
+        if (ImGui::BeginMenu("Game"_L)) {
             if (ImGui::MenuItem("New Game")) {
                 game_scene.resign_leave_session_and_reset();
             }
@@ -339,6 +341,20 @@ void Ui::main_menu_bar(sm::Ctx& ctx, GameScene& game_scene) {
                     game_scene.get_camera_controller()->sensitivity = g.options.camera_sensitivity;;
                 }
                 ImGui::PopItemWidth();
+
+                ImGui::EndMenu();
+            }
+            if (ImGui::BeginMenu("Language"_L)) {
+                if (ImGui::RadioButton("English"_L, &m_options.language, LanguageEnglish)) {
+                    g.options.language = m_options.language;
+
+                    sm::localization::set_language("en"_H);
+                }
+                if (ImGui::RadioButton("Romanian"_L, &m_options.language, LanguageRomanian)) {
+                    g.options.language = m_options.language;
+
+                    sm::localization::set_language("ro"_H);
+                }
 
                 ImGui::EndMenu();
             }
