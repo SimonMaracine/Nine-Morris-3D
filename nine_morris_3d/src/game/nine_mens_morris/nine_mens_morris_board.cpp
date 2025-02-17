@@ -520,13 +520,13 @@ void NineMensMorrisBoard::timeout(Player player) {
         case Player::White:
             m_game_over = GameOver(
                 GameOver::WinnerBlack,
-                "White player has ran out of time."
+                "White player has ran out of time"_L
             );
             break;
         case Player::Black:
             m_game_over = GameOver(
                 GameOver::WinnerWhite,
-                "Black player has ran out of time."
+                "Black player has ran out of time"_L
             );
             break;
     }
@@ -537,13 +537,13 @@ void NineMensMorrisBoard::resign(Player player) {
         case Player::White:
             m_game_over = GameOver(
                 GameOver::WinnerBlack,
-                "White player has resigned."
+                "White player has resigned"_L
             );
             break;
         case Player::Black:
             m_game_over = GameOver(
                 GameOver::WinnerWhite,
-                "Black player has resigned."
+                "Black player has resigned"_L
             );
             break;
     }
@@ -552,7 +552,7 @@ void NineMensMorrisBoard::resign(Player player) {
 void NineMensMorrisBoard::accept_draw() {
     m_game_over = GameOver(
         GameOver::Draw,
-        "Draw has been offered and accepted."
+        "Draw has been offered and accepted"_L
     );
 }
 
@@ -1185,7 +1185,7 @@ void NineMensMorrisBoard::check_material() {
     if (count_pieces(m_position.board, m_position.player) < 3) {
         m_game_over = GameOver(
             if_player_white(GameOver::WinnerBlack, GameOver::WinnerWhite),
-            format("%s player cannot make any more mills.", if_player_white("White", "Black"))
+            if_player_white("White player cannot make any more mills"_L, "Black player cannot make any more mills"_L)
         );
     }
 }
@@ -1198,7 +1198,7 @@ void NineMensMorrisBoard::check_legal_moves() {
     if (m_legal_moves.empty()) {
         m_game_over = GameOver(
             if_player_white(GameOver::WinnerBlack, GameOver::WinnerWhite),
-            format("%s player has no more legal moves to play.", if_player_white("White", "Black"))
+            if_player_white("White player has no more legal moves to play"_L, "Black player has no more legal moves to play"_L)
         );
     }
 }
@@ -1211,7 +1211,7 @@ void NineMensMorrisBoard::check_fifty_move_rule() {
     if (m_plies_no_advancement == 100) {
         m_game_over = GameOver(
             GameOver::Draw,
-            "Fifty moves have been played without a mill."
+            "Fifty moves have been played without a mill"_L
         );
     }
 }
@@ -1230,7 +1230,7 @@ void NineMensMorrisBoard::check_threefold_repetition() {
     if (count == 3) {
         m_game_over = GameOver(
             GameOver::Draw,
-            "The same position has happened three times."
+            "The same position has happened three times"_L
         );
     }
 }

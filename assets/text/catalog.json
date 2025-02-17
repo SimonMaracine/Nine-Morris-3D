@@ -237,13 +237,13 @@
             "en": "Log Information",
             "ro": "Înregistrează informații"
         },
-        "%u minute": {
-            "en": "%u minute",
-            "ro": "%u minut"
+        "minute": {
+            "en": "minute",
+            "ro": "minut"
         },
-        "%u minutes": {
-            "en": "%u minutes",
-            "ro": "%u minute"
+        "minutes": {
+            "en": "minutes",
+            "ro": "minute"
         },
         "Start Game": {
             "en": "Start Game",
@@ -289,13 +289,13 @@
             "en": "A 3D implementation of the board game nine men's morris",
             "ro": "O implementare în 3D a jocului de masă moară"
         },
-        "Version %u.%u.%u": {
-            "en": "Version %u.%u.%u",
-            "ro": "Versinea %u.%u.%u"
+        "Version": {
+            "en": "Version",
+            "ro": "Versinea"
         },
-        "All programming by:": {
-            "en": "All programming by:",
-            "ro": "Toată programarea de către:"
+        "All programming by": {
+            "en": "All programming by",
+            "ro": "Toată programarea de către"
         },
         "Help General Play": {
             "en": "Help General Play",
@@ -409,6 +409,14 @@
             "en": "Black",
             "ro": "Negru"
         },
+        "white": {
+            "en": "white",
+            "ro": "alb"
+        },
+        "black": {
+            "en": "black",
+            "ro": "negru"
+        },
         "Remote Plays As": {
             "en": "Remote Plays As",
             "ro": "Distantul joacă ca"
@@ -417,9 +425,13 @@
             "en": "Time Control",
             "ro": "Setări de timp"
         },
-        "analyze_games_tip": {
+        "analyze_games_tip1": {
             "en": "Select the game that you want to analyze.",
             "ro": "Selectează jocul pe care dorești să îl analizezi."
+        },
+        "analyze_games_tip2": {
+            "en": "There are currently no games.",
+            "ro": "Momentan nu există jocuri."
         },
         "Date & Time": {
             "en": "Date & Time",
@@ -503,7 +515,7 @@
         },
         "waiting_for_player_to_join_description2": {
             "en": "Send your opponent the following code",
-            "ro": "Trimite-i oponentului următorul cod"
+            "ro": "Trimite oponentului următorul cod"
         },
         "Cancel Game": {
             "en": "Cancel Game",
@@ -530,35 +542,44 @@
             "ro": "Reguli moară"
         },
         "nine_mens_morris_rules1": {
-            "en": "Each player has nine pieces, either black or white."
+            "en": "Each player has nine pieces, either black or white.",
+            "ro": "Fiecare jucător are nouă piese, albe sau negre."
         },
         "nine_mens_morris_rules2": {
-            "en": "A player wins by reducing the opponent to two pieces, or by leaving them without a legal move."
+            "en": "A player wins by reducing the opponent to two pieces, or by leaving them without a legal move.",
+            "ro": "Un jucător câștigă atunci când reduce oponentul la două piese sau când oponentul nu mai are mutări legale."
         },
         "nine_mens_morris_rules3": {
-            "en": "When a player remains with three pieces, they can jump on the board."
+            "en": "When a player remains with three pieces, they can jump on the board.",
+            "ro": "Când un jucător rămâne la trei piese, acesta/aceasta poate să sară pe tablă."
         },
         "nine_mens_morris_rules4": {
-            "en": "A player may take a piece from a mill only if there are no other pieces available."
+            "en": "A player may take a piece from a mill only if there are no other pieces available.",
+            "ro": "Un jucător poate să ia o piesă dintr-o moară doar dacă toate piesele oponentului se află în mori."
         },
         "nine_mens_morris_rules5": {
-            "en": "The game ends with a draw when fifty turns are made without mills."
+            "en": "The game ends with a draw when fifty turns are made without mills or without placing pieces.",
+            "ro": "Jocul se termină cu remiză atunci când cincizeci de ture sunt efectuate fără mori sau fără piese așezate."
         },
         "nine_mens_morris_rules6": {
-            "en": "The game ends with a draw when the same position happens three times."
+            "en": "The game ends with a draw when the same position happens three times.",
+            "ro": "Jocul se termină cu remiză atunci când aceeași poziție apare de trei ori."
         },
         "Twelve Men's Morris Rules": {
             "en": "Twelve Men's Morris Rules",
             "ro": "Reguli moară de doisprezece"
         },
         "twelve_mens_morris_rules1": {
-            "en": "Same rules apply as in nine men's morris, except the following:"
+            "en": "Same rules apply as in nine men's morris, except the following:",
+            "ro": "Aceleași reguli se aplică ca în moară, în afara următoarelor aspecte:"
         },
         "twelve_mens_morris_rules2": {
-            "en": "Each player has twelve pieces instead of nine."
+            "en": "Each player has twelve pieces instead of nine.",
+            "ro": "Fiecare jucător are douăsprezece piese în loc de nouă."
         },
         "twelve_mens_morris_rules3": {
-            "en": "Players can make mills and move pieces along the diagonals."
+            "en": "Players can make mills and move pieces along the diagonals.",
+            "ro": "Jucătorii pot să facă mori și să mute piesele de-alungul diagonalelor."
         },
         "Okay": {
             "en": "Okay",
@@ -647,6 +668,50 @@
         "Custom": {
             "en": "Custom",
             "ro": "Personalizat"
+        },
+        "White player has ran out of time": {
+            "en": "White player has ran out of time",
+            "ro": "Jucătorul alb a rămas fără timp"
+        },
+        "Black player has ran out of time": {
+            "en": "Black player has ran out of time",
+            "ro": "Jucătorul negru a rămas fără timp"
+        },
+        "White player has resigned": {
+            "en": "White player has resigned",
+            "ro": "Jucătorul alb a renunțat"
+        },
+        "Black player has resigned": {
+            "en": "Black player has resigned",
+            "ro": "Jucătorul negru a renunțat"
+        },
+        "Draw has been offered and accepted.": {
+            "en": "Draw has been offered and accepted",
+            "ro": "Remiză a fost propusă și acceptată"
+        },
+        "White player cannot make any more mills": {
+            "en": "White player cannot make any more mills",
+            "ro": "Jucătorul alb nu mai poate face mori"
+        },
+        "Black player cannot make any more mills": {
+            "en": "Black player cannot make any more mills",
+            "ro": "Jucătorul negru nu mai poate face mori"
+        },
+        "White player has no more legal moves to play": {
+            "en": "White player has no more legal moves to play",
+            "ro": "Jucătorul alb nu mai are mutări legale"
+        },
+        "Black player has no more legal moves to play": {
+            "en": "Black player has no more legal moves to play",
+            "ro": "Jucătorul negru nu mai are mutări legale"
+        },
+        "Fifty moves have been played without a mill": {
+            "en": "Fifty moves have been played without a mill",
+            "ro": "Cincizeci de ture au fost efectuate fără mori"
+        },
+        "The same position has happened three times": {
+            "en": "The same position has happened three times",
+            "ro": "Acceași poziție s-a întâmplat de trei ori"
         }
     }
 }

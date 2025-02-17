@@ -28,6 +28,7 @@ public:
     operator int() const { return m_type; }
     operator const std::string&() const { return m_reason; }
 
+    // Debug string
     const char* to_string() const;
 private:
     Type m_type {None};
@@ -57,8 +58,6 @@ public:
     void enable_move_animations(bool enable);
 protected:
     void update_hover_id(glm::vec3 ray, glm::vec3 camera, std::function<std::vector<HoverableObj>()>&& get_hoverables);
-
-    static std::string format(const char* format, ...);
 
     bool m_enable_move_callback {true};
     bool m_enable_move_animations {true};

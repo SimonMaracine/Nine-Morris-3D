@@ -76,7 +76,7 @@ void GameSession::session_window(sm::Ctx& ctx, GameScene& game_scene) {
                 ImGui::PopStyleColor();
 
                 if (ImGui::IsItemHovered(ImGuiHoveredFlags_DelayShort)) {
-                    ImGui::SetTooltip("remote_offered_draw_tooltip"_L);
+                    ImGui::SetTooltip("%s", "remote_offered_draw_tooltip"_L);
                 }
             }
 
@@ -90,15 +90,15 @@ void GameSession::session_window(sm::Ctx& ctx, GameScene& game_scene) {
         } else if (game_scene.get_game_state() != GameState::Ready) {
             ImGui::Image(game_scene.get_icon_wait()->get_id(), ImVec2(Ui::rem(1.0f), Ui::rem(1.0f)));
             ImGui::SameLine();
-            ImGui::TextWrapped("The opponent has disconnected."_L);
+            ImGui::TextWrapped("%s", "The opponent has disconnected."_L);
 
             if (ImGui::IsItemHovered(ImGuiHoveredFlags_DelayShort)) {
-                ImGui::SetTooltip("opponent_disconnected_tooltip"_L);
+                ImGui::SetTooltip("%s", "opponent_disconnected_tooltip"_L);
             }
         } else {
             ImGui::Image(game_scene.get_icon_wait()->get_id(), ImVec2(Ui::rem(1.0f), Ui::rem(1.0f)));
             ImGui::SameLine();
-            ImGui::TextWrapped("Waiting for the opponent..."_L);
+            ImGui::TextWrapped("%s", "Waiting for the opponent..."_L);
         }
 
         ImGui::Dummy(ImVec2(0.0f, Ui::rem(0.1f)));
@@ -134,9 +134,10 @@ void GameSession::session_window(sm::Ctx& ctx, GameScene& game_scene) {
         ImGui::EndChild();
 
         const auto& g {ctx.global<Global>()};
+        const auto& style {ImGui::GetStyle()};
 
-        const float button_width {ImGui::CalcTextSize("Send"_L).x};
-        const auto size {ImVec2(ImGui::GetContentRegionAvail().x - button_width, ImGui::GetContentRegionAvail().y)};
+        const float button_width {ImGui::CalcTextSize("Send"_L).x + style.FramePadding.x * 2};
+        const auto size {ImVec2(ImGui::GetContentRegionAvail().x - style.ItemSpacing.x - button_width, ImGui::GetContentRegionAvail().y)};
         const auto flags {ImGuiInputTextFlags_CtrlEnterForNewLine | ImGuiInputTextFlags_EnterReturnsTrue};
 
         if (ImGui::InputTextMultiline("##MessageBox", m_message_buffer, sizeof(m_message_buffer), size, flags)) {

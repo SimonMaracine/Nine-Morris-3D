@@ -44,6 +44,12 @@ namespace sm {
 
         g_localization.default_language = Id(catalog_file.default_language);
         g_localization.language = g_localization.default_language;
+
+        for (const auto& [_, translations] : g_localization.catalog) {
+            if (translations.find(g_localization.default_language) == translations.cend()) {
+                SM_THROW_ERROR(internal::ResourceError, "Catalog has missing default translation");
+            }
+        }
     }
 
     void localization::load_catalog(const std::filesystem::path& file_path) {
@@ -119,25 +125,37 @@ namespace sm {
             return iter->second.c_str();
         }
 
-        try {
-            return translations.at(g_localization.default_language).c_str();
-        } catch (const std::out_of_range& e) {
-            SM_THROW_ERROR(internal::ResourceError, "Could not find text in catalog: {}", e.what());
+        {
+            const auto iter {translations.find(g_localization.default_language)};
+
+            if (iter == translations.cend()) {
+                SM_THROW_ERROR(internal::ResourceError, "Could not find text in catalog");
+            }
+
+            return iter->second.c_str();
         }
     }
 
     const char* localization::get_text(Id id) {
-        return get_text_translations(g_localization.catalog.at(id));
+        const auto iter {g_localization.catalog.find(id)};
+
+        if (iter == g_localization.catalog.cend()) {
+            SM_THROW_ERROR(internal::ResourceError, "Could not find text in catalog");
+        }
+
+        return get_text_translations(iter->second);
     }
 
     const char* localization::get_text(const char* string) {
         for (const auto& [_, translations] : g_localization.catalog) {
-            try {
-                // Compare the full string
-                if (translations.at(g_localization.default_language) != string) {
-                    continue;
-                }
-            } catch (...) {
+            const auto iter {translations.find(g_localization.default_language)};
+
+            if (iter == translations.cend()) {
+                continue;
+            }
+
+            // Compare the full string to find the one we are looking for
+            if (iter->second != string) {
                 continue;
             }
 

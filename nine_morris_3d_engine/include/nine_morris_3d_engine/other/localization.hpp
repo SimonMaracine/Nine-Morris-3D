@@ -19,7 +19,7 @@
     If the catalog file gets deleted or corrupted, the game cannot run anymore, which seems to be a huge problem.
     This is in fact not a big deal, because all the other resources are in the same situation, thus it is consistent
     with everything in the project. The project should become open-source anyway, which almost defeats the purpose of
-    any "resource protection". The resource files should be stored with protection flags on the filesystem anyway.
+    any "resource protection". The resource files should be stored with write protection flags on the filesystem anyway.
 */
 
 namespace sm {

@@ -1,8 +1,6 @@
 #include "game/board.hpp"
 
 #include <algorithm>
-#include <cstdarg>
-#include <cstdio>
 #include <cassert>
 
 #include <nine_morris_3d_engine/external/glm.h++>
@@ -108,18 +106,4 @@ void BoardObj::update_hover_id(glm::vec3 ray, glm::vec3 camera, std::function<st
     if (!hover) {
         m_hover_id = -1;
     }
-}
-
-std::string BoardObj::format(const char* format, ...) {
-    std::string buffer;
-    buffer.resize(128);
-
-    va_list args;
-    va_start(args, format);
-
-    std::vsnprintf(buffer.data(), buffer.size(), format, args);
-
-    va_end(args);
-
-    return buffer;
 }

@@ -16,6 +16,11 @@
 #include "ver.hpp"
 #include "window_size.hpp"
 
+/*
+    Pay attention to ImGui::Text*, ImGui::SetTooltip and possibly other functions that take formats.
+    Don't specify runtime translated strings as formats.
+*/
+
 using namespace sm::localization_literals;
 
 void Ui::initialize(sm::Ctx& ctx) {
@@ -31,6 +36,7 @@ void Ui::initialize(sm::Ctx& ctx) {
 }
 
 void Ui::update(sm::Ctx& ctx, GameScene& game_scene) {
+    ImGui::ShowDemoWindow();
     main_menu_bar(ctx, game_scene);
     game_window(ctx, game_scene);
 
@@ -413,7 +419,7 @@ void Ui::main_menu_bar(sm::Ctx& ctx, GameScene& game_scene) {
                 ImGui::PopItemWidth();
 
                 if (ImGui::IsItemHovered(ImGuiHoveredFlags_DelayNormal)) {
-                    ImGui::SetTooltip("session_name_tooltip"_L);
+                    ImGui::SetTooltip("%s", "session_name_tooltip"_L);
                 }
 
                 ImGui::EndMenu();
@@ -549,9 +555,9 @@ void Ui::before_game_window(sm::Ctx& ctx, GameScene& game_scene) {
     const auto minutes {std::get<0>(Clock::split_time(game_scene.get_clock().get_white_time()))};
 
     if (minutes == 1) {
-        ImGui::TextWrapped("%u minute"_L, minutes);
+        ImGui::TextWrapped("%u %s", minutes, "minute"_L);
     } else {
-        ImGui::TextWrapped("%u minutes"_L, minutes);
+        ImGui::TextWrapped("%u %s", minutes, "minutes"_L);
     }
 }
 
@@ -571,10 +577,10 @@ void Ui::before_game_local_window(sm::Ctx& ctx, GameScene& game_scene) {
 
     switch (g.options.game_type) {
         case GameTypeLocal:
-            ImGui::TextWrapped("local_game_two_humans_description"_L);
+            ImGui::TextWrapped("%s", "local_game_two_humans_description"_L);
             break;
         case GameTypeLocalVsComputer:
-            ImGui::TextWrapped("local_game_human_computer_description"_L);
+            ImGui::TextWrapped("%s", "local_game_human_computer_description"_L);
             ImGui::TextWrapped(
                 "%s %s",
                 "Computer plays as"_L,
@@ -610,6 +616,11 @@ void Ui::before_game_online_window(sm::Ctx& ctx, GameScene& game_scene) {
 
     ImGui::SameLine();
 
+    if (ImGui::GetContentRegionAvail().x < rem(3.0f) + ImGui::GetStyle().ItemInnerSpacing.x + ImGui::CalcTextSize("Code"_L).x) {
+        // Go on the next line
+        ImGui::Dummy(ImVec2());
+    }
+
     ImGui::PushItemWidth(rem(3.0f));
     if (ImGui::InputText("Code"_L, m_session_id, sizeof(m_session_id), ImGuiInputTextFlags_EnterReturnsTrue)) {
         if (join_game_available(game_scene)) {
@@ -624,7 +635,7 @@ void Ui::before_game_online_window(sm::Ctx& ctx, GameScene& game_scene) {
     ImGui::Separator();
     ImGui::Dummy(ImVec2(0.0f, rem(0.1f)));
 
-    ImGui::TextWrapped("online_hame_two_humans_description"_L);
+    ImGui::TextWrapped("%s", "online_hame_two_humans_description"_L);
     ImGui::TextWrapped(
         "%s %s",
         "Remote plays as"_L,
@@ -741,10 +752,10 @@ void Ui::analyze_game_window(GameScene& game_scene) {
 
 void Ui::about_window() {
     modal_window_ok("About Nine Morris 3D"_L, []() {
-        ImGui::Text("about_description"_L);
-        ImGui::Text("Version %u.%u.%u"_L, VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH);
+        ImGui::Text("%s", "about_description"_L);
+        ImGui::Text("%s %u.%u.%u", "Version"_L, VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH);
         ImGui::Separator();
-        ImGui::Text("All programming by:"_L);
+        ImGui::Text("%s:", "All programming by"_L);
         ImGui::Text("Simon <simonmara.dev@gmail.com>");
     });
 }
@@ -756,26 +767,26 @@ void Ui::general_play_window() {
             ImGui::SeparatorText("Starting A Game:"_L);
             ImGui::Bullet();
             ImGui::SameLine();
-            ImGui::TextWrapped("help_general_play_starting_a_game1"_L);
+            ImGui::TextWrapped("%s", "help_general_play_starting_a_game1"_L);
             ImGui::Bullet();
             ImGui::SameLine();
-            ImGui::TextWrapped("help_general_play_starting_a_game2"_L);
+            ImGui::TextWrapped("%s", "help_general_play_starting_a_game2"_L);
             ImGui::Bullet();
             ImGui::SameLine();
-            ImGui::TextWrapped("help_general_play_starting_a_game3"_L);
+            ImGui::TextWrapped("%s", "help_general_play_starting_a_game3"_L);
 
             ImGui::Spacing();
 
             ImGui::SeparatorText("Game Controls:"_L);
             ImGui::Bullet();
             ImGui::SameLine();
-            ImGui::TextWrapped("help_general_play_game_controls1"_L);
+            ImGui::TextWrapped("%s", "help_general_play_game_controls1"_L);
             ImGui::Bullet();
             ImGui::SameLine();
-            ImGui::TextWrapped("help_general_play_game_controls2"_L);
+            ImGui::TextWrapped("%s", "help_general_play_game_controls2"_L);
             ImGui::Bullet();
             ImGui::SameLine();
-            ImGui::TextWrapped("help_general_play_game_controls3"_L);
+            ImGui::TextWrapped("%s", "help_general_play_game_controls3"_L);
         },
         glm::vec2(MIN_WIDTH - rem(1.0f), 0.0f),
         glm::vec2(ImGui::GetMainViewport()->WorkSize.x - rem(0.5f), ImGui::GetMainViewport()->WorkSize.y - rem(0.5f))
@@ -788,23 +799,23 @@ void Ui::online_play_window() {
         []() {
             ImGui::Bullet();
             ImGui::SameLine();
-            ImGui::TextWrapped("help_general_play1"_L);
-            ImGui::TextWrapped("help_general_play2"_L);
+            ImGui::TextWrapped("%s", "help_general_play1"_L);
+            ImGui::TextWrapped("%s", "help_general_play2"_L);
             ImGui::Bullet();
             ImGui::SameLine();
-            ImGui::TextWrapped("help_general_play3"_L);
+            ImGui::TextWrapped("%s", "help_general_play3"_L);
             ImGui::Bullet();
             ImGui::SameLine();
-            ImGui::TextWrapped("help_general_play4"_L);
+            ImGui::TextWrapped("%s", "help_general_play4"_L);
             ImGui::Bullet();
             ImGui::SameLine();
-            ImGui::TextWrapped("help_general_play5"_L);
+            ImGui::TextWrapped("%s", "help_general_play5"_L);
             ImGui::Bullet();
             ImGui::SameLine();
-            ImGui::TextWrapped("help_general_play6"_L);
+            ImGui::TextWrapped("%s", "help_general_play6"_L);
             ImGui::Bullet();
             ImGui::SameLine();
-            ImGui::TextWrapped("help_general_play7"_L);
+            ImGui::TextWrapped("%s", "help_general_play7"_L);
         },
         glm::vec2(MIN_WIDTH - rem(1.0f), 0.0f),
         glm::vec2(ImGui::GetMainViewport()->WorkSize.x - rem(0.5f), ImGui::GetMainViewport()->WorkSize.y - rem(0.5f))
@@ -836,7 +847,7 @@ void Ui::game_over_window(GameScene& game_scene) {
         const auto& reason {static_cast<const std::string&>(game_scene.get_board().get_game_over())};
 
         ImGui::SetCursorPosX((ImGui::GetWindowWidth() - ImGui::CalcTextSize(reason.c_str()).x) * 0.5f);
-        ImGui::Text("%s", reason.c_str());
+        ImGui::Text("%s.", reason.c_str());
     });
 }
 
@@ -902,7 +913,13 @@ void Ui::analyze_games_window(GameScene& game_scene) {
     modal_window_ok_size(
         "Analyze Games"_L,
         [&]() {
-            ImGui::TextWrapped("analyze_games_tip"_L);
+            ImGui::TextWrapped("%s", "analyze_games_tip1"_L);
+
+            const auto& saved_games {game_scene.get_saved_games().get()};
+
+            if (saved_games.empty()) {
+                ImGui::TextWrapped("%s", "analyze_games_tip2"_L);
+            }
 
             ImGui::Dummy(ImVec2(0.0f, Ui::rem(0.5f)));
 
@@ -916,8 +933,6 @@ void Ui::analyze_games_window(GameScene& game_scene) {
                     ImGui::TableSetupColumn("Moves"_L);
                     ImGui::TableSetupColumn("Result"_L);
                     ImGui::TableHeadersRow();
-
-                    const auto& saved_games {game_scene.get_saved_games().get()};
 
                     for (std::size_t i {0}; i < saved_games.size(); i++) {
                         ImGui::TableNextRow();
@@ -954,42 +969,42 @@ void Ui::analyze_games_window(GameScene& game_scene) {
 
 void Ui::engine_error_window() {
     modal_window_ok("Engine Error"_L, []() {
-        ImGui::Text("engine_error_description1"_L);
-        ImGui::Text("engine_error_description2"_L);
+        ImGui::Text("%s", "engine_error_description1"_L);
+        ImGui::Text("%s", "engine_error_description2"_L);
     });
 }
 
 void Ui::connection_error_window() {
     modal_window_ok("Connection Error"_L, []() {
-        ImGui::Text("connection_error_description1"_L);
-        ImGui::Text("connection_error_description2"_L);
+        ImGui::Text("%s", "connection_error_description1"_L);
+        ImGui::Text("%s", "connection_error_description2"_L);
     });
 }
 
 void Ui::server_rejection_window(const std::string& string) {
     modal_window_ok("Server Error"_L, [&string]() {
-        ImGui::Text("server_error_description"_L);
+        ImGui::Text("%s", "server_error_description"_L);
         ImGui::Text("%s.", string.c_str());
     });
 }
 
 void Ui::new_game_session_error_window(const std::string& string) {
     modal_window_ok("New Online Game Error"_L, [&string]() {
-        ImGui::Text("new_online_game_error_description"_L);
+        ImGui::Text("%s", "new_online_game_error_description"_L);
         ImGui::Text("%s.", string.c_str());
     });
 }
 
 void Ui::join_game_session_error_window(const std::string& string) {
     modal_window_ok("Join Online Game Error"_L, [&string]() {
-        ImGui::Text("join_online_game_error_description"_L);
+        ImGui::Text("%s", "join_online_game_error_description"_L);
         ImGui::Text("%s.", string.c_str());
     });
 }
 
 void Ui::wait_server_accept_game_session_window(GameScene&) {
     modal_window("Waiting For Server To Accept"_L, []() {
-        ImGui::Text("waiting_for_server_to_accept_description"_L);
+        ImGui::Text("%s", "waiting_for_server_to_accept_description"_L);
 
         return false;
     });
@@ -999,7 +1014,7 @@ void Ui::wait_remote_join_game_session_window(GameScene& game_scene) {
     assert(game_scene.get_game_session());
 
     modal_window("Waiting For Player To Join"_L, [&game_scene]() {
-        ImGui::Text("waiting_for_player_to_join_description1"_L);
+        ImGui::Text("%s", "waiting_for_player_to_join_description1"_L);
         ImGui::Text("%s: %.5u", "waiting_for_player_to_join_description2"_L, game_scene.get_game_session()->get_session_id());
 
         ImGui::Dummy(ImVec2(0.0f, rem(0.5f)));
@@ -1017,7 +1032,7 @@ void Ui::wait_remote_join_game_session_window(GameScene& game_scene) {
 
 void Ui::wait_server_accept_join_game_session_window(GameScene&) {
     modal_window("Waiting For Server To Accept"_L, []() {
-        ImGui::Text("waiting_for_server_to_accept_description"_L);
+        ImGui::Text("%s", "waiting_for_server_to_accept_description"_L);
 
         return false;
     });
@@ -1027,8 +1042,8 @@ void Ui::wait_remote_rematch_window(GameScene& game_scene) {
     assert(game_scene.get_game_session());
 
     modal_window("Waiting For Player"_L, [&game_scene]() {
-        ImGui::Text("waiting_for_player_description1"_L);
-        ImGui::Text("waiting_for_player_description2"_L);
+        ImGui::Text("%s", "waiting_for_player_description1"_L);
+        ImGui::Text("%s", "waiting_for_player_description2"_L);
 
         ImGui::Dummy(ImVec2(0.0f, rem(0.5f)));
 
@@ -1046,22 +1061,22 @@ void Ui::rules_nine_mens_morris_window() {
         []() {
             ImGui::Bullet();
             ImGui::SameLine();
-            ImGui::TextWrapped("nine_mens_morris_rules1"_L);
+            ImGui::TextWrapped("%s", "nine_mens_morris_rules1"_L);
             ImGui::Bullet();
             ImGui::SameLine();
-            ImGui::TextWrapped("nine_mens_morris_rules2"_L);
+            ImGui::TextWrapped("%s", "nine_mens_morris_rules2"_L);
             ImGui::Bullet();
             ImGui::SameLine();
-            ImGui::TextWrapped("nine_mens_morris_rules3"_L);
+            ImGui::TextWrapped("%s", "nine_mens_morris_rules3"_L);
             ImGui::Bullet();
             ImGui::SameLine();
-            ImGui::TextWrapped("nine_mens_morris_rules4"_L);
+            ImGui::TextWrapped("%s", "nine_mens_morris_rules4"_L);
             ImGui::Bullet();
             ImGui::SameLine();
-            ImGui::TextWrapped("nine_mens_morris_rules5"_L);
+            ImGui::TextWrapped("%s", "nine_mens_morris_rules5"_L);
             ImGui::Bullet();
             ImGui::SameLine();
-            ImGui::TextWrapped("nine_mens_morris_rules6"_L);
+            ImGui::TextWrapped("%s", "nine_mens_morris_rules6"_L);
         },
         glm::vec2(MIN_WIDTH - rem(1.0f), 0.0f),
         glm::vec2(ImGui::GetMainViewport()->WorkSize.x - rem(0.5f), ImGui::GetMainViewport()->WorkSize.y - rem(0.5f))
@@ -1072,13 +1087,13 @@ void Ui::rules_twelve_mens_morris_window() {
     modal_window_ok_size_constraints(
         "Twelve Men's Morris Rules"_L,
         []() {
-            ImGui::TextWrapped("twelve_mens_morris_rules1"_L);
+            ImGui::TextWrapped("%s", "twelve_mens_morris_rules1"_L);
             ImGui::Bullet();
             ImGui::SameLine();
-            ImGui::TextWrapped("twelve_mens_morris_rules2"_L);
+            ImGui::TextWrapped("%s", "twelve_mens_morris_rules2"_L);
             ImGui::Bullet();
             ImGui::SameLine();
-            ImGui::TextWrapped("twelve_mens_morris_rules3"_L);
+            ImGui::TextWrapped("%s", "twelve_mens_morris_rules3"_L);
         },
         glm::vec2(MIN_WIDTH - rem(1.0f), 0.0f),
         glm::vec2(ImGui::GetMainViewport()->WorkSize.x - rem(0.5f), ImGui::GetMainViewport()->WorkSize.y - rem(0.5f))
