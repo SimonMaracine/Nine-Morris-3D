@@ -1,24 +1,9 @@
 #pragma once
 
-#include <variant>
-
 #include "engines/engine.hpp"
 
-class GbgpEngine : public Engine {
+class GbgpEngine : public UciLikeEngine {
 public:
-    struct Info : Engine::Info {
-        struct ScoreEval { int value; };
-        struct ScoreWin { int value; };
-
-        using Score = std::variant<ScoreEval, ScoreWin>;
-
-        std::optional<unsigned int> depth;
-        std::optional<unsigned int> time;
-        std::optional<unsigned int> nodes;
-        std::optional<Score> score;
-        std::optional<std::vector<std::string>> pv;
-    };
-
     void initialize(const std::filesystem::path& file_path, bool search_executable = false) override;
     void set_debug(bool active) override;
     void synchronize() override;

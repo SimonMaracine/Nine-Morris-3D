@@ -1,5 +1,6 @@
 #include "scenes/game_scene.hpp"
 
+#include <ranges>
 #include <ctime>
 
 #include <nine_morris_3d_engine/external/resmanager.h++>
@@ -323,14 +324,24 @@ void GameScene::reset_camera_position() {
     }
 }
 
-void GameScene::analyze_game(std::size_t index) {
-    reset(m_saved_games.get().at(index).initial_position);
+void GameScene::analyze_game(std::size_t game_index) {
+    reset(m_saved_games.get().at(game_index).initial_position);
 
-    m_game_analysis = GameAnalysis(index);
-    m_game_analysis->time_white = m_saved_games.get().at(index).initial_time;
-    m_game_analysis->time_black = m_saved_games.get().at(index).initial_time;
+    m_game_analysis = GameAnalysis(game_index, m_engine);
+    m_game_analysis->set_engine_callback();  // Second step initialization prevents UB
+    m_game_analysis->time_white = m_saved_games.get().at(game_index).initial_time;
+    m_game_analysis->time_black = m_saved_games.get().at(game_index).initial_time;
+
+    analyze_position();
 
     m_game_state = GameState::Analyze;
+}
+
+void GameScene::analyze_position() {
+    engine_analyze_position(
+        m_saved_games.get().at(m_game_analysis->get_game_index()).initial_position,
+        current_analysis_position(m_game_analysis->ply)
+    );
 }
 
 void GameScene::resign_leave_session_and_reset() {
@@ -888,6 +899,7 @@ void GameScene::update_game_state() {
         case GameState::Over:
             break;
         case GameState::Analyze:
+            game_state_analyze();
             break;
     }
 }
@@ -1024,7 +1036,7 @@ void GameScene::game_state_stop() {
         case GameTypeLocalVsComputer:
             // Don't crash, if timeout occurs
             if (m_clock.get_white_time() != 0 && m_clock.get_black_time() != 0) {
-                assert_engine_game_over();
+                engine_assert_game_over();
             }
             break;
         case GameTypeOnline:
@@ -1054,6 +1066,31 @@ void GameScene::game_state_stop() {
     sm::Ctx::play_audio_sound(m_sound_game_over);
 }
 
+void GameScene::game_state_analyze() {
+    assert(m_game_analysis);
+
+    if (!m_engine) {
+        return;
+    }
+
+    if (!m_game_analysis->thinking) {
+        return;
+    }
+
+    std::optional<std::string> best_move;
+
+    try {
+        best_move = m_engine->done_thinking();
+    } catch (const EngineError& e) {
+        engine_error(e);
+        return;
+    }
+
+    if (best_move) {
+        m_game_analysis->thinking = false;
+    }
+}
+
 void GameScene::engine_error(const EngineError& e) {
     LOG_DIST_ERROR("Engine error: {}", e.what());
     m_engine.reset();
@@ -1074,7 +1111,7 @@ void GameScene::stop_engine() {
     m_engine.reset();
 }
 
-void GameScene::assert_engine_game_over() {
+void GameScene::engine_assert_game_over() {
     assert(m_engine);
 
     try {
@@ -1102,6 +1139,42 @@ void GameScene::assert_engine_game_over() {
     } catch (const EngineError& e) {
         engine_error(e);
     }
+}
+
+void GameScene::engine_analyze_position(const std::string position, const std::vector<std::string>& moves) {
+    assert(m_game_analysis);
+
+    if (!m_engine) {
+        return;
+    }
+
+    try {
+        // Must synchronize!!!
+        // If we don't process all current messages before starting a new think invocation, they will mess up the state
+        if (m_game_analysis->thinking) {
+            m_engine->stop_thinking();
+            while (!m_engine->done_thinking()) {}
+        }
+
+        m_engine->start_thinking(position, moves, std::nullopt, std::nullopt, 7000);
+    } catch (const EngineError& e) {
+        engine_error(e);
+        return;
+    }
+
+    m_game_analysis->thinking = true;
+}
+
+std::vector<std::string> GameScene::current_analysis_position(std::size_t ply) {
+    const auto saved_game {m_saved_games.get().at(m_game_analysis->get_game_index())};
+
+    std::vector<std::string> moves;
+
+    for (const auto& move : saved_game.moves | std::views::take(ply)) {
+        moves.push_back(move.first);
+    }
+
+    return moves;
 }
 
 void GameScene::connection_error(const networking::ConnectionError& e) {

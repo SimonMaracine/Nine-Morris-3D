@@ -85,7 +85,7 @@ public:
     virtual std::filesystem::path saved_games_file_path() const = 0;
 
     std::shared_ptr<PointCameraController> get_camera_controller() const { return m_camera_controller; }
-    const std::unique_ptr<Engine>& get_engine() const { return m_engine; }
+    std::shared_ptr<UciLikeEngine> get_engine() const { return m_engine; }
     GameState& get_game_state() { return m_game_state; }
     GameOptions& get_game_options() { return m_game_options; }
     std::optional<GameSession>& get_game_session() { return m_game_session; }
@@ -108,7 +108,8 @@ public:
 
     void reset(const std::string& string, const TimedMoves& moves = {});
     void reset_camera_position();
-    void analyze_game(std::size_t index);
+    void analyze_game(std::size_t game_index);
+    void analyze_position();
     void resign_leave_session_and_reset();
 
     void connect(const std::string& address, std::uint16_t port);
@@ -151,10 +152,13 @@ protected:
     void game_state_computer_thinking();
     void game_state_finish_turn();
     void game_state_stop();
+    void game_state_analyze();
 
     void engine_error(const EngineError& e);
     void stop_engine();
-    void assert_engine_game_over();
+    void engine_assert_game_over();
+    void engine_analyze_position(const std::string position, const std::vector<std::string>& moves);
+    std::vector<std::string> current_analysis_position(std::size_t ply);
 
     void connection_error(const networking::ConnectionError& e);
     void serialization_error(const networking::SerializationError& e);
@@ -183,7 +187,7 @@ protected:
     void server_cancel_rematch(const networking::Message& message);
 
     std::shared_ptr<PointCameraController> m_camera_controller;
-    std::unique_ptr<Engine> m_engine;
+    std::shared_ptr<UciLikeEngine> m_engine;
     Ui m_ui;
 
     std::shared_ptr<sm::GlTexture> m_icon_wait;

@@ -44,7 +44,6 @@ void GbgpEngine::initialize(const std::filesystem::path& file_path, bool search_
 
         if (m_log_output_stream.is_open()) {
             m_log_output_stream << message << '\n';
-            m_log_output_stream.flush();
         }
 
         const auto tokens {parse_message(message)};
@@ -119,7 +118,6 @@ void GbgpEngine::synchronize() {
 
         if (m_log_output_stream.is_open()) {
             m_log_output_stream << message << '\n';
-            m_log_output_stream.flush();
         }
 
         const auto tokens {parse_message(message)};
@@ -208,7 +206,6 @@ std::optional<std::string> GbgpEngine::done_thinking() {
 
     if (m_log_output_stream.is_open()) {
         m_log_output_stream << message << '\n';
-        m_log_output_stream.flush();
     }
 
     const auto tokens {parse_message(message)};

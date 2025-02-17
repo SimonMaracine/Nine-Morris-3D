@@ -1,5 +1,6 @@
 #include <iostream>
 #include <filesystem>
+#include <string_view>
 #include <cstring>
 
 // Include entry point first as it includes Windows.h
@@ -134,10 +135,13 @@ int sm_application_main(int argc, char** argv) {
     } catch (const sm::RuntimeError& e) {
         std::cerr << "A fatal error occurred in the crash handler: " << e.what() << '\n';
 
+        // Cut off the error message, if it's too large
+        const auto error_message {std::string(std::string_view(e.what()).substr(0, 110))};
+
         try {
             sm::crash::show_error_window(
                 "Nine Morris 3D Fatal Error",
-                "Sorry! A fatal error occurred.\nPlease consider reporting the event to the developer.\n\n" + std::string(e.what())
+                "Sorry! A fatal error occurred.\nPlease consider reporting the event to the developer.\n\n`" + error_message + '`'
             );
         } catch (...) {}
 

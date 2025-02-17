@@ -11,9 +11,20 @@
 
 #include "engines/subprocess.hpp"
 
-class Engine {
+class UciLikeEngine {
 public:
-    struct Info {};
+    struct Info {
+        struct ScoreEval { int value; };
+        struct ScoreWin { int value; };
+
+        using Score = std::variant<ScoreEval, ScoreWin>;
+
+        std::optional<unsigned int> depth;
+        std::optional<unsigned int> time;
+        std::optional<unsigned int> nodes;
+        std::optional<Score> score;
+        std::optional<std::vector<std::string>> pv;
+    };
 
     struct Option {
         struct Check {
@@ -43,7 +54,7 @@ public:
         Value value;
     };
 
-    virtual ~Engine() = default;
+    virtual ~UciLikeEngine() = default;
 
     virtual void initialize(const std::filesystem::path& file_path, bool search_executable = false) = 0;
     virtual void set_debug(bool active) = 0;

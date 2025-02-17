@@ -3,6 +3,7 @@
 #include <utility>
 #include <algorithm>
 #include <iterator>
+#include <ranges>
 #include <cstring>
 #include <ctime>
 #include <cassert>
@@ -37,7 +38,6 @@ void Ui::initialize(sm::Ctx& ctx) {
 }
 
 void Ui::update(sm::Ctx& ctx, GameScene& game_scene) {
-    ImGui::ShowDemoWindow();
     main_menu_bar(ctx, game_scene);
     game_window(ctx, game_scene);
 
@@ -500,7 +500,7 @@ void Ui::game_window(sm::Ctx& ctx, GameScene& game_scene) {
         static_cast<float>(MIN_WIDTH),
         static_cast<float>(MAX_WIDTH),
         rem(11.0f),
-        rem(15.0f)
+        rem(16.0f)
     )};
 
     const float height_offset {sm::utils::map(
@@ -508,7 +508,7 @@ void Ui::game_window(sm::Ctx& ctx, GameScene& game_scene) {
         static_cast<float>(MIN_HEIGHT),
         static_cast<float>(MAX_HEIGHT),
         rem(5.0f),
-        rem(15.0f)
+        rem(14.0f)
     )};
 
     const float right_offset {sm::utils::map(
@@ -671,7 +671,7 @@ void Ui::analyze_game_window(GameScene& game_scene) {
     assert(game_scene.get_game_analysis());
 
     auto& game_analysis {game_scene.get_game_analysis()};
-    const SavedGame& saved_game {game_scene.get_saved_games().get().at(game_analysis->get_index())};
+    const SavedGame& saved_game {game_scene.get_saved_games().get().at(game_analysis->get_game_index())};
 
     const auto set_clock_time {[](GameScene& game_scene, auto& game_analysis, unsigned int time) {
         switch (game_scene.get_board().get_player_color()) {
@@ -687,6 +687,7 @@ void Ui::analyze_game_window(GameScene& game_scene) {
     ImGui::BeginDisabled(game_analysis->ply == 0);
     if (ImGui::Button("Previous"_L)) {
         game_analysis->ply--;
+        game_scene.analyze_position();
 
         game_scene.reset_board(saved_game.initial_position);
         game_scene.get_moves_list().clear();
@@ -710,7 +711,6 @@ void Ui::analyze_game_window(GameScene& game_scene) {
 
         // Place the pieces into their places without animation
         game_scene.get_board().setup_pieces(false);
-
     }
     ImGui::EndDisabled();
 
@@ -728,6 +728,7 @@ void Ui::analyze_game_window(GameScene& game_scene) {
         set_clock_time(game_scene, game_analysis, time);
 
         game_analysis->ply++;
+        game_scene.analyze_position();
     }
     ImGui::EndDisabled();
 
@@ -745,6 +746,25 @@ void Ui::analyze_game_window(GameScene& game_scene) {
         const auto [minutes, seconds, centiseconds] {Clock::split_time(game_analysis->time_black)};
         ImGui::Text("%u:%02u.%02u", minutes, seconds, centiseconds);
     }
+
+    ImGui::Dummy(ImVec2(0.0f, rem(0.1f)));
+    ImGui::Separator();
+    ImGui::Dummy(ImVec2(0.0f, rem(0.1f)));
+
+    const auto get_current_line {[&saved_game, &game_analysis]() {
+        std::string result;
+
+        for (const auto& move : saved_game.moves | std::views::drop(game_analysis->ply) | std::views::take(5)) {
+            result += move.first;
+            result += ' ';
+        }
+
+        return result;
+    }};
+
+    ImGui::TextWrapped("%s %s", "Current Line"_L, get_current_line().c_str());
+    ImGui::Dummy(ImVec2(0.0f, rem(0.1f)));
+    ImGui::TextWrapped("%s %s", "PV Line"_L, game_analysis->get_pv().c_str());
 
     ImGui::Dummy(ImVec2(0.0f, rem(0.1f)));
     ImGui::Separator();

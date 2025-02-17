@@ -227,7 +227,7 @@
         },
         "Game Rules": {
             "en": "Game Rules",
-            "ro": "Reguli jocuri"
+            "ro": "Reguli joc"
         },
         "About": {
             "en": "About",
@@ -280,6 +280,14 @@
         "Next": {
             "en": "Next",
             "ro": "Înainte"
+        },
+        "Current Line": {
+            "en": "Current Line",
+            "ro": "Linia curentă"
+        },
+        "PV Line": {
+            "en": "PV Line",
+            "ro": "Linia PV"
         },
         "About Nine Morris 3D": {
             "en": "About Nine Morris 3D",

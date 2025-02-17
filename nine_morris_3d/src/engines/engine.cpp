@@ -2,11 +2,11 @@
 
 #include <cstring>
 
-void Engine::set_info_callback(std::function<void(const Info&)>&& info_callback) {
+void UciLikeEngine::set_info_callback(std::function<void(const Info&)>&& info_callback) {
     m_info_callback = std::move(info_callback);
 }
 
-void Engine::set_log_output(bool enable, const std::filesystem::path& file_path) {
+void UciLikeEngine::set_log_output(bool enable, const std::filesystem::path& file_path) {
     if (enable) {
         m_log_output_stream.open(file_path, std::ios::app);
     } else {
@@ -14,7 +14,7 @@ void Engine::set_log_output(bool enable, const std::filesystem::path& file_path)
     }
 }
 
-std::vector<std::string> Engine::parse_message(const std::string& message) {
+std::vector<std::string> UciLikeEngine::parse_message(const std::string& message) {
     std::vector<std::string> tokens;
     std::string buffer {message};
 
@@ -32,7 +32,7 @@ std::vector<std::string> Engine::parse_message(const std::string& message) {
     return tokens;
 }
 
-std::optional<Engine::Option> Engine::parse_option(const std::vector<std::string>& tokens) {
+std::optional<UciLikeEngine::Option> UciLikeEngine::parse_option(const std::vector<std::string>& tokens) {
     Option option;
 
     const auto name {parse_option_name(tokens)};
@@ -116,7 +116,7 @@ std::optional<Engine::Option> Engine::parse_option(const std::vector<std::string
     return option;
 }
 
-std::optional<std::string> Engine::parse_option_name(const std::vector<std::string>& tokens) {
+std::optional<std::string> UciLikeEngine::parse_option_name(const std::vector<std::string>& tokens) {
     auto iter {std::find(tokens.cbegin(), tokens.cend(), "name")};
 
     if (iter == tokens.cend()) {
@@ -140,7 +140,7 @@ std::optional<std::string> Engine::parse_option_name(const std::vector<std::stri
     return name.substr(1);
 }
 
-std::optional<std::string> Engine::parse_option_type(const std::vector<std::string>& tokens) {
+std::optional<std::string> UciLikeEngine::parse_option_type(const std::vector<std::string>& tokens) {
     auto iter {std::find(tokens.cbegin(), tokens.cend(), "type")};
 
     if (iter == tokens.cend()) {
@@ -154,7 +154,7 @@ std::optional<std::string> Engine::parse_option_type(const std::vector<std::stri
     return std::nullopt;
 }
 
-std::optional<std::string> Engine::parse_option_default(const std::vector<std::string>& tokens) {
+std::optional<std::string> UciLikeEngine::parse_option_default(const std::vector<std::string>& tokens) {
     auto iter {std::find(tokens.cbegin(), tokens.cend(), "default")};
 
     if (iter == tokens.cend()) {
@@ -178,7 +178,7 @@ std::optional<std::string> Engine::parse_option_default(const std::vector<std::s
     return default_.substr(1);
 }
 
-std::optional<int> Engine::parse_option_min(const std::vector<std::string>& tokens) {
+std::optional<int> UciLikeEngine::parse_option_min(const std::vector<std::string>& tokens) {
     auto iter {std::find(tokens.cbegin(), tokens.cend(), "min")};
 
     if (iter == tokens.cend()) {
@@ -196,7 +196,7 @@ std::optional<int> Engine::parse_option_min(const std::vector<std::string>& toke
     return std::nullopt;
 }
 
-std::optional<int> Engine::parse_option_max(const std::vector<std::string>& tokens) {
+std::optional<int> UciLikeEngine::parse_option_max(const std::vector<std::string>& tokens) {
     auto iter {std::find(tokens.cbegin(), tokens.cend(), "max")};
 
     if (iter == tokens.cend()) {
@@ -214,7 +214,7 @@ std::optional<int> Engine::parse_option_max(const std::vector<std::string>& toke
     return std::nullopt;
 }
 
-std::optional<std::vector<std::string>> Engine::parse_option_vars(const std::vector<std::string>& tokens) {
+std::optional<std::vector<std::string>> UciLikeEngine::parse_option_vars(const std::vector<std::string>& tokens) {
     std::vector<std::string>::const_iterator iter {tokens.cbegin()};
     std::vector<std::string> vars;
 
@@ -245,6 +245,6 @@ std::optional<std::vector<std::string>> Engine::parse_option_vars(const std::vec
     return vars;
 }
 
-bool Engine::token_available(const std::vector<std::string>& tokens, std::size_t index) {
+bool UciLikeEngine::token_available(const std::vector<std::string>& tokens, std::size_t index) {
     return index < tokens.size();
 }

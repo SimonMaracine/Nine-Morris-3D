@@ -220,7 +220,7 @@ void NineMensMorrisBaseScene::time_control_options_window() {
 void NineMensMorrisBaseScene::start_engine() {
     assert(!m_engine);
 
-    m_engine = std::make_unique<GbgpEngine>();
+    m_engine = std::make_shared<GbgpEngine>();
 #ifndef SM_BUILD_DISTRIBUTION
     m_engine->set_log_output(true, "nine_mens_morris_engine.log");
 #endif
