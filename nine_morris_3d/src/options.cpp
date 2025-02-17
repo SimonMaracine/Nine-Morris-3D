@@ -116,8 +116,14 @@ void load_options(Options& options, const std::filesystem::path& file_path) {
         cereal::BinaryInputArchive archive {stream};
         archive(options);
     } catch (const cereal::Exception& e) {
+        options = Options();
         throw OptionsError("Error reading from file: "s + e.what());
+    } catch (...) {
+        options = Options();
+        throw OptionsError("Unexpected error reading from file");
     }
+
+    // Must reset the data on error, as it is corrupted
 
     validate(options);
 }

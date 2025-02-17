@@ -62,8 +62,14 @@ void load_configuration(Configuration& configuration, const std::filesystem::pat
         cereal::JSONInputArchive archive {stream};
         archive(CEREAL_NVP(configuration));
     } catch (const cereal::Exception& e) {
+        configuration = Configuration();
         throw ConfigurationError("Error reading from file: "s + e.what());
+    } catch (...) {
+        configuration = Configuration();
+        throw ConfigurationError("Unexpected error reading from file");
     }
+
+    // Must reset the data on error, as it is corrupted
 
     validate(configuration);
 }

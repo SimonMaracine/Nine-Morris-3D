@@ -1036,8 +1036,7 @@ void GameScene::game_state_stop() {
     }
 
     // Save current game
-    const auto current_time {std::time(nullptr)};
-    m_current_game.date_time = std::ctime(&current_time);
+    m_current_game.game_time = std::time(nullptr);
     m_current_game.ending = static_cast<SavedGame::Ending>(static_cast<int>(get_board().get_game_over()) - 1);
     m_saved_games.add_saved_game(std::move(m_current_game));
     m_current_game = {};

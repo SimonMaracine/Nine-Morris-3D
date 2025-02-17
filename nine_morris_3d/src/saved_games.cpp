@@ -19,9 +19,14 @@ void SavedGames::load(const std::filesystem::path& file_path) {
         cereal::BinaryInputArchive archive {stream};
         archive(m_saved_games);
     } catch (const cereal::Exception& e) {
+        m_saved_games.clear();
         throw SavedGamesError("Error reading from file: "s + e.what());
+    } catch (...) {
+        m_saved_games.clear();
+        throw SavedGamesError("Unexpected error reading from file");
     }
 
+    // Must clear the data on error, as it is incomplete
     // No validation for now
 }
 

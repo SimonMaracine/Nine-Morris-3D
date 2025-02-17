@@ -397,6 +397,18 @@
             "en": "Online",
             "ro": "Online"
         },
+        "local": {
+            "en": "local",
+            "ro": "local"
+        },
+        "local vs computer": {
+            "en": "local vs computer",
+            "ro": "local contra calculator"
+        },
+        "online": {
+            "en": "online",
+            "ro": "online"
+        },
         "Computer Plays As": {
             "en": "Computer Plays As",
             "ro": "Calculatorul joacă ca"

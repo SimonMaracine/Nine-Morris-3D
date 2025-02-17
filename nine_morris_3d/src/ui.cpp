@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <iterator>
 #include <cstring>
+#include <ctime>
 #include <cassert>
 
 #include <nine_morris_3d_engine/external/imgui.h++>
@@ -184,11 +185,13 @@ void Ui::main_menu_bar(sm::Ctx& ctx, GameScene& game_scene) {
                     g.options.language = m_options.language;
 
                     sm::localization::set_language("en"_H);
+                    sm::localization::set_locale("en_US.UTF-8");
                 }
                 if (ImGui::RadioButton("Romanian"_L, &m_options.language, LanguageRomanian)) {
                     g.options.language = m_options.language;
 
                     sm::localization::set_language("ro"_H);
+                    sm::localization::set_locale("ro_RO.UTF-8");
                 }
 
                 ImGui::EndMenu();
@@ -948,7 +951,17 @@ void Ui::analyze_games_window(GameScene& game_scene) {
                         }
 
                         ImGui::TableSetColumnIndex(1);
-                        ImGui::Text("%s", saved_games[i].date_time.c_str());
+                        {
+                            char buffer[64] {};
+                            const std::tm* game_time {std::localtime(&saved_games[i].game_time)};
+
+                            if (game_time != nullptr) {
+                                // https://en.cppreference.com/w/cpp/chrono/c/strftime
+                                std::strftime(buffer, sizeof(buffer), "%a %b %d %Y %H:%M", game_time);
+                            }
+
+                            ImGui::Text("%s", buffer);
+                        }
                         ImGui::TableSetColumnIndex(2);
                         ImGui::Text("%s", to_string(saved_games[i].game_type));
                         ImGui::TableSetColumnIndex(3);

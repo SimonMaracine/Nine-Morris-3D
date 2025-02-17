@@ -4,11 +4,15 @@
 #include <vector>
 #include <utility>
 #include <stdexcept>
+#include <ctime>
 
+#include <nine_morris_3d_engine/nine_morris_3d.hpp>
 #include <nine_morris_3d_engine/external/cereal.h++>
 
 #include "clock.hpp"
 #include "ver.hpp"
+
+using namespace sm::localization_literals;
 
 struct SavedGame {
     enum class GameType {
@@ -28,7 +32,7 @@ struct SavedGame {
     Ending ending {};
     std::string initial_position;
     std::vector<std::pair<std::string, Clock::Time>> moves;
-    std::string date_time;
+    std::time_t game_time;  // The time when the game has finished
 
     template<typename Archive>
     void serialize(Archive& archive, const std::uint32_t) {
@@ -38,7 +42,7 @@ struct SavedGame {
             ending,
             initial_position,
             moves,
-            date_time
+            game_time
         );
     }
 };
@@ -48,13 +52,13 @@ inline const char* to_string(SavedGame::GameType game_type) {
 
     switch (game_type) {
         case SavedGame::GameType::Local:
-            string = "local";
+            string = "local"_L;
             break;
         case SavedGame::GameType::LocalVsComputer:
-            string = "local vs computer";
+            string = "local vs computer"_L;
             break;
         case SavedGame::GameType::Online:
-            string = "online";
+            string = "online"_L;
             break;
     }
 

@@ -14,18 +14,19 @@ void game_start(sm::Ctx& ctx) {
     try {
         load_options(g.options, ctx.path_saved_data(OPTIONS_FILE_NAME));
     } catch (const OptionsError& e) {
-        // Must reset the data, as it may be corrupted
-        g.options = Options();
-
         LOG_DIST_ERROR("Could not load options: {}", e.what());
+
+        // Default options are restored in case of error
     }
 
     switch (g.options.language) {
         case LanguageEnglish:
             sm::localization::set_language("en"_H);
+            sm::localization::set_locale("en_US.UTF-8");  // TODO test on Windows
             break;
         case LanguageRomanian:
             sm::localization::set_language("ro"_H);
+            sm::localization::set_locale("ro_RO.UTF-8");
             break;
     }
 

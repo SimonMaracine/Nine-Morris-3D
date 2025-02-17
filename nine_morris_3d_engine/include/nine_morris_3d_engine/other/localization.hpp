@@ -5,7 +5,7 @@
 #include "nine_morris_3d_engine/application/id.hpp"
 
 /*
-    Language localization support.
+    Localization and language localization support.
 
     There should be a JSON file containing all the piece of texts for the game, in the default language
     and in other optional languages (translations).
@@ -41,6 +41,10 @@ namespace sm {
         // Retrieve the piece of text that corresponds with the default language text referred to by string
         // This is very slow
         const char* get_text(const char* string);
+
+        // Set the preferred system locale
+        // locale is a system specific string; consult the GCC, MSVC etc. documentations
+        void set_locale(const char* locale);
     }
 
     namespace localization_literals {

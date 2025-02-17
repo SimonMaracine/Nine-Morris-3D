@@ -2,12 +2,18 @@
 
 #include <unordered_map>
 #include <string>
+#include <locale>
 
 #include <cereal/external/rapidjson/document.h>
 
 #include "nine_morris_3d_engine/application/internal/error.hpp"
 #include "nine_morris_3d_engine/application/logging.hpp"
 #include "nine_morris_3d_engine/other/utilities.hpp"
+
+// https://en.cppreference.com/w/cpp/locale/locale
+// https://en.cppreference.com/w/cpp/locale/locale/global
+// https://en.cppreference.com/w/cpp/locale/setlocale
+// https://learn.microsoft.com/en-us/cpp/c-runtime-library/locale-names-languages-and-country-region-strings
 
 namespace sm {
     static struct Localization {
@@ -163,5 +169,15 @@ namespace sm {
         }
 
         SM_THROW_ERROR(internal::ResourceError, "Could not find text in catalog");
+    }
+
+    void localization::set_locale(const char* locale) {
+        try {
+            std::locale::global(std::locale(locale));
+        } catch (const std::runtime_error& e) {
+            LOG_DIST_ERROR("Could not set locale `{}`: {}", locale, e.what());
+        }
+
+        // FIXME set locale on streams?
     }
 }
