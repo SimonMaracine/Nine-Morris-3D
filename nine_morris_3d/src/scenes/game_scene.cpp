@@ -68,11 +68,11 @@ void GameScene::on_start() {
             return sm::Task::Result::Repeat;
         }
 
-        if (get_board().get_player_color() == static_cast<PlayerColor>(m_game_options.remote_color)) {
+        if (board().get_player_color() == static_cast<PlayerColor>(m_game_options.remote_color)) {
             return sm::Task::Result::Repeat;
         }
 
-        client_update_turn_time(get_board().get_player_color() == PlayerColorWhite ? m_clock.get_white_time() : m_clock.get_black_time());
+        client_update_turn_time(board().get_player_color() == PlayerColorWhite ? m_clock.get_white_time() : m_clock.get_black_time());
 
         return sm::Task::Result::Repeat;
     }, 3.0);
@@ -108,7 +108,7 @@ void GameScene::on_update() {
     // Clamp the remote's clock such that it never reaches 0, because they handle their clock
     // When their clock actually reaches 0, we will get notified by the server
     if (g.options.game_type == GameTypeOnline) {
-        if (get_player_type() == GamePlayer::Remote) {
+        if (player_type() == GamePlayer::Remote) {
             switch (m_game_options.remote_color) {
                 case PlayerColorWhite:
                     m_clock.set_white_time(std::max(m_clock.get_white_time(), 1u));
@@ -146,6 +146,10 @@ void GameScene::on_update() {
 
 void GameScene::on_fixed_update() {
     m_camera_controller->update_friction();
+
+    if (m_game_analysis) {
+        m_game_analysis->update_evaluation_bar();
+    }
 
     scene_fixed_update();
 }
@@ -216,7 +220,7 @@ bool GameScene::offer_draw_available() const {
     return (
         m_game_session &&
         m_game_session->get_remote_joined() &&
-        get_board().get_player_color() == static_cast<PlayerColor>(m_game_options.remote_color) &&
+        board().get_player_color() == static_cast<PlayerColor>(m_game_options.remote_color) &&
         game_in_progress()
     );
 }
@@ -261,8 +265,8 @@ void GameScene::reset(const std::string& string, const TimedMoves& moves) {
     }
 
     // Play the moves offscreen
-    get_board().enable_move_callback(false);
-    get_board().enable_move_animations(false);
+    board().enable_move_callback(false);
+    board().enable_move_animations(false);
 
     for (const auto& move : moves) {
         play_move(move.first);
@@ -271,16 +275,16 @@ void GameScene::reset(const std::string& string, const TimedMoves& moves) {
         m_current_game.moves.emplace_back(move.first, move.second);  // Remember the previously played moves
     }
 
-    get_board().enable_move_animations(true);
-    get_board().enable_move_callback(true);
+    board().enable_move_animations(true);
+    board().enable_move_callback(true);
 
     // After the played moves, the game might be already over
-    if (get_board().get_game_over() != GameOver::None) {
+    if (board().get_game_over() != GameOver::None) {
         m_game_state = GameState::Over;
     }
 
     // Place the pieces into their places
-    get_board().setup_pieces();
+    board().setup_pieces();
 
     // The correct colors should be set before calling reset()
     reset_camera_position();
@@ -649,7 +653,7 @@ void GameScene::on_key_released(const sm::KeyReleasedEvent& event) {
 void GameScene::on_mouse_button_pressed(const sm::MouseButtonPressedEvent& event) {
     if (event.button == sm::Button::Left) {
         if (m_game_state == GameState::HumanThinking) {
-            get_board().user_click_press();
+            board().user_click_press();
         }
     }
 }
@@ -657,7 +661,7 @@ void GameScene::on_mouse_button_pressed(const sm::MouseButtonPressedEvent& event
 void GameScene::on_mouse_button_released(const sm::MouseButtonReleasedEvent& event) {
     if (event.button == sm::Button::Left) {
         if (m_game_state == GameState::HumanThinking) {
-            get_board().user_click_release();
+            board().user_click_release();
         }
     }
 }
@@ -920,7 +924,7 @@ void GameScene::game_state_start() {
     // Save current game
     m_current_game.initial_time = clock_time(m_game_options.time_enum);
     m_current_game.game_type = static_cast<SavedGame::GameType>(g.options.game_type);
-    m_current_game.initial_position = get_setup_position();
+    m_current_game.initial_position = setup_position();
 
     reset_camera_position();
     sm::Ctx::play_audio_sound(m_sound_game_start);
@@ -933,7 +937,7 @@ void GameScene::game_state_go() {
 }
 
 void GameScene::game_state_next_turn() {
-    switch (get_player_type()) {
+    switch (player_type()) {
         case GamePlayer::Human:
             m_game_state = GameState::HumanThinking;
             break;
@@ -951,7 +955,7 @@ void GameScene::game_state_computer_start_thinking() {
 
     try {
         m_engine->start_thinking(
-            get_setup_position(),
+            setup_position(),
             m_moves_list.get_moves(),
             m_clock.get_white_time(),
             m_clock.get_black_time(),
@@ -981,7 +985,7 @@ void GameScene::game_state_computer_thinking() {
 
     if (best_move) {
         if (m_engine->is_null_move(*best_move)) {
-            if (get_board().get_game_over() == GameOver::None) {
+            if (board().get_game_over() == GameOver::None) {
                 SM_THROW_ERROR(sm::ApplicationError, "The engine calls game over, but the GUI doesn't agree");
             }
         } else {
@@ -991,7 +995,7 @@ void GameScene::game_state_computer_thinking() {
 }
 
 void GameScene::game_state_finish_turn() {
-    if (get_board().is_turn_finished()) {
+    if (board().is_turn_finished()) {
         m_clock.switch_turn();
 
         if (m_game_session) {
@@ -999,16 +1003,16 @@ void GameScene::game_state_finish_turn() {
         }
 
         const auto& move {m_moves_list.get_moves().back()};
-        const auto time {get_board().get_player_color() == PlayerColorWhite ? m_clock.get_black_time() : m_clock.get_white_time()};
+        const auto time {board().get_player_color() == PlayerColorWhite ? m_clock.get_black_time() : m_clock.get_white_time()};
 
         if (m_game_session) {
             // If the next player is the remote or is us
-            if (get_player_type() == GamePlayer::Remote) {
-                client_play_move(move, time, get_board().get_game_over() != GameOver::None);
+            if (player_type() == GamePlayer::Remote) {
+                client_play_move(move, time, board().get_game_over() != GameOver::None);
             } else {
                 // Turn the clock back to where it should be
                 // The stored time comes from a message from the server
-                switch (get_board().get_player_color()) {
+                switch (board().get_player_color()) {
                     case PlayerColorWhite:
                         m_clock.reset_black_to_time_point();
                         break;
@@ -1021,7 +1025,7 @@ void GameScene::game_state_finish_turn() {
 
         m_current_game.moves.emplace_back(move, time);
 
-        if (get_board().get_game_over() != GameOver::None) {
+        if (board().get_game_over() != GameOver::None) {
             m_game_state = GameState::Stop;
         } else {
             m_game_state = GameState::NextTurn;
@@ -1049,7 +1053,7 @@ void GameScene::game_state_stop() {
 
     // Save current game
     m_current_game.game_time = std::time(nullptr);
-    m_current_game.ending = static_cast<SavedGame::Ending>(static_cast<int>(get_board().get_game_over()) - 1);
+    m_current_game.ending = static_cast<SavedGame::Ending>(static_cast<int>(board().get_game_over()) - 1);
     m_saved_games.add_saved_game(std::move(m_current_game));
     m_current_game = {};
 
@@ -1116,7 +1120,7 @@ void GameScene::engine_assert_game_over() {
 
     try {
         m_engine->start_thinking(
-            get_setup_position(),
+            setup_position(),
             m_moves_list.get_moves(),
             std::nullopt,
             std::nullopt,
@@ -1492,7 +1496,7 @@ void GameScene::server_remote_played_move(const networking::Message& message) {
     // This ensures that clocks remain in sync
     // Store this time in the clock
     // After the move is made, the clock will reset the time to this stored
-    switch (get_board().get_player_color()) {
+    switch (board().get_player_color()) {
         case PlayerColorWhite:
             m_clock.set_white_time_point(payload.time);
             break;

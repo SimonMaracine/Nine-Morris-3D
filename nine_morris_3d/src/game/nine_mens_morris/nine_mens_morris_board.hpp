@@ -112,7 +112,7 @@ public:
     void setup_pieces(bool animate = true) override;
 
     Player get_player() const { return m_position.player; }
-    const Position& get_setup_position() const { return m_setup_position; }
+    const Position& setup_position() const { return m_setup_position; }
 
     std::shared_ptr<sm::ModelNode> get_board_model() const { return m_board_model; }
     std::shared_ptr<sm::ModelNode> get_paint_model() const { return m_paint_model; }

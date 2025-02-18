@@ -46,6 +46,10 @@ void Ui::update(sm::Ctx& ctx, GameScene& game_scene) {
         game_scene.get_game_session()->session_window(ctx, game_scene);
     }
 
+    if (game_scene.get_game_analysis()) {
+        game_scene.get_game_analysis()->evaluation_bar_window(ctx, game_scene);
+    }
+
     if (!m_modal_window_queue.empty()) {
         const auto& [modal_window, string] {m_modal_window_queue.front()};
 
@@ -674,7 +678,7 @@ void Ui::analyze_game_window(GameScene& game_scene) {
     const SavedGame& saved_game {game_scene.get_saved_games().get().at(game_analysis->get_game_index())};
 
     const auto set_clock_time {[](GameScene& game_scene, auto& game_analysis, unsigned int time) {
-        switch (game_scene.get_board().get_player_color()) {
+        switch (game_scene.board().get_player_color()) {
             case PlayerColorWhite:
                 game_analysis->time_white = time;
                 break;
@@ -695,8 +699,8 @@ void Ui::analyze_game_window(GameScene& game_scene) {
         game_analysis->time_black = saved_game.initial_time;
 
         // Play the moves offscreen
-        game_scene.get_board().enable_move_callback(false);
-        game_scene.get_board().enable_move_animations(false);
+        game_scene.board().enable_move_callback(false);
+        game_scene.board().enable_move_animations(false);
 
         for (std::size_t i {0}; i < game_analysis->ply; i++) {
             const auto& [move, time] {saved_game.moves.at(i)};
@@ -706,23 +710,23 @@ void Ui::analyze_game_window(GameScene& game_scene) {
             set_clock_time(game_scene, game_analysis, time);
         }
 
-        game_scene.get_board().enable_move_animations(true);
-        game_scene.get_board().enable_move_callback(true);
+        game_scene.board().enable_move_animations(true);
+        game_scene.board().enable_move_callback(true);
 
         // Place the pieces into their places without animation
-        game_scene.get_board().setup_pieces(false);
+        game_scene.board().setup_pieces(false);
     }
     ImGui::EndDisabled();
 
     ImGui::SameLine();
 
-    ImGui::BeginDisabled(game_analysis->ply == saved_game.moves.size() || !game_scene.get_board().is_turn_finished());
+    ImGui::BeginDisabled(game_analysis->ply == saved_game.moves.size() || !game_scene.board().is_turn_finished());
     if (ImGui::Button("Next"_L)) {
         const auto& [move, time] {saved_game.moves.at(game_analysis->ply)};
 
-        game_scene.get_board().enable_move_callback(false);
+        game_scene.board().enable_move_callback(false);
         game_scene.play_move(move);
-        game_scene.get_board().enable_move_callback(true);
+        game_scene.board().enable_move_callback(true);
 
         game_scene.get_moves_list().push(move);
         set_clock_time(game_scene, game_analysis, time);
@@ -849,7 +853,7 @@ void Ui::game_over_window(GameScene& game_scene) {
     modal_window_ok("Game Over"_L, [&]() {
         const char* message {};
 
-        switch (game_scene.get_board().get_game_over()) {
+        switch (game_scene.board().get_game_over()) {
             case GameOver::None:
                 assert(false);
                 break;
@@ -867,7 +871,7 @@ void Ui::game_over_window(GameScene& game_scene) {
         ImGui::SetCursorPosX((ImGui::GetWindowWidth() - ImGui::CalcTextSize(message).x) * 0.5f);
         ImGui::Text("%s", message);
 
-        const auto& reason {static_cast<const std::string&>(game_scene.get_board().get_game_over())};
+        const auto& reason {static_cast<const std::string&>(game_scene.board().get_game_over())};
 
         ImGui::SetCursorPosX((ImGui::GetWindowWidth() - ImGui::CalcTextSize(reason.c_str()).x) * 0.5f);
         ImGui::Text("%s.", reason.c_str());

@@ -34,15 +34,15 @@ void NineMensMorrisBaseScene::scene_imgui_update() {
     m_board.debug_window();
 }
 
-BoardObj& NineMensMorrisBaseScene::get_board() {
+BoardObj& NineMensMorrisBaseScene::board() {
     return m_board;
 }
 
-const BoardObj& NineMensMorrisBaseScene::get_board() const {
+const BoardObj& NineMensMorrisBaseScene::board() const {
     return m_board;
 }
 
-GamePlayer NineMensMorrisBaseScene::get_player_type() const {
+GamePlayer NineMensMorrisBaseScene::player_type() const {
     const auto& g {ctx.global<Global>()};
 
     GamePlayer player {};
@@ -74,8 +74,8 @@ GamePlayer NineMensMorrisBaseScene::get_player_type() const {
     return player;
 }
 
-std::string NineMensMorrisBaseScene::get_setup_position() const {
-    return NineMensMorrisBoard::position_to_string(m_board.get_setup_position());
+std::string NineMensMorrisBaseScene::setup_position() const {
+    return NineMensMorrisBoard::position_to_string(m_board.setup_position());
 }
 
 void NineMensMorrisBaseScene::reset(const TimedMoves& moves) {
@@ -91,7 +91,7 @@ void NineMensMorrisBaseScene::reset_board(const std::string& string) {
 }
 
 bool NineMensMorrisBaseScene::second_player_starting() {
-    return m_board.get_setup_position().player == NineMensMorrisBoard::Player::Black;
+    return m_board.setup_position().player == NineMensMorrisBoard::Player::Black;
 }
 
 Clock::Time NineMensMorrisBaseScene::clock_time(int time_enum) {
@@ -354,6 +354,18 @@ void NineMensMorrisBaseScene::reload_and_set_scene_textures() {
             1
         );
     }
+}
+
+int NineMensMorrisBaseScene::score_bound() const {
+    return 200;
+}
+
+unsigned int NineMensMorrisBaseScene::white_color() const {
+    return IM_COL32(217, 175, 116, 255);
+}
+
+unsigned int NineMensMorrisBaseScene::black_color() const {
+    return IM_COL32(81, 81, 79, 255);
 }
 
 std::shared_ptr<sm::ModelNode> NineMensMorrisBaseScene::setup_board() const {

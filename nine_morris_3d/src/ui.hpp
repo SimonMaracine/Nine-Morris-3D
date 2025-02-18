@@ -52,9 +52,9 @@ private:
     void before_game_online_window(sm::Ctx& ctx, GameScene& game_scene);
     void during_game_window(GameScene& game_scene);
     void analyze_game_window(GameScene& game_scene);
-    void about_window();
     void general_play_window();
     void online_play_window();
+    void about_window();
     void game_over_window(GameScene& game_scene);
     void game_options_window(sm::Ctx& ctx, GameScene& game_scene);
     void analyze_games_window(GameScene& game_scene);

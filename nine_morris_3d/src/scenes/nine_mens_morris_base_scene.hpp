@@ -23,10 +23,10 @@ public:
     void scene_fixed_update() override;
     void scene_imgui_update() override;
 
-    BoardObj& get_board() override;
-    const BoardObj& get_board() const override;
-    GamePlayer get_player_type() const override;
-    std::string get_setup_position() const override;
+    BoardObj& board() override;
+    const BoardObj& board() const override;
+    GamePlayer player_type() const override;
+    std::string setup_position() const override;
     void reset(const TimedMoves& moves = {}) override;
     void reset_board(const std::string& string) override;
     bool second_player_starting() override;
@@ -41,6 +41,9 @@ public:
     void load_game_icons() override;
     void reload_scene_texture_data() const override;
     void reload_and_set_scene_textures() override;
+    int score_bound() const override;
+    unsigned int white_color() const override;
+    unsigned int black_color() const override;
 
     virtual bool twelve_mens_morris() const = 0;
 private:

@@ -64,10 +64,10 @@ public:
     virtual void scene_fixed_update() = 0;
     virtual void scene_imgui_update() = 0;
 
-    virtual BoardObj& get_board() = 0;
-    virtual const BoardObj& get_board() const = 0;
-    virtual GamePlayer get_player_type() const = 0;
-    virtual std::string get_setup_position() const = 0;
+    virtual BoardObj& board() = 0;
+    virtual const BoardObj& board() const = 0;
+    virtual GamePlayer player_type() const = 0;
+    virtual std::string setup_position() const = 0;
     virtual void reset(const TimedMoves& moves = {}) = 0;
     virtual void reset_board(const std::string& string) = 0;
     virtual bool second_player_starting() = 0;
@@ -83,6 +83,9 @@ public:
     virtual void reload_scene_texture_data() const = 0;
     virtual void reload_and_set_scene_textures() = 0;
     virtual std::filesystem::path saved_games_file_path() const = 0;
+    virtual int score_bound() const = 0;
+    virtual unsigned int white_color() const = 0;
+    virtual unsigned int black_color() const = 0;
 
     std::shared_ptr<PointCameraController> get_camera_controller() const { return m_camera_controller; }
     std::shared_ptr<UciLikeEngine> get_engine() const { return m_engine; }
