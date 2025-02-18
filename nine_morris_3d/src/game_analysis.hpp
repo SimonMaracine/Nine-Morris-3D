@@ -47,7 +47,7 @@ private:
     int m_score {};
     ScoreType m_score_type {};
 
-    int m_old_score {};
+    int m_old_score {};  // Used to detect changes to score for linear interpolation
     float m_white_fill_current {};  // What is diplayed on the screen
     float m_white_fill_real {};  // What is the actual value
     float m_interpolation {};  // Normalized value that signifies how close current is to real

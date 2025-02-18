@@ -357,7 +357,7 @@ void NineMensMorrisBaseScene::reload_and_set_scene_textures() {
 }
 
 int NineMensMorrisBaseScene::score_bound() const {
-    return 200;
+    return 150;
 }
 
 unsigned int NineMensMorrisBaseScene::white_color() const {

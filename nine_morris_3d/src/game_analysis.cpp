@@ -41,7 +41,7 @@ void GameAnalysis::evaluation_bar_window(const sm::Ctx& ctx, const GameScene& ga
         static_cast<float>(MIN_HEIGHT),
         static_cast<float>(MAX_HEIGHT),
         Ui::rem(11.0f),
-        Ui::rem(33.0f)
+        Ui::rem(35.0f)
     )};
 
     const float left_offset {sm::utils::map(
@@ -85,25 +85,29 @@ void GameAnalysis::evaluation_bar_window(const sm::Ctx& ctx, const GameScene& ga
     ImDrawList* list {ImGui::GetBackgroundDrawList()};
 
     // Outline
-    list->AddRectFilled(ImVec2(left_offset - 1.0f, top_anchor - 1.0f), ImVec2(left_offset + width + 1.0f, bottom_anchor + 1.0f), IM_COL32_BLACK, 8.0f);
+    list->AddRectFilled(ImVec2(left_offset - 1.0f, top_anchor - 1.0f), ImVec2(left_offset + width + 1.0f, bottom_anchor + 1.0f), IM_COL32_BLACK, 6.0f);
 
     // White bar
     if (bottom_anchor - m_white_fill_current < bottom_anchor - 2.0f) {
-        list->AddRectFilled(ImVec2(left_offset, bottom_anchor - m_white_fill_current), ImVec2(left_offset + width, bottom_anchor), game_scene.white_color(), 8.0f);
+        list->AddRectFilled(ImVec2(left_offset, bottom_anchor - m_white_fill_current), ImVec2(left_offset + width, bottom_anchor), game_scene.white_color(), 6.0f);
     }
 
     // Black bar
     if (top_anchor + height - m_white_fill_current > top_anchor + 2.0f) {
-        list->AddRectFilled(ImVec2(left_offset, top_anchor), ImVec2(left_offset + width, top_anchor + height - m_white_fill_current), game_scene.black_color(), 8.0f);
+        list->AddRectFilled(ImVec2(left_offset, top_anchor), ImVec2(left_offset + width, top_anchor + height - m_white_fill_current), game_scene.black_color(), 6.0f);
     }
 
-    // Outline
-    // list->AddRect(ImVec2(left_offset, top_anchor), ImVec2(left_offset + width, bottom_anchor), IM_COL32_BLACK, 8.0f);
+    // Middle
+    list->AddLine(ImVec2(left_offset, top_anchor + height / 2.0f), ImVec2(left_offset + width, top_anchor + height / 2.0f), IM_COL32_BLACK);
 
     // If there is forced win, also render the moves needed to win in the opposite sides with opposite colors
     if (m_score_type == ScoreType::Win) {
         const auto text_win {std::to_string(std::abs(m_score))};
         const auto text_size {ImGui::CalcTextSize(text_win.c_str())};
+
+        if (m_score == 0) {
+            LOG_DIST_WARNING("Ambiguous win score from engine");
+        }
 
         if (m_score > 0) {
             list->AddText(ImVec2(left_offset + width / 2.0f - text_size.x / 2.0f, top_anchor), game_scene.black_color(), text_win.c_str());
