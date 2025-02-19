@@ -7,6 +7,7 @@
 #include <nine_morris_3d_engine/external/glm.h++>
 
 #include "scenes/game_scene.hpp"
+#include "game/board.hpp"
 #include "window_size.hpp"
 
 GameAnalysis::GameAnalysis(std::size_t game_index, std::shared_ptr<UciLikeEngine> engine)
@@ -55,20 +56,26 @@ void GameAnalysis::evaluation_bar_window(const sm::Ctx& ctx, const GameScene& ga
     const float top_anchor {static_cast<float>(ctx.get_window_height()) / 2.0f - height / 2.0f};
     const float bottom_anchor {static_cast<float>(ctx.get_window_height()) / 2.0f + height / 2.0f};
 
+    handle_game_over(game_scene);
+
     int score {};
 
     switch (m_score_type) {
         case ScoreType::Eval:
             score = m_score;
             break;
-        case ScoreType::Win:
-            score = game_scene.score_bound() * (m_score > 0 ? 1 : -1);
+        case ScoreType::Win: {
+            // If that score means nothing, use the other one
+            const int score_winner {m_score != 0 ? m_score : m_score_win};
+
+            score = game_scene.score_bound() * (score_winner > 0 ? 1 : -1);
             break;
+        }
     }
 
-    if (m_score != m_old_score) {
+    if (m_score != m_score_old) {
         m_interpolation = 0.0f;
-        m_old_score = m_score;
+        m_score_old = m_score;
     }
 
     // Based on the white fill (absolute height), we can determine the black fill
@@ -105,15 +112,33 @@ void GameAnalysis::evaluation_bar_window(const sm::Ctx& ctx, const GameScene& ga
         const auto text_win {std::to_string(std::abs(m_score))};
         const auto text_size {ImGui::CalcTextSize(text_win.c_str())};
 
-        if (m_score == 0) {
-            LOG_DIST_WARNING("Ambiguous win score from engine");
-        }
+        // If that score means nothing, use the other one
+        const int score_winner {m_score != 0 ? m_score : m_score_win};
 
-        if (m_score > 0) {
+        if (score_winner > 0) {
             list->AddText(ImVec2(left_offset + width / 2.0f - text_size.x / 2.0f, top_anchor), game_scene.black_color(), text_win.c_str());
         } else {
             list->AddText(ImVec2(left_offset + width / 2.0f - text_size.x / 2.0f, bottom_anchor - text_size.y), game_scene.white_color(), text_win.c_str());
         }
+    }
+}
+
+void GameAnalysis::handle_game_over(const GameScene& game_scene) {
+    switch (game_scene.board().get_game_over()) {
+        case GameOver::None:
+            break;
+        case GameOver::WinnerWhite:
+            m_score_win = 1;
+            break;
+        case GameOver::WinnerBlack:
+            m_score_win = -1;
+            break;
+        case GameOver::Draw:
+            break;
+    }
+
+    if (game_scene.board().get_game_over() != GameOver::None) {
+        m_pv.clear();
     }
 }
 

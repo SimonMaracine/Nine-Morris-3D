@@ -10,6 +10,7 @@
 #include "clock.hpp"
 
 class GameScene;
+class BoardObj;
 
 class GameAnalysis {
 public:
@@ -33,6 +34,7 @@ public:
     Clock::Time time_black {};
     std::size_t ply {0};
 private:
+    void handle_game_over(const GameScene& game_scene);
     void information_callback(const UciLikeEngine::Info& info);
 
     enum class ScoreType {
@@ -47,7 +49,8 @@ private:
     int m_score {};
     ScoreType m_score_type {};
 
-    int m_old_score {};  // Used to detect changes to score for linear interpolation
+    int m_score_old {};  // Used to detect changes to score for linear interpolation
+    int m_score_win {};  // Used to handle game over
     float m_white_fill_current {};  // What is diplayed on the screen
     float m_white_fill_real {};  // What is the actual value
     float m_interpolation {};  // Normalized value that signifies how close current is to real
