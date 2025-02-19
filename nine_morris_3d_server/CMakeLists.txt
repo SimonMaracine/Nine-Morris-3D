@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.20)
 
 add_executable(nine_morris_3d_server
+    "src/clock.cpp"
+    "src/clock.hpp"
     "src/configuration.cpp"
     "src/configuration.hpp"
     "src/game_session.hpp"
