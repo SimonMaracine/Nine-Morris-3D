@@ -109,9 +109,9 @@
             "en": "Volume",
             "ro": "Volum"
         },
-        "Skybox": {
-            "en": "Skybox",
-            "ro": "Skybox"
+        "Environment": {
+            "en": "Environment",
+            "ro": "Mediu"
         },
         "None": {
             "en": "None",

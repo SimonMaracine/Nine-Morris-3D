@@ -304,7 +304,7 @@ void Ui::main_menu_bar(sm::Ctx& ctx, GameScene& game_scene) {
 
                 ImGui::EndMenu();
             }
-            if (ImGui::BeginMenu("Skybox"_L)) {
+            if (ImGui::BeginMenu("Environment"_L)) {
                 if (m_loading_skybox) {
                     ImGui::RadioButton("None"_L, false);
                     ImGui::RadioButton("Field"_L, false);
