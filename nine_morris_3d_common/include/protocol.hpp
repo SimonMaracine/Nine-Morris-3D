@@ -212,8 +212,10 @@ namespace protocol {
     using ClockTime = unsigned int;
     using Version = unsigned int;
 
-    using Messages = std::vector<std::pair<std::string, std::string>>;
+    using Messages = std::vector<std::pair<std::string, std::string>>;  // Player name of the message and the actual message
     inline constexpr std::size_t MAX_MESSAGE_SIZE {128};
+
+    using Moves = std::vector<std::pair<std::string, ClockTime>>;  // The actual move and the player's time after the move
 
     enum class Player {
         White,
@@ -363,7 +365,7 @@ namespace protocol {
         ClockTime remote_time {};
         ClockTime time {};
         bool game_over {};
-        std::vector<std::pair<std::string, ClockTime>> moves;
+        Moves moves;
         Messages messages;
         std::string remote_name;
 

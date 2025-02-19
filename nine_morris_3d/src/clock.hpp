@@ -2,11 +2,16 @@
 
 #include <chrono>
 #include <tuple>
+#include <type_traits>
+
+#include <protocol.hpp>
 
 class Clock {
 public:
     using Time = unsigned int;  // In milliseconds
     static constexpr unsigned int DEFAULT_TIME {1000 * 60 * 10};
+
+    static_assert(std::is_same_v<Time, protocol::ClockTime>);
 
     void reset(Time time = DEFAULT_TIME);
     void start();

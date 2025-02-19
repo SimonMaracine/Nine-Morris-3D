@@ -4,7 +4,6 @@
 #include <ctime>
 
 #include <nine_morris_3d_engine/external/resmanager.h++>
-#include <protocol.hpp>
 
 #include "global.hpp"
 #include "ver.hpp"

@@ -8,6 +8,7 @@
 
 #include <nine_morris_3d_engine/nine_morris_3d.hpp>
 #include <networking/client.hpp>
+#include <protocol.hpp>
 
 #include "engines/engine.hpp"
 #include "game/board.hpp"
@@ -45,7 +46,7 @@ enum class GamePlayer {
 };
 
 // Moves with player's time after the move attached
-using TimedMoves = std::vector<std::pair<std::string, Clock::Time>>;
+using TimedMoves = protocol::Moves;
 
 // Base class for scenes representing games
 class GameScene : public sm::ApplicationScene {
@@ -206,11 +207,11 @@ protected:
     GameState m_game_state {GameState::Ready};
     glm::vec3 m_white_camera_position {};
     glm::vec3 m_black_camera_position {};
-    std::optional<GameSession> m_game_session;
+    std::optional<GameSession> m_game_session;  // It's something when the session is alive
     GameOptions m_game_options;
     Clock m_clock;
     MovesList m_moves_list;
     SavedGames m_saved_games;  // All saved games
-    SavedGame m_current_game;  // Used to save the game after is over
-    std::optional<GameAnalysis> m_game_analysis;
+    SavedGame m_current_game;  // Used to save the current game after is over
+    std::optional<GameAnalysis> m_game_analysis;  // It's something when analysis mode is on
 };

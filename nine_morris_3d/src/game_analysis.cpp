@@ -91,8 +91,10 @@ void GameAnalysis::evaluation_bar_window(const sm::Ctx& ctx, const GameScene& ga
 
     ImDrawList* list {ImGui::GetBackgroundDrawList()};
 
+    static constexpr auto BAR_COLOR {IM_COL32(128, 128, 128, 255)};
+
     // Outline
-    list->AddRectFilled(ImVec2(left_offset - 1.0f, top_anchor - 1.0f), ImVec2(left_offset + width + 1.0f, bottom_anchor + 1.0f), IM_COL32_BLACK, 6.0f);
+    list->AddRectFilled(ImVec2(left_offset - 1.0f, top_anchor - 1.0f), ImVec2(left_offset + width + 1.0f, bottom_anchor + 1.0f), BAR_COLOR, 6.0f);
 
     // White bar
     if (bottom_anchor - m_white_fill_current < bottom_anchor - 2.0f) {
@@ -105,7 +107,7 @@ void GameAnalysis::evaluation_bar_window(const sm::Ctx& ctx, const GameScene& ga
     }
 
     // Middle
-    list->AddLine(ImVec2(left_offset, top_anchor + height / 2.0f), ImVec2(left_offset + width, top_anchor + height / 2.0f), IM_COL32_BLACK);
+    list->AddLine(ImVec2(left_offset, top_anchor + height / 2.0f), ImVec2(left_offset + width, top_anchor + height / 2.0f), BAR_COLOR);
 
     // If there is forced win, also render the moves needed to win in the opposite sides with opposite colors
     if (m_score_type == ScoreType::Win) {

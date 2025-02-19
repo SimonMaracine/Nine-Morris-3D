@@ -8,8 +8,8 @@
 
 #include <nine_morris_3d_engine/nine_morris_3d.hpp>
 #include <nine_morris_3d_engine/external/cereal.h++>
+#include <protocol.hpp>
 
-#include "clock.hpp"
 #include "ver.hpp"
 
 using namespace sm::localization_literals;
@@ -27,11 +27,11 @@ struct SavedGame {
         Draw
     };
 
-    Clock::Time initial_time {};
+    protocol::ClockTime initial_time {};
     GameType game_type {};
     Ending ending {};
     std::string initial_position;
-    std::vector<std::pair<std::string, Clock::Time>> moves;
+    protocol::Moves moves;
     std::time_t game_time;  // The time when the game has finished
 
     template<typename Archive>
