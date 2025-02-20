@@ -1,7 +1,6 @@
 #include "server.hpp"
 
 #include "ver.hpp"
-#include "clock.hpp"
 
 Server::Server(const Configuration& configuration)
     : m_server(
@@ -46,9 +45,6 @@ void Server::start(const Configuration& configuration) {
 }
 
 void Server::update() {
-    // Start the clock
-    Clock clock;
-
     m_server.accept_connections();
 
     while (m_server.available_messages()) {
@@ -57,11 +53,6 @@ void Server::update() {
     }
 
     m_task_manager.update();
-
-    using namespace std::chrono_literals;
-
-    // 60 UPS is fine for now
-    clock.sleep(16ms);
 }
 
 void Server::on_client_connected(std::shared_ptr<networking::ClientConnection>) {

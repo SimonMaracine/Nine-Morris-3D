@@ -51,7 +51,7 @@ corrupted:
     throw ConfigurationError("Data has been corrupted");
 }
 
-void load_configuration(Configuration& configuration, const std::filesystem::path& file_path) {
+void read_configuration(Configuration& configuration, const std::filesystem::path& file_path) {
     std::ifstream stream {file_path};
 
     if (!stream.is_open()) {
@@ -74,7 +74,7 @@ void load_configuration(Configuration& configuration, const std::filesystem::pat
     validate(configuration);
 }
 
-void save_configuration(const Configuration& configuration, const std::filesystem::path& file_path) {
+void write_configuration(const Configuration& configuration, const std::filesystem::path& file_path) {
     std::ofstream stream {file_path};
 
     if (!stream.is_open()) {

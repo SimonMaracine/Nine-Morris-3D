@@ -17,7 +17,7 @@ struct Configuration {
     std::uint32_t max_clients {std::numeric_limits<std::uint16_t>::max()};
     std::chrono::seconds session_collect_period {std::chrono::seconds(15)};
     std::chrono::seconds connection_check_period {std::chrono::seconds(10)};
-    std::string log_target {"both"};
+    std::string log_target {"file"};
     std::string log_level {"info"};
 
     template<typename Archive>
@@ -35,8 +35,8 @@ struct Configuration {
 
 CEREAL_CLASS_VERSION(Configuration, version_number())
 
-void load_configuration(Configuration& configuration, const std::filesystem::path& file_path);
-void save_configuration(const Configuration& configuration, const std::filesystem::path& file_path);
+void read_configuration(Configuration& configuration, const std::filesystem::path& file_path);
+void write_configuration(const Configuration& configuration, const std::filesystem::path& file_path);
 
 struct ConfigurationError : std::runtime_error {
     explicit ConfigurationError(const char* message)

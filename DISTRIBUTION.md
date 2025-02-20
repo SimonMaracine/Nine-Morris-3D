@@ -52,9 +52,13 @@ python export_assets.py ..\build ..\assets ..\assets_engine
 - Copy `nine_morris_3d.ico` from `nine_morris_3d\res` into the folder
 - Create an NSIS installer called `Nine-Morris-3D-X.Y.Z-Windows` using the installer script
 
-## Update the version
+## Server (Linux)
 
-- main.cpp
+<!-- TODO -->
+
+## Update The Version
+
+- ver.hpp
 - ninemorris3d.desktop
 - nine_morris_3d.nsi
 

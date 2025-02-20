@@ -8,6 +8,7 @@
 - Rust (building engines)
 - Visual Studio (build environment - Windows only)
 - Packages (dependencies - Linux only)
+- systemd (server and Linux only)
 
 ### Linux packages - dnf
 
@@ -18,6 +19,7 @@
 - Wayland: wayland-devel libxkbcommon-devel wayland-protocols-devel extra-cmake-modules
 - PipeWire: pipewire-devel.x86_64
 - OpenGL: mesa-libGL-devel.x86_64
+- systemd: systemd-devel.x86_64
 - Asan: libasan libubsan
 
 ### Linux packages - apt
@@ -27,6 +29,7 @@
 - Wayland: libwayland-dev libxkbcommon-dev (wayland-protocols extra-cmake-modules)? libdecor.x86_64
 - PulseAudio: libasound2-dev libpulse-dev
 - OpenGL: libopengl-dev | libegl1-mesa-dev | mesa-common-dev (one of these)
+- systemd: libsystemd-dev
 - zlib: zlib1g-dev
 - package-config: pkgconf
 
