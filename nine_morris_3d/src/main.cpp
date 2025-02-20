@@ -14,7 +14,7 @@
 #include "game.hpp"
 #include "global.hpp"
 #include "window_size.hpp"
-#include "ver.hpp"
+#include "version.hpp"
 
 struct Paths {
     std::filesystem::path logs;
@@ -91,7 +91,10 @@ static int game() {
 
 static void crash_handler(int) {
     const char* title {"Nine Morris 3D Fatal Error"};
-    const char* message {"Sorry! Nine Morris 3D encountered a fatal error!\nPlease take a look at the logs and consider reporting the event to the developer."};
+    const char* message {
+        "Sorry! Nine Morris 3D encountered a fatal error!\n"
+        "Please take a look at the logs and consider reporting the event to the developer."
+    };
 
     try {
         sm::crash::show_error_window(title, message);

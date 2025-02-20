@@ -15,7 +15,7 @@
 #include "scenes/game_scene.hpp"
 #include "global.hpp"
 #include "game_options.hpp"
-#include "ver.hpp"
+#include "version.hpp"
 #include "window_size.hpp"
 
 /*

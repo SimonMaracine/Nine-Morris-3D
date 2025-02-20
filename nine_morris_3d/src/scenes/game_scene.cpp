@@ -6,7 +6,7 @@
 #include <nine_morris_3d_engine/external/resmanager.h++>
 
 #include "global.hpp"
-#include "ver.hpp"
+#include "version.hpp"
 
 void GameScene::on_start() {
     ctx.connect_event<sm::KeyReleasedEvent, &GameScene::on_key_released>(this);

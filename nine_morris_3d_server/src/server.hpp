@@ -12,7 +12,7 @@
 
 class Server {
 public:
-    Server(const Configuration& configuration);
+    Server(const Configuration& configuration, const std::filesystem::path& log_file_path);
 
     void start(const Configuration& configuration);
     void update();

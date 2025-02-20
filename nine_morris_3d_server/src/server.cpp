@@ -1,12 +1,13 @@
 #include "server.hpp"
 
-#include "ver.hpp"
+#include "version.hpp"
 
-Server::Server(const Configuration& configuration)
+Server::Server(const Configuration& configuration, const std::filesystem::path& log_file_path)
     : m_server(
         [this](std::shared_ptr<networking::ClientConnection> connection) { on_client_connected(connection); },
         [this](std::shared_ptr<networking::ClientConnection> connection) { on_client_disconnected(connection); },
-        log_target_from_str(configuration.log_target)
+        log_target_from_str(configuration.log_target),
+        log_file_path
     ) {}
 
 void Server::start(const Configuration& configuration) {

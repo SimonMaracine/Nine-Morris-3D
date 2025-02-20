@@ -10,7 +10,7 @@
 #include <cereal/cereal.hpp>
 #include <cereal/types/chrono.hpp>
 
-#include "ver.hpp"
+#include "version.hpp"
 
 struct Configuration {
     std::uint16_t port {7915};
@@ -37,6 +37,9 @@ CEREAL_CLASS_VERSION(Configuration, version_number())
 
 void read_configuration(Configuration& configuration, const std::filesystem::path& file_path);
 void write_configuration(const Configuration& configuration, const std::filesystem::path& file_path);
+
+// Check if the file path exists and if not, create the directory file
+void make_configuration_directory(const std::filesystem::path& file_path);
 
 struct ConfigurationError : std::runtime_error {
     explicit ConfigurationError(const char* message)

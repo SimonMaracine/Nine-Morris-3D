@@ -88,3 +88,21 @@ void write_configuration(const Configuration& configuration, const std::filesyst
         throw ConfigurationError("Error writing to file: "s + e.what());
     }
 }
+
+void make_configuration_directory(const std::filesystem::path& file_path) {
+    std::error_code ec;
+
+    const bool result {std::filesystem::exists(file_path, ec)};
+
+    if (ec) {
+        throw ConfigurationError("Could not check path: " + ec.message());
+    }
+
+    if (!result) {
+        std::filesystem::create_directories(file_path, ec);
+
+        if (ec) {
+            throw ConfigurationError("Could not create directory: " + ec.message());
+        }
+    }
+}

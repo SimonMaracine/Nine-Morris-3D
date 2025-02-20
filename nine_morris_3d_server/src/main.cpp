@@ -9,9 +9,14 @@
 #include "platform.hpp"
 
 #ifdef SM_BUILD_DISTRIBUTION
-    static const char* CONFIGURATION_FILE_PATH {"/etc/ninemorris3d/nine_morris_3d_config.json"};
+    static constexpr const char* CONFIGURATION_DIRECTORY_PATH {"/etc/ninemorris3d"};
+    static constexpr const char* CONFIGURATION_FILE_PATH {"/etc/ninemorris3d/nine_morris_3d.json"};
+    static constexpr const char* LOG_FILE_PATH {"/var/log/ninemorris3d/nine_morris_3d.log"};
+    static constexpr auto SIGNAL_TYPE {SIGTERM};
 #else
-    static const char* CONFIGURATION_FILE_PATH {"nine_morris_3d_config.json"};
+    static constexpr const char* CONFIGURATION_FILE_PATH {"nine_morris_3d.json"};
+    static constexpr const char* LOG_FILE_PATH {"nine_morris_3d.log"};
+    static constexpr auto SIGNAL_TYPE {SIGINT};
 #endif
 
 static volatile std::sig_atomic_t g_running {1};
@@ -21,17 +26,19 @@ extern "C" void handler(int) {
 }
 
 int main() {
-    if (std::signal(SIGTERM, handler) == SIG_ERR) {
-        std::cerr << "Could not set sigterm signal handler\n";
-        notify_stopping("Could not set sigterm signal handler");
+    if (std::signal(SIGNAL_TYPE, handler) == SIG_ERR) {
+        std::cerr << "Could not set signal handler\n";
+        notify_stopping("Could not set signal handler");
         return 1;
     }
 
-    if (std::signal(SIGINT, handler) == SIG_ERR) {
-        std::cerr << "Could not set sigint signal handler\n";
-        notify_stopping("Could not set sigint signal handler");
-        return 1;
+#ifdef SM_BUILD_DISTRIBUTION
+    try {
+        make_configuration_directory(CONFIGURATION_DIRECTORY_PATH);
+    } catch (const ConfigurationError& e) {
+        std::cerr << "Error configuration directory: " << e.what() << '\n';
     }
+#endif
 
     Configuration configuration;
 
@@ -50,7 +57,7 @@ int main() {
     using namespace std::chrono_literals;
 
     try {
-        Server server {configuration};
+        Server server {configuration, LOG_FILE_PATH};
         server.start(configuration);
 
         notify_ready();

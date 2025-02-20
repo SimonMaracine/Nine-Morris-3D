@@ -16,7 +16,7 @@ add_executable(nine_morris_3d_server
     "src/session_pool.hpp"
     "src/task_manager.cpp"
     "src/task_manager.hpp"
-    "src/ver.hpp"
+    "src/version.hpp"
 )
 
 target_include_directories(nine_morris_3d_server PUBLIC "src")

@@ -8,11 +8,12 @@ namespace networking {
     Server::Server(
         std::function<void(std::shared_ptr<ClientConnection>)> on_client_connected,
         std::function<void(std::shared_ptr<ClientConnection>)> on_client_disconnected,
-        unsigned int log_target
+        unsigned int log_target,
+        const std::filesystem::path& log_file_path
     )
         : m_acceptor(m_context), m_on_client_connected(std::move(on_client_connected)),
         m_on_client_disconnected(std::move(on_client_disconnected)) {
-        initialize_logging(log_target);
+        initialize_logging(log_target, log_file_path);
     }
 
     Server::~Server() {
@@ -258,7 +259,7 @@ namespace networking {
         m_pool.free_id(connection->get_id());
     }
 
-    void Server::initialize_logging(unsigned int log_target) {
+    void Server::initialize_logging(unsigned int log_target, const std::filesystem::path& log_file_path) {
         m_logger = std::make_shared<spdlog::logger>("ServerLogger");
 
         try {
@@ -274,7 +275,7 @@ namespace networking {
                 static constexpr int MAX_SIZE {1024 * 1024 * 5};
                 static constexpr int MAX_FILES {5};
 
-                m_rotating_file_sink = std::make_shared<spdlog::sinks::rotating_file_sink_mt>("logs/rotating.log", MAX_SIZE, MAX_FILES);
+                m_rotating_file_sink = std::make_shared<spdlog::sinks::rotating_file_sink_mt>(log_file_path.string(), MAX_SIZE, MAX_FILES);
                 m_rotating_file_sink->set_pattern("%^[%l] [%H:%M:%S]%$ %v");
                 m_rotating_file_sink->set_level(spdlog::level::trace);
 

@@ -6,7 +6,7 @@
 
 #include <nine_morris_3d_engine/external/cereal.h++>
 
-#include "ver.hpp"
+#include "version.hpp"
 
 inline constexpr const char* OPTIONS_FILE_NAME {"options.dat"};
 

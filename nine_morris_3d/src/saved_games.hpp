@@ -10,7 +10,7 @@
 #include <nine_morris_3d_engine/external/cereal.h++>
 #include <protocol.hpp>
 
-#include "ver.hpp"
+#include "version.hpp"
 
 using namespace sm::localization_literals;
 

@@ -48,4 +48,4 @@ void notify_stopping() {}
 void notify_stopping(const char*, ...) {}
 void notify_status(const char*, ...) {}
 
-#endif  // SM_NO_SYSTEMD
+#endif  // SM_SERVER_NO_SYSTEMD

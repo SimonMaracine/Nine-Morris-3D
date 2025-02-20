@@ -9,6 +9,7 @@
 #include <functional>
 #include <exception>
 #include <stdexcept>
+#include <filesystem>
 
 #include <spdlog/spdlog.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
@@ -44,7 +45,8 @@ namespace networking {
         Server(
             std::function<void(std::shared_ptr<ClientConnection>)> on_client_connected,
             std::function<void(std::shared_ptr<ClientConnection>)> on_client_disconnected,
-            unsigned int log_target
+            unsigned int log_target,
+            const std::filesystem::path& log_file_path = "logs/rotating.log"
         );
 
         ~Server();
@@ -104,7 +106,7 @@ namespace networking {
         void task_accept_connection();
         void maybe_client_disconnected(std::shared_ptr<ClientConnection> connection);
         void maybe_client_disconnected(std::shared_ptr<ClientConnection> connection, ConnectionsIter& iter, ConnectionsIter before_iter);
-        void initialize_logging(unsigned int log_target);
+        void initialize_logging(unsigned int log_target, const std::filesystem::path& log_file_path);
 
         std::forward_list<std::shared_ptr<ClientConnection>> m_connections;
         internal::SyncQueue<std::shared_ptr<ClientConnection>> m_new_connections;
