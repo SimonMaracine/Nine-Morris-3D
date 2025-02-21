@@ -65,7 +65,7 @@ namespace sm {
         }
     }
 
-    const char* utils::get_environment_variable(const std::string& variable) {
+    const char* utils::get_environment_variable_ex(const std::string& variable) {
         const char* value {std::getenv(variable.c_str())};
 
         if (value == nullptr) {
@@ -73,6 +73,16 @@ namespace sm {
         }
 
         return value;
+    }
+
+    std::string utils::get_environment_variable(const std::string& variable) {
+        try {
+            return get_environment_variable_ex(variable);
+        } catch (const internal::ResourceError& e) {
+            LOG_DIST_ERROR("{}", e.what());
+        }
+
+        return {};
     }
 
     std::string utils::file_name(const std::filesystem::path& file_path) {
@@ -98,7 +108,7 @@ namespace sm {
         stream.read(buffer.data(), length);
 
         if (stream.fail()) {
-            throw internal::ResourceError("Error reading file");
+            throw internal::ResourceError("Could not read from file");
         }
 
         return buffer;
@@ -124,7 +134,7 @@ namespace sm {
         stream.write(buffer.data(), buffer.size());
 
         if (stream.fail()) {
-            throw internal::ResourceError("Error writing file");
+            throw internal::ResourceError("Could not write to file");
         }
     }
 

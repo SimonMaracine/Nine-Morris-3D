@@ -34,10 +34,10 @@ static void get_paths([[maybe_unused]] Paths& paths) {
     paths.saved_data = home / ".ninemorris3d";
     paths.assets = "/usr/local/share/ninemorris3d";
 #elif defined(SM_PLATFORM_WINDOWS)
-    const std::filesystem::path username {sm::utils::get_environment_variable("USERNAME")};
+    const std::filesystem::path home {sm::utils::get_environment_variable("HOMEPATH")};
 
-    paths.logs = "C:\\Users" / username / "Documents\\Nine Morris 3D";
-    paths.saved_data = "C:\\Users" / username / "Documents\\Nine Morris 3D";
+    paths.logs = home / "Documents\\Nine Morris 3D";
+    paths.saved_data = home / "Documents\\Nine Morris 3D";
 #endif
 
 #endif  // SM_BUILD_DISTRIBUTION

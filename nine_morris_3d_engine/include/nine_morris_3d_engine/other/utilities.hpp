@@ -42,7 +42,10 @@ namespace sm {
         );
 
         // Retrieve an environment variable
-        const char* get_environment_variable(const std::string& variable);
+        const char* get_environment_variable_ex(const std::string& variable);
+
+        // Retrieve an environment variable; fail silently
+        std::string get_environment_variable(const std::string& variable);
 
         // Retrieve the name of a file
         std::string file_name(const std::filesystem::path& file_path);

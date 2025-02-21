@@ -20,16 +20,6 @@ namespace sm {
         char buffer[128] {};
         std::string result;
 
-        result += "*** Compiler ***\n";
-
-#if defined(SM_PLATFORM_LINUX)
-        std::snprintf(buffer, sizeof(buffer), "GCC: %d.%d\n", __GNUC__, __GNUC_MINOR__);
-        result += buffer;
-#elif defined(SM_PLATFORM_WINDOWS)
-        std::snprintf(buffer, sizeof(buffer), "MSVC: %d\n", _MSC_VER);
-        result += buffer;
-#endif
-
         result += "*** Engine Dependencies ***\n";
 
         std::snprintf(

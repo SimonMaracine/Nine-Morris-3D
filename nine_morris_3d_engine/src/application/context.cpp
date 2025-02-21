@@ -234,6 +234,23 @@ namespace sm {
         std::string result;
         result += "*** Build ***\n";
         result += std::string(m_build_date) + " " + m_build_time + SUFFIX + '\n';
+        result += "*** Compiler ***\n";
+#if defined(SM_PLATFORM_LINUX)
+        result += "GCC: " + std::to_string(__GNUC__) + "." + std::to_string(__GNUC_MINOR__) + '\n';
+#elif defined(SM_PLATFORM_WINDOWS)
+        result += "MSVC: " + std::to_string(_MSC_VER) + '\n';
+#endif
+        result += "*** Environment ***\n";
+#if defined(SM_PLATFORM_LINUX)
+        result += "HOSTNAME=" + utils::get_environment_variable("HOSTNAME") + '\n';
+        result += "XDG_CURRENT_DESKTOP=" + utils::get_environment_variable("XDG_CURRENT_DESKTOP") + '\n';
+        result += "XDG_SESSION_DESKTOP=" + utils::get_environment_variable("XDG_SESSION_DESKTOP") + '\n';
+        result += "XDG_SESSION_TYPE=" + utils::get_environment_variable("XDG_SESSION_TYPE") + '\n';
+#elif defined(SM_PLATFORM_WINDOWS)
+        result += "OS=" + utils::get_environment_variable("OS");  // TODO see if it works
+        result += "PROCESSOR_IDENTIFIER=" + utils::get_environment_variable("PROCESSOR_IDENTIFIER") + '\n';
+        result += "NUMBER_OF_PROCESSORS=" + utils::get_environment_variable("NUMBER_OF_PROCESSORS") + '\n';
+#endif
         result += opengl_debug::get_information();
         result += dependencies::get_information();
 
