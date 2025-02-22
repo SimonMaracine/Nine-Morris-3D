@@ -367,7 +367,15 @@ void NineMensMorrisBoard::update(sm::Ctx& ctx, glm::vec3 ray, glm::vec3 camera, 
         user_input
     );
 
-    update_pieces_highlight(user_input);
+    update_pieces_highlight(
+        [this](const PieceObj& piece) {
+            return (
+                m_capture_piece && static_cast<Player>(piece.get_type()) != m_position.player && piece.node_id != -1 ||
+                m_position.plies >= m_pieces.size() && static_cast<Player>(piece.get_type()) == m_position.player && !m_capture_piece
+            );
+        },
+        user_input
+    );
 
     ctx.render_3d()->add_node(m_board_model);
     m_board_model->add_node(m_paint_model);
@@ -806,7 +814,7 @@ void NineMensMorrisBoard::update_nodes_highlight(std::function<bool()>&& highlig
     }
 }
 
-void NineMensMorrisBoard::update_pieces_highlight(bool enabled) {
+void NineMensMorrisBoard::update_pieces_highlight(std::function<bool(const PieceObj&)>&& highlight, bool enabled) {
     if (!enabled) {
         for (PieceObj& piece : m_pieces) {
             piece.get_model()->get_material()->set_vec3("u_highlight_color"_H, glm::vec3(0.0f));
@@ -816,7 +824,11 @@ void NineMensMorrisBoard::update_pieces_highlight(bool enabled) {
     }
 
     for (PieceObj& piece : m_pieces) {
-        piece.get_model()->get_material()->set_vec3("u_highlight_color"_H, glm::vec3(0.0f));
+        if (piece.get_id() == m_hover_id && highlight(piece)) {
+            piece.get_model()->get_material()->set_vec3("u_highlight_color"_H, glm::vec3(0.1f));
+        } else {
+            piece.get_model()->get_material()->set_vec3("u_highlight_color"_H, glm::vec3(0.0f));
+        }
     }
 
     // Override, if the piece is actually selected
@@ -824,7 +836,7 @@ void NineMensMorrisBoard::update_pieces_highlight(bool enabled) {
         const int piece_id {m_nodes[m_select_id].piece_id};
 
         if (piece_id != -1) {
-            m_pieces[PIECE(piece_id)].get_model()->get_material()->set_vec3("u_highlight_color"_H, glm::vec3(0.15f));
+            m_pieces[PIECE(piece_id)].get_model()->get_material()->set_vec3("u_highlight_color"_H, glm::vec3(0.175f));
         }
     }
 }

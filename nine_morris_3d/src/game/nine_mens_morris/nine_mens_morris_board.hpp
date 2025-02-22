@@ -144,7 +144,7 @@ private:
     void initialize_objects();
 
     void update_nodes_highlight(std::function<bool()>&& highlight, bool enabled);
-    void update_pieces_highlight(bool enabled);
+    void update_pieces_highlight(std::function<bool(const PieceObj&)>&& highlight, bool enabled);
     void update_nodes(sm::Ctx& ctx);
     void update_pieces(sm::Ctx& ctx);
 
