@@ -8,10 +8,11 @@
 #include "daemon.hpp"
 #include "platform.hpp"
 
-#ifdef SM_BUILD_DISTRIBUTION
-    static constexpr const char* CONFIGURATION_DIRECTORY_PATH {"/etc/ninemorris3d"};
-    static constexpr const char* CONFIGURATION_FILE_PATH {"/etc/ninemorris3d/nine_morris_3d.json"};
-    static constexpr const char* LOG_FILE_PATH {"/var/log/ninemorris3d/nine_morris_3d.log"};
+#if defined(SM_BUILD_DISTRIBUTION) && defined(SM_PLATFORM_LINUX)
+    // Require a user named `ninemorris3d`
+    #define CONFIGURATION_DIRECTORY_PATH "/home/ninemorris3d/.ninemorris3dserver"
+    static constexpr const char* CONFIGURATION_FILE_PATH {CONFIGURATION_DIRECTORY_PATH "/nine_morris_3d.json"};
+    static constexpr const char* LOG_FILE_PATH {CONFIGURATION_DIRECTORY_PATH "/nine_morris_3d.log"};
     static constexpr auto SIGNAL_TYPE {SIGTERM};
 #else
     static constexpr const char* CONFIGURATION_FILE_PATH {"nine_morris_3d.json"};
@@ -32,7 +33,7 @@ int main() {
         return 1;
     }
 
-#ifdef SM_BUILD_DISTRIBUTION
+#if defined(SM_BUILD_DISTRIBUTION) && defined(SM_PLATFORM_LINUX)
     try {
         make_configuration_directory(CONFIGURATION_DIRECTORY_PATH);
     } catch (const ConfigurationError& e) {
