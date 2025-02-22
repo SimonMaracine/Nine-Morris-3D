@@ -13,7 +13,8 @@ Server::Server(const Configuration& configuration, const std::filesystem::path& 
 void Server::start(const Configuration& configuration) {
     m_server.get_logger()->set_level(spdlog::level::from_str(configuration.log_level));
 
-    m_server.get_logger()->info("Server version {}.{}.{}", VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH);
+    m_server.get_logger()->info("Version {}.{}.{}", VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH);
+    m_server.get_logger()->info("Build {} {}", __DATE__, __TIME__);
 
     m_server.start(configuration.port, configuration.max_clients);
 

@@ -132,13 +132,13 @@ namespace sm {
         }
 
         {
-            const auto iter {translations.find(g_localization.default_language)};
+            const auto iter_ {translations.find(g_localization.default_language)};
 
-            if (iter == translations.cend()) {
+            if (iter_ == translations.cend()) {
                 SM_THROW_ERROR(internal::ResourceError, "Could not find text in catalog");
             }
 
-            return iter->second.c_str();
+            return iter_->second.c_str();
         }
     }
 

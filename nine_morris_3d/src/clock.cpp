@@ -51,7 +51,11 @@ std::tuple<Clock::Time, Clock::Time, Clock::Time> Clock::split_time(Time time) {
     const auto result_minutes {std::div(static_cast<long long>(time), 1000ll * 60ll)};
     const auto result_seconds {std::div(static_cast<long long>(result_minutes.rem), 1000ll)};
 
-    return std::make_tuple(result_minutes.quot, result_seconds.quot, result_seconds.rem / 10);
+    return std::make_tuple(
+        static_cast<Clock::Time>(result_minutes.quot),
+        static_cast<Clock::Time>(result_seconds.quot),
+        static_cast<Clock::Time>(result_seconds.rem / 10)
+    );
 }
 
 void Clock::set_time(std::chrono::steady_clock::time_point& last_time) {

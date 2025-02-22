@@ -247,7 +247,7 @@ namespace sm {
         result += "XDG_SESSION_DESKTOP=" + utils::get_environment_variable("XDG_SESSION_DESKTOP") + '\n';
         result += "XDG_SESSION_TYPE=" + utils::get_environment_variable("XDG_SESSION_TYPE") + '\n';
 #elif defined(SM_PLATFORM_WINDOWS)
-        result += "OS=" + utils::get_environment_variable("OS");  // TODO see if it works
+        result += "OS=" + utils::get_environment_variable("OS") + '\n';
         result += "PROCESSOR_IDENTIFIER=" + utils::get_environment_variable("PROCESSOR_IDENTIFIER") + '\n';
         result += "NUMBER_OF_PROCESSORS=" + utils::get_environment_variable("NUMBER_OF_PROCESSORS") + '\n';
 #endif
