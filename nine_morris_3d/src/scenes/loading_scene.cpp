@@ -126,7 +126,7 @@ void LoadingScene::load_assets(sm::AsyncTask& task) {
         specification.object_name = "Board";
         specification.type = sm::MeshType::PNTT;
 
-        ctx.load_mesh(ctx.path_assets("models/board/board.obj"), specification);
+        ctx.load_mesh(ctx.path_assets("nine_mens_morris/board.obj"), specification);
 
         sm::TexturePostProcessing post_processing;
 
@@ -134,8 +134,8 @@ void LoadingScene::load_assets(sm::AsyncTask& task) {
             post_processing.size = sm::TextureSize::Half;
         }
 
-        ctx.load_texture_data(ctx.path_assets("textures/board/board_diffuse.png"), post_processing);
-        ctx.load_texture_data(ctx.path_assets("textures/board/board_normal.png"), post_processing);
+        ctx.load_texture_data(ctx.path_assets("nine_mens_morris/board_diffuse.png"), post_processing);
+        ctx.load_texture_data(ctx.path_assets("nine_mens_morris/board_normal.png"), post_processing);
     }
 
     if (task.stop_requested()) {
@@ -148,7 +148,7 @@ void LoadingScene::load_assets(sm::AsyncTask& task) {
         specification.object_name = "Paint";
         specification.type = sm::MeshType::PNTT;
 
-        ctx.load_mesh(ctx.path_assets("models/board/paint.obj"), specification);
+        ctx.load_mesh(ctx.path_assets("nine_mens_morris/paint.obj"), specification);
 
         sm::TexturePostProcessing post_processing;
 
@@ -156,16 +156,15 @@ void LoadingScene::load_assets(sm::AsyncTask& task) {
             post_processing.size = sm::TextureSize::Half;
         }
 
-        ctx.load_texture_data(ctx.path_assets("textures/board/paint_diffuse.png"), post_processing);
+        ctx.load_texture_data(ctx.path_assets("nine_mens_morris/paint_diffuse.png"), post_processing);
     }
 
     {
         sm::MeshSpecification specification;
         specification.object_name = "Node";
         specification.type = sm::MeshType::PN;
-        specification.flip_winding = true;
 
-        ctx.load_mesh(ctx.path_assets("models/node/node.obj"), specification);
+        ctx.load_mesh(ctx.path_assets("nine_mens_morris/node.obj"), specification);
     }
 
     if (task.stop_requested()) {
@@ -177,20 +176,8 @@ void LoadingScene::load_assets(sm::AsyncTask& task) {
         sm::MeshSpecification specification;
         specification.type = sm::MeshType::PNTT;
 
-        specification.object_name = "White_Piece";
-        ctx.load_mesh(ctx.path_assets("models/piece/piece_white.obj"), specification);
-
-        specification.object_name = "Black_Piece";
-        ctx.load_mesh(ctx.path_assets("models/piece/piece_black.obj"), specification);
-
-        specification.type = sm::MeshType::P;
-        specification.generate_adjacency_indices = true;
-
-        specification.object_name = "White_Piece";
-        ctx.load_mesh("piece_white.obj.adj"_H, ctx.path_assets("models/piece/piece_white.obj"), specification);
-
-        specification.object_name = "Black_Piece";
-        ctx.load_mesh("piece_black.obj.adj"_H, ctx.path_assets("models/piece/piece_black.obj"), specification);
+        specification.object_name = "Piece";
+        ctx.load_mesh(ctx.path_assets("nine_mens_morris/piece.obj"), specification);
 
         sm::TexturePostProcessing post_processing;
 
@@ -198,9 +185,9 @@ void LoadingScene::load_assets(sm::AsyncTask& task) {
             post_processing.size = sm::TextureSize::Half;
         }
 
-        ctx.load_texture_data(ctx.path_assets("textures/piece/piece_white_diffuse.png"), post_processing);
-        ctx.load_texture_data(ctx.path_assets("textures/piece/piece_black_diffuse.png"), post_processing);
-        ctx.load_texture_data(ctx.path_assets("textures/piece/piece_normal.png"), post_processing);
+        ctx.load_texture_data(ctx.path_assets("nine_mens_morris/piece_white_diffuse.png"), post_processing);
+        ctx.load_texture_data(ctx.path_assets("nine_mens_morris/piece_black_diffuse.png"), post_processing);
+        ctx.load_texture_data(ctx.path_assets("nine_mens_morris/piece_normal.png"), post_processing);
     }
 
     ctx.add_task_immediate([this]() {

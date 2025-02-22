@@ -29,6 +29,7 @@ public:
     float get_angle_around_point() const { return m_angle_around_point; }
 
     void set_distance_to_point(float distance_to_point);
+    void set_angle_around_point(float angle_around_point);
 
     // Call these every frame
     void update_controls(float dt, const sm::Ctx&) override;

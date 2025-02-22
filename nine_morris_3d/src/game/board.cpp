@@ -71,7 +71,7 @@ void BoardObj::enable_move_animations(bool enable) {
     m_enable_move_animations = enable;
 }
 
-void BoardObj::update_hover_id(glm::vec3 ray, glm::vec3 camera, std::function<std::vector<HoverableObj>()>&& get_hoverables) {
+void BoardObj::update_hover_id(glm::vec3 ray, glm::vec3 camera, std::function<std::vector<const HoverableObj*>()>&& get_hoverables) {
     if (camera.y < 0.0f) {
         m_hover_id = -1;
         return;
@@ -80,26 +80,27 @@ void BoardObj::update_hover_id(glm::vec3 ray, glm::vec3 camera, std::function<st
     auto hoverables {get_hoverables()};
 
     std::sort(hoverables.begin(), hoverables.end(), [camera](const auto& lhs, const auto& rhs) {
-        const auto left {glm::distance(lhs.get_model()->position, camera)};
-        const auto right {glm::distance(rhs.get_model()->position, camera)};
+        const auto left {glm::distance(lhs->get_position(), camera)};
+        const auto right {glm::distance(rhs->get_position(), camera)};
 
         return left > right;
     });
 
     bool hover {false};
 
-    for (const HoverableObj& hoverable : hoverables) {
+    for (const HoverableObj* hoverable : hoverables) {
         const glm::mat4 to_world_space {
-            transformation_matrix(hoverable.get_model()->position, hoverable.get_model()->rotation, hoverable.get_model()->scale)
+            transformation_matrix(hoverable->get_position(), hoverable->get_rotation(), hoverable->get_scale())
         };
 
         sm::utils::AABB aabb;
-        aabb.min = to_world_space * glm::vec4(hoverable.get_model()->get_aabb().min, 1.0f);
-        aabb.max = to_world_space * glm::vec4(hoverable.get_model()->get_aabb().max, 1.0f);
+        aabb.min = to_world_space * glm::vec4(hoverable->get_aabb().min, 1.0f);
+        aabb.max = to_world_space * glm::vec4(hoverable->get_aabb().max, 1.0f);
 
         if (ray_aabb_collision(ray, camera, aabb)) {
-            m_hover_id = hoverable.get_id();
+            m_hover_id = hoverable->get_id();
             hover = true;
+            break;
         }
     }
 

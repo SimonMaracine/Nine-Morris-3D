@@ -7,8 +7,8 @@ static constexpr float PIECE_MIN_VELOCITY_STRENGTH {0.01f};
 static constexpr float PIECE_MAX_VELOCITY_STRENGTH {1.0f};
 static constexpr float PIECE_DISTANCE_ERROR {0.001f};
 
-PieceObj::PieceObj(int id, std::shared_ptr<sm::OutlinedModelNode> model, glm::vec3 position, PieceType type)
-    : HoverableObj(id, model), m_type(type) {
+PieceObj::PieceObj(int id, glm::vec3 position, PieceType type, std::shared_ptr<sm::ModelNode> model)
+    : HoverableObj(id), m_type(type), m_model(model) {
     m_model->position = position;
 }
 

@@ -2,7 +2,7 @@
 
 #include <memory>
 #include <unordered_map>
-#include <vector>
+#include <unordered_set>
 
 #include <glm/glm.hpp>
 
@@ -32,13 +32,13 @@ namespace sm {
     private:
         std::shared_ptr<GlShader> m_shader;
 
-        std::vector<Id> m_uniforms_mat4;
-        std::vector<Id> m_uniforms_int;
-        std::vector<Id> m_uniforms_float;
-        std::vector<Id> m_uniforms_vec2;
-        std::vector<Id> m_uniforms_vec3;
-        std::vector<Id> m_uniforms_vec4;
-        std::vector<Id> m_textures;
+        std::unordered_set<Id, Hash> m_uniforms_mat4;
+        std::unordered_set<Id, Hash> m_uniforms_int;
+        std::unordered_set<Id, Hash> m_uniforms_float;
+        std::unordered_set<Id, Hash> m_uniforms_vec2;
+        std::unordered_set<Id, Hash> m_uniforms_vec3;
+        std::unordered_set<Id, Hash> m_uniforms_vec4;
+        std::unordered_set<Id, Hash> m_textures;
 
         friend class MaterialInstance;
     };

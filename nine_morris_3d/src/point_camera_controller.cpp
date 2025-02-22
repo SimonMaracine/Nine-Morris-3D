@@ -50,8 +50,7 @@ PointCameraController::PointCameraController(
     float pitch,
     float sensitivity
 )
-    : sm::CameraController(camera), sensitivity(sensitivity), m_pitch(pitch), m_point(point),
-    m_distance_to_point(distance_to_point) {
+    : sm::CameraController(camera), sensitivity(sensitivity), m_pitch(pitch), m_point(point), m_distance_to_point(distance_to_point) {
     camera.set_projection(width, height, LENS_FOV, LENS_NEAR, LENS_FAR);
     update_camera(1.0f);
 }
@@ -78,6 +77,11 @@ float PointCameraController::get_far() const {
 
 void PointCameraController::set_distance_to_point(float distance_to_point) {
     m_distance_to_point = distance_to_point;
+    update_camera(1.0f);
+}
+
+void PointCameraController::set_angle_around_point(float angle_around_point) {
+    m_angle_around_point = angle_around_point;
     update_camera(1.0f);
 }
 
