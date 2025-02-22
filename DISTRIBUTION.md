@@ -19,7 +19,7 @@ cd scripts
 ```txt
 cd scripts
 ./create_source_archive.sh ../build_dist/ X.Y.Z ../build_dist/nine_morris_3d/nine_morris_3d ../ \
-    ../build_dist/assets/icons/ ../distribution/nine_morris_3d/linux/nine_morris_3d.desktop \
+    ../build_dist/assets/icons/ ../distribution/nine_morris_3d/linux/ninemorris3d.desktop \
     ../build_dist/assets/ ../build_dist/assets_engine/
 ```
 
