@@ -7,47 +7,43 @@
 #include <cassert>
 
 #include <nine_morris_3d_engine/external/imgui.h++>
+#include <nine_morris_3d_engine/external/resmanager.h++>
 
 #define PIECE(index) (index - NineMensMorrisBoard::NODES)
 
-static constexpr float NODE_Y_POSITION {0.0751f};
 static const glm::vec3 NODE_POSITIONS[24] {
-    glm::vec3(2.046f, NODE_Y_POSITION, 2.062f),    // 0
-    glm::vec3(-0.008f, NODE_Y_POSITION, 2.089f),   // 1
-    glm::vec3(-2.101f, NODE_Y_POSITION, 2.076f),   // 2
-    glm::vec3(1.480f, NODE_Y_POSITION, 1.512f),    // 3
-    glm::vec3(0.001f, NODE_Y_POSITION, 1.513f),    // 4
-    glm::vec3(-1.509f, NODE_Y_POSITION, 1.502f),   // 5
-    glm::vec3(0.889f, NODE_Y_POSITION, 0.898f),    // 6
-    glm::vec3(0.001f, NODE_Y_POSITION, 0.906f),    // 7
-    glm::vec3(-0.930f, NODE_Y_POSITION, 0.892f),   // 8
-    glm::vec3(2.058f, NODE_Y_POSITION, 0.031f),    // 9
-    glm::vec3(1.481f, NODE_Y_POSITION, 0.025f),    // 10
-    glm::vec3(0.894f, NODE_Y_POSITION, 0.026f),    // 11
-    glm::vec3(-0.934f, NODE_Y_POSITION, 0.050f),   // 12
-    glm::vec3(-1.508f, NODE_Y_POSITION, 0.050f),   // 13
-    glm::vec3(-2.083f, NODE_Y_POSITION, 0.047f),   // 14
-    glm::vec3(0.882f, NODE_Y_POSITION, -0.894f),   // 15
-    glm::vec3(0.011f, NODE_Y_POSITION, -0.900f),   // 16
-    glm::vec3(-0.930f, NODE_Y_POSITION, -0.890f),  // 17
-    glm::vec3(1.477f, NODE_Y_POSITION, -1.455f),   // 18
-    glm::vec3(0.006f, NODE_Y_POSITION, -1.463f),   // 19
-    glm::vec3(-1.493f, NODE_Y_POSITION, -1.458f),  // 20
-    glm::vec3(2.063f, NODE_Y_POSITION, -2.046f),   // 21
-    glm::vec3(0.001f, NODE_Y_POSITION, -2.061f),   // 22
-    glm::vec3(-2.081f, NODE_Y_POSITION, -2.045f)   // 23
+    glm::vec3(1.846f, 0.0f, 1.812f),    // 0
+    glm::vec3(-0.004f, 0.0f, 1.819f),   // 1
+    glm::vec3(-1.831f, 0.0f, 1.816f),   // 2
+    glm::vec3(1.330f, 0.0f, 1.292f),    // 3
+    glm::vec3(-0.009f, 0.0f, 1.293f),   // 4
+    glm::vec3(-1.309f, 0.0f, 1.292f),   // 5
+    glm::vec3(0.829f, 0.0f, 0.788f),    // 6
+    glm::vec3(-0.010f, 0.0f, 0.786f),   // 7
+    glm::vec3(-0.790f, 0.0f, 0.792f),   // 8
+    glm::vec3(1.858f, 0.0f, -0.039f),   // 9
+    glm::vec3(1.331f, 0.0f, -0.045f),   // 10
+    glm::vec3(0.824f, 0.0f, -0.044f),   // 11
+    glm::vec3(-0.794f, 0.0f, -0.020f),  // 12
+    glm::vec3(-1.318f, 0.0f, -0.020f),  // 13
+    glm::vec3(-1.823f, 0.0f, -0.023f),  // 14
+    glm::vec3(0.822f, 0.0f, -0.804f),   // 15
+    glm::vec3(0.001f, 0.0f, -0.800f),   // 16
+    glm::vec3(-0.800f, 0.0f, -0.800f),  // 17
+    glm::vec3(1.337f, 0.0f, -1.335f),   // 18
+    glm::vec3(0.000f, 0.0f, -1.333f),   // 19
+    glm::vec3(-1.313f, 0.0f, -1.338f),  // 20
+    glm::vec3(1.853f, 0.0f, -1.836f),   // 21
+    glm::vec3(0.000f, 0.0f, -1.841f),   // 22
+    glm::vec3(-1.821f, 0.0f, -1.835f)   // 23
 };
-
-static constexpr float BOARD_SCALE {1.0f};
-static constexpr float PAINT_Y_POSITION {0.049f};
 
 static const glm::vec3 RED {0.996f, 0.443f, 0.443f};
 static const glm::vec3 ORANGE {1.0f, 0.733f, 0.36f};
 static const glm::vec3 GRAY {0.827f, 0.827f, 0.85f};
 
 static constexpr float PIECE_X_POSITION_OFFSET {3.0f};
-static constexpr float PIECE_Y_POSITION_AIR_INITIAL {0.5f};
-static constexpr float PIECE_Y_POSITION_BOARD {0.139f};
+static constexpr float PIECE_Y_POSITION_AIR_INITIAL {0.45f};
 static constexpr float PIECE_Y_POSITION_AIR_MOVE {0.75f};
 static constexpr float PIECE_Y_POSITION_AIR_TAKE {2.0f};
 static constexpr float PIECE_Z_POSITION_MULTIPLIER {0.5f};
@@ -238,10 +234,7 @@ NineMensMorrisBoard::NineMensMorrisBoard(
 )
     : m_move_callback(std::move(move_callback)) {
     m_board_model = board;
-    m_board_model->scale = BOARD_SCALE;
-
     m_paint_model = paint;
-    m_paint_model->position.y = PAINT_Y_POSITION;
 
     m_sound_piece_place1 = sound_piece_place1;
     m_sound_piece_place2 = sound_piece_place2;
@@ -326,7 +319,7 @@ void NineMensMorrisBoard::setup_pieces(bool animate) {
             do_place_animation(m_pieces[PIECE(id)], m_nodes[i], [](PieceObj&) {});
         } else {
             m_pieces[PIECE(id)].get_model()->position = (
-                glm::vec3(m_nodes[i].get_model()->position.x, PIECE_Y_POSITION_BOARD, m_nodes[i].get_model()->position.z)
+                glm::vec3(m_nodes[i].get_position().x, 0.0f, m_nodes[i].get_position().z)
             );
         }
     }
@@ -344,10 +337,12 @@ void NineMensMorrisBoard::setup_pieces(bool animate) {
 void NineMensMorrisBoard::update(sm::Ctx& ctx, glm::vec3 ray, glm::vec3 camera, bool user_input) {
     if (user_input) {
         update_hover_id(ray, camera, [this]() {
-            std::vector<HoverableObj> hoverables;
+            std::vector<const HoverableObj*> hoverables;
 
             for (const NodeObj& node : m_nodes) {
-                hoverables.push_back(node);
+                if (node.piece_id == -1) {
+                    hoverables.push_back(&node);
+                }
             }
 
             for (const PieceObj& piece : m_pieces) {
@@ -355,7 +350,7 @@ void NineMensMorrisBoard::update(sm::Ctx& ctx, glm::vec3 ray, glm::vec3 camera, 
                     continue;
                 }
 
-                hoverables.push_back(piece);
+                hoverables.push_back(&piece);
             }
 
             return hoverables;
@@ -372,15 +367,7 @@ void NineMensMorrisBoard::update(sm::Ctx& ctx, glm::vec3 ray, glm::vec3 camera, 
         user_input
     );
 
-    update_pieces_highlight(
-        [this](const PieceObj& piece) {
-            return (
-                m_capture_piece && static_cast<Player>(piece.get_type()) != m_position.player && piece.node_id != -1 ||
-                m_position.plies >= m_pieces.size() && static_cast<Player>(piece.get_type()) == m_position.player && !m_capture_piece
-            );
-        },
-        user_input
-    );
+    update_pieces_highlight(user_input);
 
     ctx.render_3d()->add_node(m_board_model);
     m_board_model->add_node(m_paint_model);
@@ -740,7 +727,7 @@ void NineMensMorrisBoard::initialize_objects(const NodeModels& nodes, const Piec
     assert(white_pieces.size() + black_pieces.size() == NINE || white_pieces.size() + black_pieces.size() == TWELVE);
 
     for (int i {0}; i < NODES; i++) {
-        m_nodes[i] = NodeObj(i, nodes[i], NODE_POSITIONS[i]);
+        m_nodes[i] = NodeObj(i, NODE_POSITIONS[i], nodes[i]);
     }
 
     // Thus it always contains the correct number of pieces
@@ -751,28 +738,28 @@ void NineMensMorrisBoard::initialize_objects(const NodeModels& nodes, const Piec
     for (int i {0}; i < m_pieces.size() / 2; i++) {
         m_pieces[i] = PieceObj(
             i + NODES,
-            white_pieces[i],
             glm::vec3(
-                -PIECE_X_POSITION_OFFSET,
+                PIECE_X_POSITION_OFFSET,
                 PIECE_Y_POSITION_AIR_INITIAL,
                 static_cast<float>(i) * PIECE_Z_POSITION_MULTIPLIER -
                     (m_pieces.size() == NINE ? PIECE_Z_POSITION_OFFSET_NINE : PIECE_Z_POSITION_OFFSET_TWELVE)
             ),
-            PieceType::White
+            PieceType::White,
+            white_pieces[i]
         );
     }
 
     for (int i {m_pieces.size() / 2}; i < m_pieces.size(); i++) {
         m_pieces[i] = PieceObj(
             i + NODES,
-            black_pieces[i - m_pieces.size() / 2],
             glm::vec3(
-                PIECE_X_POSITION_OFFSET,
+                -PIECE_X_POSITION_OFFSET,
                 PIECE_Y_POSITION_AIR_INITIAL,
                 static_cast<float>(i - m_pieces.size() / 2) * -PIECE_Z_POSITION_MULTIPLIER +
                     (m_pieces.size() == NINE ? PIECE_Z_POSITION_OFFSET_NINE : PIECE_Z_POSITION_OFFSET_TWELVE)
             ),
-            PieceType::Black
+            PieceType::Black,
+            black_pieces[i - m_pieces.size() / 2]
         );
     }
 }
@@ -787,11 +774,11 @@ void NineMensMorrisBoard::initialize_objects() {
     }
 
     for (int i {0}; i < m_pieces.size() / 2; i++) {
-        white_pieces.push_back(m_pieces[i].get_model<sm::OutlinedModelNode>());
+        white_pieces.push_back(m_pieces[i].get_model());
     }
 
     for (int i {m_pieces.size() / 2}; i < m_pieces.size(); i++) {
-        black_pieces.push_back(m_pieces[i].get_model<sm::OutlinedModelNode>());
+        black_pieces.push_back(m_pieces[i].get_model());
     }
 
     initialize_objects(nodes, white_pieces, black_pieces);
@@ -819,22 +806,17 @@ void NineMensMorrisBoard::update_nodes_highlight(std::function<bool()>&& highlig
     }
 }
 
-void NineMensMorrisBoard::update_pieces_highlight(std::function<bool(const PieceObj&)>&& highlight, bool enabled) {
+void NineMensMorrisBoard::update_pieces_highlight(bool enabled) {
     if (!enabled) {
         for (PieceObj& piece : m_pieces) {
-            piece.get_model<sm::OutlinedModelNode>()->outline = sm::NodeFlag::Inherited;
+            piece.get_model()->get_material()->set_vec3("u_highlight_color"_H, glm::vec3(0.0f));
         }
 
         return;
     }
 
     for (PieceObj& piece : m_pieces) {
-        if (piece.get_id() == m_hover_id && highlight(piece)) {
-        piece.get_model<sm::OutlinedModelNode>()->outline = sm::NodeFlag::Enabled;
-        piece.get_model<sm::OutlinedModelNode>()->outline_color = m_capture_piece ? GRAY : ORANGE;
-        } else {
-            piece.get_model<sm::OutlinedModelNode>()->outline = sm::NodeFlag::Inherited;
-        }
+        piece.get_model()->get_material()->set_vec3("u_highlight_color"_H, glm::vec3(0.0f));
     }
 
     // Override, if the piece is actually selected
@@ -842,8 +824,7 @@ void NineMensMorrisBoard::update_pieces_highlight(std::function<bool(const Piece
         const int piece_id {m_nodes[m_select_id].piece_id};
 
         if (piece_id != -1) {
-            m_pieces[piece_id - NODES].get_model<sm::OutlinedModelNode>()->outline = sm::NodeFlag::Enabled;
-            m_pieces[piece_id - NODES].get_model<sm::OutlinedModelNode>()->outline_color = RED;
+            m_pieces[PIECE(piece_id)].get_model()->get_material()->set_vec3("u_highlight_color"_H, glm::vec3(0.15f));
         }
     }
 }
@@ -863,8 +844,8 @@ void NineMensMorrisBoard::update_pieces(sm::Ctx& ctx) {
 void NineMensMorrisBoard::do_place_animation(PieceObj& piece, const NodeObj& node, PieceObj::OnFinish&& on_finish) const {
     const glm::vec3 origin {piece.get_model()->position};
     const glm::vec3 target0 {piece.get_model()->position.x, PIECE_Y_POSITION_AIR_MOVE, piece.get_model()->position.z};
-    const glm::vec3 target1 {node.get_model()->position.x, PIECE_Y_POSITION_AIR_MOVE, node.get_model()->position.z};
-    const glm::vec3 target {node.get_model()->position.x, PIECE_Y_POSITION_BOARD, node.get_model()->position.z};
+    const glm::vec3 target1 {node.get_position().x, PIECE_Y_POSITION_AIR_MOVE, node.get_position().z};
+    const glm::vec3 target {node.get_position().x, 0.0f, node.get_position().z};
 
     piece.move_three_step(origin, target0, target1, target, [this, on_finish = std::move(on_finish)](PieceObj& piece) {
         on_finish(piece);
@@ -875,7 +856,7 @@ void NineMensMorrisBoard::do_place_animation(PieceObj& piece, const NodeObj& nod
 void NineMensMorrisBoard::do_move_animation(PieceObj& piece, const NodeObj& node, PieceObj::OnFinish&& on_finish, bool direct) const {
     if (direct) {
         const glm::vec3 origin {piece.get_model()->position};
-        const glm::vec3 target {node.get_model()->position.x, PIECE_Y_POSITION_BOARD, node.get_model()->position.z};
+        const glm::vec3 target {node.get_position().x, 0.0f, node.get_position().z};
 
         sm::Ctx::play_audio_sound(sm::utils::choice({m_sound_piece_move1, m_sound_piece_move2, m_sound_piece_move3}));
 
@@ -883,8 +864,8 @@ void NineMensMorrisBoard::do_move_animation(PieceObj& piece, const NodeObj& node
     } else {
         const glm::vec3 origin {piece.get_model()->position};
         const glm::vec3 target0 {piece.get_model()->position.x, PIECE_Y_POSITION_AIR_MOVE, piece.get_model()->position.z};
-        const glm::vec3 target1 {node.get_model()->position.x, PIECE_Y_POSITION_AIR_MOVE, node.get_model()->position.z};
-        const glm::vec3 target {node.get_model()->position.x, PIECE_Y_POSITION_BOARD, node.get_model()->position.z};
+        const glm::vec3 target1 {node.get_position().x, PIECE_Y_POSITION_AIR_MOVE, node.get_position().z};
+        const glm::vec3 target {node.get_position().x, 0.0f, node.get_position().z};
 
         sm::Ctx::play_audio_sound(sm::utils::choice({m_sound_piece_capture1, m_sound_piece_capture2}));
 

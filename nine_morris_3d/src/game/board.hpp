@@ -57,7 +57,7 @@ public:
     void enable_move_callback(bool enable);
     void enable_move_animations(bool enable);
 protected:
-    void update_hover_id(glm::vec3 ray, glm::vec3 camera, std::function<std::vector<HoverableObj>()>&& get_hoverables);
+    void update_hover_id(glm::vec3 ray, glm::vec3 camera, std::function<std::vector<const HoverableObj*>()>&& get_hoverables);
 
     bool m_enable_move_callback {true};
     bool m_enable_move_animations {true};

@@ -272,13 +272,13 @@ void NineMensMorrisBaseScene::load_game_icons() {
 
     m_icon_white = ctx.load_texture(
         "icon_white"_H,
-        ctx.load_texture_data(ctx.path_assets("textures/icons/icon_white.png"), post_processing),
+        ctx.load_texture_data(ctx.path_assets("icons/nine_mens_morris/icon_white.png"), post_processing),
         specification
     );
 
     m_icon_black = ctx.load_texture(
         "icon_black"_H,
-        ctx.load_texture_data(ctx.path_assets("textures/icons/icon_black.png"), post_processing),
+        ctx.load_texture_data(ctx.path_assets("icons/nine_mens_morris/icon_black.png"), post_processing),
         specification
     );
 }
@@ -402,7 +402,7 @@ std::shared_ptr<sm::ModelNode> NineMensMorrisBaseScene::setup_paint() const {
     const auto material {ctx.load_material(
         "paint"_H,
         ctx.path_engine_assets("shaders/phong_diffuse_normal_shadow.vert"),
-        ctx.path_assets("shaders/board/phong_diffuse_normal_shadow.frag"),
+        ctx.path_assets("shaders/nine_mens_morris/board/phong_diffuse_normal_shadow.frag"),
         sm::MaterialType::PhongDiffuseNormalShadow
     )};
 
@@ -443,16 +443,21 @@ NineMensMorrisBoard::NodeModels NineMensMorrisBaseScene::setup_nodes() const {
 }
 
 NineMensMorrisBoard::PieceModels NineMensMorrisBaseScene::setup_white_pieces() const {
-    const auto mesh {ctx.get_mesh("piece_white.obj"_H)};
-    const auto mesh_adj {ctx.get_mesh("piece_white.obj.adj"_H)};
+    const auto mesh {ctx.get_mesh("piece.obj"_H)};
 
-    const auto vertex_array {ctx.load_vertex_array("piece_white"_H, mesh)};
-    const auto vertex_array_adj {ctx.load_vertex_array("piece_white_adj"_H, mesh_adj)};
+    const auto vertex_array {ctx.load_vertex_array("piece"_H, mesh)};
 
     const auto diffuse {load_piece_white_diffuse_texture()};
     const auto normal {load_piece_normal_texture()};
 
-    const auto material {ctx.load_material(sm::MaterialType::PhongDiffuseNormalShadow)};
+    const auto material {ctx.load_material(
+        "piece"_H,
+        ctx.path_engine_assets("shaders/phong_diffuse_normal_shadow.vert"),
+        ctx.path_assets("shaders/nine_mens_morris/piece/phong_diffuse_normal_shadow.frag"),
+        sm::MaterialType::PhongDiffuseNormalShadow
+    )};
+
+    material->add_uniform(sm::Material::Uniform::Vec3, "u_highlight_color"_H);
 
     NineMensMorrisBoard::PieceModels models;
 
@@ -463,23 +468,28 @@ NineMensMorrisBoard::PieceModels NineMensMorrisBaseScene::setup_white_pieces() c
         material_instance->set_float("u_material.shininess"_H, 8.0f);
         material_instance->set_texture("u_material.normal"_H, normal, 1);
 
-        models.push_back(std::make_shared<sm::OutlinedModelNode>(mesh, vertex_array, material_instance, mesh_adj, vertex_array_adj));
+        models.push_back(std::make_shared<sm::ModelNode>(mesh, vertex_array, material_instance));
     }
 
     return models;
 }
 
 NineMensMorrisBoard::PieceModels NineMensMorrisBaseScene::setup_black_pieces() const {
-    const auto mesh {ctx.get_mesh("piece_black.obj"_H)};
-    const auto mesh_adj {ctx.get_mesh("piece_black.obj.adj"_H)};
+    const auto mesh {ctx.get_mesh("piece.obj"_H)};
 
-    const auto vertex_array {ctx.load_vertex_array("piece_black"_H, mesh)};
-    const auto vertex_array_adj {ctx.load_vertex_array("piece_black_adj"_H, mesh_adj)};
+    const auto vertex_array {ctx.load_vertex_array("piece"_H, mesh)};
 
     const auto diffuse {load_piece_black_diffuse_texture()};
     const auto normal {load_piece_normal_texture()};
 
-    const auto material {ctx.load_material(sm::MaterialType::PhongDiffuseNormalShadow)};
+    const auto material {ctx.load_material(
+        "piece"_H,
+        ctx.path_engine_assets("shaders/phong_diffuse_normal_shadow.vert"),
+        ctx.path_assets("shaders/nine_mens_morris/piece/phong_diffuse_normal_shadow.frag"),
+        sm::MaterialType::PhongDiffuseNormalShadow
+    )};
+
+    material->add_uniform(sm::Material::Uniform::Vec3, "u_highlight_color"_H);
 
     NineMensMorrisBoard::PieceModels models;
 
@@ -490,7 +500,7 @@ NineMensMorrisBoard::PieceModels NineMensMorrisBaseScene::setup_black_pieces() c
         material_instance->set_float("u_material.shininess"_H, 8.0f);
         material_instance->set_texture("u_material.normal"_H, normal, 1);
 
-        models.push_back(std::make_shared<sm::OutlinedModelNode>(mesh, vertex_array, material_instance, mesh_adj, vertex_array_adj));
+        models.push_back(std::make_shared<sm::ModelNode>(mesh, vertex_array, material_instance));
     }
 
     return models;

@@ -14,28 +14,28 @@ namespace sm {
     void Material::add_uniform(Uniform type, Id name) {
         switch (type) {
             case Uniform::Mat4:
-                m_uniforms_mat4.push_back(name);
+                m_uniforms_mat4.insert(name);
                 break;
             case Uniform::Int:
-                m_uniforms_int.push_back(name);
+                m_uniforms_int.insert(name);
                 break;
             case Uniform::Float:
-                m_uniforms_float.push_back(name);
+                m_uniforms_float.insert(name);
                 break;
             case Uniform::Vec2:
-                m_uniforms_vec2.push_back(name);
+                m_uniforms_vec2.insert(name);
                 break;
             case Uniform::Vec3:
-                m_uniforms_vec3.push_back(name);
+                m_uniforms_vec3.insert(name);
                 break;
             case Uniform::Vec4:
-                m_uniforms_vec4.push_back(name);
+                m_uniforms_vec4.insert(name);
                 break;
         }
     }
 
     void Material::add_texture(Id name) {
-        m_textures.push_back(name);
+        m_textures.insert(name);
     }
 
     MaterialInstance::MaterialInstance(std::shared_ptr<Material> material) {

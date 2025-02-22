@@ -2,12 +2,12 @@
 
 #include <nine_morris_3d_engine/nine_morris_3d.hpp>
 
-// Generic visual object that can be hovered with the mouse pointer
+// Generic object that can be hovered with the mouse pointer
 class HoverableObj {
 public:
     HoverableObj() = default;
-    HoverableObj(int id, std::shared_ptr<sm::ModelNode> model)
-        : m_id(id), m_model(model) {}
+    explicit HoverableObj(int id)
+        : m_id(id) {}
 
     virtual ~HoverableObj() = default;
 
@@ -16,13 +16,12 @@ public:
     HoverableObj(HoverableObj&&) = default;
     HoverableObj& operator=(HoverableObj&&) = default;
 
-    int get_id() const { return m_id; }
+    virtual glm::vec3 get_position() const = 0;
+    virtual glm::vec3 get_rotation() const = 0;
+    virtual float get_scale() const = 0;
+    virtual const sm::utils::AABB& get_aabb() const = 0;
 
-    template<typename Node = sm::ModelNode>
-    std::shared_ptr<Node> get_model() const {
-        return std::dynamic_pointer_cast<Node>(m_model);
-    }
+    int get_id() const { return m_id; }
 protected:
     int m_id {-1};
-    std::shared_ptr<sm::ModelNode> m_model;
 };

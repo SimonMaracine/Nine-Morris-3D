@@ -2,8 +2,8 @@
 
 #include <nine_morris_3d_engine/external/resmanager.h++>
 
-NodeObj::NodeObj(int id, std::shared_ptr<sm::ModelNode> model, glm::vec3 position)
-    : HoverableObj(id, model) {
+NodeObj::NodeObj(int id, glm::vec3 position, std::shared_ptr<sm::ModelNode> model)
+    : HoverableObj(id), m_model(model) {
     m_model->position = position;
 }
 

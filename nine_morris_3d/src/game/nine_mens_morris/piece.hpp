@@ -22,10 +22,16 @@ public:
     using OnFinish = std::function<void(PieceObj&)>;
 
     PieceObj() = default;
-    PieceObj(int id, std::shared_ptr<sm::OutlinedModelNode> model, glm::vec3 position, PieceType type);
+    PieceObj(int id, glm::vec3 position, PieceType type, std::shared_ptr<sm::ModelNode> model);
+
+    glm::vec3 get_position() const override { return m_model->position; }
+    glm::vec3 get_rotation() const override { return m_model->rotation; }
+    float get_scale() const override { return m_model->scale; }
+    const sm::utils::AABB& get_aabb() const override { return m_model->get_aabb(); }
 
     PieceType get_type() const { return m_type; }
     bool is_moving() const { return m_movement != PieceMovement::None; }
+    std::shared_ptr<sm::ModelNode> get_model() const { return m_model; }
 
     void update(sm::Ctx& ctx);
     void update_movement();
@@ -52,4 +58,6 @@ private:
     bool m_reached_target0 {false};
     bool m_reached_target1 {false};
     OnFinish m_on_finish;
+
+    std::shared_ptr<sm::ModelNode> m_model;
 };

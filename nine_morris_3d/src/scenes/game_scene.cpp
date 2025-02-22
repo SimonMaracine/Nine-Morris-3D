@@ -682,6 +682,8 @@ void GameScene::setup_camera() {
 
     m_camera_controller->connect_events(ctx);
 
+    m_camera_controller->set_angle_around_point(180.0f);
+
     m_white_camera_position = m_camera_controller->get_position();
     m_black_camera_position = glm::vec3(m_white_camera_position.x, m_white_camera_position.y, -m_white_camera_position.z);
 
@@ -753,7 +755,7 @@ void GameScene::load_icons() {
 
     m_icon_wait = ctx.load_texture(
         "icon_wait"_H,
-        ctx.load_texture_data(ctx.path_assets("textures/icons/icon_wait.png"), post_processing),
+        ctx.load_texture_data(ctx.path_assets("icons/nine_mens_morris/icon_wait.png"), post_processing),
         specification
     );
 }
