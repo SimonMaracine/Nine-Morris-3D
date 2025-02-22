@@ -22,7 +22,7 @@ void game_start(sm::Ctx& ctx) {
     switch (g.options.language) {
         case LanguageEnglish:
             sm::localization::set_language("en"_H);
-            sm::localization::set_locale("en_US.UTF-8");  // TODO test on Windows
+            sm::localization::set_locale("en_US.UTF-8");
             break;
         case LanguageRomanian:
             sm::localization::set_language("ro"_H);

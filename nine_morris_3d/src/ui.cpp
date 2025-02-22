@@ -966,7 +966,7 @@ void Ui::analyze_games_window(GameScene& game_scene) {
                         ImGui::TableSetColumnIndex(0);
 
                         char buffer[22] {};
-                        std::snprintf(buffer, sizeof(buffer), "%lu.", i + 1);
+                        std::snprintf(buffer, sizeof(buffer), "%zu.", i + 1);
 
                         if (ImGui::Selectable(buffer, false, ImGuiSelectableFlags_SpanAllColumns | ImGuiSelectableFlags_NoAutoClosePopups)) {
                             game_scene.resign_leave_session_and_reset();
@@ -976,15 +976,15 @@ void Ui::analyze_games_window(GameScene& game_scene) {
 
                         ImGui::TableSetColumnIndex(1);
                         {
-                            char buffer[64] {};
+                            char buffer_[64] {};
                             const std::tm* game_time {std::localtime(&saved_games[i].game_time)};
 
                             if (game_time != nullptr) {
                                 // https://en.cppreference.com/w/cpp/chrono/c/strftime
-                                std::strftime(buffer, sizeof(buffer), "%a %b %d %Y %H:%M", game_time);
+                                std::strftime(buffer_, sizeof(buffer_), "%a %b %d %Y %H:%M", game_time);
                             }
 
-                            ImGui::Text("%s", buffer);
+                            ImGui::Text("%s", buffer_);
                         }
                         ImGui::TableSetColumnIndex(2);
                         ImGui::Text("%s", to_string(saved_games[i].game_type));

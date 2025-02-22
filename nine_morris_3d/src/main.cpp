@@ -28,13 +28,13 @@ static void get_paths([[maybe_unused]] Paths& paths) {
 #else
 
 #if defined(SM_PLATFORM_LINUX)
-    const std::filesystem::path home {sm::utils::get_environment_variable("HOME")};
+    const std::filesystem::path home {sm::utils::get_environment_variable_ex("HOME")};
 
     paths.logs = home / ".ninemorris3d";
     paths.saved_data = home / ".ninemorris3d";
     paths.assets = "/usr/local/share/ninemorris3d";
 #elif defined(SM_PLATFORM_WINDOWS)
-    const std::filesystem::path home {sm::utils::get_environment_variable("HOMEPATH")};
+    const std::filesystem::path home {sm::utils::get_environment_variable_ex("HOMEPATH")};
 
     paths.logs = home / "Documents\\Nine Morris 3D";
     paths.saved_data = home / "Documents\\Nine Morris 3D";
